@@ -1,0 +1,5 @@
+.worktrees/
+pipeline/.venv/
+pipeline/places.json
+__pycache__/
+*.pyc
