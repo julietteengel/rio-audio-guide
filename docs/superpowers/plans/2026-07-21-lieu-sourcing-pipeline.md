@@ -6,7 +6,7 @@
 
 **Architecture:** Un module Python par source de données (`overture.py`, `wikidata.py`, `feiras.py`), un module de déduplication pur sans dépendance réseau (`dedup.py`), et un orchestrateur (`pipeline.py`) qui combine tout et écrit le JSON final. Chaque module de source sépare sa logique pure (testable sans réseau, avec mocks/fixtures) de son appel réseau (testé en intégration).
 
-**Tech Stack:** Python 3.11+ (éviter 3.14, incompatibilités SSL constatées avec certaines libs sur macOS), `duckdb` (requêtes Overture via S3 parquet), `requests` (Wikidata SPARQL, Nominatim, PDF), `pdfplumber` (extraction de tableau PDF), `pytest`.
+**Tech Stack:** Python 3.11+ (vérifié en pratique dans Task 1 : `requests` et `duckdb` gèrent leurs propres certificats TLS et fonctionnent bien même sur Python 3.14 ; le souci SSL rencontré plus tôt en conception était spécifique à `urllib` brut, non utilisé ici — pas de contrainte de version stricte au-delà de 3.11+), `duckdb` (requêtes Overture via S3 parquet), `requests` (Wikidata SPARQL, Nominatim, PDF), `pdfplumber` (extraction de tableau PDF), `pytest`.
 
 ## Global Constraints
 
@@ -57,8 +57,8 @@ pipeline/
 - [ ] **Step 1: Créer la structure du projet**
 
 ```bash
-mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline/sourcing
-mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline/tests
+mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline/sourcing
+mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline/tests
 ```
 
 - [ ] **Step 2: Créer `pyproject.toml`**
@@ -68,7 +68,7 @@ mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline/tests
 name = "rio-audio-guide-sourcing"
 version = "0.1.0"
 description = "Location sourcing pipeline for Rio Audio Guide"
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.11"
 dependencies = [
     "duckdb>=1.5.0",
     "requests>=2.32.0",
@@ -85,13 +85,13 @@ testpaths = ["tests"]
 - [ ] **Step 3: Créer un venv et installer les dépendances**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline
-python3.12 -m venv .venv
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-Expected: installation sans erreur. Si `python3.12` n'est pas disponible, utiliser la version 3.11/3.12 la plus proche installée (`python3 --version` pour vérifier).
+Expected: installation sans erreur, quelle que soit la version 3.11+ disponible (vérifié fonctionnel avec 3.14 sur cette machine, `python3 --version` pour vérifier).
 
 - [ ] **Step 4: Écrire le test qui échoue**
 
@@ -125,7 +125,7 @@ def test_place_wikidata_qid_defaults_to_none():
 - [ ] **Step 5: Lancer le test, vérifier qu'il échoue**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline
 pytest tests/test_models.py -v
 ```
 
@@ -167,7 +167,7 @@ Expected: `3 passed`.
 - [ ] **Step 8: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/pyproject.toml pipeline/sourcing/__init__.py pipeline/sourcing/models.py pipeline/tests/test_models.py
 git commit -m "Add sourcing pipeline scaffolding and Place model"
 ```
@@ -318,7 +318,7 @@ Expected: `7 passed`.
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/sourcing/dedup.py pipeline/tests/test_dedup.py
 git commit -m "Add name normalization and cross-source deduplication logic"
 ```
@@ -447,7 +447,7 @@ Expected: `4 passed`. Le 4e test (`test_query_overture_places_returns_known_land
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/sourcing/overture.py pipeline/tests/test_overture.py
 git commit -m "Add Overture Maps query module with tourism category allowlist"
 ```
@@ -575,7 +575,7 @@ Expected: `2 passed`.
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/sourcing/wikidata.py pipeline/tests/test_wikidata.py
 git commit -m "Add Wikidata SPARQL query for IPHAN-listed heritage sites"
 ```
@@ -789,7 +789,7 @@ Expected: un nombre de feiras proche de 165 (total actif connu), avec au moins u
 - [ ] **Step 6: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/sourcing/feiras.py pipeline/tests/test_feiras.py
 git commit -m "Add feiras livres PDF parsing and Nominatim geocoding"
 ```
@@ -926,7 +926,7 @@ Expected: tous les tests passent (le test d'intégration Overture de Task 3 incl
 - [ ] **Step 6: Exécution réelle du pipeline complet**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline
 python -m sourcing.pipeline
 ```
 
@@ -935,7 +935,7 @@ Expected: un fichier `places.json` créé avec une liste de lieux candidats pour
 - [ ] **Step 7: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 echo "pipeline/places.json" >> .gitignore
 echo "pipeline/.venv/" >> .gitignore
 git add pipeline/sourcing/pipeline.py pipeline/tests/test_pipeline.py .gitignore
