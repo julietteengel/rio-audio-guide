@@ -48,7 +48,7 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 
 **LLM de génération** : Claude (Sonnet) ou GPT-4o, à comparer concrètement sur 3-4 lieux tests avant de trancher. Le coût du modèle n'est pas le facteur limitant vu le volume (quelques centaines de générations, one-shot) — le critère de choix est la fidélité aux faits sources (pas d'invention) et la qualité multilingue naturelle (PT/ES/EN, pas des traductions mot à mot).
 
-**Public visé** : une seule version adulte par lieu/langue pour la v1 (pas de variantes enfant/ado). Multiplier par 3 les scripts et l'audio par lieu triplerait la charge de relecture humaine et le coût TTS pour un MVP — à reconsidérer en Phase 2 si une vraie demande émerge (ex: un partenaire hôtel famille).
+**Public visé — décision révisée** : 3 versions par lieu/langue (adulte / ado / enfant), avec **texte différent par public** (vocabulaire/ton adapté), pas juste la voix. Décision assumée en connaissance de cause : ça triple la charge de relecture éditoriale ET le coût TTS par rapport à une version adulte unique (9 scripts + 9 audios par lieu au lieu de 3, en comptant les 3 langues). Le scope MVP n'est donc plus "minimal" sur cet axe — choix produit délibéré (argument de vente famille dès le lancement), à garder en tête pour le budget temps.
 
 ## Photos
 
@@ -64,6 +64,8 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 - Langues au lancement : **anglais, portugais, espagnol**.
 - **Source des voix** : clonage de voix de proches (1-2 min d'enregistrement propre par langue), via la fonctionnalité de clonage intégrée à l'API cloud déjà choisie (type ElevenLabs) — pas de self-hosting nécessaire pour ça non plus, même pipeline que la génération audio. **Nécessite un accord écrit simple de consentement** pour chaque personne enregistrée, puisqu'il s'agit d'un usage commercial (vendu aux hôtels).
 - **Mécanisme de clonage** (vérifié dans la doc ElevenLabs) : clonage instantané par conditionnement, pas d'entraînement de modèle — upload de l'échantillon (`POST /v1/voices/add`) → `voice_id` disponible immédiatement, capable de parler 32+ langues. Génération ensuite par `POST /v1/text-to-speech/{voice_id}` avec le texte du script validé → MP3. Appelé une fois par lieu/langue au moment de la génération batch, jamais à l'écoute utilisateur (le MP3 est stocké, pas streamé à la demande).
+- **Voix ado/enfant** : pas de clonage (pas de proche disponible pour ces tranches d'âge) — voix de banque via la bibliothèque de voix ElevenLabs (catégories "teenager", "youthful"/"playful"), licence commerciale gratuite incluse. Point de vigilance vérifié : leurs règles interdisent d'ajouter des voix créées par les utilisateurs "qui sonnent comme des voix d'enfants" — la catégorie "teenager" est clairement couverte, une vraie voix "enfant" (pas ado) est à vérifier précisément dans leur catalogue au moment de l'implémentation, pas garantie au même niveau.
+- **Synchronisation texte-audio façon karaoké — inclus au MVP** : utiliser l'endpoint natif "with-timestamps" de l'API TTS (au lieu de l'endpoint simple) — retourne les timestamps précis (début-fin en secondes) de chaque mot/caractère dans la même réponse que l'audio, sans pipeline d'alignement forcé séparé (type WhisperX). Stocker ces timestamps à côté du MP3 (JSON par lieu/langue/voix). Reste à construire : le widget d'affichage/surlignage synchronisé côté app — la donnée est gratuite, l'UI ne l'est pas.
 
 ## Stockage
 
@@ -73,6 +75,8 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 ## Produit / UX
 
 - **App mobile** (React Native) avec géolocalisation temps réel, déclenchement de proximité façon "découverte" à l'approche d'un lieu, calcul d'itinéraire optionnel vers un point choisi.
+- **Carte avec filtre par catégorie** : affichage des lieux avec leurs coordonnées, filtrables par type (événements culturels récurrents, lieux de culte, musées, etc. — reprend les catégories du pipeline de sourcing).
+- **Alerte de proximité = prompt, pas de lecture automatique** : à l'approche d'un lieu, notification "Voulez-vous écouter l'histoire de ce lieu ?" — si oui, choix de la voix (adulte/ado/enfant) avant lecture. Pas de déclenchement audio intrusif sans confirmation.
 - **Mode hors-ligne dès la v1 (requis, pas optionnel)** : le GPS fonctionne sans connexion data (système satellite indépendant du réseau mobile), mais l'app doit avoir en local les coordonnées des lieux, les fichiers audio et les tuiles de carte pour fonctionner pendant la balade. Le touriste télécharge son parcours/quartier au wifi (hôtel) avant de partir ; la détection de proximité tourne ensuite entièrement en local. Beaucoup de touristes à Rio n'ont pas de forfait data brésilien — ce n'est pas un nice-to-have.
   - **Carte hors-ligne** : `MapLibre React Native` (open source) — `OfflineManager` permet de télécharger une région (zoom/style/emprise configurables) à l'avance. Pattern déjà éprouvé : un guide audio existant utilise MapLibre GL JS (web) + MapLibre Native (React Native) avec tuiles servies par Martin.
   - **Géofencing en arrière-plan** : `react-native-background-geolocation` — lib la plus citée/éprouvée du secteur, détection de mouvement par accéléromètre/gyroscope pour économiser la batterie, déclenche un événement à l'entrée dans le rayon d'un lieu, entièrement en local.
@@ -140,6 +144,10 @@ Avec 5+ sources actives, un même lieu apparaît souvent plusieurs fois sous des
 ## Points ouverts pour la suite
 
 - Nombre et liste exacts de lieux pour le lancement v1 (quartier(s) précis à trancher)
-- Qui relit les traductions ES/PT (étape non encore assignée)
+- Qui relit les traductions ES/PT — et maintenant, avec 3 scripts par lieu/langue, qui relit les versions ado/enfant en plus de l'adulte
 - Test de géolocalisation en conditions réelles (précision GPS en terrain dense à Santa Teresa/Lapa, consommation batterie du géofencing en arrière-plan) — non encore fait, à faire tôt
 - Vigilance sur la filiation CC BY-SA des textes Wikipedia utilisés en génération conditionnée (réécriture, pas copie, mais à garder à l'esprit)
+- **Fournisseur de tuiles de carte sous-jacent à MapLibre** (MapTiler, Stadia Maps, ou auto-hébergé) — pas encore choisi
+- **Schéma de données** (lieux, scripts par langue/public, fichiers audio par langue/public/voix, timestamps karaoké, catégories, comptes partenaires) — pas encore formalisé
+- **Comptes utilisateurs** : probablement aucun compte pour le touriste (usage anonyme via QR hôtel), mais un compte est nécessaire pour les partenaires/admin — modèle d'auth pas encore spécifié
+- Vérification précise de la disponibilité d'une vraie voix "enfant" (pas juste "ado"/"youthful") dans le catalogue du fournisseur TTS choisi, au moment de l'implémentation
