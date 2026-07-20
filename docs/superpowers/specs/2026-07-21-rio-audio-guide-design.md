@@ -63,6 +63,7 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 - `voice-factory` (le projet TTS auto-hébergé de mmaudet) reste une piste crédible pour une **Phase 2** (batch ponctuel sur pod éphémère, démarré/arrêté à la demande) comme démonstration DevOps supplémentaire — pas un prérequis v1.
 - Langues au lancement : **anglais, portugais, espagnol**.
 - **Source des voix** : clonage de voix de proches (1-2 min d'enregistrement propre par langue), via la fonctionnalité de clonage intégrée à l'API cloud déjà choisie (type ElevenLabs) — pas de self-hosting nécessaire pour ça non plus, même pipeline que la génération audio. **Nécessite un accord écrit simple de consentement** pour chaque personne enregistrée, puisqu'il s'agit d'un usage commercial (vendu aux hôtels).
+- **Mécanisme de clonage** (vérifié dans la doc ElevenLabs) : clonage instantané par conditionnement, pas d'entraînement de modèle — upload de l'échantillon (`POST /v1/voices/add`) → `voice_id` disponible immédiatement, capable de parler 32+ langues. Génération ensuite par `POST /v1/text-to-speech/{voice_id}` avec le texte du script validé → MP3. Appelé une fois par lieu/langue au moment de la génération batch, jamais à l'écoute utilisateur (le MP3 est stocké, pas streamé à la demande).
 
 ## Stockage
 
@@ -73,6 +74,8 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 
 - **App mobile** (React Native) avec géolocalisation temps réel, déclenchement de proximité façon "découverte" à l'approche d'un lieu, calcul d'itinéraire optionnel vers un point choisi.
 - **Mode hors-ligne dès la v1 (requis, pas optionnel)** : le GPS fonctionne sans connexion data (système satellite indépendant du réseau mobile), mais l'app doit avoir en local les coordonnées des lieux, les fichiers audio et les tuiles de carte pour fonctionner pendant la balade. Le touriste télécharge son parcours/quartier au wifi (hôtel) avant de partir ; la détection de proximité tourne ensuite entièrement en local. Beaucoup de touristes à Rio n'ont pas de forfait data brésilien — ce n'est pas un nice-to-have.
+  - **Carte hors-ligne** : `MapLibre React Native` (open source) — `OfflineManager` permet de télécharger une région (zoom/style/emprise configurables) à l'avance. Pattern déjà éprouvé : un guide audio existant utilise MapLibre GL JS (web) + MapLibre Native (React Native) avec tuiles servies par Martin.
+  - **Géofencing en arrière-plan** : `react-native-background-geolocation` — lib la plus citée/éprouvée du secteur, détection de mouvement par accéléromètre/gyroscope pour économiser la batterie, déclenche un événement à l'entrée dans le rayon d'un lieu, entièrement en local.
 - **Dashboard admin** : validation éditoriale (scripts générés vs vérifiés), gestion des partenaires (branding par hôtel/agence, marque blanche B2B), statistiques d'écoute.
 - **Chat "pose une question" en direct** : explicitement **hors scope v1**. Nécessiterait du RAG live, contrairement au pipeline de génération statique ci-dessus. Décision volontaire de ne pas le forcer dans le produit juste pour "montrer du RAG" — à reconsidérer en Phase 2 si un vrai besoin utilisateur émerge.
 
