@@ -81,6 +81,48 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 - Couverture de la ville entière — démarrage sur un périmètre de quartiers restreint (Santa Teresa/Lapa en priorité)
 - Infrastructure TTS auto-hébergée
 
+## Annexe technique — accès concret aux sources, croisement, concurrents
+
+### A. Références et méthodes d'accès (une par source, toutes testées en direct dans cette session)
+
+| Source | Méthode d'accès | Détail technique |
+|---|---|---|
+| **Overture Maps** | API/requête, pas de scraping | Parquet public sur S3 (`s3://overturemaps-us-west-2/release/<version>/theme=places/type=place/*.parquet`), requêtable sans téléchargement complet via DuckDB (`INSTALL spatial; INSTALL httpfs;`) filtré par bbox + `category`. Version testée : `2026-06-17.0`, à vérifier/mettre à jour au moment de l'implémentation. |
+| **OpenStreetMap (Overpass)** | API | `https://overpass-api.de/api/interpreter`, requêtes Overpass QL par tags (`tourism=*`, `historic=*`, etc.) — **superseded par Overture Maps** qui fusionne déjà OSM avec d'autres sources ; gardé en référence pour comprendre pourquoi Overture est préféré (OSM seul loupe Copacabana, Jardim Botânico...). Attention : l'endpoint `/api/status` renvoie 406 en HTTPS sans rapport avec un vrai blocage — ne pas s'y fier comme test de santé, tester directement `/api/interpreter`. Fair-use policy : espacer les requêtes, prévoir des retries. |
+| **Wikidata** | API (SPARQL) | `https://query.wikidata.org/sparql` — propriétés clés : `wdt:P1435` (désignation patrimoniale), `wdt:P625` (coordonnées), `wdt:P131*` (localisation, filtrer sur `wd:Q8678` = Rio de Janeiro ville). Éviter les requêtes `CONTAINS`/`LCASE` en texte libre sur tout Wikidata (timeout) — filtrer d'abord par propriété structurée. Pour une recherche ponctuelle par nom, utiliser l'API de recherche (`action=wbsearchentities`), beaucoup plus rapide qu'un scan SPARQL. |
+| **Wikipedia** | API | `https://pt.wikipedia.org/w/api.php` (`action=query&prop=extracts&exintro=1&explaintext=1&titles=<nom>&redirects=1`), repli sur `en.wikipedia.org` si vide. |
+| **Registre feiras livres** | Téléchargement direct (PDF public) | `https://ordempublica.prefeitura.rio/wp-content/uploads/sites/30/2024/10/Relacao-feira-livre-atualizada.pdf` — à re-vérifier périodiquement (URL avec date, peut changer). Extraction texte + géocodage (Nominatim par adresse + quartier) requis en aval. |
+| **IRPH ArcGIS** | API (ArcGIS REST, pas de clé requise pour les couches publiques) | Organisation `OlP4dGNtIcnD3RYf`. Recherche de couches : `https://www.arcgis.com/sharing/rest/search?q=orgid:OlP4dGNtIcnD3RYf AND ...&f=json`. Couche principale testée : `Bens_Protegidos_Areas_Protecao` (`.../FeatureServer/0/query?where=1=1&outFields=*&f=json`), 10 505 entrées, système de coordonnées projeté (wkid 29183/29193) — demander `outSR=4326` pour du lat/lon standard. Attention : certaines couches utiles (ex: `Equipamentos Culturais Não Municipais`) existent mais sont verrouillées par authentification municipale — non accessibles publiquement, à ne pas re-tester. |
+| **Riotur** | Navigation manuelle / scraping léger toléré (site officiel de tourisme, page d'archive paginée) | `https://riotur.rio/en/o-que-fazer/museums-and-cultural-centers/` (et équivalents `/que_fazer/`) — liste curée, paginée ("ver mais"), pas d'API structurée trouvée. |
+| **MuseusBr / IBRAM** | Scraping toléré (site public gouvernemental, `robots.txt` vérifié permissif : seul `/wp-admin/` est interdit) | `https://museusbr.museus.gov.br/` — pas d'API publique trouvée (le point d'entrée `dados.gov.br` testé renvoie 401). Navigation/scraping des pages de recherche public légitime. |
+| **Wikimedia Commons** (photos) | API | `https://commons.wikimedia.org/w/api.php` (`action=query&list=search&srnamespace=6` pour chercher, puis `prop=imageinfo&iiprop=url|size|extmetadata` pour récupérer URL/licence/résolution). Toujours vérifier `LicenseShortName` dans `extmetadata` avant réutilisation. |
+
+**Pistes testées et écartées** (documentées pour ne pas perdre de temps à les retester) : CDURP "Turístico e Cultural 2012" (service ArcGIS discontinué, lien mort), scraping de l'app Passeio Carioca (écarté pour raisons légales, voir Analyse concurrentielle).
+
+### B. Méthode de croisement / déduplication entre sources
+
+Avec 5+ sources actives, un même lieu apparaît souvent plusieurs fois sous des formes différentes (ex: "Museu Nacional" est ressorti sous 8 variantes de nom dans un seul test Overture). Processus recommandé :
+
+1. **Normalisation des noms** : minuscules, suppression des accents, retrait des préfixes génériques ("Museu de", "Igreja de"...) avant toute comparaison.
+2. **Rapprochement géographique** : pour les sources avec coordonnées (Overture, Wikidata, IRPH), regrouper les entrées à moins de ~50-100m les unes des autres comme doublons probables.
+3. **Géocodage préalable** pour les sources en adresses textuelles seules (feiras, IRPH `LOGRADOURO`) — via Nominatim — avant de pouvoir appliquer le rapprochement géographique du point 2.
+4. **Clé de déduplication prioritaire** : identifiant Wikidata (QID) si disponible en premier choix (source la plus fiable), sinon regroupement nom normalisé + proximité.
+5. **Ne jamais fusionner automatiquement en cas d'ambiguïté** — un score de correspondance faible doit être routé vers une revue humaine plutôt que fusionné silencieusement (on a vu que la sur-confiance dans le matching automatique, comme le filtrage par catégorie, produit des faux négatifs sur des lieux réels).
+
+### C. Concurrents — références
+
+| Concurrent | URL | Portée |
+|---|---|---|
+| Passeio Carioca | *(app mobile — non vérifiée par une recherche web directe dans cette session, analysée via captures d'écran fournies par l'utilisatrice ; à confirmer l'URL/fiche store avant toute citation publique)* | Rio, gratuit, soutenu par la mairie |
+| VoiceMap | voicemap.me | International, payant à l'unité |
+| izi.TRAVEL | izi.travel | International, 2500 villes, mixte gratuit/payant |
+| GPSmyCity | gpsmycity.com | International |
+| Summer AI | summer.ai | International, façon "Pokémon Go" |
+| StreetPhonia | streetphonia.com | International, déclenchement GPS auto |
+| AI TourMate | aitourmate.eu | International, 14 langues |
+| MyGuide | myguide.cc | International |
+| Gamana | gamana.app | International |
+
 ## Points ouverts pour la suite
 
 - Nombre et liste exacts de lieux pour le lancement v1 (quartier(s) précis à trancher)
