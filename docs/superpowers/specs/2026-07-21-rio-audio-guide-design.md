@@ -2,7 +2,7 @@
 
 ## Vision
 
-Un guide audio mains libres, multilingue (EN/PT/ES), à déclenchement géolocalisé, pour les lieux culturels et patrimoniaux de Rio de Janeiro — vendu en marque blanche à des hôtels/agences (B2B), tout en servant de vitrine technique fullstack + cloud + IA.
+Un guide audio mains libres, multilingue (EN/FR/PT/ES), à déclenchement géolocalisé, pour les lieux culturels et patrimoniaux de Rio de Janeiro — vendu en marque blanche à des hôtels/agences (B2B), tout en servant de vitrine technique fullstack + cloud + IA.
 
 **Double objectif assumé** : un vrai produit testable/vendable à Rio, ET une démonstration de compétences pour candidatures/freelance. Les deux ne se recouvrent pas parfaitement (voir section IA) — c'est un choix conscient, pas un oubli.
 
@@ -48,7 +48,7 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 
 **LLM de génération** : Claude (Sonnet) ou GPT-4o, à comparer concrètement sur 3-4 lieux tests avant de trancher. Le coût du modèle n'est pas le facteur limitant vu le volume (quelques centaines de générations, one-shot) — le critère de choix est la fidélité aux faits sources (pas d'invention) et la qualité multilingue naturelle (PT/ES/EN, pas des traductions mot à mot).
 
-**Public visé — décision révisée** : 3 versions par lieu/langue (adulte / ado / enfant), avec **texte différent par public** (vocabulaire/ton adapté), pas juste la voix. Décision assumée en connaissance de cause : ça triple la charge de relecture éditoriale ET le coût TTS par rapport à une version adulte unique (9 scripts + 9 audios par lieu au lieu de 3, en comptant les 3 langues). Le scope MVP n'est donc plus "minimal" sur cet axe — choix produit délibéré (argument de vente famille dès le lancement), à garder en tête pour le budget temps.
+**Public visé — décision finale (après chiffrage du coût réel)** : une seule version adulte par lieu/langue pour la v1, en 4 langues (EN/FR/PT/ES). Les variantes ado/enfant (textes + voix dédiés) sont explicitement repoussées en Phase 2 — le chiffrage du scope × 3 (voir Budget) a confirmé que ça n'était pas justifié pour un premier lancement. Ce point a été tranché deux fois dans des sens opposés durant la conception ; la version qui reste est celle-ci, adulte seul, 4 langues.
 
 ## Photos
 
@@ -59,18 +59,27 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 ## Audio / TTS
 
 - **MVP : API cloud payante à l'usage** (type ElevenLabs), pas de self-hosting GPU.
-- **Pourquoi** : à l'échelle du MVP (~60 lieux × 3 langues × ~1500 caractères ≈ 270 000 caractères, un batch ponctuel), le calcul économique favorise nettement l'API (~30-80$ au total) contre le risque d'un pod GPU auto-hébergé laissé actif par erreur (~360-580$/mois pour rien — probablement l'origine du coût élevé mentionné par mmaudet avec `voice-factory`). Le seuil de rentabilité du self-hosting se situe vers 5-10M caractères/mois, très au-dessus du besoin MVP.
+- **Pourquoi** : à l'échelle du MVP (25 lieux × 4 langues × 1 voix ≈ 100 variantes, un batch ponctuel), le calcul économique favorise nettement l'API contre le risque d'un pod GPU auto-hébergé laissé actif par erreur (~360-580$/mois pour rien — probablement l'origine du coût élevé mentionné par mmaudet avec `voice-factory`). Le seuil de rentabilité du self-hosting se situe vers 5-10M caractères/mois, très au-dessus du besoin MVP.
 - `voice-factory` (le projet TTS auto-hébergé de mmaudet) reste une piste crédible pour une **Phase 2** (batch ponctuel sur pod éphémère, démarré/arrêté à la demande) comme démonstration DevOps supplémentaire — pas un prérequis v1.
-- Langues au lancement : **anglais, portugais, espagnol**.
-- **Source des voix** : clonage de voix de proches (1-2 min d'enregistrement propre par langue), via la fonctionnalité de clonage intégrée à l'API cloud déjà choisie (type ElevenLabs) — pas de self-hosting nécessaire pour ça non plus, même pipeline que la génération audio. **Nécessite un accord écrit simple de consentement** pour chaque personne enregistrée, puisqu'il s'agit d'un usage commercial (vendu aux hôtels).
+- Langues au lancement : **anglais, français, portugais, espagnol**.
+- **Source de la voix (v1, adulte uniquement)** : clonage d'un proche (1-2 min d'enregistrement propre par langue), via la fonctionnalité de clonage intégrée à l'API cloud déjà choisie (type ElevenLabs) — pas de self-hosting nécessaire, même pipeline que la génération audio. **Nécessite un accord écrit simple de consentement** pour la personne enregistrée, puisqu'il s'agit d'un usage commercial (vendu aux hôtels).
 - **Mécanisme de clonage** (vérifié dans la doc ElevenLabs) : clonage instantané par conditionnement, pas d'entraînement de modèle — upload de l'échantillon (`POST /v1/voices/add`) → `voice_id` disponible immédiatement, capable de parler 32+ langues. Génération ensuite par `POST /v1/text-to-speech/{voice_id}` avec le texte du script validé → MP3. Appelé une fois par lieu/langue au moment de la génération batch, jamais à l'écoute utilisateur (le MP3 est stocké, pas streamé à la demande).
-- **Voix ado/enfant** : pas de clonage (pas de proche disponible pour ces tranches d'âge) — voix de banque via la bibliothèque de voix ElevenLabs (catégories "teenager", "youthful"/"playful"), licence commerciale gratuite incluse. Point de vigilance vérifié : leurs règles interdisent d'ajouter des voix créées par les utilisateurs "qui sonnent comme des voix d'enfants" — la catégorie "teenager" est clairement couverte, une vraie voix "enfant" (pas ado) est à vérifier précisément dans leur catalogue au moment de l'implémentation, pas garantie au même niveau.
+- **Voix ado/enfant** : **Phase 2**, hors scope v1 (voir décision ci-dessus). Piste déjà documentée pour plus tard : voix de banque via la bibliothèque ElevenLabs (catégories "teenager", "youthful"/"playful"), licence commerciale gratuite incluse — leurs règles interdisent d'ajouter des voix utilisateur "qui sonnent comme des voix d'enfants", la catégorie "teenager" est couverte, une vraie voix "enfant" reste à vérifier dans leur catalogue le moment venu.
 - **Synchronisation texte-audio façon karaoké — inclus au MVP** : utiliser l'endpoint natif "with-timestamps" de l'API TTS (au lieu de l'endpoint simple) — retourne les timestamps précis (début-fin en secondes) de chaque mot/caractère dans la même réponse que l'audio, sans pipeline d'alignement forcé séparé (type WhisperX). Stocker ces timestamps à côté du MP3 (JSON par lieu/langue/voix). Reste à construire : le widget d'affichage/surlignage synchronisé côté app — la donnée est gratuite, l'UI ne l'est pas.
 
 ## Stockage
 
-- **Fichiers audio** : stockage objet compatible S3 — AWS S3 pour la démo technique, Scaleway Object Storage pour la production réelle (cohérent avec le choix d'hébergement). Organisation : `audio/{lieu_id}/{langue}.mp3`.
+- **Fichiers audio** : stockage objet compatible S3 — AWS S3 pour la démo technique, Scaleway Object Storage pour la production réelle (cohérent avec le choix d'hébergement). Organisation : `audio/{lieu_id}/{langue}.mp3`, plus `audio/{lieu_id}/{langue}.timestamps.json` pour la synchronisation karaoké.
 - **Métadonnées** (infos lieu, texte du script, source utilisée, statut de relecture) : PostgreSQL, dans le même backend que le reste.
+- **Schéma de données (v1, une seule voix adulte donc pas de dimension "public")** :
+```
+places        (id, name, lat, lon, category, source, wikidata_qid, source_richness)
+scripts       (id, place_id, language, text, source_text, status, reviewer, reviewed_at)
+audio_files   (id, script_id, voice_id, storage_url, timestamps_url, duration)
+partners      (id, name, type[hotel|agency], branding_config)
+users         (id, email, role[tourist|partner_admin|super_admin], partner_id nullable)
+```
+- **Fournisseur de tuiles de carte** : MapTiler, palier gratuit pour démarrer (~100k chargements/mois, largement suffisant en test) — alternative gratuite illimitée si besoin plus tard : OpenFreeMap.
 
 ## Produit / UX
 
@@ -81,6 +90,7 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
   - **Carte hors-ligne** : `MapLibre React Native` (open source) — `OfflineManager` permet de télécharger une région (zoom/style/emprise configurables) à l'avance. Pattern déjà éprouvé : un guide audio existant utilise MapLibre GL JS (web) + MapLibre Native (React Native) avec tuiles servies par Martin.
   - **Géofencing en arrière-plan** : `react-native-background-geolocation` — lib la plus citée/éprouvée du secteur, détection de mouvement par accéléromètre/gyroscope pour économiser la batterie, déclenche un événement à l'entrée dans le rayon d'un lieu, entièrement en local.
 - **Dashboard admin** : validation éditoriale (scripts générés vs vérifiés), gestion des partenaires (branding par hôtel/agence, marque blanche B2B), statistiques d'écoute.
+- **Comptes utilisateurs avec authentification, y compris côté touriste** (pas d'usage anonyme — revu après discussion). Trois niveaux : touriste (accès à son/ses parcours téléchargés), partenaire (accès à son branding/ses statistiques), super-admin (toi, gestion complète). Modèle d'auth à préciser en phase d'implémentation (email/mot de passe classique vs magic link) — impact sur le schéma de données ci-dessous (table `users` distincte de `admin_users`, ou table unique avec `role`).
 - **Chat "pose une question" en direct** : explicitement **hors scope v1**. Nécessiterait du RAG live, contrairement au pipeline de génération statique ci-dessus. Décision volontaire de ne pas le forcer dans le produit juste pour "montrer du RAG" — à reconsidérer en Phase 2 si un vrai besoin utilisateur émerge.
 
 ## Backend / cloud
@@ -95,9 +105,27 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 
 - Bars et restaurants (recentrage décidé sur lieux patrimoniaux + événements culturels récurrents uniquement)
 - Chat RAG en direct pendant la visite
+- Voix/textes ado et enfant (tranché après chiffrage — voir Sourcing du contenu)
 - Monétisation par affiliation/publicité locale (Phase 2)
-- Couverture de la ville entière — démarrage sur un périmètre de quartiers restreint (Santa Teresa/Lapa en priorité)
+- Couverture de la ville entière — périmètre fixé à **25 lieux, Santa Teresa + Lapa**
 - Infrastructure TTS auto-hébergée
+
+## Budget estimé (scope final v1 : 25 lieux × 4 langues × 1 voix adulte = 100 variantes)
+
+| Poste | Estimation | Type |
+|---|---|---|
+| Génération LLM (100 scripts) | ~5-15 $ | Ponctuel |
+| TTS + clonage vocal (100 audios, ~100k caractères) | ~10-30 $ | Ponctuel |
+| Relecture des traductions (toi + un ami, pas de freelance) | 0 $ (temps personnel) | Ponctuel |
+| Apple Developer Program | 99 $ | Annuel |
+| Google Play | 25 $ | Unique |
+| Nom de domaine (optionnel) | ~15 $ | Annuel |
+| **Total pour lancer le MVP** | **≈ 155-185 $** | — |
+| VPS Scaleway + stockage objet | ~11-16 $ | Mensuel |
+| Tuiles de carte (MapTiler, palier gratuit) | 0 $ pour démarrer | Mensuel |
+| **Total mensuel une fois en ligne** | **≈ 11-16 $/mois** | — |
+
+Estimations basées sur les fourchettes de prix trouvées durant les recherches de cette session (pas des devis vérifiés en direct) — à reconfirmer au moment de l'implémentation.
 
 ## Annexe technique — accès concret aux sources, croisement, concurrents
 
@@ -143,11 +171,10 @@ Avec 5+ sources actives, un même lieu apparaît souvent plusieurs fois sous des
 
 ## Points ouverts pour la suite
 
-- Nombre et liste exacts de lieux pour le lancement v1 (quartier(s) précis à trancher)
-- Qui relit les traductions ES/PT — et maintenant, avec 3 scripts par lieu/langue, qui relit les versions ado/enfant en plus de l'adulte
+Tous les points de conception majeurs sont maintenant tranchés (lieux, langues, public, voix, comptes, stockage, tuiles, budget). Restent des vérifications/actions à mener en implémentation, pas des décisions de conception :
+
 - Test de géolocalisation en conditions réelles (précision GPS en terrain dense à Santa Teresa/Lapa, consommation batterie du géofencing en arrière-plan) — non encore fait, à faire tôt
 - Vigilance sur la filiation CC BY-SA des textes Wikipedia utilisés en génération conditionnée (réécriture, pas copie, mais à garder à l'esprit)
-- **Fournisseur de tuiles de carte sous-jacent à MapLibre** (MapTiler, Stadia Maps, ou auto-hébergé) — pas encore choisi
-- **Schéma de données** (lieux, scripts par langue/public, fichiers audio par langue/public/voix, timestamps karaoké, catégories, comptes partenaires) — pas encore formalisé
-- **Comptes utilisateurs** : probablement aucun compte pour le touriste (usage anonyme via QR hôtel), mais un compte est nécessaire pour les partenaires/admin — modèle d'auth pas encore spécifié
-- Vérification précise de la disponibilité d'une vraie voix "enfant" (pas juste "ado"/"youthful") dans le catalogue du fournisseur TTS choisi, au moment de l'implémentation
+- Modèle d'authentification précis (email/mot de passe vs magic link) pour la table `users`
+- Liste précise des 25 lieux (Santa Teresa + Lapa) à établir via le pipeline de sourcing déjà défini
+- Choix final entre Claude et GPT-4o pour la génération, à trancher sur 3-4 lieux tests
