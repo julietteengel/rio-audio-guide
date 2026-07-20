@@ -46,6 +46,10 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 4. **Lieux sans source** (cas réel, pas rare) : **aucune génération automatique**. Direction vers une file "à rédiger manuellement" (toi, ou recherche web ciblée au cas par cas).
 5. **Relecture humaine obligatoire** de tout script avant synthèse vocale, y compris ceux générés à partir de bonnes sources — passages incertains mis en évidence en priorité.
 
+**LLM de génération** : Claude (Sonnet) ou GPT-4o, à comparer concrètement sur 3-4 lieux tests avant de trancher. Le coût du modèle n'est pas le facteur limitant vu le volume (quelques centaines de générations, one-shot) — le critère de choix est la fidélité aux faits sources (pas d'invention) et la qualité multilingue naturelle (PT/ES/EN, pas des traductions mot à mot).
+
+**Public visé** : une seule version adulte par lieu/langue pour la v1 (pas de variantes enfant/ado). Multiplier par 3 les scripts et l'audio par lieu triplerait la charge de relecture humaine et le coût TTS pour un MVP — à reconsidérer en Phase 2 si une vraie demande émerge (ex: un partenaire hôtel famille).
+
 ## Photos
 
 - **Photos personnelles** (Santa Teresa accessible à pied) en priorité : zéro risque légal, authenticité comme différenciateur.
@@ -58,10 +62,17 @@ Pas de RAG classique (pas de base vectorielle, pas de recherche sur corpus) — 
 - **Pourquoi** : à l'échelle du MVP (~60 lieux × 3 langues × ~1500 caractères ≈ 270 000 caractères, un batch ponctuel), le calcul économique favorise nettement l'API (~30-80$ au total) contre le risque d'un pod GPU auto-hébergé laissé actif par erreur (~360-580$/mois pour rien — probablement l'origine du coût élevé mentionné par mmaudet avec `voice-factory`). Le seuil de rentabilité du self-hosting se situe vers 5-10M caractères/mois, très au-dessus du besoin MVP.
 - `voice-factory` (le projet TTS auto-hébergé de mmaudet) reste une piste crédible pour une **Phase 2** (batch ponctuel sur pod éphémère, démarré/arrêté à la demande) comme démonstration DevOps supplémentaire — pas un prérequis v1.
 - Langues au lancement : **anglais, portugais, espagnol**.
+- **Source des voix** : clonage de voix de proches (1-2 min d'enregistrement propre par langue), via la fonctionnalité de clonage intégrée à l'API cloud déjà choisie (type ElevenLabs) — pas de self-hosting nécessaire pour ça non plus, même pipeline que la génération audio. **Nécessite un accord écrit simple de consentement** pour chaque personne enregistrée, puisqu'il s'agit d'un usage commercial (vendu aux hôtels).
+
+## Stockage
+
+- **Fichiers audio** : stockage objet compatible S3 — AWS S3 pour la démo technique, Scaleway Object Storage pour la production réelle (cohérent avec le choix d'hébergement). Organisation : `audio/{lieu_id}/{langue}.mp3`.
+- **Métadonnées** (infos lieu, texte du script, source utilisée, statut de relecture) : PostgreSQL, dans le même backend que le reste.
 
 ## Produit / UX
 
 - **App mobile** (React Native) avec géolocalisation temps réel, déclenchement de proximité façon "découverte" à l'approche d'un lieu, calcul d'itinéraire optionnel vers un point choisi.
+- **Mode hors-ligne dès la v1 (requis, pas optionnel)** : le GPS fonctionne sans connexion data (système satellite indépendant du réseau mobile), mais l'app doit avoir en local les coordonnées des lieux, les fichiers audio et les tuiles de carte pour fonctionner pendant la balade. Le touriste télécharge son parcours/quartier au wifi (hôtel) avant de partir ; la détection de proximité tourne ensuite entièrement en local. Beaucoup de touristes à Rio n'ont pas de forfait data brésilien — ce n'est pas un nice-to-have.
 - **Dashboard admin** : validation éditoriale (scripts générés vs vérifiés), gestion des partenaires (branding par hôtel/agence, marque blanche B2B), statistiques d'écoute.
 - **Chat "pose une question" en direct** : explicitement **hors scope v1**. Nécessiterait du RAG live, contrairement au pipeline de génération statique ci-dessus. Décision volontaire de ne pas le forcer dans le produit juste pour "montrer du RAG" — à reconsidérer en Phase 2 si un vrai besoin utilisateur émerge.
 
