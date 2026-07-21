@@ -957,9 +957,20 @@ def test_run_pipeline_combines_and_writes_output(tmp_path):
 
 
 def test_run_pipeline_deduplicates_across_sources(tmp_path):
+    # Catégorie alignée sur "museum" des deux côtés (et non "heritage_site" côté
+    # Wikidata) : le chemin de fusion nom+proximité de dedup.py exige des
+    # catégories identiques par conception (durci en Task 2, commit 28547c2 —
+    # "jamais de fusion automatique en cas d'ambiguïté forte"), et le côté
+    # Overture ne porte jamais de wikidata_qid (query_overture_places n'en
+    # définit pas), donc le chemin de fusion par QID ne s'applique pas non
+    # plus ici. Une version à catégories différentes ne fusionnerait
+    # légitimement pas avec le dedup.py actuel — ce ne serait donc plus ce
+    # test-ci (vérifier que run_pipeline câble bien deduplicate_places entre
+    # sources), mais un test du comportement de dedup.py lui-même (déjà
+    # couvert en Task 2).
     overture_result = [Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture")]
     wikidata_result = [
-        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="heritage_site", source="wikidata", wikidata_qid="Q1798512")
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="wikidata", wikidata_qid="Q1798512")
     ]
 
     output_file = tmp_path / "places.json"
@@ -1037,12 +1048,18 @@ Expected: tous les tests passent (le test d'intégration Overture de Task 3 incl
 
 - [ ] **Step 6: Exécution réelle du pipeline complet**
 
+**Avant de lancer** : `feiras_to_places` (Task 5) doit avoir un `time.sleep(1)` dans sa boucle après chaque appel à `geocode_address` — Nominatim (usage public) limite à 1 requête/seconde, et le pipeline complet géocode ~149 feiras en une seule exécution. Sans ce délai, l'exécution réelle ci-dessous violerait leur politique d'usage.
+
 ```bash
 cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline
 python -m sourcing.pipeline
 ```
 
-Expected: un fichier `places.json` créé avec une liste de lieux candidats pour Santa Teresa/Lapa. Vérifier manuellement : présence de l'Escadaria Selarón, du Museu da Chácara do Céu, d'au moins une feira — et absence du Santuário do Zé Pelintra (attendu : Overture le catégorise en `business_advertising`, hors allowlist — confirme qu'il faudra l'ajouter manuellement à la liste finale, comme documenté dans le spec).
+Expected (~2-3 minutes à cause du rate-limit Nominatim) : un fichier `places.json` créé. Vérifié en exécution réelle : **350 lieux candidats** (221 Overture, 126 Wikidata, 3 feiras après géocodage). Présence confirmée : Escadaria Selarón (3 variantes de nom), Museu da Chácara do Céu, au moins une feira. Absence confirmée du Santuário do Zé Pelintra sous son nom exact (attendu : catégorisé `business_advertising` par Overture, hors allowlist) — **mais** une entrée différemment nommée "Santuário de Seu Zé Pelintra" (catégorie `topic_concert_venue`, dans l'allowlist) apparaît bien : c'est le résultat voulu de l'ajout de cette catégorie plus tôt dans la conception, à vérifier manuellement que c'est bien la même entité avant de l'inclure dans la liste finale.
+
+**Limitations connues révélées par cette exécution réelle** (voir aussi section "Résultats et limitations connues" après le Self-Review) :
+- Seulement 3 des ~149 feiras survivent au géocodage (description d'adresse trop complexe pour Nominatim) — amélioration de la stratégie de géocodage hors scope de ce plan.
+- Wikidata et les feiras ne sont pas filtrés par bbox (contrairement à Overture) — résultats à l'échelle de la ville entière, le filtrage géographique final pour Santa Teresa/Lapa reste à faire manuellement lors de la curation.
 
 - [ ] **Step 7: Commit**
 
@@ -1065,6 +1082,16 @@ git commit -m "Add pipeline orchestration: combine sources, dedupe, write places
 **Cohérence des types/signatures** : `Place` (Task 1) est utilisé de façon cohérente dans tous les modules suivants (mêmes noms de champs). `deduplicate_places` (Task 2) est appelée avec la signature exacte définie. `query_overture_places`, `query_iphan_heritage_sites`, `fetch_and_parse_feiras_pdf`, `feiras_to_places` sont importés dans `pipeline.py` avec les noms exacts définis dans leurs tasks respectives, et mockés sous ces mêmes noms dans les tests de Task 6.
 
 ---
+
+## Résultats de l'exécution réelle et limitations connues
+
+Ce plan a été exécuté en entier (Tasks 1-6, subagent-driven, avec revue et corrections à chaque tâche). Résumé pour qui reprend ce travail :
+
+- **350 lieux candidats** produits pour Santa Teresa/Lapa (221 Overture, 126 Wikidata/IPHAN, 3 feiras) — c'est la liste de candidats, **pas** la sélection finale des 25 lieux (étape humaine, toujours à faire).
+- **Géocodage des feiras très partiel** (3/149 réussis) : la requête Nominatim concatène la description d'adresse complète du registre (souvent une plage de rues type "entre la rue X et la rue Y") avec le quartier — trop complexe pour un géocodeur généraliste. Une stratégie de géocodage plus fine (extraire une seule rue, ou géocoder par quartier avec vérification manuelle) serait nécessaire pour vraiment exploiter les feiras — hors scope de ce plan.
+- **Wikidata et feiras ne sont pas filtrés par bbox** (contrairement à Overture) — résultats à l'échelle de Rio entière ; le filtrage géographique final pour Santa Teresa/Lapa se fait actuellement à la main lors de la curation, pas dans le code.
+- **Rate limiting Nominatim** : `time.sleep(1)` ajouté dans `feiras_to_places` (découvert nécessaire seulement à l'exécution réelle du pipeline complet en Task 6, pas anticipé dans le plan initial) — respecte la politique d'usage de l'instance publique (max 1 req/s).
+- **Santuário do Zé Pelintra** : confirmé absent sous son nom exact (catégorisé `business_advertising`, hors allowlist), mais une entrée "Santuário de Seu Zé Pelintra" (`topic_concert_venue`, dans l'allowlist) apparaît bien — probablement la même entité sous un nom légèrement différent, à vérifier manuellement avant curation finale.
 
 ## Execution Handoff
 
