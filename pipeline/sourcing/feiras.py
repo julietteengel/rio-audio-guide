@@ -1,5 +1,6 @@
 import io
 import logging
+import time
 
 import pdfplumber
 import requests
@@ -61,6 +62,7 @@ def feiras_to_places(feiras: list[dict]) -> list[Place]:
     for feira in feiras:
         query = f"{feira['descricao']}, {feira['bairro']}, Rio de Janeiro, Brazil"
         coords = geocode_address(query)
+        time.sleep(1)  # Respect Nominatim's public-instance usage policy (max 1 req/s).
         if coords is None:
             continue
         lat, lon = coords
