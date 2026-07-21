@@ -81,3 +81,12 @@ def test_deduplicate_places_does_not_merge_different_categories_even_if_close_sa
     ]
     result = deduplicate_places(places)
     assert len(result) == 2
+
+
+def test_deduplicate_places_merges_qid_match_even_with_different_categories():
+    places = [
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
+        Place(name="Museu Nacional", lat=-22.9060, lon=-43.2248, category="history_museum", source="wikidata", wikidata_qid="Q1798512"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 1
