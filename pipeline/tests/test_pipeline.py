@@ -10,10 +10,10 @@ def test_run_pipeline_combines_and_writes_output(tmp_path):
         Place(name="Escadaria Selarón", lat=-22.9147, lon=-43.1806, category="landmark_and_historical_building", source="overture")
     ]
     wikidata_result = [
-        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="heritage_site", source="wikidata", wikidata_qid="Q1798512")
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.1850, category="heritage_site", source="wikidata", wikidata_qid="Q1798512")
     ]
     feiras_places_result = [
-        Place(name="Feira de Santa Teresa (Sexta-Feira)", lat=-22.9350, lon=-43.1900, category="recurring_cultural_event", source="feiras_registry")
+        Place(name="Feira de Santa Teresa (Sexta-Feira)", lat=-22.9150, lon=-43.1900, category="recurring_cultural_event", source="feiras_registry")
     ]
 
     output_file = tmp_path / "places.json"
@@ -41,9 +41,9 @@ def test_run_pipeline_deduplicates_across_sources(tmp_path):
     # under the current, intentionally-hardened dedup.py — so it wouldn't exercise
     # what this test is meant to check (that run_pipeline wires deduplicate_places
     # in correctly across sources).
-    overture_result = [Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture")]
+    overture_result = [Place(name="Museu Nacional", lat=-22.9058, lon=-43.1850, category="museum", source="overture")]
     wikidata_result = [
-        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="wikidata", wikidata_qid="Q1798512")
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.1850, category="museum", source="wikidata", wikidata_qid="Q1798512")
     ]
 
     output_file = tmp_path / "places.json"
@@ -55,3 +55,19 @@ def test_run_pipeline_deduplicates_across_sources(tmp_path):
         result = run_pipeline(output_file)
 
     assert len(result) == 1
+
+
+def test_run_pipeline_filters_out_of_bbox_places(tmp_path):
+    overture_result = [Place(name="In Bbox", lat=-22.92, lon=-43.18, category="museum", source="overture")]
+    wikidata_result = [Place(name="Far Away", lat=-22.80, lon=-43.30, category="heritage_site", source="wikidata")]
+
+    output_file = tmp_path / "places.json"
+
+    with patch("sourcing.pipeline.query_overture_places", return_value=overture_result), \
+         patch("sourcing.pipeline.query_iphan_heritage_sites", return_value=wikidata_result), \
+         patch("sourcing.pipeline.fetch_and_parse_feiras_pdf", return_value=[]), \
+         patch("sourcing.pipeline.feiras_to_places", return_value=[]):
+        result = run_pipeline(output_file)
+
+    assert len(result) == 1
+    assert result[0].name == "In Bbox"

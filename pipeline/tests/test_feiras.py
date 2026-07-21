@@ -1,3 +1,4 @@
+import time
 from unittest.mock import patch, Mock
 
 import pytest
@@ -51,7 +52,8 @@ def test_feiras_to_places_builds_named_place_from_geocoded_feira():
     fake_response = Mock()
     fake_response.json.return_value = [{"lat": "-22.9350", "lon": "-43.1900"}]
     fake_response.raise_for_status = Mock()
-    with patch("sourcing.feiras.requests.get", return_value=fake_response):
+    with patch("sourcing.feiras.requests.get", return_value=fake_response), \
+         patch("sourcing.feiras.time.sleep"):
         places = feiras_to_places(feiras)
     assert len(places) == 1
     assert places[0].name == "Feira de Santa Teresa (Sexta-Feira)"
@@ -64,7 +66,8 @@ def test_feiras_to_places_skips_feiras_that_fail_to_geocode():
     fake_response = Mock()
     fake_response.json.return_value = []
     fake_response.raise_for_status = Mock()
-    with patch("sourcing.feiras.requests.get", return_value=fake_response):
+    with patch("sourcing.feiras.requests.get", return_value=fake_response), \
+         patch("sourcing.feiras.time.sleep"):
         places = feiras_to_places(feiras)
     assert places == []
 

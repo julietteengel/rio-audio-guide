@@ -12,6 +12,11 @@ from sourcing.wikidata import query_iphan_heritage_sites
 SANTA_TERESA_LAPA_BBOX = (-43.1950, -22.9250, -43.1750, -22.9050)
 
 
+def _within_bbox(place: Place, bbox: tuple[float, float, float, float]) -> bool:
+    min_lon, min_lat, max_lon, max_lat = bbox
+    return min_lon <= place.lon <= max_lon and min_lat <= place.lat <= max_lat
+
+
 def run_pipeline(output_path: Path) -> list[Place]:
     overture_places = query_overture_places(SANTA_TERESA_LAPA_BBOX)
     wikidata_places = query_iphan_heritage_sites()
@@ -19,7 +24,8 @@ def run_pipeline(output_path: Path) -> list[Place]:
     feiras_places = feiras_to_places(feiras_raw)
 
     all_places = overture_places + wikidata_places + feiras_places
-    deduped = deduplicate_places(all_places)
+    in_scope_places = [place for place in all_places if _within_bbox(place, SANTA_TERESA_LAPA_BBOX)]
+    deduped = deduplicate_places(in_scope_places)
 
     output_path.write_text(
         json.dumps([place.__dict__ for place in deduped], ensure_ascii=False, indent=2),

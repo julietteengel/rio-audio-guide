@@ -10,6 +10,15 @@ GENERIC_PREFIXES = [
     "praca ", "parque ",
 ]
 
+# Some sources emit a single generic bucket category for every place they
+# produce (Wikidata's IPHAN query always uses "heritage_site"; the feiras
+# registry always uses "recurring_cultural_event"). These are not genuine
+# entity-type signals, so treating them as "compatible with anything" during
+# the name+proximity match doesn't reintroduce the false-merge risk the
+# category check exists to prevent — it only unblocks legitimate cross-source
+# merges that would otherwise never happen.
+GENERIC_SOURCE_CATEGORIES = {"heritage_site", "recurring_cultural_event"}
+
 
 def normalize_name(name: str) -> str:
     lowered = name.strip().lower()
@@ -47,9 +56,14 @@ def deduplicate_places(
                 and place.wikidata_qid == existing.wikidata_qid
                 and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_qid_distance_m
             )
+            categories_compatible = (
+                place.category == existing.category
+                or place.category in GENERIC_SOURCE_CATEGORIES
+                or existing.category in GENERIC_SOURCE_CATEGORIES
+            )
             same_name_and_close = (
                 normalize_name(place.name) == normalize_name(existing.name)
-                and place.category == existing.category
+                and categories_compatible
                 and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_distance_m
             )
             if same_qid or same_name_and_close:
