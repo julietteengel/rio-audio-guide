@@ -27,7 +27,7 @@ def test_haversine_distance_approx_one_km_for_known_delta():
 def test_deduplicate_places_merges_close_same_name():
     places = [
         Place(name="Escadaria Selarón", lat=-22.91470, lon=-43.18060, category="landmark_and_historical_building", source="overture"),
-        Place(name="escadaria selaron", lat=-22.91471, lon=-43.18061, category="artwork", source="wikidata"),
+        Place(name="escadaria selaron", lat=-22.91471, lon=-43.18061, category="landmark_and_historical_building", source="wikidata"),
     ]
     result = deduplicate_places(places)
     assert len(result) == 1
@@ -50,3 +50,34 @@ def test_deduplicate_places_merges_by_shared_wikidata_qid_even_if_name_differs()
     ]
     result = deduplicate_places(places)
     assert len(result) == 1
+
+
+def test_normalize_name_strips_praca_prefix():
+    assert normalize_name("Praça XV de Novembro") == "xv de novembro"
+
+
+def test_deduplicate_places_does_not_merge_qid_match_when_far_apart():
+    places = [
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
+        Place(name="Museu Nacional (Erro)", lat=-22.8600, lon=-43.1700, category="museum", source="wikidata", wikidata_qid="Q1798512"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 2
+
+
+def test_deduplicate_places_merges_qid_match_within_qid_threshold():
+    places = [
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
+        Place(name="Museu Nacional (approx)", lat=-22.9080, lon=-43.2260, category="museum", source="wikidata", wikidata_qid="Q1798512"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 1
+
+
+def test_deduplicate_places_does_not_merge_different_categories_even_if_close_same_name():
+    places = [
+        Place(name="Igreja de Santa Rita", lat=-22.9050, lon=-43.1800, category="church_cathedral", source="overture"),
+        Place(name="Praça Santa Rita", lat=-22.90501, lon=-43.18001, category="landmark_and_historical_building", source="overture"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 2

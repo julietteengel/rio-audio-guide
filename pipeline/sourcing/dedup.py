@@ -7,7 +7,7 @@ from sourcing.models import Place
 GENERIC_PREFIXES = [
     "museu de ", "museu do ", "museu da ",
     "igreja de ", "igreja do ", "igreja da ",
-    "praça ", "parque ",
+    "praca ", "parque ",
 ]
 
 
@@ -33,14 +33,23 @@ def haversine_distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> 
     return 2 * r * atan2(sqrt(a), sqrt(1 - a))
 
 
-def deduplicate_places(places: list[Place], max_distance_m: float = 100.0) -> list[Place]:
+def deduplicate_places(
+    places: list[Place],
+    max_distance_m: float = 100.0,
+    max_qid_distance_m: float = 5000.0,
+) -> list[Place]:
     kept: list[Place] = []
     for place in places:
         is_duplicate = False
         for existing in kept:
-            same_qid = place.wikidata_qid and place.wikidata_qid == existing.wikidata_qid
+            same_qid = (
+                place.wikidata_qid
+                and place.wikidata_qid == existing.wikidata_qid
+                and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_qid_distance_m
+            )
             same_name_and_close = (
                 normalize_name(place.name) == normalize_name(existing.name)
+                and place.category == existing.category
                 and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_distance_m
             )
             if same_qid or same_name_and_close:
