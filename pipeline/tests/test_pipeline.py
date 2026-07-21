@@ -58,8 +58,11 @@ def test_run_pipeline_deduplicates_across_sources(tmp_path):
 
 
 def test_run_pipeline_filters_out_of_bbox_places(tmp_path):
+    # RIO_DE_JANEIRO_BBOX = (-43.7962520, -23.0827051, -43.0990811, -22.7460878).
+    # "In Bbox" est dans Rio (Santa Teresa) ; "Far Away" est à São Paulo, bien
+    # en dehors de la municipalité de Rio.
     overture_result = [Place(name="In Bbox", lat=-22.92, lon=-43.18, category="museum", source="overture")]
-    wikidata_result = [Place(name="Far Away", lat=-22.80, lon=-43.30, category="heritage_site", source="wikidata")]
+    wikidata_result = [Place(name="Far Away", lat=-23.5505, lon=-46.6333, category="heritage_site", source="wikidata")]
 
     output_file = tmp_path / "places.json"
 
