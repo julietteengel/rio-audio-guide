@@ -348,9 +348,14 @@ def deduplicate_places(
                 and place.wikidata_qid == existing.wikidata_qid
                 and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_qid_distance_m
             )
+            categories_compatible = (
+                place.category == existing.category
+                or place.category in GENERIC_SOURCE_CATEGORIES
+                or existing.category in GENERIC_SOURCE_CATEGORIES
+            )
             same_name_and_close = (
                 normalize_name(place.name) == normalize_name(existing.name)
-                and place.category == existing.category
+                and categories_compatible
                 and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_distance_m
             )
             if same_qid or same_name_and_close:
@@ -362,6 +367,8 @@ def deduplicate_places(
 ```
 
 Note : le chemin QID ne vérifie volontairement pas la catégorie — une identité Wikidata partagée confirmée est une preuve suffisante en elle-même, même si la catégorie diffère (ex : un même lieu catégorisé différemment selon la source).
+
+**Correctif post-revue finale (`GENERIC_SOURCE_CATEGORIES`)** : découvert lors de la revue de branche complète (Task 6) que la dédup inter-sources ne fonctionnait jamais en pratique (350 lieux réels = 221+126+3, zéro fusion) — Wikidata génère toujours `"heritage_site"` et les feiras toujours `"recurring_cultural_event"` (des catégories génériques par source, pas de vraie information de type d'entité), donc elles ne correspondaient jamais aux catégories précises d'Overture, et Overture ne porte jamais de `wikidata_qid`. Solution : traiter ces catégories génériques comme compatibles avec n'importe quelle autre catégorie pour la correspondance nom+proximité, sans affaiblir la protection anti-fusion entre deux catégories *spécifiques* différentes (le cas concret church/praça, qui reste protégé). Compromis accepté et documenté : un lieu générique (Wikidata/feiras) qui devient l'ancre `kept` peut en théorie faire fusionner deux entités Overture spécifiques différentes qui partagent son nom normalisé à moins de 100m — jugé rare en pratique, non bloquant.
 
 - [ ] **Step 4: Lancer les tests, vérifier qu'ils passent**
 
@@ -1092,6 +1099,8 @@ Ce plan a été exécuté en entier (Tasks 1-6, subagent-driven, avec revue et c
 - **Wikidata et feiras ne sont pas filtrés par bbox** (contrairement à Overture) — résultats à l'échelle de Rio entière ; le filtrage géographique final pour Santa Teresa/Lapa se fait actuellement à la main lors de la curation, pas dans le code.
 - **Rate limiting Nominatim** : `time.sleep(1)` ajouté dans `feiras_to_places` (découvert nécessaire seulement à l'exécution réelle du pipeline complet en Task 6, pas anticipé dans le plan initial) — respecte la politique d'usage de l'instance publique (max 1 req/s).
 - **Santuário do Zé Pelintra** : confirmé absent sous son nom exact (catégorisé `business_advertising`, hors allowlist), mais une entrée "Santuário de Seu Zé Pelintra" (`topic_concert_venue`, dans l'allowlist) apparaît bien — probablement la même entité sous un nom légèrement différent, à vérifier manuellement avant curation finale.
+
+**Correctifs post-revue finale de branche** (voir aussi la note dans le bloc `deduplicate_places` de Task 2) : la revue de branche complète a révélé que le chiffre de 350 lieux ci-dessus correspondait à **zéro fusion inter-source réelle** (221+126+3, addition exacte) à cause d'un défaut de conception dans le filtre de catégorie de la dédup, et que le filtrage géographique Santa Teresa/Lapa n'était appliqué qu'à Overture, pas à Wikidata/feiras (contrairement à la contrainte globale du spec). Les deux ont été corrigés (`GENERIC_SOURCE_CATEGORIES` dans `dedup.py`, filtre bbox post-agrégation dans `pipeline.py`) — une ré-exécution réelle du pipeline produirait maintenant un nombre de lieux plus bas que 350, à la fois grâce au filtre géographique et à une vraie déduplication inter-sources. Non re-exécuté après ce correctif faute de temps dans cette session (le géocodage des feiras à 1 req/s prend plusieurs minutes) — à faire avant la sélection finale des 25 lieux.
 
 ## Execution Handoff
 
