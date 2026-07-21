@@ -79,9 +79,5 @@ def fetch_and_parse_feiras_pdf(url: str = FEIRAS_PDF_URL) -> list[dict]:
         for page in pdf.pages:
             table = page.extract_table()
             if table:
-                try:
-                    all_feiras.extend(parse_feiras_table_rows(table))
-                except ValueError:
-                    # Skip pages that don't have the expected table structure
-                    continue
+                all_feiras.extend(parse_feiras_table_rows(table))
     return all_feiras
