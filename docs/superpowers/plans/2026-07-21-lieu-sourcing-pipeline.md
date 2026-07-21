@@ -396,6 +396,8 @@ git commit -m "Add name normalization and cross-source deduplication logic"
 Créer `pipeline/tests/test_overture.py` :
 
 ```python
+import pytest
+
 from sourcing.overture import filter_by_category, query_overture_places, CATEGORY_ALLOWLIST
 
 
@@ -420,11 +422,13 @@ def test_category_allowlist_does_not_include_bars_or_restaurants():
     assert "business_advertising" not in CATEGORY_ALLOWLIST
 
 
+@pytest.mark.integration
 def test_query_overture_places_returns_known_landmark_for_selaron_bbox():
-    # Bbox serré autour de l'Escadaria Selarón (frontière Lapa/Santa Teresa).
-    # Test d'intégration réel (réseau requis) : vérifié manuellement dans la
-    # recherche de conception, cette zone renvoie de manière fiable ce lieu.
-    bbox = (-43.1815, -22.9155, -43.1795, -22.9140)
+    # Bbox serré (marge uniforme de ±0.0005°) autour des coordonnées réelles
+    # des entrées "Selarón"/"Selaron" trouvées par requête diagnostique dans
+    # le release 2026-06-17.0 (Selarón Apartments, Scalinata Selarón, Selaron
+    # Steps). Test d'intégration réel (réseau requis).
+    bbox = (-43.180157, -22.916949, -43.178459, -22.915033)
     places = query_overture_places(bbox)
     names = [p.name for p in places]
     assert any("Selarón" in name or "Selaron" in name for name in names)
@@ -498,7 +502,13 @@ def query_overture_places(
 pytest tests/test_overture.py -v
 ```
 
-Expected: `4 passed`. Le 4e test (`test_query_overture_places_returns_known_landmark_for_selaron_bbox`) nécessite un accès réseau et prend ~10-20s (requête sur le parquet public S3, comme vérifié en conception) — si le CI n'a pas d'accès réseau, marquer ce test `@pytest.mark.integration` et l'exclure du run rapide, mais le garder pour l'exécution locale.
+Expected: `4 passed`. Le 4e test (`test_query_overture_places_returns_known_landmark_for_selaron_bbox`) est marqué `@pytest.mark.integration` (nécessite un accès réseau, prend ~10-20s) — exclu du run rapide via `pytest -m "not integration"`, mais s'exécute normalement dans un run complet. Le marqueur doit être enregistré dans `pipeline/pyproject.toml` sous `[tool.pytest.ini_options]` :
+
+```toml
+markers = [
+    "integration: tests that require live network access (deselect with '-m \"not integration\"')",
+]
+```
 
 - [ ] **Step 5: Commit**
 
