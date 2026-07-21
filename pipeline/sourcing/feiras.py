@@ -1,8 +1,12 @@
 import io
+import logging
 
+import pdfplumber
 import requests
 
 from sourcing.models import Place
+
+logger = logging.getLogger(__name__)
 
 FEIRAS_PDF_URL = (
     "https://ordempublica.prefeitura.rio/wp-content/uploads/sites/30/2024/10/"
@@ -70,14 +74,15 @@ def feiras_to_places(feiras: list[dict]) -> list[Place]:
 def fetch_and_parse_feiras_pdf(url: str = FEIRAS_PDF_URL) -> list[dict]:
     """Wrapper d'I/O fin autour de parse_feiras_table_rows (déjà testé) : pas de
     test dédié, à vérifier manuellement contre le vrai PDF lors de Task 6."""
-    import pdfplumber
-
     response = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=60)
     response.raise_for_status()
     all_feiras: list[dict] = []
     with pdfplumber.open(io.BytesIO(response.content)) as pdf:
-        for page in pdf.pages:
+        for page_num, page in enumerate(pdf.pages, start=1):
             table = page.extract_table()
             if table:
-                all_feiras.extend(parse_feiras_table_rows(table))
+                try:
+                    all_feiras.extend(parse_feiras_table_rows(table))
+                except ValueError as exc:
+                    logger.warning("Skipping page %d in feiras PDF: %s", page_num, exc)
     return all_feiras

@@ -67,3 +67,39 @@ def test_feiras_to_places_skips_feiras_that_fail_to_geocode():
     with patch("sourcing.feiras.requests.get", return_value=fake_response):
         places = feiras_to_places(feiras)
     assert places == []
+
+
+def test_fetch_and_parse_feiras_pdf_logs_warning_and_continues_on_malformed_page(caplog, monkeypatch):
+    import logging
+    from unittest.mock import MagicMock
+    import sourcing.feiras as feiras_module
+
+    bad_table = [["Título institucional", "", ""]]
+    good_table = [
+        ["Código", "Turno", "Descrição", "Bairro", "Dias da Semana"],
+        ["54", "Não", "RUA TEREZINA", "SANTA TERESA", "Sexta-Feira"],
+    ]
+
+    fake_page_bad = MagicMock()
+    fake_page_bad.extract_table.return_value = bad_table
+    fake_page_good = MagicMock()
+    fake_page_good.extract_table.return_value = good_table
+
+    fake_pdf = MagicMock()
+    fake_pdf.pages = [fake_page_bad, fake_page_good]
+    fake_pdf.__enter__.return_value = fake_pdf
+    fake_pdf.__exit__.return_value = False
+
+    fake_response = MagicMock()
+    fake_response.content = b"fake-pdf-bytes"
+    fake_response.raise_for_status = MagicMock()
+
+    monkeypatch.setattr(feiras_module.requests, "get", lambda *a, **kw: fake_response)
+    monkeypatch.setattr(feiras_module.pdfplumber, "open", lambda *a, **kw: fake_pdf)
+
+    with caplog.at_level(logging.WARNING):
+        result = feiras_module.fetch_and_parse_feiras_pdf()
+
+    assert len(result) == 1
+    assert result[0]["bairro"] == "SANTA TERESA"
+    assert any("Skipping page" in record.message for record in caplog.records)
