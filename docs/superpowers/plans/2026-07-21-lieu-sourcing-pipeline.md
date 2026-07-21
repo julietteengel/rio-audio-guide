@@ -732,6 +732,42 @@ def test_feiras_to_places_skips_feiras_that_fail_to_geocode():
     with patch("sourcing.feiras.requests.get", return_value=fake_response):
         places = feiras_to_places(feiras)
     assert places == []
+
+
+def test_fetch_and_parse_feiras_pdf_logs_warning_and_continues_on_malformed_page(caplog, monkeypatch):
+    import logging
+    from unittest.mock import MagicMock
+    import sourcing.feiras as feiras_module
+
+    bad_table = [["Título institucional", "", ""]]
+    good_table = [
+        ["Código", "Turno", "Descrição", "Bairro", "Dias da Semana"],
+        ["54", "Não", "RUA TEREZINA", "SANTA TERESA", "Sexta-Feira"],
+    ]
+
+    fake_page_bad = MagicMock()
+    fake_page_bad.extract_table.return_value = bad_table
+    fake_page_good = MagicMock()
+    fake_page_good.extract_table.return_value = good_table
+
+    fake_pdf = MagicMock()
+    fake_pdf.pages = [fake_page_bad, fake_page_good]
+    fake_pdf.__enter__.return_value = fake_pdf
+    fake_pdf.__exit__.return_value = False
+
+    fake_response = MagicMock()
+    fake_response.content = b"fake-pdf-bytes"
+    fake_response.raise_for_status = MagicMock()
+
+    monkeypatch.setattr(feiras_module.requests, "get", lambda *a, **kw: fake_response)
+    monkeypatch.setattr(feiras_module.pdfplumber, "open", lambda *a, **kw: fake_pdf)
+
+    with caplog.at_level(logging.WARNING):
+        result = feiras_module.fetch_and_parse_feiras_pdf()
+
+    assert len(result) == 1
+    assert result[0]["bairro"] == "SANTA TERESA"
+    assert any("Skipping page" in record.message for record in caplog.records)
 ```
 
 - [ ] **Step 2: Lancer les tests, vérifier qu'ils échouent**
@@ -746,10 +782,14 @@ Expected: `ModuleNotFoundError: No module named 'sourcing.feiras'`.
 
 ```python
 import io
+import logging
 
+import pdfplumber
 import requests
 
 from sourcing.models import Place
+
+logger = logging.getLogger(__name__)
 
 FEIRAS_PDF_URL = (
     "https://ordempublica.prefeitura.rio/wp-content/uploads/sites/30/2024/10/"
@@ -816,17 +856,21 @@ def feiras_to_places(feiras: list[dict]) -> list[Place]:
 
 def fetch_and_parse_feiras_pdf(url: str = FEIRAS_PDF_URL) -> list[dict]:
     """Wrapper d'I/O fin autour de parse_feiras_table_rows (déjà testé) : pas de
-    test dédié, à vérifier manuellement contre le vrai PDF lors de Task 6."""
-    import pdfplumber
-
+    test dédié sur l'accès réseau réel, mais une page malformée (ex: le bloc
+    titre/en-tête institutionnel de la page 1, qui n'a pas la structure de
+    colonnes attendue) est loguée en warning et sautée plutôt que de faire
+    planter toute l'extraction ou d'être avalée silencieusement."""
     response = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=60)
     response.raise_for_status()
     all_feiras: list[dict] = []
     with pdfplumber.open(io.BytesIO(response.content)) as pdf:
-        for page in pdf.pages:
+        for page_num, page in enumerate(pdf.pages, start=1):
             table = page.extract_table()
             if table:
-                all_feiras.extend(parse_feiras_table_rows(table))
+                try:
+                    all_feiras.extend(parse_feiras_table_rows(table))
+                except ValueError as exc:
+                    logger.warning("Skipping page %d in feiras PDF: %s", page_num, exc)
     return all_feiras
 ```
 
@@ -836,12 +880,14 @@ def fetch_and_parse_feiras_pdf(url: str = FEIRAS_PDF_URL) -> list[dict]:
 pytest tests/test_feiras.py -v
 ```
 
-Expected: `6 passed`.
+Expected: `8 passed`.
 
 - [ ] **Step 5: Vérification manuelle de `fetch_and_parse_feiras_pdf` contre le vrai PDF**
 
 ```bash
 python3 -c "
+import logging
+logging.basicConfig(level=logging.WARNING)
 from sourcing.feiras import fetch_and_parse_feiras_pdf
 feiras = fetch_and_parse_feiras_pdf()
 print(f'Total feiras parsées: {len(feiras)}')
@@ -850,7 +896,7 @@ print('Santa Teresa:', santa_teresa)
 "
 ```
 
-Expected: un nombre de feiras proche de 165 (total actif connu), avec au moins une entrée pour Santa Teresa (Rua Terezina, vendredi — confirmé en conception). Si le nombre est très inférieur, l'extraction de tableau du PDF a probablement raté des pages — inspecter `pdf.pages` individuellement.
+Expected (vérifié en exécution réelle) : un warning loggé pour la page 1 (bloc titre institutionnel, structure de colonnes différente), puis **149 feiras parsées** sur les pages restantes, avec l'entrée Santa Teresa (Rua Terezina, vendredi) présente. **Point de vigilance pour Task 6** : 149 est en dessous du total de 165 feiras actives annoncé par le registre — l'écart pourrait venir de lignes de continuation de tableau sur plusieurs pages mal détectées comme des en-têtes (donc silencieusement sautées avec un warning, pas une vraie perte de données non tracée), mais ça mérite une vérification manuelle ciblée (comparer la liste obtenue au PDF source) avant de considérer le pipeline de sourcing des feiras comme complet à 100%.
 
 - [ ] **Step 6: Commit**
 
