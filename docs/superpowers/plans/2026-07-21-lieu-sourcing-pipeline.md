@@ -218,7 +218,7 @@ def test_haversine_distance_approx_one_km_for_known_delta():
 def test_deduplicate_places_merges_close_same_name():
     places = [
         Place(name="Escadaria Selarón", lat=-22.91470, lon=-43.18060, category="landmark_and_historical_building", source="overture"),
-        Place(name="escadaria selaron", lat=-22.91471, lon=-43.18061, category="artwork", source="wikidata"),
+        Place(name="escadaria selaron", lat=-22.91471, lon=-43.18061, category="landmark_and_historical_building", source="wikidata"),
     ]
     result = deduplicate_places(places)
     assert len(result) == 1
@@ -238,6 +238,46 @@ def test_deduplicate_places_merges_by_shared_wikidata_qid_even_if_name_differs()
     places = [
         Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
         Place(name="National Museum of Brazil", lat=-22.9059, lon=-43.2247, category="museum", source="wikidata", wikidata_qid="Q1798512"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 1
+
+
+def test_normalize_name_strips_praca_prefix():
+    assert normalize_name("Praça XV de Novembro") == "xv de novembro"
+
+
+def test_deduplicate_places_does_not_merge_qid_match_when_far_apart():
+    places = [
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
+        Place(name="Museu Nacional (Erro)", lat=-22.8600, lon=-43.1700, category="museum", source="wikidata", wikidata_qid="Q1798512"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 2
+
+
+def test_deduplicate_places_merges_qid_match_within_qid_threshold():
+    places = [
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
+        Place(name="Museu Nacional (approx)", lat=-22.9080, lon=-43.2260, category="museum", source="wikidata", wikidata_qid="Q1798512"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 1
+
+
+def test_deduplicate_places_does_not_merge_different_categories_even_if_close_same_name():
+    places = [
+        Place(name="Igreja de Santa Rita", lat=-22.9050, lon=-43.1800, category="church_cathedral", source="overture"),
+        Place(name="Praça Santa Rita", lat=-22.90501, lon=-43.18001, category="landmark_and_historical_building", source="overture"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 2
+
+
+def test_deduplicate_places_merges_qid_match_even_with_different_categories():
+    places = [
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
+        Place(name="Museu Nacional", lat=-22.9060, lon=-43.2248, category="history_museum", source="wikidata", wikidata_qid="Q1798512"),
     ]
     result = deduplicate_places(places)
     assert len(result) == 1
@@ -263,7 +303,7 @@ from sourcing.models import Place
 GENERIC_PREFIXES = [
     "museu de ", "museu do ", "museu da ",
     "igreja de ", "igreja do ", "igreja da ",
-    "praça ", "parque ",
+    "praca ", "parque ",
 ]
 
 
@@ -289,14 +329,28 @@ def haversine_distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> 
     return 2 * r * atan2(sqrt(a), sqrt(1 - a))
 
 
-def deduplicate_places(places: list[Place], max_distance_m: float = 100.0) -> list[Place]:
+def deduplicate_places(
+    places: list[Place],
+    max_distance_m: float = 100.0,
+    max_qid_distance_m: float = 5000.0,
+) -> list[Place]:
+    """max_qid_distance_m is deliberately more generous than max_distance_m: a
+    shared Wikidata QID is stronger evidence than name+proximity alone, but a
+    QID match with wildly divergent coordinates (a plausible tagging error)
+    should still not auto-merge unconditionally — that would violate the
+    "jamais de fusion automatique en cas d'ambiguïté forte" constraint."""
     kept: list[Place] = []
     for place in places:
         is_duplicate = False
         for existing in kept:
-            same_qid = place.wikidata_qid and place.wikidata_qid == existing.wikidata_qid
+            same_qid = (
+                place.wikidata_qid
+                and place.wikidata_qid == existing.wikidata_qid
+                and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_qid_distance_m
+            )
             same_name_and_close = (
                 normalize_name(place.name) == normalize_name(existing.name)
+                and place.category == existing.category
                 and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_distance_m
             )
             if same_qid or same_name_and_close:
@@ -307,13 +361,15 @@ def deduplicate_places(places: list[Place], max_distance_m: float = 100.0) -> li
     return kept
 ```
 
+Note : le chemin QID ne vérifie volontairement pas la catégorie — une identité Wikidata partagée confirmée est une preuve suffisante en elle-même, même si la catégorie diffère (ex : un même lieu catégorisé différemment selon la source).
+
 - [ ] **Step 4: Lancer les tests, vérifier qu'ils passent**
 
 ```bash
 pytest tests/test_dedup.py -v
 ```
 
-Expected: `7 passed`.
+Expected: `13 passed`.
 
 - [ ] **Step 5: Commit**
 
