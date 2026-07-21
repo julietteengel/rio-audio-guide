@@ -14,3 +14,6 @@ dev = ["pytest>=8.0.0"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: tests that require live network access (deselect with '-m \"not integration\"')",
+]
