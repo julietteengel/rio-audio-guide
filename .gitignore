@@ -1,5 +1,6 @@
 .worktrees/
 pipeline/.venv/
 pipeline/places.json
+pipeline/places.csv
 __pycache__/
 *.pyc
