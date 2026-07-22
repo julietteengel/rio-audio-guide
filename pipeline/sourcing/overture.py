@@ -13,6 +13,12 @@ CATEGORY_ALLOWLIST = {
     "national_park",
     "topic_concert_venue",
     "cultural_center",
+    # Ajouté après audit manuel : "beach" avait été identifié dès les tout
+    # premiers tests de cette recherche (777 entrées dans la bbox Rio) mais
+    # jamais reporté dans l'allowlist finale — Copacabana, Ipanema, Flamengo
+    # et Botafogo, parmi les lieux les plus incontournables de Rio, étaient
+    # de ce fait totalement absents du pipeline.
+    "beach",
 }
 
 DEFAULT_RELEASE = "2026-06-17.0"

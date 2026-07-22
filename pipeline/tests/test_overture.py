@@ -24,6 +24,13 @@ def test_category_allowlist_does_not_include_bars_or_restaurants():
     assert "business_advertising" not in CATEGORY_ALLOWLIST
 
 
+def test_category_allowlist_includes_beach():
+    # Régression : "beach" avait été identifié comme catégorie pertinente dès
+    # les premiers tests (Copacabana, Ipanema, Flamengo, Botafogo) mais avait
+    # été omis de l'allowlist réelle jusqu'à un audit manuel qui l'a révélé.
+    assert "beach" in CATEGORY_ALLOWLIST
+
+
 @pytest.mark.integration
 def test_query_overture_places_returns_known_landmark_for_selaron_bbox():
     # Bbox serré autour de l'Escadaria Selarón (frontière Lapa/Santa Teresa).
