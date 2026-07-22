@@ -2,5 +2,8 @@
 pipeline/.venv/
 pipeline/places.json
 pipeline/places.csv
+pipeline/curation/*.csv
+pipeline/curation/*.log
 __pycache__/
 *.pyc
+.DS_Store
