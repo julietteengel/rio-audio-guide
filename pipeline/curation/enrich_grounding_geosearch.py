@@ -7,6 +7,7 @@ name matching against Wikidata.
 Resumable: skips rows that already have grounding_status set.
 """
 import csv
+import math
 import sys
 import time
 
@@ -16,7 +17,17 @@ USER_AGENT = "rio-audio-guide-sourcing/1.0"
 WP_API_PT = "https://pt.wikipedia.org/w/api.php"
 WP_API_EN = "https://en.wikipedia.org/w/api.php"
 GEOSEARCH_RADIUS_M = 150
+MAX_ACCEPT_DISTANCE_M = 250  # reject matches further than this even if word-hint matched
 CHECKPOINT_EVERY = 25
+
+
+def haversine_distance_m(lat1, lon1, lat2, lon2):
+    R = 6371000
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp = math.radians(lat2 - lat1)
+    dl = math.radians(lon2 - lon1)
+    a = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return 2 * R * math.asin(math.sqrt(a))
 
 
 def get_with_retry(url, params, max_retries=5):
@@ -54,22 +65,39 @@ def geosearch_with_extract(lat, lon, name_hint, lang="pt"):
     if not pages:
         return None
 
+    # NOTE: generator=geosearch does NOT populate a "dist" field on
+    # prop=coordinates (that only exists with list=geosearch). Compute the
+    # real distance ourselves from the returned lat/lon against our own
+    # coordinates -- otherwise every candidate falls back to a fake default
+    # and effectively disables proximity-based ranking.
     candidates = []
     for page in pages.values():
         title = page.get("title", "")
         extract = (page.get("extract") or "").strip()
-        coords = page.get("coordinates", [{}])[0]
-        candidates.append((title, extract, coords.get("dist", 9999)))
+        coords_list = page.get("coordinates") or [{}]
+        c = coords_list[0]
+        if "lat" in c and "lon" in c:
+            dist = haversine_distance_m(lat, lon, c["lat"], c["lon"])
+        else:
+            dist = float("inf")
+        candidates.append((title, extract, dist))
 
-    # Prefer a candidate whose title shares a word with our name hint (helps
-    # pick the right one when several unrelated things sit within the radius,
-    # e.g. a church next to a square); fall back to the closest candidate.
-    hint_words = set(w.lower() for w in name_hint.split() if len(w) > 3)
+    candidates = [c for c in candidates if c[2] <= MAX_ACCEPT_DISTANCE_M]
+
+    # Only accept a candidate whose title shares a real word with our name
+    # hint. A nearby-but-unrelated building (a different museum, a church
+    # next door) is not grounding for THIS place -- it's grounding for a
+    # different one, and using it would misattribute facts. No accepted
+    # candidate is a valid, honest outcome (grounding_status stays no_match),
+    # not a bug to work around.
+    STOPWORDS = {"museu", "museum", "casa", "centro", "instituto", "espaço",
+                 "espaco", "cultural", "de", "da", "do", "dos", "das", "e"}
+    hint_words = set(w.lower() for w in name_hint.split() if len(w) > 3) - STOPWORDS
+    if not hint_words:
+        return None
     for title, extract, dist in sorted(candidates, key=lambda c: c[2]):
-        if extract and hint_words & set(w.lower() for w in title.split()):
-            return title, extract, dist
-    for title, extract, dist in sorted(candidates, key=lambda c: c[2]):
-        if extract:
+        title_words = set(w.lower() for w in title.split()) - STOPWORDS
+        if extract and hint_words & title_words:
             return title, extract, dist
     return None
 
