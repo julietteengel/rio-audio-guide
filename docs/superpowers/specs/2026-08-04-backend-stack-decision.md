@@ -1,0 +1,83 @@
+# Rio Audio Guide — Décision : stack backend et portfolio
+
+Ce document tranche un point qui n'était pas encore décidé dans `2026-07-21-rio-audio-guide-design.md`
+ni dans `2026-07-23-roadmap-v2-agentic-architecture.md` : **la stack technique précise du backend**
+(sous-système 5, jusqu'ici "détaillé au moment venu"). Il ne remplace ni l'un ni l'autre.
+
+## Contexte de la décision
+
+En cherchant un projet portfolio pour une candidature (Senior Software Engineer, Powens, équipe EMI —
+Go, hexagonal, DDD, Kubernetes, RabbitMQ, SQL/NoSQL, Redis, Kafka, Docker), une piste a été explorée
+dans une conversation séparée : construire un projet fintech dédié (ledger de paiements) pour coller
+exactement à la fiche de poste. Cette piste a été écartée — la fintech n'est pas un intérêt réel, et un
+projet qu'on ne trouve pas intéressant ne se termine pas.
+
+La piste retenue à la place : **l'audioguide reste le projet unique**, et son backend (jamais construit
+à ce jour — seul le pipeline Python de sourcing/curation existe) est conçu pour couvrir légitimement les
+compétences ciblées, sans ajouter de technologie qui ne sert pas un vrai besoin du produit.
+
+**Point de vigilance explicite** : une proposition initiale pour ce backend listait Postgres + MongoDB +
+Redis + RabbitMQ + Kafka + Kubernetes simultanément, présentés comme des besoins du produit alors qu'ils
+étaient choisis pour matcher une liste de mots-clés de fiche de poste. Ce risque est nommé ici pour ne
+pas se reproduire : une techno qui ne se justifie qu'en entretien par "c'était dans l'offre d'emploi" est
+disqualifiante, pas valorisante, pour un poste qui évalue explicitement le "sound judgment" — et contredit
+le principe déjà posé dans le design doc v1 (hébergement pragmatique, ne pas sur-dimensionner pour un
+produit naissant).
+
+## Stack backend retenue
+
+| Brique | Décision | Justification produit réelle |
+|---|---|---|
+| **Go**, architecture hexagonale + DDD | Retenu (déjà dans le design doc v1) | Domaine réel et non trivial : workflow de publication de contenu (voir invariants ci-dessous) |
+| **PostgreSQL + PostGIS** | Retenu (déjà dans le design doc v1) | Requêtes géospatiales natives ("lieux à moins de N mètres"), stockage des métadonnées (lieux, scripts, statut de relecture) |
+| **RabbitMQ** | Retenu (nouveau) | File de tâches TTS : génération audio longue (jusqu'à ~40s/fichier), coûteuse, avec retries et DLQ — sémantique tâche/file, pas événementielle |
+| **Redis** | Retenu (nouveau) | Cache des requêtes géo chaudes (lieux consultés en boucle par les touristes à proximité), rate limiting sur les endpoints publics |
+| **Kubernetes + Helm + AWS (EKS ponctuel)** | Retenu (déjà dans le design doc v1 — "démo technique EKS, prod réelle Scaleway") | Rien de nouveau à justifier ; KEDA peut scaler les workers TTS sur la profondeur de file plutôt que sur le CPU (cas d'usage réel, pas artificiel) |
+| **Docker** | Retenu | Prérequis de tout ce qui précède |
+
+## Explicitement écarté (et pourquoi)
+
+- **Apache Kafka** — un deuxième broker en plus de RabbitMQ, pour une seule application à volume naissant,
+  n'a pas de justification produit. RabbitMQ seul couvre le seul besoin réel identifié (file de tâches TTS).
+  Un event-streaming pour la télémétrie d'écoute pourrait être un vrai besoin un jour, mais ce jour n'est
+  pas venu — à reconsidérer seulement si un besoin d'analytics temps réel apparaît concrètement en usage.
+- **MongoDB** — le besoin invoqué ("stocker les payloads bruts hétérogènes OSM/Wikidata") existe, mais un
+  type `JSONB` dans PostgreSQL le couvre déjà, dans la même base que le reste, sans opérer un second
+  système de stockage. Ajouter une base NoSQL ici serait une démonstration de technologie, pas une décision
+  d'architecture.
+
+**Principe retenu pour trancher ce genre de cas à l'avenir** : une techno n'entre dans le scope que si un
+besoin produit concret l'exige *et* qu'aucune brique déjà présente ne le couvre aussi bien. Sinon, elle
+reste documentée ici comme option écartée, avec la raison — pas ajoutée "pour le portfolio".
+
+## Le domaine (pourquoi le DDD n'est pas décoratif ici)
+
+Le bounded context central du backend est le **workflow de publication de contenu**, avec des invariants
+réels, découverts par l'expérience pendant la construction du pipeline de sourcing/curation, pas inventés
+pour l'exercice :
+
+- Un lieu ne se publie pas sans relecture humaine (règle déjà en vigueur dans le pipeline de contenu,
+  voir `2026-07-23-roadmap-v2-agentic-architecture.md`, "zéro-hallucination").
+- Une variante linguistique ne se publie pas sans audio généré associé.
+- La déduplication entre sources reste conservatrice — l'expérience réelle du pipeline (ex. les faux
+  positifs du juge anti-hallucination, la nécessité de ne jamais fusionner automatiquement en cas
+  d'ambiguïté) a montré concrètement le coût d'une fusion trop agressive.
+
+## Ce qui n'existe pas encore (correction d'une confusion)
+
+Pour éviter de répéter une inexactitude ailleurs : à la date de ce document, **aucun code Go, aucune base
+de données montée, aucune file de messages et aucune intégration TTS n'existent dans le repo.** Seuls le
+pipeline de sourcing (`pipeline/sourcing/`, branche `sourcing-pipeline`) et les scripts de curation/
+narration Python existent réellement. Tout le contenu de ce document est un plan, pas un état des lieux.
+
+## Séquencement (mise à jour de celui du roadmap v2)
+
+Le séquencement du roadmap v2 reste valable ; ce document précise seulement le contenu technique du
+sous-système 5 (ici renommé backend, distinct du dashboard admin/app mobile) quand il sera attaqué :
+
+1. Compléter le corpus de contenu (sous-système 2 — en cours).
+2. Guide runtime agentique (sous-système 3) — reste la priorité d'apprentissage la plus haute, à écrire
+   à la main en premier.
+3. Backend (Go/hexagonal/DDD/Postgres+PostGIS/RabbitMQ/Redis/K8s, ce document) — écrit à la main pour
+   les mêmes raisons : c'est la partie directement évaluée par la fiche de poste visée.
+4. Ops en profondeur (sous-système 4), dashboard admin + app mobile (sous-système 5 restant).
