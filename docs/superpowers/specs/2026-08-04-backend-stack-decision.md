@@ -31,7 +31,7 @@ produit naissant).
 | **Go**, architecture hexagonale + DDD | Retenu (déjà dans le design doc v1) | Domaine réel et non trivial : workflow de publication de contenu (voir invariants ci-dessous) |
 | **PostgreSQL + PostGIS** | Retenu (déjà dans le design doc v1) | Requêtes géospatiales natives ("lieux à moins de N mètres"), stockage des métadonnées (lieux, scripts, statut de relecture) |
 | **RabbitMQ** | Retenu (nouveau) | File de tâches TTS : génération audio longue (jusqu'à ~40s/fichier), coûteuse, avec retries et DLQ — sémantique tâche/file, pas événementielle |
-| **Redis** | Retenu (nouveau) | Cache des requêtes géo chaudes (lieux consultés en boucle par les touristes à proximité), rate limiting sur les endpoints publics |
+| **Redis** | Écarté pour l'instant (revu le 2026-08-04) | Voir section dédiée ci-dessous |
 | **Kubernetes + Helm + AWS (EKS ponctuel)** | Retenu (déjà dans le design doc v1 — "démo technique EKS, prod réelle Scaleway") | Rien de nouveau à justifier ; KEDA peut scaler les workers TTS sur la profondeur de file plutôt que sur le CPU (cas d'usage réel, pas artificiel) |
 | **Docker** | Retenu | Prérequis de tout ce qui précède |
 
@@ -49,6 +49,23 @@ produit naissant).
 **Principe retenu pour trancher ce genre de cas à l'avenir** : une techno n'entre dans le scope que si un
 besoin produit concret l'exige *et* qu'aucune brique déjà présente ne le couvre aussi bien. Sinon, elle
 reste documentée ici comme option écartée, avec la raison — pas ajoutée "pour le portfolio".
+
+## Redis — revu et écarté (2026-08-04)
+
+Une première version de ce document gardait Redis (cache des requêtes géo chaudes, rate limiting),
+jugé "petit coût, cas d'usage réel". En relisant ce choix à la lumière du même principe que pour
+Kafka/MongoDB, il ne tient pas mieux qu'eux : **il n'y a aujourd'hui aucune requête mesurée lente et
+aucun trafic réel à rate-limiter** — le produit n'a pas encore d'utilisateurs. C'est le même biais
+que Kafka/MongoDB sous une forme plus discrète (un "petit coût" reste un coût, et une brique de plus
+à opérer, tester, et expliquer en entretien si elle n'a jamais servi à rien de concret).
+
+PostGIS seul encaisse largement le volume attendu au lancement (2230 lieux, requêtes géo simples).
+Redis est retardé, pas supprimé : à ajouter seulement quand un besoin mesuré apparaît (une requête
+identifiée comme lente en usage réel, ou un abus constaté sur un endpoint public) — jamais de manière
+anticipée. C'est cohérent avec la recherche du même jour sur le jugement IA/dev
+(`2026-08-04-ai-judgment-research.md`) : la documentation GitHub citée y insiste sur la vérification
+du besoin réel avant d'accepter une suggestion, IA ou non — le même standard s'applique à mes propres
+propositions passées, pas seulement à celles d'un outil IA.
 
 ## Le domaine (pourquoi le DDD n'est pas décoratif ici)
 
