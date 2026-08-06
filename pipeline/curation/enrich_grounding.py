@@ -18,7 +18,7 @@ import time
 
 import requests
 
-USER_AGENT = "rio-audio-guide-sourcing/1.0"
+USER_AGENT = "rio-audio-guide-content-pipeline/1.0 (non-commercial research project; contact via project repo)"
 WD_API = "https://www.wikidata.org/w/api.php"
 WP_API_PT = "https://pt.wikipedia.org/w/api.php"
 WP_API_EN = "https://en.wikipedia.org/w/api.php"

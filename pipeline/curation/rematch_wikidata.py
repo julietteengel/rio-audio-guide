@@ -12,7 +12,7 @@ import unicodedata
 import requests
 
 SEARCH_URL = "https://www.wikidata.org/w/api.php"
-USER_AGENT = "rio-audio-guide-sourcing/1.0"
+USER_AGENT = "rio-audio-guide-content-pipeline/1.0 (non-commercial research project; contact via project repo)"
 MAX_DISTANCE_M = 200.0
 
 

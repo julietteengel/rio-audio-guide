@@ -13,12 +13,14 @@ import time
 
 import requests
 
-USER_AGENT = "rio-audio-guide-sourcing/1.0"
+USER_AGENT = "rio-audio-guide-content-pipeline/1.0 (non-commercial research project; contact via project repo)"
 WP_API_PT = "https://pt.wikipedia.org/w/api.php"
 WP_API_EN = "https://en.wikipedia.org/w/api.php"
+NOMINATIM_REVERSE_URL = "https://nominatim.openstreetmap.org/reverse"
 GEOSEARCH_RADIUS_M = 150
 MAX_ACCEPT_DISTANCE_M = 250  # reject matches further than this even if word-hint matched
 CHECKPOINT_EVERY = 25
+RIO_MUNICIPALITY_NAMES = {"rio de janeiro"}
 
 
 def haversine_distance_m(lat1, lon1, lat2, lon2):
@@ -48,7 +50,8 @@ def get_with_retry(url, params, max_retries=5):
 
 def geosearch_with_extract(lat, lon, name_hint, lang="pt"):
     """One call: find nearby Wikipedia articles + their intro extracts.
-    Returns (title, extract, distance_m) for the best match, or None."""
+    Returns (title, extract, distance_m, matched_lat, matched_lon) for the
+    best match, or None."""
     api = WP_API_PT if lang == "pt" else WP_API_EN
     data = get_with_retry(api, {
         "action": "query",
@@ -80,7 +83,7 @@ def geosearch_with_extract(lat, lon, name_hint, lang="pt"):
             dist = haversine_distance_m(lat, lon, c["lat"], c["lon"])
         else:
             dist = float("inf")
-        candidates.append((title, extract, dist))
+        candidates.append((title, extract, dist, c.get("lat"), c.get("lon")))
 
     candidates = [c for c in candidates if c[2] <= MAX_ACCEPT_DISTANCE_M]
 
@@ -95,11 +98,30 @@ def geosearch_with_extract(lat, lon, name_hint, lang="pt"):
     hint_words = set(w.lower() for w in name_hint.split() if len(w) > 3) - STOPWORDS
     if not hint_words:
         return None
-    for title, extract, dist in sorted(candidates, key=lambda c: c[2]):
+    for title, extract, dist, m_lat, m_lon in sorted(candidates, key=lambda c: c[2]):
         title_words = set(w.lower() for w in title.split()) - STOPWORDS
         if extract and hint_words & title_words:
-            return title, extract, dist
+            return title, extract, dist, m_lat, m_lon
     return None
+
+
+def municipality_for(lat, lon):
+    """Reverse-geocode via Nominatim; returns the municipality/city name or
+    None if it can't be determined. Used to catch sources that are real but
+    describe a place in a neighboring municipality (Niterói, São João de
+    Meriti, Nova Iguaçu, Duque de Caxias...) -- proximity to our stored
+    coordinates alone doesn't rule this out, since our own coordinates can
+    already be wrong (this exact failure hit Casa de Cultura de Nova Iguaçu
+    during sourcing, and 3 of 60 canary results during grounding)."""
+    data = get_with_retry(NOMINATIM_REVERSE_URL, {
+        "lat": lat,
+        "lon": lon,
+        "format": "json",
+        "zoom": 10,
+        "addressdetails": 1,
+    })
+    address = data.get("address", {})
+    return address.get("city") or address.get("town") or address.get("municipality")
 
 
 def process_row(row):
@@ -116,10 +138,26 @@ def process_row(row):
         row["grounding_status"] = "no_match"
         return
 
-    title, extract, dist = result
+    title, extract, dist, m_lat, m_lon = result
     row["matched_wikipedia_title"] = title
     row["grounding_text"] = extract
     row["grounding_distance_m"] = f"{dist:.0f}"
+
+    try:
+        time.sleep(1)  # Nominatim public-instance usage policy: max 1 req/s.
+        municipality = municipality_for(m_lat, m_lon)
+    except (requests.RequestException, RuntimeError) as exc:
+        row["boundary_municipality"] = ""
+        row["grounding_status"] = f"error:boundary_check:{type(exc).__name__}"
+        return
+
+    row["boundary_municipality"] = municipality or ""
+    if municipality and municipality.strip().lower() not in RIO_MUNICIPALITY_NAMES:
+        # Real source, wrong city -- reject rather than silently accept a
+        # neighboring municipality's landmark under Rio de Janeiro content.
+        row["grounding_status"] = "outside_boundary"
+        return
+
     row["grounding_status"] = "ok"
 
 
@@ -128,7 +166,8 @@ def main(input_path, output_path, limit=None):
         rows = list(csv.DictReader(f))
 
     for r in rows:
-        for col in ("matched_wikipedia_title", "grounding_text", "grounding_distance_m", "grounding_status"):
+        for col in ("matched_wikipedia_title", "grounding_text", "grounding_distance_m",
+                    "boundary_municipality", "grounding_status"):
             r.setdefault(col, "")
 
     fieldnames = list(rows[0].keys())
@@ -141,8 +180,12 @@ def main(input_path, output_path, limit=None):
     for i, row in enumerate(targets, 1):
         process_row(row)
         time.sleep(0.5)
-        print(f"  [{i}/{len(targets)}] {row['name']!r} -> {row['grounding_status']}"
-              + (f" ({row['matched_wikipedia_title']}, {row['grounding_distance_m']}m)" if row["grounding_status"] == "ok" else ""))
+        detail = ""
+        if row["grounding_status"] == "ok":
+            detail = f" ({row['matched_wikipedia_title']}, {row['grounding_distance_m']}m)"
+        elif row["grounding_status"] == "outside_boundary":
+            detail = f" ({row['matched_wikipedia_title']} -> {row['boundary_municipality']})"
+        print(f"  [{i}/{len(targets)}] {row['name']!r} -> {row['grounding_status']}{detail}")
         if i % CHECKPOINT_EVERY == 0:
             with open(output_path, "w", newline="", encoding="utf-8") as f:
                 writer = csv.DictWriter(f, fieldnames=fieldnames)
