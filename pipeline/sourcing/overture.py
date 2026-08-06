@@ -9,17 +9,15 @@ CATEGORY_ALLOWLIST = {
     "history_museum",
     "art_museum",
     "modern_art_museum",
-    "botanical_garden",
-    "national_park",
     "topic_concert_venue",
     "cultural_center",
-    # Ajouté après audit manuel : "beach" avait été identifié dès les tout
-    # premiers tests de cette recherche (777 entrées dans la bbox Rio) mais
-    # jamais reporté dans l'allowlist finale — Copacabana, Ipanema, Flamengo
-    # et Botafogo, parmi les lieux les plus incontournables de Rio, étaient
-    # de ce fait totalement absents du pipeline.
-    "beach",
 }
+
+# Explicitly excluded, not forgotten: "beach", "botanical_garden", "national_park".
+# Scope decision: culturel strict — no nature/landscape categories, even popular
+# ones. landmark_and_historical_building still needs its own cultural-vs-natural
+# triage downstream (it mixes built heritage with hills/rocks/waterfalls/viewpoints
+# under the same Overture category).
 
 DEFAULT_RELEASE = "2026-06-17.0"
 

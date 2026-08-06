@@ -24,11 +24,12 @@ def test_category_allowlist_does_not_include_bars_or_restaurants():
     assert "business_advertising" not in CATEGORY_ALLOWLIST
 
 
-def test_category_allowlist_includes_beach():
-    # Régression : "beach" avait été identifié comme catégorie pertinente dès
-    # les premiers tests (Copacabana, Ipanema, Flamengo, Botafogo) mais avait
-    # été omis de l'allowlist réelle jusqu'à un audit manuel qui l'a révélé.
-    assert "beach" in CATEGORY_ALLOWLIST
+def test_category_allowlist_excludes_nature_categories():
+    # Scope decision reversed: culturel strict, no landscape/nature categories,
+    # even popular ones (beaches included) — see overture.py comment.
+    assert "beach" not in CATEGORY_ALLOWLIST
+    assert "botanical_garden" not in CATEGORY_ALLOWLIST
+    assert "national_park" not in CATEGORY_ALLOWLIST
 
 
 @pytest.mark.integration
