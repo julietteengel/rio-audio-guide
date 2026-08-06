@@ -74,10 +74,16 @@ current need — see the backend-stack-decision spec before re-adding either.
   judge has only checked 131 of those. The `landmark_and_historical_building` category (1374 of the
   1789 still-unnarrated places) was found to be ~78% noise (real-estate/business/street-address
   entries, not landmarks) and triaged down to 307 real candidates
-  (`pipeline/curation/landmark_classification.csv`); a 60-place grounding-search canary on that
-  triaged set is in progress to measure real hit rate before scaling to the rest. The other ~415
-  unnarrated places (museums, cultural centers, monuments, etc.) haven't been through this triage yet.
-  Photos and audio/TTS generation — both fully specced in the design doc — have **not started at all**.
+  (`pipeline/curation/landmark_classification.csv`). A 60-place grounding-search canary on that
+  triaged set is done: **30/60 found (50%)**. New finding from the canary, not previously known: at
+  least 3 of the "found" places (Gragoatá, Morro do Embaixador, Serra do Vulcão) have a real source
+  but sit outside Rio de Janeiro's actual municipal boundary (Niterói, São João de Meriti, Nova
+  Iguaçu respectively) — the same failure mode that already hit once during sourcing (Casa de Cultura
+  de Nova Iguaçu). This is now a confirmed recurring pattern, not a one-off — an explicit municipal-
+  boundary check needs to be added to the grounding pipeline before scaling to the remaining ~249
+  places, not fixed case-by-case. The other ~415 unnarrated places (museums, cultural centers,
+  monuments, etc.) haven't been through this triage yet. Photos and audio/TTS generation — both fully
+  specced in the design doc — have **not started at all**.
 - **Everything else** (guide runtime, backend, ops, admin/mobile): not started.
 
 ## Where to find more

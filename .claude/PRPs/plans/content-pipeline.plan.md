@@ -131,13 +131,17 @@ is smaller and more specific than the raw unnarrated count suggested.
 
 ## Step-by-Step Tasks
 
-### Task 1: Resolve the grounding-search canary
-- **ACTION**: Get batch B's actual 30-line result (it stalled twice returning status updates instead
-  of data); if it can't produce a clean result, either retry it once more or treat batch A's 30-place,
-  57%-found result as sufficient signal.
-- **VALIDATE**: A combined hit-rate number exists for the 60-place canary, with the failure-pattern
-  notes batch A already surfaced (micro-toponyms in under-documented areas fail search reliably;
-  try IPHAN/INEPAC/prefeitura.rio registries directly for those instead of generic web search).
+### Task 1: Resolve the grounding-search canary — DONE
+- **RESULT**: 30/60 found (50%). Batch A: 17/30 (57%). Batch B: 13/30 (43%).
+- **NEW FINDING**: at least 3 of the 30 found places are outside Rio de Janeiro's actual municipal
+  boundary despite having a real source (Gragoatá → Niterói, Morro do Embaixador → São João de
+  Meriti, Serra do Vulcão → Nova Iguaçu). This is now a confirmed recurring pattern (same failure as
+  the earlier Casa de Cultura de Nova Iguaçu case during sourcing) — see Task 3, a dedicated check is
+  now required, not case-by-case fixes.
+- Failure pattern for NOT_FOUND: micro-toponyms in under-documented areas fail search reliably;
+  scenic-sounding names (e.g. "Reserva Natura Camorim", "Bosque dos Buritis") often turn out to be
+  residential condominiums, not real landmarks, despite passing the earlier KEEP/UNCERTAIN triage —
+  self-corrects naturally since they come back NOT_FOUND, no separate action needed.
 
 ### Task 2: Sample-audit the remaining ~415 places in other categories
 - **ACTION**: Same method as the landmark-category audit — pull a ~50-80 place random sample across
@@ -148,10 +152,14 @@ is smaller and more specific than the raw unnarrated count suggested.
 
 ### Task 3: Scale grounding search to the full triaged pool
 - **ACTION**: Run the established source-priority order (cache → SPARQL → Wikipedia geosearch → web
-  search) across the ~249 landmark-category candidates needing fresh grounding (196 minus canary'd 53
-  once Task 1 resolves) plus whatever categories Task 2 clears for direct search — batched, spaced out
-  per the documented quota constraint (2-3 concurrent lots max).
-- **VALIDATE**: A grounding-found/not-found count per batch, logged the same way the canary was.
+  search) across the ~249 landmark-category candidates needing fresh grounding (189 remaining after
+  the 60-place canary) plus whatever categories Task 2 clears for direct search — batched, spaced out
+  per the documented quota constraint (2-3 concurrent lots max). **New requirement from the canary**:
+  every FOUND result must be checked against Rio de Janeiro's actual municipal boundary (not just
+  proximity to the stored coordinates) before being accepted — reject or flag anything resolving to
+  a neighboring municipality (Niterói, São João de Meriti, Nova Iguaçu, Duque de Caxias, etc.).
+- **VALIDATE**: A grounding-found/not-found count per batch, logged the same way the canary was, plus
+  a boundary-check pass/fail count.
 
 ### Task 4: Generate FR narration for everything grounded
 - **ACTION**: Apply the calibrated style (see Patterns to Mirror) to every newly-grounded place.
