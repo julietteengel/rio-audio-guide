@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
-"""Fetch Wikipedia intro extracts in batches of 50 titles per request
-(instead of one request per place) for places matched via the Wikidata
-SPARQL bulk query. Uses a compliant User-Agent per Wikimedia's 2026 API
-usage policy (meaningful UA + contact info) to avoid the restrictive
-anonymous-traffic rate tier.
+"""Fetch Wikipedia intro extracts in batches of 20 titles per request
+(TextExtracts' real cap even with exlimit=max) for places matched via
+bulk_wikidata_match.py's SPARQL bulk query. Uses a compliant User-Agent per
+Wikimedia's 2026 API usage policy (meaningful UA + contact info) to avoid
+the restrictive anonymous-traffic rate tier.
+
+Resumable: skips place ids already present in the output file.
 """
 import json
-import pickle
 import sys
 import time
-import urllib.parse
 
 import requests
 
 USER_AGENT = "rio-audio-guide-content-pipeline/1.0 (non-commercial research project; contact via project repo)"
+BATCH = 20  # TextExtracts' exlimit caps at 20 even with exlimit=max
 
 
 def fetch_batch(titles, lang, max_retries=6):
@@ -25,7 +26,7 @@ def fetch_batch(titles, lang, max_retries=6):
             "prop": "extracts",
             "exintro": 1,
             "explaintext": 1,
-            "exlimit": "max",  # without this, TextExtracts only computes the extract for the FIRST title in the batch
+            "exlimit": "max",
             "redirects": 1,
             "titles": "|".join(titles),
             "format": "json",
@@ -53,55 +54,48 @@ def fetch_batch(titles, lang, max_retries=6):
     return result, normalized, redirects
 
 
-def main():
-    with open("/Users/julietteengel/.claude/jobs/b341cee9/tmp/wikidata_matches.pkl", "rb") as f:
-        matches = pickle.load(f)
-
-    def get_title_lang(wp):
-        for lang, key in [("pt", "artPT"), ("fr", "artFR"), ("en", "artEN"), ("es", "artES")]:
-            url = wp.get(key)
-            if url:
-                title = urllib.parse.unquote(url.rsplit("/", 1)[-1]).replace("_", " ")
-                return lang, title
-        return None, None
-
-    by_lang = {}
-    for r, wp, d in matches:
-        lang, title = get_title_lang(wp)
-        by_lang.setdefault(lang, []).append({"place_name": r["name"], "title": title, "qid": wp["qid"], "dist": d})
+def main(matches_path, output_path):
+    with open(matches_path, encoding="utf-8") as f:
+        matches = json.load(f)  # place_id -> {qid, wikidata_label, lang, title, dist_m}
 
     try:
-        with open("curation/wikidata_bulk_extracts.json", encoding="utf-8") as f:
+        with open(output_path, encoding="utf-8") as f:
             all_results = json.load(f)
         print(f"Resuming: {len(all_results)} already fetched", file=sys.stderr)
     except FileNotFoundError:
-        all_results = {}  # place_name -> {title, lang, extract}
+        all_results = {}  # place_id -> {title, lang, extract, qid, dist_m}
+
+    by_lang = {}
+    for place_id, m in matches.items():
+        if place_id in all_results:
+            continue
+        by_lang.setdefault(m["lang"], []).append((place_id, m))
 
     for lang, items in by_lang.items():
-        items = [it for it in items if it["place_name"] not in all_results]
-        titles = [it["title"] for it in items]
-        BATCH = 20  # TextExtracts' exlimit caps at 20 even with exlimit=max
-        for i in range(0, len(titles), BATCH):
-            batch = titles[i:i+BATCH]
-            print(f"[{lang}] batch {i//BATCH+1}/{(len(titles)-1)//BATCH+1} ({len(batch)} titles)", file=sys.stderr)
-            extracts, normalized, redirects = fetch_batch(batch, lang)
-            # resolve title -> extract, following normalization/redirects
-            for it in items[i:i+BATCH]:
-                t = it["title"]
+        for i in range(0, len(items), BATCH):
+            batch = items[i:i + BATCH]
+            titles = [m["title"] for _, m in batch]
+            print(f"[{lang}] batch {i // BATCH + 1}/{(len(items) - 1) // BATCH + 1} ({len(batch)} titles)", file=sys.stderr)
+            extracts, normalized, redirects = fetch_batch(titles, lang)
+            for place_id, m in batch:
+                t = m["title"]
                 t2 = normalized.get(t, t)
                 t3 = redirects.get(t2, t2)
                 extract = extracts.get(t3) or extracts.get(t2) or extracts.get(t)
                 if extract:
-                    all_results[it["place_name"]] = {"title": t, "lang": lang, "extract": extract, "qid": it["qid"], "dist_m": it["dist"]}
-            with open("curation/wikidata_bulk_extracts.json", "w", encoding="utf-8") as f:
+                    all_results[place_id] = {
+                        "title": t, "lang": lang, "extract": extract,
+                        "qid": m["qid"], "dist_m": m["dist_m"],
+                    }
+            with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(all_results, f, ensure_ascii=False, indent=2)
             time.sleep(2)
 
-    with open("curation/wikidata_bulk_extracts.json", "w", encoding="utf-8") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(all_results, f, ensure_ascii=False, indent=2)
 
     print(f"Total extracts fetched: {len(all_results)} / {len(matches)}", file=sys.stderr)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1], sys.argv[2])

@@ -16,6 +16,7 @@ title, dist_m}. Not resumable (single bulk query, re-run is cheap).
 import json
 import sys
 import unicodedata
+import urllib.parse
 
 import requests
 
@@ -43,6 +44,17 @@ SELECT ?item ?itemLabel ?coord ?artPT ?artEN ?artFR ?artES WHERE {{
 
 STOPWORDS = {"museu", "museum", "casa", "centro", "instituto", "espaco",
              "cultural", "de", "da", "do", "dos", "das", "e", "praca", "parque"}
+
+NON_MAINSPACE_PREFIXES = {
+    "wikipedia", "wikipédia", "wikipédia discussão", "wikipedia talk",
+    "portal", "portal discussão", "portal talk",
+    "categoria", "category", "categoria discussão", "category talk",
+    "ficheiro", "file", "arquivo",
+    "predefinição", "template", "modelo",
+    "ajuda", "help", "wikcionário", "wiktionary",
+    "usuário", "usuária", "user", "utilisateur",
+    "anexo", "anexo discussão",
+}
 
 
 def haversine_m(lat1, lon1, lat2, lon2):
@@ -85,10 +97,22 @@ def fetch_wikidata_items():
         for lang, key in [("pt", "artPT"), ("en", "artEN"), ("fr", "artFR"), ("es", "artES")]:
             if key in b:
                 url = b[key]["value"]
-                title = url.rsplit("/", 1)[-1].replace("_", " ")
-                import urllib.parse
-                title = urllib.parse.unquote(title)
+                # Split only on the "/wiki/" marker, not on the last "/" --
+                # titles can contain their own slashes (e.g. project pages
+                # like "Wikipédia:GLAM/Instituto Pretos Novos"), and rsplit
+                # on "/" alone truncates those to a nonexistent page title.
+                title = urllib.parse.unquote(url.split("/wiki/", 1)[-1].replace("_", " "))
+                # Reject non-mainspace pages: project/portal/category pages
+                # aren't real encyclopedia content and can't ground a
+                # narration (mainspace titles can legitimately contain a
+                # colon, e.g. film titles, so check against known namespace
+                # prefixes rather than "any colon").
+                prefix = title.split(":", 1)[0].lower()
+                if prefix in NON_MAINSPACE_PREFIXES:
+                    continue
                 articles[lang] = title
+        if not articles:
+            continue  # every sitelink was non-mainspace -- no real article left to ground on
         items.append({"qid": qid, "label": label, "lat": lat, "lon": lon, "articles": articles})
     return items
 
