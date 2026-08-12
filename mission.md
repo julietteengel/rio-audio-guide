@@ -69,23 +69,28 @@ current need — see the backend-stack-decision spec before re-adding either.
 5. **Ops depth** — built as its own deliberate phase, not bolted on at the end.
 6. **Admin dashboard + mobile app** — last.
 
-## Current status (as of 2026-08-06 — keep this section updated, don't let it drift)
+## Current status (as of 2026-08-12 — keep this section updated, don't let it drift)
 
-- **Sourcing**: 2230 candidate places in Rio, deduplicated. Branch complete but unmerged.
-- **Content pipeline**: 441/2230 places narrated in FR, 422 in all 4 languages. Anti-hallucination
-  judge has only checked 131 of those. The `landmark_and_historical_building` category (1374 of the
-  1789 still-unnarrated places) was found to be ~78% noise (real-estate/business/street-address
-  entries, not landmarks) and triaged down to 307 real candidates
-  (`pipeline/curation/landmark_classification.csv`). A 60-place grounding-search canary on that
-  triaged set is done: **30/60 found (50%)**. New finding from the canary, not previously known: at
-  least 3 of the "found" places (Gragoatá, Morro do Embaixador, Serra do Vulcão) have a real source
-  but sit outside Rio de Janeiro's actual municipal boundary (Niterói, São João de Meriti, Nova
-  Iguaçu respectively) — the same failure mode that already hit once during sourcing (Casa de Cultura
-  de Nova Iguaçu). This is now a confirmed recurring pattern, not a one-off — an explicit municipal-
-  boundary check needs to be added to the grounding pipeline before scaling to the remaining ~249
-  places, not fixed case-by-case. The other ~415 unnarrated places (museums, cultural centers,
-  monuments, etc.) haven't been through this triage yet. Photos and audio/TTS generation — both fully
-  specced in the design doc — have **not started at all**.
+- **Sourcing**: rebuilt from scratch after an accidental data-loss (see
+  `docs/superpowers/specs/2026-08-04-backend-stack-decision.md`-era commits and git history on
+  `sourcing-pipeline` for context) — 3858 raw places, category allowlist restricted to strict cultural
+  scope (nature/landscape categories dropped). Branch complete but unmerged, pending human review.
+- **Content pipeline**: full CULTURAL/NATURAL/NOISE triage done on the three noisy Overture categories
+  (`landmark_and_historical_building`, `topic_concert_venue`, `cultural_center`) plus the trusted
+  categories → **773 CULTURAL places**. Municipal-boundary check (Nominatim reverse-geocode, not just
+  proximity to stored coordinates) removed **77 places actually outside Rio** (mostly Niterói) →
+  **696 boundary-verified places**, the real base for grounding. Grounding switched from a per-place
+  Wikipedia geosearch (throttled by Wikimedia's anti-scraping tier even with a compliant User-Agent)
+  to a **bulk SPARQL query** (`wikibase:around`, one request, ~1300 candidate Wikidata items) + local
+  spatial/name-overlap matching — **193 places grounded** with a real source. Of those, 154 got fresh
+  FR/EN/ES/PT narration this session (`narrations_data_part4.py`), on top of 33 that already had
+  narration surviving from before the data loss — **187 places narrated across parts 1-4**. 7 places
+  hit a real source that didn't actually describe them (wrong entity, thin/off-topic extract) and were
+  routed to `ungrounded_queue_v1.csv` with a reason, not silently dropped. The remaining ~500
+  boundary-verified places haven't been grounded yet (per-place fallback search or manual web search
+  needed for places with no Wikidata/Wikipedia presence). Anti-hallucination judge has not been re-run
+  on this new corpus yet. Photos and audio/TTS generation — both fully specced in the design doc —
+  have **not started at all**.
 - **Everything else** (guide runtime, backend, ops, admin/mobile): not started.
 
 ## Where to find more
