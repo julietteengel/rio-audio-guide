@@ -13,20 +13,6 @@
     "qid": "Q10333663",
     "dist_m": 51.4
   },
-  "overture:MAAS Museu Arquidiocesano de Arte Sacra do Rio de Janeiro:-22.91072:-43.18043": {
-    "title": "Catedral de São Sebastião do Rio de Janeiro",
-    "lang": "pt",
-    "extract": "A Catedral de São Sebastião do Rio de Janeiro, também conhecida como Catedral Metropolitana do Rio de Janeiro, é uma catedral católica localizada no Centro da cidade do Rio de Janeiro, no Brasil. Foi inaugurada em 1979, substituindo, como catedral da cidade, a Igreja de Nossa Senhora do Carmo.",
-    "qid": "Q2411716",
-    "dist_m": 36.6
-  },
-  "overture:Museu Arquidiocesano de Arte Sacra do Rio de Janeiro (MAAS):-22.91014:-43.18058": {
-    "title": "Catedral de São Sebastião do Rio de Janeiro",
-    "lang": "pt",
-    "extract": "A Catedral de São Sebastião do Rio de Janeiro, também conhecida como Catedral Metropolitana do Rio de Janeiro, é uma catedral católica localizada no Centro da cidade do Rio de Janeiro, no Brasil. Foi inaugurada em 1979, substituindo, como catedral da cidade, a Igreja de Nossa Senhora do Carmo.",
-    "qid": "Q2411716",
-    "dist_m": 88.2
-  },
   "overture:Museu das Telecomunicações:-22.92996:-43.17651": {
     "title": "Museu das Comunicações e Humanidades",
     "lang": "pt",
@@ -68,13 +54,6 @@
     "extract": "A Escadaria Selarón é uma obra arquitetônica localizada entre os bairros de Santa Teresa e Lapa, no Rio de Janeiro, Brasil, decorada pelo artista chileno radicado no Brasil de longa data, Jorge Selarón, que declarou-a como uma \"homenagem ao povo brasileiro\".\nA obra do artista chileno é considerada a terceira atração turística mais buscada pelos turistas do Rio de Janeiro, atrás somente do Cristo Redentor e do Pão de Açúcar.",
     "qid": "Q2200939",
     "dist_m": 56.9
-  },
-  "overture:CCBB Rio de Janeiro:-22.90094:-43.17645": {
-    "title": "Centro Cultural Correios (Rio de Janeiro)",
-    "lang": "pt",
-    "extract": "O Centro Cultural Correios Rio de Janeiro localiza-se no Centro da cidade do Rio de Janeiro, no Brasil.\nEncontra-se instalado em um edifício histórico que integra o Corredor Cultural, tendo, como vizinhos, a Casa França-Brasil e o Centro Cultural do Banco do Brasil.",
-    "qid": "Q18483673",
-    "dist_m": 71.7
   },
   "overture:Centro Cultural Banco do Brasil:-22.90096:-43.17648": {
     "title": "Centro Cultural Banco do Brasil (Rio de Janeiro)",
@@ -783,13 +762,6 @@
     "qid": "Q2500590",
     "dist_m": 0.0
   },
-  "wikidata:Rua do Catete:-22.92592:-43.17625": {
-    "title": "Rua do Catete",
-    "lang": "pt",
-    "extract": "A Rua do Catete localiza-se nos bairros da Glória e do Catete, na cidade do Rio de Janeiro, no Brasil. Originou-se do Caminho do Catete, que já existia desde antes da chegada dos portugueses e dos franceses ao Rio de Janeiro no século XVI.\nAtualmente, ela se divide em dois trechos: um, com o trânsito no sentido Centro-Zona Sul, que começa no Largo da Glória e vai até a Rua Pedro Américo. O outro trecho, com sentido Zona Sul-Centro, começa no Centro Integrado de Educação Pública Presidente Tancredo Neves e termina na Glória.",
-    "qid": "Q10365024",
-    "dist_m": 0.0
-  },
   "wikidata:Sambódromo da Marquês de Sapucaí:-22.91138:-43.19685": {
     "title": "Sambódromo da Marquês de Sapucaí",
     "lang": "pt",
@@ -889,11 +861,11 @@
     "dist_m": 10.2
   },
   "overture:Palácio do Catete:-22.92589:-43.17620": {
-    "title": "Rua do Catete",
+    "title": "Palácio do Catete",
     "lang": "pt",
-    "extract": "A Rua do Catete localiza-se nos bairros da Glória e do Catete, na cidade do Rio de Janeiro, no Brasil. Originou-se do Caminho do Catete, que já existia desde antes da chegada dos portugueses e dos franceses ao Rio de Janeiro no século XVI.\nAtualmente, ela se divide em dois trechos: um, com o trânsito no sentido Centro-Zona Sul, que começa no Largo da Glória e vai até a Rua Pedro Américo. O outro trecho, com sentido Zona Sul-Centro, começa no Centro Integrado de Educação Pública Presidente Tancredo Neves e termina na Glória.",
-    "qid": "Q10365024",
-    "dist_m": 5.9
+    "extract": "O Palácio do Catete é um prédio histórico localizado na cidade do Rio de Janeiro, sendo um exemplar da arquitetura neoclássica brasileira do final do século XIX. O palácio foi palco de diversos episódios importantes da história do Brasil, tal como o suicídio de Getúlio Vargas, e abriga atualmente o Museu da República.",
+    "qid": "Q1142766",
+    "dist_m": 11.4
   },
   "overture:Submarino-Museu Riachuelo S-22:-22.90047:-43.17464": {
     "title": "S Riachuelo (S-22)",
@@ -943,13 +915,6 @@
     "extract": "O Pavilhão Mourisco, também conhecido como Castelo da Fiocruz ou Palácio de Manguinhos, foi projetado pelo arquiteto português Luiz Moraes Júnior com base em desenhos do próprio Oswaldo Cruz. A edificação, com forte inspiração do Palácio de Alhambra (Granada, Espanha), começou a ser construída em 1905 e foi inaugurada em 1918. O edifício que mescla referências mouriscas e europeias se situa no alto de uma colina, destacando-se na paisagem da cidade do Rio de Janeiro. Grande parte dos seus materiais construtivos foi importada, com exceção da madeira e do granito, e sua construção foi executada por mão de obra estrangeira, embora houvesse também brasileiros na equipe, que passaram a morar nas redondezas, sobretudo na área onde hoje se situa a comunidade do Amorim.\nA instituição que receberia seu nome, foi imaginada por Oswaldo Cruz à semelhança ao Instituto Pasteur, em Paris, reunindo a produção de vacinas e remédios, a pesquisa científica e demais atividades ligadas à saúde pública. Hoje, o edifício abriga áreas administrativas da Presidência da Fiocruz e do Instituto Oswaldo Cruz, mas, também importantes acervos como a Coleção Entomológica, a Seção de Obras Raras da Biblioteca de Manguinhos. O Pavilhão Mourisco está aberto à visitação pública, fazendo parte do circuito oferecido pelo Museu da Vida Fiocruz da Casa de Oswaldo Cruz.\nEm 1981 o pavilhão foi tombado pelo Instituto do Patrimônio Histórico e Artístico Nacional (IPHAN) junto com a Cavalariça da Fiocruz e o Pavilhão da Peste. A própria Fiocruz atua na preservação e restauração do conjunto, assim como de todo o patrimônio arquitetônico, arqueológico e urbanístico da Fundação.\nPor sua importância histórica, cultural e científica, o Pavilhão Mourisco da Fiocruz é candidato a Patrimônio Cultural da Humanidade.",
     "qid": "Q84971371",
     "dist_m": 7.2
-  },
-  "overture:Catete Palace:-22.92588:-43.17620": {
-    "title": "Rua do Catete",
-    "lang": "pt",
-    "extract": "A Rua do Catete localiza-se nos bairros da Glória e do Catete, na cidade do Rio de Janeiro, no Brasil. Originou-se do Caminho do Catete, que já existia desde antes da chegada dos portugueses e dos franceses ao Rio de Janeiro no século XVI.\nAtualmente, ela se divide em dois trechos: um, com o trânsito no sentido Centro-Zona Sul, que começa no Largo da Glória e vai até a Rua Pedro Américo. O outro trecho, com sentido Zona Sul-Centro, começa no Centro Integrado de Educação Pública Presidente Tancredo Neves e termina na Glória.",
-    "qid": "Q10365024",
-    "dist_m": 6.9
   },
   "overture:Centro de Tradições Nordestinas Luiz Gonzaga:-22.89746:-43.22038": {
     "title": "Centro Luiz Gonzaga de Tradições Nordestinas",
@@ -1203,13 +1168,6 @@
     "qid": "Q5470982",
     "dist_m": 26.4
   },
-  "overture:Museo Naval Rio do Janeiro:-22.90612:-43.17680": {
-    "title": "Zona Central do Rio de Janeiro",
-    "lang": "pt",
-    "extract": "A Zona Central do Rio de Janeiro é uma área geográfica do município do Rio de Janeiro, sendo o centro histórico, comercial e financeiro do município e do estado. É uma das quatro zonas do município, sendo administrada por uma subprefeitura, a subprefeitura do Centro e Centro Histórico. A subprefeitura administra as regiões administrativas Portuária, Centro, Rio Comprido, São Cristovão, Ilha de Paquetá e Santa Teresa, e engloba todos os seus bairros, que são: Gamboa, Centro do Rio, Lapa, Saúde, Cidade Nova, Santa Teresa, Estácio, Catumbi, Santo Cristo, Paquetá e Glória. Outros bairros também estão incluídos na subprefeitura, como: Caju, Benfica, Vasco da Gama, São Cristóvão, Mangueira, Rio Comprido e Praça da Bandeira. Os limites da Zona Central são: Catete, Flamengo e Laranjeiras, na Zona Sul; Alto da Boa Vista, Cidade Universitária, Maracanã, Praça da Bandeira, Vila Isabel, Caju e Tijuca, na Zona Norte. Desde 2009, a região vem sendo revitalizada pelo poder público através de programas como Choque de Ordem, Porto Maravilha e Morar Carioca.[carece de fontes?] Em 2023, o bairro da Glória, que antes fazia parte da Zona Sul da cidade, passou a integrar um dos bairros da Zona Central, através de um decreto assinado pela Prefeitura.",
-    "qid": "Q1086248",
-    "dist_m": 85.7
-  },
   "overture:Museu Botafogo:-22.95494:-43.17791": {
     "title": "Botafogo de Futebol e Regatas",
     "lang": "pt",
@@ -1246,11 +1204,11 @@
     "dist_m": 14.5
   },
   "overture:Museu Nacional de Belas Artes:-22.90935:-43.17569": {
-    "title": "Biblioteca Nacional do Brasil",
+    "title": "Escola Nacional de Belas Artes",
     "lang": "pt",
-    "extract": "Biblioteca Nacional, também chamada de Biblioteca Nacional do Brasil, cujo nome oficial institucional é Fundação Biblioteca Nacional, é a depositária do patrimônio bibliográfico e documental do Brasil, considerada pela UNESCO uma das dez maiores bibliotecas nacionais do mundo e a maior da América Latina. Entre suas várias responsabilidades incluem-se a de preservar, atualizar e divulgar uma coleção com cerca de nove milhões de peças, que teve início com a chegada da Real Biblioteca portuguesa ao Brasil e cresce constantemente, a partir de doações, aquisições e com o depósito legal.\nEntre os objetos que deveriam acompanhar a família real em sua viagem para o Brasil estavam os caixotes de livros e documentos da Biblioteca Real, de Lisboa, com um acervo de cerca de 60 mil peças. Na pressa, os caixotes ficaram abandonados no porto e só em 1810 começaram a ser transferidos para o Brasil. Com o acervo novamente reunido, o príncipe regente D. João fundou a Real Biblioteca Nacional. Até 1814, apenas os estudiosos podiam consultar a biblioteca e, mesmo assim, mediante autorização régia. Depois dessa data, o acesso foi liberado ao público.",
-    "qid": "Q948882",
-    "dist_m": 45.5
+    "extract": "Escola Nacional de Belas Artes é a atual Escola de Belas Artes da Universidade Federal do Rio de Janeiro, no Brasil. Mas antes de ter desses dois nomes, a academia foi chamada primeiramente de Escola Real de Ciências, Artes e Ofícios e posteriormente de Academia Imperial de Belas Artes. O nome Escola Nacional de Belas Artes foi adotado efetivamente em 8 de novembro de 1890, em um contexto de mudanças e renovações no qual o país estava inserido.",
+    "qid": "Q10274365",
+    "dist_m": 61.7
   },
   "overture:Museu Naval:-22.90394:-43.17298": {
     "title": "Museu Naval (Rio de Janeiro)",

@@ -13,20 +13,6 @@
     "title": "Museu da Chácara do Céu",
     "dist_m": 51.4
   },
-  "overture:MAAS Museu Arquidiocesano de Arte Sacra do Rio de Janeiro:-22.91072:-43.18043": {
-    "qid": "Q2411716",
-    "wikidata_label": "Catedral de São Sebastião do Rio de Janeiro",
-    "lang": "pt",
-    "title": "Catedral de São Sebastião do Rio de Janeiro",
-    "dist_m": 36.6
-  },
-  "overture:Museu Arquidiocesano de Arte Sacra do Rio de Janeiro (MAAS):-22.91014:-43.18058": {
-    "qid": "Q2411716",
-    "wikidata_label": "Catedral de São Sebastião do Rio de Janeiro",
-    "lang": "pt",
-    "title": "Catedral de São Sebastião do Rio de Janeiro",
-    "dist_m": 88.2
-  },
   "overture:Museu das Telecomunicações:-22.92996:-43.17651": {
     "qid": "Q10333734",
     "wikidata_label": "Museu das Telecomunicações",
@@ -68,13 +54,6 @@
     "lang": "pt",
     "title": "Escadaria Selarón",
     "dist_m": 56.9
-  },
-  "overture:CCBB Rio de Janeiro:-22.90094:-43.17645": {
-    "qid": "Q18483673",
-    "wikidata_label": "Centro Cultural Correios Rio de Janeiro",
-    "lang": "pt",
-    "title": "Centro Cultural Correios (Rio de Janeiro)",
-    "dist_m": 71.7
   },
   "overture:Centro Cultural Banco do Brasil:-22.90096:-43.17648": {
     "qid": "Q30939541",
@@ -783,13 +762,6 @@
     "title": "Quinta da Boa Vista",
     "dist_m": 0.0
   },
-  "wikidata:Rua do Catete:-22.92592:-43.17625": {
-    "qid": "Q10365024",
-    "wikidata_label": "Rua do Catete",
-    "lang": "pt",
-    "title": "Rua do Catete",
-    "dist_m": 0.0
-  },
   "wikidata:Sambódromo da Marquês de Sapucaí:-22.91138:-43.19685": {
     "qid": "Q281521",
     "wikidata_label": "Sambódromo da Marquês de Sapucaí",
@@ -889,11 +861,11 @@
     "dist_m": 10.2
   },
   "overture:Palácio do Catete:-22.92589:-43.17620": {
-    "qid": "Q10365024",
-    "wikidata_label": "Rua do Catete",
+    "qid": "Q1142766",
+    "wikidata_label": "Palácio do Catete",
     "lang": "pt",
-    "title": "Rua do Catete",
-    "dist_m": 5.9
+    "title": "Palácio do Catete",
+    "dist_m": 11.4
   },
   "overture:Submarino-Museu Riachuelo S-22:-22.90047:-43.17464": {
     "qid": "Q3284128",
@@ -943,13 +915,6 @@
     "lang": "pt",
     "title": "Pavilhão Mourisco",
     "dist_m": 7.2
-  },
-  "overture:Catete Palace:-22.92588:-43.17620": {
-    "qid": "Q10365024",
-    "wikidata_label": "Rua do Catete",
-    "lang": "pt",
-    "title": "Rua do Catete",
-    "dist_m": 6.9
   },
   "overture:Centro de Tradições Nordestinas Luiz Gonzaga:-22.89746:-43.22038": {
     "qid": "Q9725013",
@@ -1203,13 +1168,6 @@
     "title": "Forte de Copacabana",
     "dist_m": 26.4
   },
-  "overture:Museo Naval Rio do Janeiro:-22.90612:-43.17680": {
-    "qid": "Q1086248",
-    "wikidata_label": "Zona Central do Rio de Janeiro",
-    "lang": "pt",
-    "title": "Zona Central do Rio de Janeiro",
-    "dist_m": 85.7
-  },
   "overture:Museu Botafogo:-22.95494:-43.17791": {
     "qid": "Q80958",
     "wikidata_label": "Botafogo de Futebol e Regatas",
@@ -1246,11 +1204,11 @@
     "dist_m": 14.5
   },
   "overture:Museu Nacional de Belas Artes:-22.90935:-43.17569": {
-    "qid": "Q948882",
-    "wikidata_label": "Biblioteca Nacional do Brasil",
+    "qid": "Q10274365",
+    "wikidata_label": "Escola Nacional de Belas Artes",
     "lang": "pt",
-    "title": "Biblioteca Nacional do Brasil",
-    "dist_m": 45.5
+    "title": "Escola Nacional de Belas Artes",
+    "dist_m": 61.7
   },
   "overture:Museu Naval:-22.90394:-43.17298": {
     "qid": "Q10333597",
