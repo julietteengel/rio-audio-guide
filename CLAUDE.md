@@ -4,12 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository structure — read this first
 
-`master` currently contains **only documentation** (`docs/`) — no application code. All implemented
-code (the location-sourcing pipeline and its curation scripts) lives on the **`sourcing-pipeline`
-branch**, checked out as a git worktree at `.worktrees/sourcing-pipeline/`. That branch has not been
-merged into `master` yet (pending a human code review pass, not just the automated one it already
-went through). When asked to work on the pipeline code, `cd .worktrees/sourcing-pipeline` (or work
-directly in that branch) rather than looking for it on `master`.
+`master` currently contains **only documentation** (`docs/`) — no application code. Each implemented
+subsystem lives on its own branch, checked out as a git worktree, and is not merged into `master` until
+it's had a real human code review pass (not just an automated one). When asked to work on one of these,
+`cd` into its worktree (or work directly in that branch) rather than looking for it on `master`:
+
+- **`sourcing-pipeline` branch**, `.worktrees/sourcing-pipeline/` — the location-sourcing pipeline and
+  its curation scripts (Python).
+- **`backend` branch**, `.worktrees/backend/` — the Go backend (hexagonal architecture + DDD). Started
+  2026-08-12, hand-written (not AI-generated) per `mission.md` — see
+  `docs/superpowers/specs/2026-08-12-backend-domain-model-design.md` for the domain model and
+  `docs/superpowers/plans/2026-08-12-backend-domain-model.md` for the implementation plan. Claude's role
+  on this branch is limited to explaining concepts and reviewing code already written — not writing
+  `.go` files (the one-time empty package skeleton is the sole exception, already committed).
 
 ```
 docs/superpowers/specs/   dated, point-in-time decision/research documents (design doc, roadmap
@@ -20,6 +27,8 @@ pipeline/sourcing/        the tested package: one module per data source (Overtu
                            branch only
 pipeline/curation/        one-off/ad-hoc scripts for content enrichment, narration generation,
                            and data cleanup — NOT a tested package, run manually, no test coverage
+backend/                  Go module (hexagonal: internal/domain, internal/application, internal/ports,
+                           internal/adapters/{postgres,rabbitmq}, cmd/api) — backend branch only
 ```
 
 ## Commands (run from `pipeline/` on the `sourcing-pipeline` branch/worktree)
