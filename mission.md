@@ -49,7 +49,7 @@ Phases below.
 |---|---|---|
 | Sourcing pipeline | Python (Overture Maps, Wikidata, feiras registry) | Built, tested, **not yet merged to master** (pending human code review) |
 | Content pipeline (batch) | Python (grounding, narration, translation, anti-hallucination judge) | In progress — see status below |
-| Guide runtime (the agentic core) | TBD at build time — memory, tool calling, human-in-the-loop | Not started. **Highest learning priority — written by hand, not AI-generated**, per `docs/superpowers/specs/2026-07-23-roadmap-v2-agentic-architecture.md` |
+| Guide runtime (v1 scope) | Mobile app logic (React Native) — proximity-triggered narration + local tour memory, no server-side agent | Not started. Scope resolved 2026-08-12 — live Q&A/tool calling/human-in-the-loop deferred to Phase 2, per `docs/superpowers/specs/2026-08-12-guide-runtime-v1-scope-design.md` |
 | Backend | Go, hexagonal architecture + DDD, PostgreSQL/PostGIS, RabbitMQ (TTS job queue), K8s (EKS demo)/Scaleway (real prod) | Not started. **Written by hand**, per `docs/superpowers/specs/2026-08-04-backend-stack-decision.md` — the two skills the target job (Powens) actually evaluates |
 | Ops depth | CI/CD canary+rollback, distributed observability, security guardrails, compliance | Not started — explicitly scoped in depth, not minimal, per roadmap v2 |
 | Admin dashboard + mobile app | React Native app, admin dashboard | Not started |
@@ -62,8 +62,10 @@ current need — see the backend-stack-decision spec before re-adding either.
 1. **Sourcing** — done, unmerged (`sourcing-pipeline` branch). Needs a real human review pass before
    merge; an automated subagent review approved it, which is not the same thing.
 2. **Content pipeline** — in progress. See status below.
-3. **Guide runtime** — next major phase after content pipeline reaches an acceptable coverage level.
-4. **Backend** — in parallel with or after Guide runtime.
+3. **Guide runtime** — a mobile app feature (proximity + local memory only, see scope decision above),
+   not a blocking server-side phase; can proceed alongside backend rather than before it.
+4. **Backend** — independent of Guide runtime now that it has no server-side component; sequence by
+   availability, not by dependency.
 5. **Ops depth** — built as its own deliberate phase, not bolted on at the end.
 6. **Admin dashboard + mobile app** — last.
 
