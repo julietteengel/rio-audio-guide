@@ -50,10 +50,12 @@ pipeline's `pytest -m "not integration"` convention — `go test ./...` skips th
 
 ## File Structure
 
-Already scaffolded (empty, package-declaration only) on the `backend` branch, commit `76c9e68`:
+Already scaffolded (empty, package-declaration only) on the `backend` branch, commit `76c9e68`
+(flattened to sit at the worktree root in `fe1615e` — paths below are relative to
+`.worktrees/`, no `` prefix):
 
 ```
-backend/
+.worktrees/  (worktree root — also has the inherited docs/, mission.md, CLAUDE.md)
   go.mod
   internal/
     domain/
@@ -88,8 +90,8 @@ development — the one-time exception was the initial skeleton only.
 ### Task 1: `Place` domain entity
 
 **Files:**
-- Modify: `backend/internal/domain/place.go`
-- Test: `backend/internal/domain/place_test.go`
+- Modify: `internal/domain/place.go`
+- Test: `internal/domain/place_test.go`
 
 **Interfaces:**
 - Produces: `Place` struct (`ID, Name, Category, Lat, Lon, WikidataQID, Source, SourceRichness string;
@@ -104,7 +106,7 @@ development — the one-time exception was the initial skeleton only.
 - [ ] **Step 1: Write the failing tests**
 
 ```go
-// backend/internal/domain/place_test.go
+// internal/domain/place_test.go
 package domain
 
 import (
@@ -198,7 +200,7 @@ Expected: build failure (`Place`, `NewPlace` etc. undefined) — that's the corr
 - [ ] **Step 3: Write the minimal implementation**
 
 ```go
-// backend/internal/domain/place.go
+// internal/domain/place.go
 package domain
 
 import (
@@ -309,8 +311,8 @@ git commit -m "Add Place domain entity with edit/remove invariants"
 ### Task 2: `Script` domain entity
 
 **Files:**
-- Modify: `backend/internal/domain/script.go`
-- Test: `backend/internal/domain/script_test.go`
+- Modify: `internal/domain/script.go`
+- Test: `internal/domain/script_test.go`
 
 **Interfaces:**
 - Consumes: `newID()` from Task 1 (same package, no import needed).
@@ -325,7 +327,7 @@ git commit -m "Add Place domain entity with edit/remove invariants"
 - [ ] **Step 1: Write the failing tests**
 
 ```go
-// backend/internal/domain/script_test.go
+// internal/domain/script_test.go
 package domain
 
 import (
@@ -401,7 +403,7 @@ Expected: build failure — `Script` etc. undefined.
 - [ ] **Step 3: Write the minimal implementation**
 
 ```go
-// backend/internal/domain/script.go
+// internal/domain/script.go
 package domain
 
 import (
@@ -507,8 +509,8 @@ git commit -m "Add Script domain entity with draft/reviewed/published lifecycle"
 ### Task 3: `AudioFile` domain entity
 
 **Files:**
-- Modify: `backend/internal/domain/audiofile.go`
-- Test: `backend/internal/domain/audiofile_test.go`
+- Modify: `internal/domain/audiofile.go`
+- Test: `internal/domain/audiofile_test.go`
 
 **Interfaces:**
 - Consumes: `newID()` from Task 1.
@@ -524,7 +526,7 @@ git commit -m "Add Script domain entity with draft/reviewed/published lifecycle"
 - [ ] **Step 1: Write the failing tests**
 
 ```go
-// backend/internal/domain/audiofile_test.go
+// internal/domain/audiofile_test.go
 package domain
 
 import (
@@ -601,7 +603,7 @@ Expected: build failure — `AudioFile` etc. undefined.
 - [ ] **Step 3: Write the minimal implementation**
 
 ```go
-// backend/internal/domain/audiofile.go
+// internal/domain/audiofile.go
 package domain
 
 import (
@@ -704,10 +706,10 @@ git commit -m "Add AudioFile domain entity with queued/generating/ready/failed l
 ### Task 4: Ports (repository and publisher interfaces)
 
 **Files:**
-- Modify: `backend/internal/ports/place_repository.go`
-- Modify: `backend/internal/ports/script_repository.go`
-- Modify: `backend/internal/ports/audiofile_repository.go`
-- Modify: `backend/internal/ports/audio_job_publisher.go`
+- Modify: `internal/ports/place_repository.go`
+- Modify: `internal/ports/script_repository.go`
+- Modify: `internal/ports/audiofile_repository.go`
+- Modify: `internal/ports/audio_job_publisher.go`
 
 **Interfaces:**
 - Consumes: `domain.Place`, `domain.Script`, `domain.AudioFile` from Tasks 1–3.
@@ -721,7 +723,7 @@ instead of the usual TDD cycle.
 - [ ] **Step 1: Write the interfaces**
 
 ```go
-// backend/internal/ports/place_repository.go
+// internal/ports/place_repository.go
 package ports
 
 import (
@@ -738,7 +740,7 @@ type PlaceRepository interface {
 ```
 
 ```go
-// backend/internal/ports/script_repository.go
+// internal/ports/script_repository.go
 package ports
 
 import (
@@ -754,7 +756,7 @@ type ScriptRepository interface {
 ```
 
 ```go
-// backend/internal/ports/audiofile_repository.go
+// internal/ports/audiofile_repository.go
 package ports
 
 import (
@@ -770,7 +772,7 @@ type AudioFileRepository interface {
 ```
 
 ```go
-// backend/internal/ports/audio_job_publisher.go
+// internal/ports/audio_job_publisher.go
 package ports
 
 import "context"
@@ -798,8 +800,8 @@ git commit -m "Define repository and audio job publisher ports"
 ### Task 5: Application — `ReviewAndRequestAudio` use case
 
 **Files:**
-- Modify: `backend/internal/application/request_audio_generation.go`
-- Modify: `backend/internal/application/request_audio_generation_test.go`
+- Modify: `internal/application/request_audio_generation.go`
+- Modify: `internal/application/request_audio_generation_test.go`
 
 **Interfaces:**
 - Consumes: `ports.ScriptRepository`, `ports.AudioFileRepository`, `ports.AudioJobPublisher` (Task 4);
@@ -817,7 +819,7 @@ for a script that's reviewed but has no audio job in flight yet.
 - [ ] **Step 1: Write the failing test (including the fakes)**
 
 ```go
-// backend/internal/application/request_audio_generation_test.go
+// internal/application/request_audio_generation_test.go
 package application
 
 import (
@@ -929,7 +931,7 @@ Expected: build failure — `ReviewAndRequestAudio` undefined.
 - [ ] **Step 3: Write the minimal implementation**
 
 ```go
-// backend/internal/application/request_audio_generation.go
+// internal/application/request_audio_generation.go
 package application
 
 import (
@@ -986,8 +988,8 @@ git commit -m "Add ReviewAndRequestAudio use case"
 ### Task 6: Application — `StartAudioGeneration` and `CompleteAudioGeneration`
 
 **Files:**
-- Modify: `backend/internal/application/publish_script.go`
-- Modify: `backend/internal/application/publish_script_test.go`
+- Modify: `internal/application/publish_script.go`
+- Modify: `internal/application/publish_script_test.go`
 
 **Interfaces:**
 - Consumes: `fakeScriptRepo`, `fakeAudioFileRepo` from Task 5 (same package, reused as-is).
@@ -1004,7 +1006,7 @@ go live, hence the file's name.
 - [ ] **Step 1: Write the failing test**
 
 ```go
-// backend/internal/application/publish_script_test.go
+// internal/application/publish_script_test.go
 package application
 
 import (
@@ -1070,7 +1072,7 @@ Expected: build failure — both functions undefined.
 - [ ] **Step 3: Write the minimal implementation**
 
 ```go
-// backend/internal/application/publish_script.go
+// internal/application/publish_script.go
 package application
 
 import (
@@ -1137,9 +1139,9 @@ git commit -m "Add StartAudioGeneration and CompleteAudioGeneration use cases"
 ### Task 7: Postgres schema + `PlaceRepository` adapter
 
 **Files:**
-- Create: `backend/internal/adapters/postgres/schema.sql`
-- Modify: `backend/internal/adapters/postgres/place_repository.go`
-- Modify: `backend/internal/adapters/postgres/place_repository_test.go`
+- Create: `internal/adapters/postgres/schema.sql`
+- Modify: `internal/adapters/postgres/place_repository.go`
+- Modify: `internal/adapters/postgres/place_repository_test.go`
 
 **Interfaces:**
 - Consumes: `domain.Place`, `ports.PlaceRepository`.
@@ -1154,14 +1156,13 @@ docker run --rm -d --name rio-postgres -e POSTGRES_PASSWORD=postgres -p 5432:543
 - [ ] **Step 1: Add the pgx dependency**
 
 ```bash
-cd backend
 go get github.com/jackc/pgx/v5/pgxpool
 ```
 
 - [ ] **Step 2: Write the schema**
 
 ```sql
--- backend/internal/adapters/postgres/schema.sql
+-- internal/adapters/postgres/schema.sql
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 CREATE TABLE places (
@@ -1216,7 +1217,7 @@ per place per language.
 - [ ] **Step 3: Write the failing integration test**
 
 ```go
-// backend/internal/adapters/postgres/place_repository_test.go
+// internal/adapters/postgres/place_repository_test.go
 //go:build integration
 
 package postgres
@@ -1283,7 +1284,7 @@ Expected: build failure — `PlaceRepository`/`NewPlaceRepository` undefined.
 - [ ] **Step 5: Write the minimal implementation**
 
 ```go
-// backend/internal/adapters/postgres/place_repository.go
+// internal/adapters/postgres/place_repository.go
 package postgres
 
 import (
@@ -1386,8 +1387,8 @@ git commit -m "Add Postgres schema and PlaceRepository adapter"
 ### Task 8: `ScriptRepository` Postgres adapter
 
 **Files:**
-- Modify: `backend/internal/adapters/postgres/script_repository.go`
-- Modify: `backend/internal/adapters/postgres/script_repository_test.go`
+- Modify: `internal/adapters/postgres/script_repository.go`
+- Modify: `internal/adapters/postgres/script_repository_test.go`
 
 **Interfaces:**
 - Consumes: `domain.Script`, `ports.ScriptRepository`, the running Postgres from Task 7 (same schema).
@@ -1397,7 +1398,7 @@ git commit -m "Add Postgres schema and PlaceRepository adapter"
 - [ ] **Step 1: Write the failing integration test**
 
 ```go
-// backend/internal/adapters/postgres/script_repository_test.go
+// internal/adapters/postgres/script_repository_test.go
 //go:build integration
 
 package postgres
@@ -1448,7 +1449,7 @@ Expected: build failure — `ScriptRepository`/`NewScriptRepository` undefined.
 - [ ] **Step 3: Write the minimal implementation**
 
 ```go
-// backend/internal/adapters/postgres/script_repository.go
+// internal/adapters/postgres/script_repository.go
 package postgres
 
 import (
@@ -1539,8 +1540,8 @@ git commit -m "Add ScriptRepository adapter"
 ### Task 9: `AudioFileRepository` Postgres adapter
 
 **Files:**
-- Modify: `backend/internal/adapters/postgres/audiofile_repository.go`
-- Modify: `backend/internal/adapters/postgres/audiofile_repository_test.go`
+- Modify: `internal/adapters/postgres/audiofile_repository.go`
+- Modify: `internal/adapters/postgres/audiofile_repository_test.go`
 
 **Interfaces:**
 - Consumes: `domain.AudioFile`, `ports.AudioFileRepository`, the Script fixture pattern from Task 8.
@@ -1550,7 +1551,7 @@ git commit -m "Add ScriptRepository adapter"
 - [ ] **Step 1: Write the failing integration test**
 
 ```go
-// backend/internal/adapters/postgres/audiofile_repository_test.go
+// internal/adapters/postgres/audiofile_repository_test.go
 //go:build integration
 
 package postgres
@@ -1608,7 +1609,7 @@ Expected: build failure — `AudioFileRepository`/`NewAudioFileRepository` undef
 - [ ] **Step 3: Write the minimal implementation**
 
 ```go
-// backend/internal/adapters/postgres/audiofile_repository.go
+// internal/adapters/postgres/audiofile_repository.go
 package postgres
 
 import (
@@ -1686,8 +1687,8 @@ git commit -m "Add AudioFileRepository adapter"
 ### Task 10: `AudioJobPublisher` RabbitMQ adapter
 
 **Files:**
-- Modify: `backend/internal/adapters/rabbitmq/audio_job_publisher.go`
-- Modify: `backend/internal/adapters/rabbitmq/audio_job_publisher_test.go`
+- Modify: `internal/adapters/rabbitmq/audio_job_publisher.go`
+- Modify: `internal/adapters/rabbitmq/audio_job_publisher_test.go`
 
 **Interfaces:**
 - Consumes: `ports.AudioJobPublisher`.
@@ -1704,14 +1705,13 @@ docker run --rm -d --name rio-rabbitmq -p 5672:5672 rabbitmq:3-management
 - [ ] **Step 1: Add the amqp091-go dependency**
 
 ```bash
-cd backend
 go get github.com/rabbitmq/amqp091-go
 ```
 
 - [ ] **Step 2: Write the failing integration test**
 
 ```go
-// backend/internal/adapters/rabbitmq/audio_job_publisher_test.go
+// internal/adapters/rabbitmq/audio_job_publisher_test.go
 //go:build integration
 
 package rabbitmq
@@ -1769,7 +1769,7 @@ Expected: build failure — `NewAudioJobPublisher`/`TTSJobQueue` undefined.
 - [ ] **Step 4: Write the minimal implementation**
 
 ```go
-// backend/internal/adapters/rabbitmq/audio_job_publisher.go
+// internal/adapters/rabbitmq/audio_job_publisher.go
 package rabbitmq
 
 import (
@@ -1840,7 +1840,7 @@ git commit -m "Add AudioJobPublisher RabbitMQ adapter"
 ### Task 11: Wire `cmd/api/main.go`
 
 **Files:**
-- Modify: `backend/cmd/api/main.go`
+- Modify: `cmd/api/main.go`
 
 **Interfaces:**
 - Consumes: every constructor from Tasks 7, 9, 10 (`postgres.NewPlaceRepository`,
@@ -1854,7 +1854,7 @@ the binary against the containers from Tasks 7 and 10 and reading the log line, 
 - [ ] **Step 1: Write `main.go`**
 
 ```go
-// backend/cmd/api/main.go
+// cmd/api/main.go
 package main
 
 import (
@@ -1924,7 +1924,6 @@ func main() {
 - [ ] **Step 2: Run it against the containers from Tasks 7 and 10**
 
 ```bash
-cd backend
 go run ./cmd/api
 ```
 

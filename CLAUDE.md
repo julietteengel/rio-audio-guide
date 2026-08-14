@@ -16,7 +16,10 @@ it's had a real human code review pass (not just an automated one). When asked t
   `docs/superpowers/specs/2026-08-12-backend-domain-model-design.md` for the domain model and
   `docs/superpowers/plans/2026-08-12-backend-domain-model.md` for the implementation plan. Claude's role
   on this branch is limited to explaining concepts and reviewing code already written — not writing
-  `.go` files (the one-time empty package skeleton is the sole exception, already committed).
+  `.go` files (the one-time empty package skeleton is the sole exception, already committed). The Go
+  module lives directly at the worktree root (`go.mod`, `cmd/`, `internal/`, alongside the inherited
+  `docs/`) — no extra `backend/` subfolder inside the `backend` worktree, that would just duplicate the
+  worktree's own name.
 
 ```
 docs/superpowers/specs/   dated, point-in-time decision/research documents (design doc, roadmap
@@ -27,9 +30,11 @@ pipeline/sourcing/        the tested package: one module per data source (Overtu
                            branch only
 pipeline/curation/        one-off/ad-hoc scripts for content enrichment, narration generation,
                            and data cleanup — NOT a tested package, run manually, no test coverage
-backend/                  Go module (hexagonal: internal/domain, internal/application, internal/ports,
-                           internal/adapters/{postgres,rabbitmq}, cmd/api) — backend branch only
 ```
+
+On the `backend` branch/worktree, `go.mod`, `cmd/api`, and `internal/{domain,application,ports,
+adapters}` sit directly at the worktree root — the Go module root, playing the same role `pipeline/`
+plays on `sourcing-pipeline`.
 
 ## Commands (run from `pipeline/` on the `sourcing-pipeline` branch/worktree)
 
