@@ -59,14 +59,18 @@ current need — see the backend-stack-decision spec before re-adding either. Ra
 2026-08-15 (interview prep pressure) and cut again for the same reason: adding either now would
 contradict the founder's own documented reasoning, not extend it.
 
-**Note on the 2026-08-15 hand-written → AI-written switch (backend, remaining layers only):** the
-domain layer and ports were built by hand specifically for interview-defensibility ("I wrote this").
-Under real time pressure ahead of a Powens interview (Technical & Culture round, 2026-08-18), the
-founder made a conscious, informed choice to switch the *remaining* backend work (Postgres/RabbitMQ
-adapters, HTTP API, CI/CD) to AI-written/human-reviewed, after being shown the trade-off explicitly
-(this changes the honest interview answer from "I wrote it" to "I directed and reviewed it" for this
-part of the codebase). Not a silent default — a deliberate scope/speed decision under a real deadline.
-Revisit after 2026-08-18 whether this stays the working mode or reverts.
+**Note on the 2026-08-15 hand-written → AI-written switch, refined same day:** domain/ports stayed
+hand-written throughout. The remaining backend layers briefly switched to "AI writes by default" —
+revised a few hours later, same day, back to **founder writes by default, with Claude's help; Claude
+writes a given piece only when explicitly asked for that piece**, not as a standing default. Applies
+to Postgres adapters (already AI-written under the brief window — kept as-is, not redone) and
+everything after: RabbitMQ (publisher done under the old default; the worker/AWS S3/HTTP API/CI-CD
+are unplanned as of this note — see "what's not yet planned" below). Revisit after 2026-08-18.
+
+**What's not yet planned** (discussed in conversation, never through brainstorming/writing-plans):
+RabbitMQ consumer/worker, AWS S3 adapter, HTTP API, CI/CD pipeline, pipeline-to-Postgres import
+script. Needs its own spec/plan cycle before implementation, per the project's own convention — not
+to be implemented ad hoc off conversational discussion alone.
 
 ## Phases / sequencing
 
