@@ -6,10 +6,10 @@
 DATA_PART1 = [
 {
 "name": "Casa França-Brasil",
-"fr": "Ce bâtiment néoclassique de 1820, dessiné par l'architecte français Grandjean de Montigny, fut la première halle de style européen de Rio. Sa nef à colonnes, inspirée d'un temple antique, en fait un espace d'exposition à l'acoustique remarquable. Un témoin de la mission artistique française venue moderniser la jeune capitale impériale.",
-"en": "This eighteen-twenty neoclassical building, designed by French architect Grandjean de Montigny, was Rio's first European-style market hall. Its columned nave, inspired by an ancient temple, makes it an exhibition space with remarkable acoustics. A witness to the French artistic mission that came to modernize the young imperial capital.",
-"es": "Este edificio neoclásico de mil ochocientos veinte, diseñado por el arquitecto francés Grandjean de Montigny, fue el primer mercado de estilo europeo de Río. Su nave de columnas, inspirada en un templo antiguo, lo convierte en un espacio de exposiciones de acústica notable. Un testigo de la misión artística francesa que vino a modernizar la joven capital imperial.",
-"pt": "Este prédio neoclássico de mil oitocentos e vinte, projetado pelo arquiteto francês Grandjean de Montigny, foi o primeiro mercado em estilo europeu do Rio. Sua nave de colunas, inspirada em um templo antigo, faz dele um espaço de exposições com acústica notável. Uma testemunha da missão artística francesa que veio modernizar a jovem capital imperial.",
+"fr": "Ce bâtiment néoclassique de 1820, dessiné par l'architecte français Grandjean de Montigny, fut construit pour abriter la première Praça do Comércio de Rio, l'un des tout premiers exemples du style néoclassique dans le pays. Sa nef à colonnes en fait aujourd'hui un espace d'exposition. Un témoin de la mission artistique française venue moderniser la jeune capitale impériale.",
+"en": "This eighteen-twenty neoclassical building, designed by French architect Grandjean de Montigny, was built to house Rio's first Praça do Comércio, one of the very first examples of neoclassical style in the country. Its columned nave now serves as an exhibition space. A witness to the French artistic mission that came to modernize the young imperial capital.",
+"es": "Este edificio neoclásico de mil ochocientos veinte, diseñado por el arquitecto francés Grandjean de Montigny, fue construido para albergar la primera Praça do Comércio de Río, uno de los primerísimos ejemplos del estilo neoclásico en el país. Su nave de columnas es hoy un espacio de exposiciones. Un testigo de la misión artística francesa que vino a modernizar la joven capital imperial.",
+"pt": "Este prédio neoclássico de mil oitocentos e vinte, projetado pelo arquiteto francês Grandjean de Montigny, foi construído para abrigar a primeira Praça do Comércio do Rio, um dos primeiríssimos exemplos do estilo neoclássico no país. Sua nave de colunas é hoje um espaço de exposições. Uma testemunha da missão artística francesa que veio modernizar a jovem capital imperial.",
 },
 {
 "name": "Chácara do Céu",
@@ -27,10 +27,10 @@ DATA_PART1 = [
 },
 {
 "name": "Museu de Arte do Rio (MAR)",
-"fr": "Sur la Praça Mauá, le MAR réunit deux bâtiments que tout oppose — un palais éclectique et une structure moderne — coiffés d'une même toiture ondulée. Ouvert en 2013, il explore Rio par l'art : la ville, ses habitants, ses contrastes. Sur le toit, une belle vue sur le port réhabilité et le Musée de Demain voisin.",
-"en": "On Praça Mauá, the MAR joins two buildings that couldn't be more different, an eclectic palace and a modern structure, topped by the same wave-shaped roof. Opened in twenty thirteen, it explores Rio through art: the city, its people, its contrasts. From the rooftop, a lovely view over the redeveloped port and the neighboring Museum of Tomorrow.",
-"es": "En la Praça Mauá, el MAR une dos edificios completamente opuestos, un palacio ecléctico y una estructura moderna, coronados por el mismo techo ondulado. Inaugurado en dos mil trece, explora Río a través del arte: la ciudad, sus habitantes, sus contrastes. Desde la azotea, una hermosa vista sobre el puerto renovado y el vecino Museo del Mañana.",
-"pt": "Na Praça Mauá, o MAR reúne dois prédios completamente opostos, um palacete eclético e uma estrutura moderna, cobertos pelo mesmo telhado ondulado. Aberto em dois mil e treze, ele explora o Rio através da arte: a cidade, seus moradores, seus contrastes. Do telhado, uma bela vista para o porto revitalizado e o vizinho Museu do Amanhã.",
+"fr": "Sur la Praça Mauá, le MAR réunit deux bâtiments que tout oppose — un palais éclectique et une structure moderne — coiffés d'une même toiture ondulée. Ouvert en 2013, il explore Rio par l'art : la ville, ses habitants, ses contrastes, au cœur d'un quartier portuaire en pleine revitalisation.",
+"en": "On Praça Mauá, the MAR joins two buildings that couldn't be more different, an eclectic palace and a modern structure, topped by the same wave-shaped roof. Opened in twenty thirteen, it explores Rio through art: the city, its people, its contrasts, in the heart of a port district undergoing major revitalization.",
+"es": "En la Praça Mauá, el MAR une dos edificios completamente opuestos, un palacio ecléctico y una estructura moderna, coronados por el mismo techo ondulado. Inaugurado en dos mil trece, explora Río a través del arte: la ciudad, sus habitantes, sus contrastes, en el corazón de un barrio portuario en plena revitalización.",
+"pt": "Na Praça Mauá, o MAR reúne dois prédios completamente opostos, um palacete eclético e uma estrutura moderna, cobertos pelo mesmo telhado ondulado. Aberto em dois mil e treze, ele explora o Rio através da arte: a cidade, seus moradores, seus contrastes, no coração de uma zona portuária em plena revitalização.",
 },
 {
 "name": "Polo Praça XV",
@@ -90,10 +90,10 @@ DATA_PART1 = [
 },
 {
 "name": "Centro Cultural Banco do Brasil (Rio de Janeiro)",
-"fr": "Ancien siège de la Banque du Brésil, ce palais de 1906 à la rotonde monumentale est devenu l'un des centres culturels les plus fréquentés du pays. Expositions internationales, cinéma, théâtre, concerts, souvent gratuits. Prenez le temps de lever les yeux vers la verrière et l'escalier de fer. L'entrée est libre : profitez-en.",
-"en": "Once the headquarters of the Bank of Brazil, this nineteen-oh-six palace with its monumental rotunda has become one of the country's most visited cultural centers. International exhibitions, film, theater, concerts, often free. Take a moment to look up at the glass roof and the iron staircase. Admission is free, so make the most of it.",
-"es": "Antigua sede del Banco de Brasil, este palacio de mil novecientos seis con su rotonda monumental se ha convertido en uno de los centros culturales más visitados del país. Exposiciones internacionales, cine, teatro, conciertos, a menudo gratuitos. Tómese un momento para mirar hacia el techo de vidrio y la escalera de hierro. La entrada es gratuita, aprovéchela.",
-"pt": "Antiga sede do Banco do Brasil, este palacete de mil novecentos e seis com sua rotunda monumental se tornou um dos centros culturais mais visitados do país. Exposições internacionais, cinema, teatro, shows, muitas vezes gratuitos. Reserve um tempo para olhar para cima, para a claraboia e a escada de ferro. A entrada é gratuita, aproveite.",
+"fr": "Ancien siège de la Banque du Brésil, ce palais de 1906 à la rotonde monumentale est devenu l'un des centres culturels les plus fréquentés du pays. Expositions internationales, cinéma, théâtre, concerts. Prenez le temps de lever les yeux vers la verrière et l'escalier de marbre.",
+"en": "Once the headquarters of the Bank of Brazil, this nineteen-oh-six palace with its monumental rotunda has become one of the country's most visited cultural centers. International exhibitions, film, theater, concerts. Take a moment to look up at the glass roof and the marble staircase.",
+"es": "Antigua sede del Banco de Brasil, este palacio de mil novecientos seis con su rotonda monumental se ha convertido en uno de los centros culturales más visitados del país. Exposiciones internacionales, cine, teatro, conciertos. Tómese un momento para mirar hacia el techo de vidrio y la escalera de mármol.",
+"pt": "Antiga sede do Banco do Brasil, este palacete de mil novecentos e seis com sua rotunda monumental se tornou um dos centros culturais mais visitados do país. Exposições internacionais, cinema, teatro, shows. Reserve um tempo para olhar para cima, para a claraboia e a escada de mármore.",
 },
 {
 "name": "Centro Cultural Correios",
@@ -132,10 +132,10 @@ DATA_PART1 = [
 },
 {
 "name": "Paço Imperial",
-"fr": "Sur la Praça XV, ce sobre édifice colonial fut le siège du pouvoir : résidence des gouverneurs, puis des rois et empereurs. C'est de son balcon que la princesse Isabel proclama, en 1888, l'abolition de l'esclavage — la Loi d'Or. Restauré, il abrite aujourd'hui expositions et cinéma. Un bâtiment discret qui a vu naître un pays.",
-"en": "On Praça XV, this understated colonial building was once the seat of power: home to governors, then to kings and emperors. It was from its balcony that Princess Isabel proclaimed the abolition of slavery in eighteen eighty-eight, the Golden Law. Restored, it now hosts exhibitions and film screenings. An unassuming building that watched a nation being born.",
-"es": "En la Praça XV, este sobrio edificio colonial fue sede del poder: residencia de gobernadores y luego de reyes y emperadores. Fue desde su balcón que la princesa Isabel proclamó, en mil ochocientos ochenta y ocho, la abolición de la esclavitud, la Ley Áurea. Restaurado, hoy alberga exposiciones y cine. Un edificio discreto que vio nacer un país.",
-"pt": "Na Praça XV, esse sóbrio prédio colonial foi sede do poder: residência de governadores, depois de reis e imperadores. Foi de sua sacada que a princesa Isabel proclamou, em mil oitocentos e oitenta e oito, a abolição da escravidão, a Lei Áurea. Restaurado, hoje abriga exposições e cinema. Um prédio discreto que viu nascer um país.",
+"fr": "Sur la Praça XV, ce sobre édifice colonial fut le siège du pouvoir : résidence des gouverneurs, puis des rois et empereurs. C'est dans l'une de ses salles que la princesse Isabel signa, en 1888, la Loi d'Or abolissant l'esclavage. Restauré, il abrite aujourd'hui expositions et cinéma. Un bâtiment discret qui a vu naître un pays.",
+"en": "On Praça XV, this understated colonial building was once the seat of power: home to governors, then to kings and emperors. It was in one of its rooms that Princess Isabel signed the Golden Law abolishing slavery in eighteen eighty-eight. Restored, it now hosts exhibitions and film screenings. An unassuming building that watched a nation being born.",
+"es": "En la Praça XV, este sobrio edificio colonial fue sede del poder: residencia de gobernadores y luego de reyes y emperadores. Fue en una de sus salas donde la princesa Isabel firmó, en mil ochocientos ochenta y ocho, la Ley Áurea que abolió la esclavitud. Restaurado, hoy alberga exposiciones y cine. Un edificio discreto que vio nacer un país.",
+"pt": "Na Praça XV, esse sóbrio prédio colonial foi sede do poder: residência de governadores, depois de reis e imperadores. Foi em uma de suas salas que a princesa Isabel assinou, em mil oitocentos e oitenta e oito, a Lei Áurea que aboliu a escravidão. Restaurado, hoje abriga exposições e cinema. Um prédio discreto que viu nascer um país.",
 },
 {
 "name": "Samba da Pedra do Sal",
