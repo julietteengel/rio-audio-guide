@@ -12,14 +12,14 @@ it's had a real human code review pass (not just an automated one). When asked t
 - **`sourcing-pipeline` branch**, `.worktrees/sourcing-pipeline/` — the location-sourcing pipeline and
   its curation scripts (Python).
 - **`backend` branch**, `.worktrees/backend/` — the Go backend (hexagonal architecture + DDD). Started
-  2026-08-12, hand-written (not AI-generated) per `mission.md` — see
-  `docs/superpowers/specs/2026-08-12-backend-domain-model-design.md` for the domain model and
-  `docs/superpowers/plans/2026-08-12-backend-domain-model.md` for the implementation plan. Claude's role
-  on this branch is limited to explaining concepts and reviewing code already written — not writing
-  `.go` files (the one-time empty package skeleton is the sole exception, already committed). The Go
-  module lives directly at the worktree root (`go.mod`, `cmd/`, `internal/`, alongside the inherited
-  `docs/`) — no extra `backend/` subfolder inside the `backend` worktree, that would just duplicate the
-  worktree's own name.
+  2026-08-12 — see `docs/superpowers/specs/2026-08-12-backend-domain-model-design.md` for the domain
+  model and `docs/superpowers/plans/2026-08-12-backend-domain-model.md` for the implementation plan.
+  The Go module lives directly at the worktree root (`go.mod`, `cmd/`, `internal/`, alongside the
+  inherited `docs/`) — no extra `backend/` subfolder inside the `backend` worktree.
+  **Authorship split (see `mission.md` for the full note)**: `internal/domain/` and `internal/ports/`
+  are hand-written by the founder — Claude's role there stays explanation/review only, never editing
+  those files directly. Everything from `internal/adapters/` onward (Postgres, RabbitMQ, HTTP, CI/CD)
+  switched to AI-written/human-reviewed on 2026-08-15, a deliberate time-boxed call, not the default.
 
 ```
 docs/superpowers/specs/   dated, point-in-time decision/research documents (design doc, roadmap
