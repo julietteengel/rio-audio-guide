@@ -98,3 +98,25 @@ sous-système 5 (ici renommé backend, distinct du dashboard admin/app mobile) q
 3. Backend (Go/hexagonal/DDD/Postgres+PostGIS/RabbitMQ/Redis/K8s, ce document) — écrit à la main pour
    les mêmes raisons : c'est la partie directement évaluée par la fiche de poste visée.
 4. Ops en profondeur (sous-système 4), dashboard admin + app mobile (sous-système 5 restant).
+
+## Kafka et Redis — déclencheurs de reconsidération, précisés (2026-08-16)
+
+Reconsidérés une nouvelle fois le 2026-08-16 (préparation entretien Powens) et écartés à nouveau, pour
+la même raison qu'au 2026-08-04. Ce qui manquait jusqu'ici : un déclencheur assez précis pour savoir
+*quand* revenir dessus, pas juste "un jour peut-être". Précisé ici pour ne pas avoir à redécouvrir le
+raisonnement à chaque fois que la question revient (elle est déjà revenue trois fois) :
+
+- **Kafka** — déclencheur : un besoin réel de télémétrie d'écoute (quels lieux sont écoutés, dans quelle
+  langue, quand) avec **plusieurs consommateurs indépendants** du même flux (ex. moteur de
+  recommandation + dashboard analytics + déclencheur marketing, chacun lisant le flux à son propre
+  rythme, avec besoin de rejouer l'historique). RabbitMQ ne couvre pas bien ce cas (pas de rejeu, un
+  seul consommateur prévu par message) — Kafka le couvrirait légitimement. N'existe pas tant qu'il n'y
+  a pas d'utilisateurs réels ni de pipeline de télémétrie construit.
+- **Redis** — deux déclencheurs séparés, l'un ou l'autre suffit : (1) une requête identifiée comme
+  **mesurée lente** en usage réel (pas supposée lente) sur les lieux/recherche géo — cache avec TTL ;
+  (2) un **abus constaté** (pas anticipé) sur un endpoint public une fois l'API exposée — rate limiting.
+  PostGIS seul suffit tant qu'aucun des deux n'est mesuré.
+
+Aucun des deux déclencheurs n'est atteint à cette date — zéro utilisateur réel, zéro trafic public,
+zéro requête mesurée lente. Documenté ici précisément pour qu'une future relecture (la mienne ou un
+entretien) trouve une réponse vérifiable plutôt qu'un principe vague.
