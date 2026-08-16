@@ -35,8 +35,13 @@ func main() {
 		log.Fatalf("read narrations csv: %v", err)
 	}
 
-	matchedPlaces, scripts := buildImportPlan(places, narrations)
+	matchedPlaces, scripts, unmatched := buildImportPlan(places, narrations)
 	log.Printf("matched %d places with narrations, %d scripts to import", len(matchedPlaces), len(scripts))
+	// Une narration orpheline est du contenu rédigé qui ne sera jamais publié —
+	// il faut la voir passer, pas la découvrir via un compteur trop bas.
+	if len(unmatched) > 0 {
+		log.Printf("WARNING: %d narrations had no matching place: %v", len(unmatched), unmatched)
+	}
 
 	if *dryRun {
 		return
@@ -52,6 +57,10 @@ func main() {
 	placeRepo := postgres.NewPlaceRepository(pool)
 	scriptRepo := postgres.NewScriptRepository(pool)
 
+	// placesCreated ne compte que les créations réelles : placeIDs contient aussi
+	// les lieux déjà présents (retrouvés par FindByName), ce qui gonflerait le
+	// total à chaque relance de l'import.
+	placesCreated := 0
 	placeIDs := make(map[string]string, len(matchedPlaces))
 	for _, p := range matchedPlaces {
 		existing, err := placeRepo.FindByName(ctx, p.Name)
@@ -86,6 +95,7 @@ func main() {
 			continue
 		}
 		placeIDs[p.Name] = place.ID()
+		placesCreated++
 	}
 
 	imported := 0
@@ -118,7 +128,7 @@ func main() {
 		imported++
 	}
 
-	log.Printf("imported %d places, %d scripts", len(placeIDs), imported)
+	log.Printf("imported %d new places, %d scripts", placesCreated, imported)
 }
 
 func isUniqueViolation(err error) bool {
