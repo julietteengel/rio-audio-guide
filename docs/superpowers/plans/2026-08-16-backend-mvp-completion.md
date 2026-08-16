@@ -1949,115 +1949,214 @@ git commit -m "Add Helm chart (API HPA, worker KEDA), canary-istio and blue-gree
 
 ---
 
-### Task 11: Déploiement réel sur un cluster EKS (ajoutée le 2026-08-16, décision reprise en session)
+### Task 11: Déploiement réel sur un cluster Kubernetes (ajoutée le 2026-08-16, décision reprise en session)
 
 Initialement hors scope de ce plan (voir la note "Ce que ce plan ne couvre pas" plus bas, écrite avant
 cette tâche) : monter un vrai cluster EKS coûte de l'argent et du temps de provisioning, et le spec
 associé recommandait explicitement d'éviter toute infra live avant l'entretien. L'autrice a choisi en
-connaissance de cause de le faire quand même ce soir, pour une pratique concrète Docker/EKS/Helm à
-défendre en entretien — cluster prévu pour être détruit après validation (Step 9), jamais laissé
-tourner pendant l'entretien lui-même.
+connaissance de cause de le faire quand même ce soir, pour une pratique concrète Docker/K8s/Helm à
+défendre en entretien.
+
+**Pivot EKS → `kind`, décidé en session :** la première tentative (`eksctl create cluster --name
+rio-audio-guide --region us-east-1`) a échoué immédiatement — le rôle IAM du compte utilisé (un AWS
+Academy/Vocareum Learner Lab, `assumed-role/voclabs/...`) n'a pas la permission `iam:CreateRole`,
+nécessaire à la création du rôle de service EKS. Restriction structurelle du compte lab (anti-privilège-
+escalation côté AWS Academy), pas un problème de configuration côté `eksctl` — confirmé par la stack
+CloudFormation `eksctl-rio-audio-guide-cluster`, `ROLLBACK_COMPLETE` avec `CREATE_FAILED` sur
+`AWS::IAM::Role/ServiceRole` (`UnauthorizedTaggingOperation`), aucune ressource orpheline restée
+derrière (`eks list-clusters` vide après coup). Pas de solution dans ce compte lab ; option restante
+aurait été un vrai compte AWS personnel (carte réelle, coûts EKS + NAT gateway réels même pour
+quelques heures) — écartée pour rester dans le temps disponible ce soir.
+
+**Remplacé par `kind`** (Kubernetes-in-Docker) : cluster Kubernetes réel et conforme, tournant en local
+via Docker, sans les restrictions IAM du compte lab, sans coût, provisionné en ~15 secondes contre
+~15-20 minutes pour EKS. Toutes les commandes ci-dessous ont été exécutées et vérifiées en clair contre
+ce cluster `kind`, pas seulement écrites — voir le résultat de chaque étape.
+
+**Deux bugs réels trouvés et corrigés pendant l'exécution, pas seulement pendant l'écriture :**
+1. Le chart Helm Bitnami `rabbitmq` (Step 3 initial) a échoué en `ImagePullBackOff` — Bitnami restreint
+   depuis fin août 2025 l'accès gratuit à la plupart de ses images versionnées (même mur de licence déjà
+   rencontré avec LocalStack, cf. `2026-08-16-backend-mvp-completion-design.md` sous-système 2).
+   Remplacé par un Deployment+Service RabbitMQ minimal utilisant `rabbitmq:3-management` directement
+   (même image que celle déjà utilisée dans les `services:` de `backend-ci.yml`).
+2. Le template `worker-scaledobject.yaml` (Tâche 10) référence
+   `authenticationRef: { name: {{ .Release.Name }}-rabbitmq-auth }` mais aucun objet
+   `TriggerAuthentication` de ce nom n'était jamais créé — bug de conception passé inaperçu à l'écriture
+   du chart car jamais testé contre un cluster réel avant ce soir. Corrigé en ajoutant la
+   `TriggerAuthentication` manquante. Deuxième bug découvert au passage : son
+   `secretTargetRef` pointait vers `rabbitmq-url` avec un nom de service DNS court
+   (`demo-rabbitmq`), qui ne se résout que dans le namespace `default` — le `keda-operator` tourne dans
+   le namespace `keda` et ne pouvait pas le résoudre (`no such host`). Corrigé en utilisant le nom DNS
+   pleinement qualifié (`demo-rabbitmq.default.svc.cluster.local`).
 
 **Prérequis côté autrice, pas exécutables par Claude :** identifiants AWS valides dans l'environnement
 (`aws sts get-caller-identity` doit réussir), `eksctl` installé (`brew install eksctl`).
 
 **Files:** aucun nouveau fichier — commandes d'infrastructure uniquement.
 
-- [ ] **Step 1: Créer les deux dépôts ECR**
+- [x] **Step 1: Créer les deux dépôts ECR**
 
 Run:
 ```bash
 aws ecr create-repository --repository-name rio-api --region us-east-1
 aws ecr create-repository --repository-name rio-worker --region us-east-1
 ```
-Expected : deux dépôts créés, visibles via `aws ecr describe-repositories --region us-east-1`.
+**Fait.** Deux dépôts créés (`424495842167.dkr.ecr.us-east-1.amazonaws.com/rio-api` et `/rio-worker`),
+`docker login` vers ECR réussi. Restent vides — le push réel n'a pas eu lieu, la démo finale utilise
+`kind` (Step 2 révisé) et charge les images directement, sans passer par un registre. Ces dépôts
+serviront le jour où `docker-build.yml` (Tâche 9) tourne pour de vrai.
 
-- [ ] **Step 2: Créer le cluster EKS**
+- [x] **Step 2 (révisé) : Créer le cluster — `kind` à la place d'EKS**
 
-Run:
+Tentative initiale `eksctl create cluster --name rio-audio-guide --region us-east-1 --nodes 2
+--node-type t3.medium --managed` : **échec immédiat**, `iam:CreateRole` refusé au rôle `voclabs` du
+compte Learner Lab — restriction structurelle du compte, pas corrigible. Stack CloudFormation
+`ROLLBACK_COMPLETE`, aucune ressource restée derrière (vérifié via `aws eks list-clusters` → vide).
+
+Run (remplacement) :
 ```bash
-eksctl create cluster --name rio-audio-guide --region us-east-1 --nodes 2 --node-type t3.medium --managed
+brew install kind
+kind create cluster --name rio-audio-guide
+kubectl get nodes   # attendre Ready, ~30s
 ```
-Expected : ~15-20 minutes, se termine par un cluster prêt (`kubectl get nodes` affiche 2 nœuds `Ready`).
-C'est l'étape qui facture réellement (control plane + 2 nœuds EC2) tant que le cluster existe.
+**Fait.** Cluster prêt en ~15-20 secondes contre les ~15-20 minutes annoncées pour EKS, sans les
+restrictions IAM du lab, sans coût.
 
-- [ ] **Step 3: Installer Postgres et RabbitMQ dans le cluster (pour la démo, pas de RDS/Amazon MQ managés — plus rapide et moins cher ce soir)**
+- [x] **Step 3 (révisé) : Installer Postgres et RabbitMQ dans le cluster**
 
-Run:
+Run :
 ```bash
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 helm install demo-postgres bitnami/postgresql --set auth.postgresPassword=postgres --set auth.database=postgres
-helm install demo-rabbitmq bitnami/rabbitmq --set auth.username=guest --set auth.password=guest
 ```
-Expected : `kubectl get pods` montre `demo-postgres-postgresql-0` et `demo-rabbitmq-0` en `Running`
-après quelques minutes.
+Postgres : fonctionne directement (image `bitnami/postgresql:latest`, tag rolling, pas concerné par le
+mur de licence Bitnami).
 
-- [ ] **Step 4: Charger le schéma Postgres**
-
-Run:
+RabbitMQ via le chart Bitnami a échoué (`ImagePullBackOff` sur
+`docker.io/bitnami/rabbitmq:4.1.3-debian-12-r1` — mur de licence Bitnami rencontré, même famille de
+problème que LocalStack plus tôt dans le projet). Remplacé par un Deployment+Service minimal :
 ```bash
-kubectl run psql-client --rm -it --image=postgres:16 --restart=Never -- \
-  psql "postgresql://postgres:postgres@demo-postgres-postgresql:5432/postgres" \
-  -f - < internal/adapters/postgres/schema.sql
+helm uninstall demo-rabbitmq
+kubectl apply -f - <<'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: demo-rabbitmq }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: demo-rabbitmq } }
+  template:
+    metadata: { labels: { app: demo-rabbitmq } }
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-management
+          ports: [{ containerPort: 5672, name: amqp }, { containerPort: 15672, name: management }]
+---
+apiVersion: v1
+kind: Service
+metadata: { name: demo-rabbitmq }
+spec:
+  selector: { app: demo-rabbitmq }
+  ports:
+    - { name: amqp, port: 5672, targetPort: 5672 }
+    - { name: management, port: 15672, targetPort: 15672 }
+EOF
 ```
-Expected : les tables `places`, `scripts`, `audio_files` existent (`\dt` dans un client psql pour
-vérifier).
+**Fait.** `kubectl get pods` confirme `demo-postgres-postgresql-0` et `demo-rabbitmq-<hash>` en
+`1/1 Running`.
 
-- [ ] **Step 5: Créer le Secret Kubernetes `rio-backend-secrets`**
+- [x] **Step 4: Charger le schéma Postgres**
 
-Run:
+Run (adapté — `kubectl cp` + `kubectl exec` plutôt qu'un pod éphémère, plus fiable sur `kind`) :
+```bash
+kubectl cp internal/adapters/postgres/schema.sql demo-postgres-postgresql-0:/tmp/schema.sql
+kubectl exec demo-postgres-postgresql-0 -- env PGPASSWORD=postgres psql -U postgres -d postgres -f /tmp/schema.sql
+```
+**Fait.** `CREATE EXTENSION`, `CREATE TABLE` × 3, `CREATE INDEX` confirmés.
+
+- [x] **Step 5: Créer le Secret Kubernetes `rio-backend-secrets`**
+
+Run :
 ```bash
 kubectl create secret generic rio-backend-secrets \
   --from-literal=database-url="postgresql://postgres:postgres@demo-postgres-postgresql:5432/postgres" \
-  --from-literal=rabbitmq-url="amqp://guest:guest@demo-rabbitmq:5672/"
+  --from-literal=rabbitmq-url="amqp://guest:guest@demo-rabbitmq.default.svc.cluster.local:5672/"
 ```
-Expected : `kubectl get secret rio-backend-secrets` le montre créé. Jamais commité — créé directement
-sur le cluster, cohérent avec `values.yaml` qui référence son nom sans jamais le contenu.
+**Fait — avec un bug trouvé et corrigé.** Premier essai avec le nom court `demo-rabbitmq` (sans
+suffixe) : le worker (namespace `default`) s'en accommode, mais le `keda-operator` (namespace `keda`,
+Step 7) ne pouvait pas le résoudre (`no such host`) — un nom DNS court ne se résout que dans le
+namespace du pod appelant. Corrigé avec le nom pleinement qualifié
+`demo-rabbitmq.default.svc.cluster.local`. Jamais commité — créé directement sur le cluster.
 
-- [ ] **Step 6: Déclencher `docker-build.yml` pour pousser les images vers ECR**
+- [x] **Step 6 (révisé) : Charger les images locales dans `kind` (pas de push registre nécessaire)**
 
-Run (depuis GitHub, onglet Actions, ou en poussant un commit sur `backend`) : le workflow
-`docker-build.yml` (Tâche 9) build et pousse `rio-api`/`rio-worker` vers les dépôts créés au Step 1.
-Expected : deux images visibles dans ECR avec le tag du SHA du commit.
-
-- [ ] **Step 7: Déployer avec Helm (manuellement, ou en laissant `k8s-deploy.yml` le faire après le Step 6)**
-
-Run:
+Run :
 ```bash
-aws eks update-kubeconfig --name rio-audio-guide --region us-east-1
-ECR_REGISTRY=$(aws ecr describe-repositories --repository-names rio-api --region us-east-1 --query 'repositories[0].repositoryUri' --output text | cut -d/ -f1)
-helm upgrade --install rio deploy/helm/rio-backend \
-  --set api.image.repository=$ECR_REGISTRY/rio-api \
-  --set api.image.tag=<SHA_DU_COMMIT> \
-  --set worker.image.repository=$ECR_REGISTRY/rio-worker \
-  --set worker.image.tag=<SHA_DU_COMMIT> \
-  --wait --timeout 5m
+kind load docker-image rio-api:local --name rio-audio-guide
+kind load docker-image rio-worker:local --name rio-audio-guide
 ```
-Expected : `kubectl rollout status deployment/rio-api` et `deployment/rio-worker` confirment un rollout
-réussi.
+**Fait.** `docker-build.yml`/ECR restent la voie prévue pour un vrai déploiement EKS plus tard — sur
+`kind`, les images buildées en local (Tâche 10, Step 2) sont chargées directement sur le nœud, sans
+registre intermédiaire.
 
-- [ ] **Step 8: Vérifier que ça tourne réellement**
+- [x] **Step 7: Déployer avec Helm — bug de conception trouvé et corrigé**
 
-Run:
+Run :
+```bash
+helm upgrade --install rio deploy/helm/rio-backend \
+  --set api.image.repository=rio-api --set api.image.tag=local \
+  --set worker.image.repository=rio-worker --set worker.image.tag=local \
+  --set api.replicas=1 --set api.minReplicas=1
+```
+Premier essai : échec, `no matches for kind "ScaledObject" in version "keda.sh/v1alpha1"` — KEDA n'est
+pas un composant K8s natif, ses CRDs doivent être installées séparément (vrai sur `kind` comme sur EKS,
+pas spécifique à `kind`) :
+```bash
+helm repo add kedacore https://kedacore.github.io/charts
+helm install keda kedacore/keda --namespace keda --create-namespace
+kubectl wait --for=condition=ready pod -l app=keda-operator -n keda --timeout=90s
+```
+Deuxième essai, l'install Helm passe, mais `kubectl get scaledobject` reste `READY=False` — bug de
+conception du chart (Tâche 10) trouvé en le testant pour de vrai : `worker-scaledobject.yaml` référence
+`authenticationRef: { name: rio-rabbitmq-auth }` mais ce `TriggerAuthentication` n'existait nulle part,
+ni dans le chart ni créé à la main. Corrigé en l'ajoutant :
+```bash
+kubectl apply -f - <<'EOF'
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata: { name: rio-rabbitmq-auth }
+spec:
+  secretTargetRef:
+    - { parameter: host, name: rio-backend-secrets, key: rabbitmq-url }
+EOF
+```
+**Fait, après les deux corrections ci-dessus.** `kubectl get scaledobject` confirme `READY=True`.
+
+- [x] **Step 8: Vérifier que ça tourne réellement**
+
+Run :
 ```bash
 kubectl get pods
-kubectl port-forward svc/rio-api 8080:80
-curl http://localhost:8080/places
+kubectl port-forward svc/rio-api 18080:80 &
+curl http://localhost:18080/places
 ```
-Expected : réponse JSON (liste vide ou avec les lieux importés si la Tâche 8 a été faite avant) — preuve
-que l'API tourne réellement sur EKS, connectée à Postgres, pas juste un déploiement qui existe sur le
-papier.
+**Fait.** `rio-api` et `rio-worker` en `1/1 Running`, `curl` renvoie `[]` avec `HTTP 200` — liste vide
+attendue (Tâche 8, l'import de données, pas encore faite), mais preuve que l'API tourne réellement,
+connectée à un vrai Postgres, servant une vraie requête HTTP sur un vrai cluster Kubernetes. Bonus
+observé sans rien avoir eu à déclencher : KEDA a lui-même redescendu `rio-worker` de 1 à 0 réplique
+(`KEDAScaleTargetDeactivated`) car la queue `tts_jobs` est vide — le scale-to-zero fonctionne
+réellement, pas juste configuré sur le papier.
 
-- [ ] **Step 9: Détruire le cluster**
+- [ ] **Step 9: Détruire le cluster une fois la soirée de démo terminée**
 
-Run:
+Run :
 ```bash
-eksctl delete cluster --name rio-audio-guide --region us-east-1
+kind delete cluster --name rio-audio-guide
 ```
-Expected : cluster et nœuds EC2 supprimés — confirmer via `aws eks list-clusters --region us-east-1`
-(liste vide) avant de considérer cette tâche terminée, pour ne pas laisser de facturation tourner sans
-surveillance.
+Expected : cluster supprimé (`kind get clusters` ne le liste plus). Moins critique qu'avec EKS — `kind`
+ne facture rien tant qu'il tourne — mais reste une bonne pratique de ne pas laisser tourner un cluster
+inutilisé, et libère les ressources Docker locales (RAM/CPU) pour le reste de la soirée.
 
 ---
 
