@@ -46,3 +46,35 @@ func TestScriptRepository_SaveAndFindByID(t *testing.T) {
 		t.Fatal("expected ReviewedAt to be set after round-trip")
 	}
 }
+
+func TestScriptRepository_FindByPlaceIDAndLanguage(t *testing.T) {
+	pool := testPool(t)
+	ctx := context.Background()
+
+	placeName, _ := domain.NewPlaceName("Theatro Municipal")
+	coords, _ := domain.NewCoordinates(-22.9105, -43.1765)
+	place := domain.NewPlace(placeName, "monument", coords, "", "overture", "correct")
+	placeRepo := NewPlaceRepository(pool)
+	if err := placeRepo.Save(ctx, place); err != nil {
+		t.Fatalf("save place fixture: %v", err)
+	}
+
+	scriptRepo := NewScriptRepository(pool)
+	text, _ := domain.NewScriptText("Voici le Theatro Municipal...")
+	script := domain.NewScript(place.ID(), domain.LanguagePT, text, "source text")
+	if err := scriptRepo.Save(ctx, script); err != nil {
+		t.Fatalf("save script fixture: %v", err)
+	}
+
+	found, err := scriptRepo.FindByPlaceIDAndLanguage(ctx, place.ID(), "pt")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if found.ID() != script.ID() {
+		t.Fatalf("got ID %q, want %q", found.ID(), script.ID())
+	}
+
+	if _, err := scriptRepo.FindByPlaceIDAndLanguage(ctx, place.ID(), "es"); err == nil {
+		t.Fatal("expected an error for a language with no script, got nil")
+	}
+}

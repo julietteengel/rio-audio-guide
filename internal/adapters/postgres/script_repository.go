@@ -75,3 +75,38 @@ func (r *ScriptRepository) FindByID(ctx context.Context, id string) (*domain.Scr
 	return domain.ReconstructScript(scriptID, placeID, language, text, sourceText, domain.ScriptStatus(status),
 		reviewer, reviewedAtVal, publishedAtVal), nil
 }
+
+func (r *ScriptRepository) FindByPlaceIDAndLanguage(ctx context.Context, placeID, language string) (*domain.Script, error) {
+	row := r.pool.QueryRow(ctx, `
+		SELECT id, place_id, language, text, COALESCE(source_text, ''), status,
+		       COALESCE(reviewer, ''), reviewed_at, published_at
+		FROM scripts WHERE place_id = $1 AND language = $2
+	`, placeID, language)
+
+	var scriptID, placeIDCol, languageRaw, textRaw, sourceText, status, reviewer string
+	var reviewedAt, publishedAt *time.Time
+	if err := row.Scan(&scriptID, &placeIDCol, &languageRaw, &textRaw, &sourceText, &status,
+		&reviewer, &reviewedAt, &publishedAt); err != nil {
+		return nil, err
+	}
+
+	language2, err := domain.NewLanguage(languageRaw)
+	if err != nil {
+		return nil, err
+	}
+	text, err := domain.NewScriptText(textRaw)
+	if err != nil {
+		return nil, err
+	}
+
+	var reviewedAtVal, publishedAtVal time.Time
+	if reviewedAt != nil {
+		reviewedAtVal = *reviewedAt
+	}
+	if publishedAt != nil {
+		publishedAtVal = *publishedAt
+	}
+
+	return domain.ReconstructScript(scriptID, placeIDCol, language2, text, sourceText, domain.ScriptStatus(status),
+		reviewer, reviewedAtVal, publishedAtVal), nil
+}
