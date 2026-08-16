@@ -42,6 +42,10 @@ func (f *fakeScriptRepo) FindByID(_ context.Context, id string) (*domain.Script,
 	return s, nil
 }
 
+func (f *fakeScriptRepo) FindByPlaceIDAndLanguage(_ context.Context, _, _ string) (*domain.Script, error) {
+	return nil, errors.New("not implemented in fake")
+}
+
 type fakeAudioFileRepo struct {
 	mu    sync.Mutex
 	files map[string]*domain.AudioFile
@@ -68,10 +72,18 @@ func (f *fakeAudioFileRepo) FindByID(_ context.Context, id string) (*domain.Audi
 	return a, nil
 }
 
+func (f *fakeAudioFileRepo) FindByScriptID(_ context.Context, _ string) (*domain.AudioFile, error) {
+	return nil, errors.New("not implemented in fake")
+}
+
 type fakeStorage struct{}
 
 func (fakeStorage) Upload(_ context.Context, key string, _ []byte, _ string) (string, error) {
 	return "fake://bucket/" + key, nil
+}
+
+func (fakeStorage) PresignURL(_ context.Context, _ string, _ time.Duration) (string, error) {
+	return "", errors.New("not implemented in fake")
 }
 
 func TestWorker_ProcessesJobEndToEnd(t *testing.T) {
@@ -245,6 +257,72 @@ func TestWorker_PermanentTTSError_MarksAudioFileFailedAndAcks(t *testing.T) {
 
 	permErr := &ports.PermanentError{StatusCode: 401, Body: "invalid api key"}
 	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{}, failingTTSGenerator{err: permErr})
+	if err != nil {
+		t.Fatalf("new worker: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	go func() { _ = worker.Run(ctx) }()
+
+	body, _ := json.Marshal(ttsJobMessage{
+		AudioFileID: audioFile.ID(),
+		ScriptID:    script.ID(),
+		Text:        "Texte",
+		Language:    "fr",
+		VoiceID:     "voice-1",
+	})
+	if err := channel.PublishWithContext(context.Background(), "", TTSJobQueue, false, false, amqp.Publishing{
+		ContentType: "application/json",
+		Body:        body,
+	}); err != nil {
+		t.Fatalf("publish test job: %v", err)
+	}
+
+	deadline := time.After(4 * time.Second)
+	tick := time.NewTicker(100 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		select {
+		case <-deadline:
+			t.Fatal("timed out waiting for job to be processed")
+		case <-tick.C:
+			found, err := audioFileRepo.FindByID(context.Background(), audioFile.ID())
+			if err == nil && found.Status() == domain.AudioFileStatusFailed {
+				if found.FailureReason() == "" {
+					t.Fatal("expected a non-empty failure reason")
+				}
+				return
+			}
+		}
+	}
+}
+
+type failingStorage struct{ err error }
+
+func (f failingStorage) Upload(_ context.Context, _ string, _ []byte, _ string) (string, error) {
+	return "", f.err
+}
+func (f failingStorage) PresignURL(_ context.Context, _ string, _ time.Duration) (string, error) {
+	return "", errors.New("not implemented in fake")
+}
+
+func TestWorker_PermanentS3Error_MarksAudioFileFailedAndAcks(t *testing.T) {
+	channel := testChannel(t)
+
+	scriptRepo := newFakeScriptRepo()
+	audioFileRepo := newFakeAudioFileRepo()
+
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript("place-1", domain.LanguageFR, text, "source")
+	_ = script.MarkReviewed("julie")
+	_ = scriptRepo.Save(context.Background(), script)
+
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	_ = audioFileRepo.Save(context.Background(), audioFile)
+
+	permErr := &ports.PermanentError{StatusCode: 0, Body: "InvalidAccessKeyId"}
+	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, failingStorage{err: permErr}, fakeTTSGenerator{})
 	if err != nil {
 		t.Fatalf("new worker: %v", err)
 	}

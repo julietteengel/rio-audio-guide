@@ -118,6 +118,15 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	// (voir ttsJobMessage côté publisher).
 	storageURL, err := w.storage.Upload(ctx, job.AudioFileID+".mp3", audioBytes, "audio/mpeg")
 	if err != nil {
+		var permErr *ports.PermanentError
+		if errors.As(err, &permErr) {
+			log.Printf("tts worker: permanent S3 error for %s, marking failed: %v", job.AudioFileID, err)
+			if failErr := application.FailAudioGeneration(ctx, w.audioFileRepo, job.AudioFileID, err.Error()); failErr != nil {
+				log.Printf("tts worker: mark failed also failed for %s: %v", job.AudioFileID, failErr)
+			}
+			_ = msg.Ack(false)
+			return
+		}
 		log.Printf("tts worker: upload failed for %s: %v", job.AudioFileID, err)
 		time.Sleep(requeueDelay)
 		_ = msg.Nack(false, true)

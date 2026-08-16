@@ -2,6 +2,7 @@ package s3
 
 import (
 	"context"
+	"errors"
 	"os"
 	"strings"
 	"testing"
@@ -11,6 +12,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+
+	"rioaudioguide/backend/internal/ports"
 )
 
 func testClient(t *testing.T) *s3.Client {
@@ -63,5 +66,21 @@ func TestAudioStorage_PresignURL(t *testing.T) {
 	}
 	if !strings.Contains(url, "X-Amz-Signature") {
 		t.Fatalf("got url %q, want a signed URL (X-Amz-Signature query param)", url)
+	}
+}
+
+func TestAudioStorage_Upload_ClassifiesInvalidCredentialsAsPermanent(t *testing.T) {
+	cfg := aws.Config{
+		Region:      "us-east-1",
+		Credentials: credentials.NewStaticCredentialsProvider("invalid-key-that-does-not-exist", "invalid-secret", ""),
+	}
+	client := s3.NewFromConfig(cfg)
+	storage := NewAudioStorage(client, "rio-audio-guide")
+
+	_, err := storage.Upload(context.Background(), "test.mp3", []byte("data"), "audio/mpeg")
+
+	var permErr *ports.PermanentError
+	if !errors.As(err, &permErr) {
+		t.Fatalf("got error %v, want a *ports.PermanentError (InvalidAccessKeyId is never resolved by retrying)", err)
 	}
 }
