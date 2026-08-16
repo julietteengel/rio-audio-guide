@@ -549,6 +549,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -574,12 +575,18 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 
 	script, err := s.scriptRepo.FindByPlaceIDAndLanguage(c.Request().Context(), placeID, language)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "no script for this place/language"})
+		if errors.Is(err, pgx.ErrNoRows) {
+			return c.JSON(http.StatusNotFound, echo.Map{"error": "no script for this place/language"})
+		}
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
 	audioFile, err := s.audioFileRepo.FindByScriptID(c.Request().Context(), script.ID())
 	if err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "no audio ever requested for this script"})
+		if errors.Is(err, pgx.ErrNoRows) {
+			return c.JSON(http.StatusNotFound, echo.Map{"error": "no audio ever requested for this script"})
+		}
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
 	if audioFile.Status() != "ready" {
@@ -602,6 +609,12 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 // parseS3Key extrait la clé d'objet d'un storage_url au format s3://bucket/clé
 // — c'est ce que domain.AudioFile.Audio().StorageURL() contient toujours,
 // c'est le seul format que le worker écrit (internal/adapters/s3.Upload).
+//
+// getPlaceAudio distingue explicitement "vraiment absent" (pgx.ErrNoRows,
+// 404) de toute autre erreur (panne DB transitoire, 500) — traiter toute
+// erreur comme un 404 masquerait une vraie panne derrière une réponse "ça
+// n'existe pas", la même classe de bug que l'erreur avalée trouvée dans
+// cmd/import pendant le chantier ElevenLabs.
 func parseS3Key(storageURL string) (string, error) {
 	rest, ok := strings.CutPrefix(storageURL, "s3://")
 	if !ok {
@@ -624,18 +637,35 @@ an import.
 Then update the two `fake*Repo` types in `server_test.go` (both existing tests must keep compiling) and
 `cmd/api/main.go`:
 
-In `internal/adapters/http/server_test.go`, add to `fakeScriptRepo`:
+In `internal/adapters/http/server_test.go`, add `"github.com/jackc/pgx/v5"` to the imports, and add to
+`fakeScriptRepo`:
 ```go
-func (f *fakeScriptRepo) FindByPlaceIDAndLanguage(_ context.Context, _, _ string) (*domain.Script, error) {
-	return nil, errNotImplementedInFake
+func (f *fakeScriptRepo) FindByPlaceIDAndLanguage(_ context.Context, placeID, language string) (*domain.Script, error) {
+	for _, s := range f.scripts {
+		if s.PlaceID() == placeID && s.Language().String() == language {
+			return s, nil
+		}
+	}
+	return nil, pgx.ErrNoRows
 }
 ```
 and to `fakeAudioFileRepo`:
 ```go
-func (f *fakeAudioFileRepo) FindByScriptID(_ context.Context, _ string) (*domain.AudioFile, error) {
-	return nil, errNotImplementedInFake
+func (f *fakeAudioFileRepo) FindByScriptID(_ context.Context, scriptID string) (*domain.AudioFile, error) {
+	for _, a := range f.files {
+		if a.ScriptID() == scriptID {
+			return a, nil
+		}
+	}
+	return nil, pgx.ErrNoRows
 }
 ```
+Unlike the other fake methods on these types (which return a plain `errNotImplementedInFake` because
+nothing in the existing test suite exercises their not-found path), these two must return the *real*
+sentinel (`pgx.ErrNoRows`) on a genuine miss — `getPlaceAudio` (above) specifically distinguishes
+`pgx.ErrNoRows` (404) from any other error (500), so a fake returning the wrong error type here would
+make `TestGetPlaceAudio_NoScriptForLanguage` assert the wrong status code.
+
 Replace every existing `errors.New("not implemented in fake")` / `errors.New("not found")` literal used
 across `fakePlaceRepo`/`fakeScriptRepo`/`fakeAudioFileRepo` in this file with a single shared
 `var errNotImplementedInFake = errors.New("not implemented in fake")` declared once near the top of the
@@ -1037,12 +1067,18 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 
 	script, err := s.scriptRepo.FindByPlaceIDAndLanguage(c.Request().Context(), placeID, language)
 	if err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "no script for this place/language"})
+		if errors.Is(err, pgx.ErrNoRows) {
+			return c.JSON(http.StatusNotFound, echo.Map{"error": "no script for this place/language"})
+		}
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
 	audioFile, err := s.audioFileRepo.FindByScriptID(c.Request().Context(), script.ID())
 	if err != nil {
-		return c.JSON(http.StatusNotFound, echo.Map{"error": "no audio ever requested for this script"})
+		if errors.Is(err, pgx.ErrNoRows) {
+			return c.JSON(http.StatusNotFound, echo.Map{"error": "no audio ever requested for this script"})
+		}
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
 	if audioFile.Status() != "ready" {
