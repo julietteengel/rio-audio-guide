@@ -11,16 +11,19 @@ adapters depend on ports, ports depend on domain, domain depends on nothing.
 ```
 internal/
   domain/        Place, Script, AudioFile — entities, value objects, invariants. No framework code.
-  ports/         Interfaces the domain/application layer depends on (repositories, publisher, storage).
+  ports/         Interfaces the domain/application layer depends on (repositories, publisher, storage,
+                 cache).
   application/   Use cases orchestrating domain + ports (ReviewAndRequestAudio, StartAudioGeneration,
                  CompleteAudioGeneration).
   adapters/
     postgres/    PlaceRepository, ScriptRepository, AudioFileRepository — real PostgreSQL+PostGIS.
     rabbitmq/    AudioJobPublisher (driven) and Worker (driving) — two roles, same tts_jobs queue.
-    s3/          AudioStorage — real AWS S3, no LocalStack/MinIO.
-    http/        Echo HTTP server (GET /places, POST /scripts/:id/review).
+    s3/          AudioStorage — real AWS S3, no LocalStack/MinIO. Uploads, and presigns GET URLs.
+    redis/       Cache — cache-aside in front of the hot read routes. Fail-open: any Redis error is
+                 treated as a miss, logged, and never fails the request.
+    http/        Echo HTTP server (GET /places, GET /places/:id/audio, POST /scripts/:id/review).
 cmd/
-  api/           HTTP server binary — Postgres + RabbitMQ (publisher).
+  api/           HTTP server binary — Postgres + RabbitMQ (publisher) + Redis + S3 (presigning only).
   worker/        TTS worker binary — Postgres + RabbitMQ (consumer) + S3. Separate from cmd/api so
                  the two can scale independently (HPA on the API, KEDA on the worker).
 ```
@@ -72,19 +75,20 @@ Postgres as `Place`/`Script` rows, before any of the above can run against real 
 ## Requirements
 
 - Go 1.25+
-- Docker (for local Postgres/RabbitMQ, or `kind` for local Kubernetes)
+- Docker (for local Postgres/RabbitMQ/Redis, or `kind` for local Kubernetes)
 - A real AWS account with an S3 bucket (`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` in your
   environment — never hardcoded, never committed)
 
 ## Running locally
 
-Plain Docker containers for Postgres/RabbitMQ, `cmd/api`/`cmd/worker` run as normal local Go processes
-(no Kubernetes involved at all — see "Running on `kind`" below if you specifically want to exercise the
-Helm chart or autoscaling).
+Plain Docker containers for Postgres/RabbitMQ/Redis, `cmd/api`/`cmd/worker` run as normal local Go
+processes (no Kubernetes involved at all — see "Running on `kind`" below if you specifically want
+to exercise the Helm chart or autoscaling).
 
 ```bash
 docker run -d --name rio-postgres -p 5433:5432 -e POSTGRES_PASSWORD=postgres postgis/postgis:16-3.4
 docker run -d --name rio-rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+docker run -d --name rio-redis -p 6379:6379 redis:7-alpine
 
 psql "postgres://postgres:postgres@localhost:5433/postgres" -f internal/adapters/postgres/schema.sql
 
@@ -95,14 +99,20 @@ DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
 
 DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
 RABBITMQ_URL="amqp://guest:guest@localhost:5672/" \
+REDIS_ADDR="localhost:6379" \
   go run ./cmd/api
 
 DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
 RABBITMQ_URL="amqp://guest:guest@localhost:5672/" \
-S3_BUCKET="rio-audioguide-bucket" \
+S3_BUCKET="rio-audio-guide" \
 ELEVENLABS_API_KEY="<your key>" \
   go run ./cmd/worker
 ```
+
+`REDIS_ADDR` is a bare `host:port`, not a URL like `DATABASE_URL`/`RABBITMQ_URL` — that's what the
+Redis client expects, and `redis://…` would fail. Skipping Redis entirely still works: the cache is
+fail-open, so the API serves every request correctly, just never from cache. It logs each failure
+rather than degrading silently.
 
 Trigger generation for an imported script (get a `voice_id` from the ElevenLabs voice library, or clone
 one with `pipeline/curation/clone_voice.py`):
@@ -111,6 +121,23 @@ one with `pipeline/curation/clone_voice.py`):
 curl -X POST localhost:8080/scripts/<script-id>/review \
   -d '{"reviewer":"you","voice_id":"<voice_id>"}'
 ```
+
+Then fetch the finished audio — note this takes a **place** ID, not a script ID, and the language
+picks which of that place's scripts to serve:
+
+```bash
+curl "localhost:8080/places/<place-id>/audio?language=fr"
+```
+
+Three response shapes:
+
+- `200 {"url":"https://rio-audio-guide.s3.amazonaws.com/…&X-Amz-Signature=…"}` — ready. The URL is
+  presigned and expires after 15 minutes; `curl -o audio.mp3 "<url>"` downloads a playable MP3.
+- `202 {"status":"…"}` — not ready. `queued`/`generating` means the worker hasn't finished, `failed`
+  means it gave up (see the `AudioFile`'s `failure_reason`), and `script not yet published` means the
+  audio exists but its script isn't published, so it isn't served.
+- `404 {"error":"…"}` — no script for that place/language, or no audio was ever requested for it.
+  Distinct from `500`, which means a real backend failure, not "doesn't exist".
 
 ### Running on `kind` (local Kubernetes — to exercise the Helm chart/autoscaling)
 
@@ -148,24 +175,36 @@ override `redis.addr`.
 ## Testing
 
 ```bash
-go test ./...                                                    # unit tests, no external deps
+go test ./...                                                    # no infra needed (2 hit the network)
 go vet ./...
 golangci-lint run ./...
 
 TEST_DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
-  go test -tags=integration ./...                                 # + real Postgres/RabbitMQ/S3
+  go test -tags=integration ./...                                 # + real Postgres/RabbitMQ/Redis/S3
 ```
 
-Integration tests are gated behind the `integration` build tag so `go test ./...` never needs live
-infrastructure. The S3 integration test additionally requires `S3_TEST_BUCKET` and skips cleanly
-without it.
+Everything needing a live Postgres/RabbitMQ/Redis is gated behind the `integration` build tag, so
+`go test ./...` needs no infrastructure to be running. Two untagged tests do touch the network, but
+neither needs anything provisioned — both are failure-path tests, and the failure is the assertion:
+
+- the S3 permanent-error test calls real AWS with deliberately invalid credentials and asserts the
+  `InvalidAccessKeyId` response is classified as permanent (no bucket, no valid credentials needed —
+  but it does need outbound network, and will fail offline);
+- the Redis connection-error test opens a socket to a port nothing listens on and asserts the failure
+  is reported as an error rather than silently as a cache miss (no Redis needed).
+
+`TestAudioStorage_Upload`, which does need a real writable bucket, requires `S3_TEST_BUCKET` and
+skips cleanly without it.
+
+The `integration` run additionally needs Redis on `localhost:6379` (override with `TEST_REDIS_ADDR`)
+alongside Postgres and RabbitMQ — CI provides all three as service containers.
 
 ## CI/CD
 
 Three GitHub Actions workflows in `.github/workflows/`:
 
 - **`backend-ci.yml`** — on every push/PR to `backend`. Three parallel jobs (`lint`, `test`,
-  `security`/`govulncheck`), then `build`, then `integration-test` against real Postgres/RabbitMQ
+  `security`/`govulncheck`), then `build`, then `integration-test` against real Postgres/RabbitMQ/Redis
   service containers.
 - **`docker-build.yml`** — builds and pushes `rio-api`/`rio-worker` images to ECR when `cmd/**`,
   `internal/**`, or a Dockerfile changes.
