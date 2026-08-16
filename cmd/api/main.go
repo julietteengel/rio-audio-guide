@@ -79,12 +79,18 @@ func main() {
 	// s'appelle REDIS_ADDR (et pas REDIS_URL comme DATABASE_URL/RABBITMQ_URL) parce
 	// que goredis.Options.Addr attend un "hôte:port", pas une URL : y mettre
 	// "redis://..." échouerait silencieusement, masqué par le fail-open.
+	// DialerRetries est un second réglage, indépendant de MaxRetries : le pool
+	// réessaie de se (re)connecter 5 fois espacées de 100ms par défaut, ce qui
+	// domine largement le temps passé quand Redis est mort. Sans lui, borner
+	// MaxRetries ne suffit pas. (Mesuré sur une adresse injoignable : 1.7s avec
+	// les défauts, ~1ms une fois les deux réglés.)
 	redisClient := goredis.NewClient(&goredis.Options{
-		Addr:         envOr("REDIS_ADDR", "localhost:6379"),
-		DialTimeout:  200 * time.Millisecond,
-		ReadTimeout:  200 * time.Millisecond,
-		WriteTimeout: 200 * time.Millisecond,
-		MaxRetries:   1,
+		Addr:          envOr("REDIS_ADDR", "localhost:6379"),
+		DialTimeout:   200 * time.Millisecond,
+		ReadTimeout:   200 * time.Millisecond,
+		WriteTimeout:  200 * time.Millisecond,
+		MaxRetries:    1,
+		DialerRetries: 1,
 	})
 	cache := redis.NewCache(redisClient)
 
