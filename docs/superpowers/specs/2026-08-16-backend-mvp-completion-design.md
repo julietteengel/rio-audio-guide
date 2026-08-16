@@ -105,22 +105,39 @@ smoke test contre le LoadBalancer) est directement réutilisable, mais seulement
 déploiement EKS — pas avant, cohérent avec "manifests écrits, pas déployés" du sous-système 6 tant que
 ce moment n'est pas venu.
 
-## Sous-système 6 — Manifests Kubernetes (écrits, pas déployés)
+## Sous-système 6 — Chart Helm + manifests Kubernetes (écrits, pas déployés)
 
-Ajouté en cours de discussion : le worker (sous-système 1) et l'API (sous-système 3) sont deux
-processus déployables distincts, avec des besoins de scaling différents — exactement la situation où
-Kubernetes devient pertinent plutôt qu'artificiel, cohérent avec `2026-08-04-backend-stack-decision.md`
-qui anticipait déjà KEDA pour ce worker précis.
+Ajouté en cours de discussion, révisé le 2026-08-16 (Helm + canary Istio + blue-green + Karpenter,
+suite à relecture du CV de l'autrice qui liste explicitement Helm/HPA/KEDA/Istio/Karpenter) : le worker
+(sous-système 1) et l'API (sous-système 3) sont deux processus déployables distincts, avec des besoins
+de scaling différents — exactement la situation où Kubernetes devient pertinent plutôt qu'artificiel,
+cohérent avec `2026-08-04-backend-stack-decision.md` qui anticipait déjà KEDA pour ce worker précis.
 
 **Écrit maintenant, déployé plus tard** — pas de cluster réel monté avant l'entretien (même raisonnement
 que pour la démo : une infra live pendant l'entretien est un risque, pas une preuve) :
-- `Dockerfile` (un par binaire : `cmd/api`, futur `cmd/worker` si le worker est séparé en binaire propre).
-- `Deployment` + `Service` + `HorizontalPodAutoscaler` (CPU/requêtes) pour l'API.
-- `Deployment` + `ScaledObject` KEDA (profondeur de la queue RabbitMQ, pas le CPU) pour le worker.
 
-Objectif explicite de l'autrice : réviser HPA et KEDA concrètement en les écrivant, pas juste en
-sachant les définir à l'oral. Le déploiement réel sur un cluster viendra dans un second temps, hors de
-la contrainte de temps actuelle.
+- **Dockerfiles** — un par binaire (`cmd/api`, `cmd/worker`).
+- **Chart Helm** (`deploy/helm/rio-backend/`), pas des YAML bruts — `Chart.yaml`, `values.yaml`
+  (tag d'image, réplicas, nom du bucket paramétrés), `templates/` contenant `Deployment`+`Service`+
+  `HorizontalPodAutoscaler` (CPU/requêtes) pour l'API, `Deployment`+`ScaledObject` KEDA (profondeur de
+  la queue RabbitMQ, pas le CPU) pour le worker. Choix Helm plutôt que Kustomize (utilisé dans la
+  référence FIAP aula03) : Helm est explicitement sur le CV de l'autrice, Kustomize non — décidé pour
+  ne pas mélanger les deux outils sans raison.
+- **Deux stratégies de rollout progressif, documentées séparément** (pas combinées — deux réponses
+  alternatives au même problème, pas un seul déploiement qui ferait les deux) :
+  - `deploy/k8s/canary-istio/` — `Gateway`, `VirtualService`, `DestinationRule`, deux `Deployment`
+    (`stable`/`canary`) — bascule progressive du trafic par pourcentage, nécessite un maillage Istio.
+  - `deploy/k8s/blue-green/` — deux `Deployment` (`blue`/`green`) + un `Service` dont le sélecteur
+    bascule intégralement de l'un à l'autre — plus simple, tout-ou-rien, pas besoin d'Istio.
+- **Karpenter** — documenté (ce que ça fait : scale les **nœuds** EC2 sous-jacents selon la demande
+  réelle des pods, différent de HPA/KEDA qui scalent le **nombre de pods**), avec un exemple de
+  `NodePool` écrit à titre d'illustration — pas déployé, pertinent seulement si le vrai déploiement EKS
+  a lieu.
+
+Objectif explicite de l'autrice : réviser Helm, HPA, KEDA, Istio et Karpenter concrètement en les
+écrivant — ce sont tous des éléments déjà présents sur son CV, l'enjeu est de pouvoir les défendre en
+détail, pas de les découvrir. Le déploiement réel sur un cluster (EKS, avec `eksctl`) viendra dans un
+second temps, hors de la contrainte de temps actuelle.
 
 ## Ce qui reste hors scope de ce document
 
