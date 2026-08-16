@@ -1,0 +1,24 @@
+api:
+  image:
+    repository: rio-api
+    tag: local
+  replicas: 2
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilization: 70
+
+worker:
+  image:
+    repository: rio-worker
+    tag: local
+  minReplicas: 0
+  maxReplicas: 10
+  rabbitmq:
+    queueName: tts_jobs
+    queueLength: "5" # jobs en attente par réplique avant de scaler
+
+s3:
+  bucket: rio-audio-guide
+
+secrets:
+  name: rio-backend-secrets # créé hors chart (kubectl create secret), jamais commité

@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels: { app: {{ .Release.Name }}-api }
+  template:
+    metadata:
+      labels: { app: {{ .Release.Name }}-api }
+    spec:
+      containers:
+        - name: api
+          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
+          ports: [{ containerPort: 8080 }]
+          env:
+            - name: DATABASE_URL
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: database-url } }
+            - name: RABBITMQ_URL
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: rabbitmq-url } }

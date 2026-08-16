@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rio-api
+spec:
+  selector: { app: rio-api, slot: blue } # bascule : kubectl patch service rio-api -p '{"spec":{"selector":{"slot":"green"}}}'
+  ports:
+    - { port: 80, targetPort: 8080 }

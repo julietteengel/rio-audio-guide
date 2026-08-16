@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rio-api-blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: rio-api, slot: blue }
+  template:
+    metadata:
+      labels: { app: rio-api, slot: blue }
+    spec:
+      containers:
+        - name: api
+          image: rio-api:v1.0.0
+          ports: [{ containerPort: 8080 }]

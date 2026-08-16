@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rio-api-canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: rio-api, version: canary }
+  template:
+    metadata:
+      labels: { app: rio-api, version: canary }
+    spec:
+      containers:
+        - name: api
+          image: rio-api:v1.1.0-rc1
+          ports: [{ containerPort: 8080 }]
