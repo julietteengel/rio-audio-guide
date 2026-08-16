@@ -26,13 +26,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("connect rabbitmq: %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	channel, err := conn.Channel()
 	if err != nil {
 		log.Fatalf("open rabbitmq channel: %v", err)
 	}
-	defer channel.Close()
+	defer func() { _ = channel.Close() }()
 
 	placeRepo := postgres.NewPlaceRepository(pool)
 	scriptRepo := postgres.NewScriptRepository(pool)

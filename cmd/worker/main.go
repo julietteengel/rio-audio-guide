@@ -31,13 +31,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("connect rabbitmq: %v", err)
 	}
-	defer conn.Close()
+	defer func() { _ = conn.Close() }()
 
 	channel, err := conn.Channel()
 	if err != nil {
 		log.Fatalf("open rabbitmq channel: %v", err)
 	}
-	defer channel.Close()
+	defer func() { _ = channel.Close() }()
 
 	// Vrai AWS : LoadDefaultConfig lit AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/
 	// AWS_SESSION_TOKEN/AWS_REGION depuis l'environnement (ou ~/.aws/credentials)

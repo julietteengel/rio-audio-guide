@@ -6,6 +6,7 @@ import (
 	"rioaudioguide/backend/internal/ports"
 )
 
+// Server regroupe l'instance Echo et les quatre ports dont l'API a besoin (les adaptateurs ne doivent jamais se connaître entre eux, seulement connaître les ports.)
 type Server struct {
 	echo          *echo.Echo
 	placeRepo     ports.PlaceRepository
