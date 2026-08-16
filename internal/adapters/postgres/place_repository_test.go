@@ -101,3 +101,34 @@ func TestPlaceRepository_FindActiveInBoundingBox(t *testing.T) {
 		t.Fatalf("expected place %q in bounding box results, got %d results", place.ID(), len(found))
 	}
 }
+
+func TestPlaceRepository_FindByName(t *testing.T) {
+	pool := testPool(t)
+	repo := NewPlaceRepository(pool)
+	ctx := context.Background()
+
+	name, err := domain.NewPlaceName("Escadaria Selarón")
+	if err != nil {
+		t.Fatalf("unexpected error building fixture: %v", err)
+	}
+	coords, err := domain.NewCoordinates(-22.9147, -43.1806)
+	if err != nil {
+		t.Fatalf("unexpected error building fixture: %v", err)
+	}
+	place := domain.NewPlace(name, "monument", coords, "", "overture", "correct")
+	if err := repo.Save(ctx, place); err != nil {
+		t.Fatalf("save fixture: %v", err)
+	}
+
+	found, err := repo.FindByName(ctx, "Escadaria Selarón")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if found.ID() != place.ID() {
+		t.Fatalf("got ID %q, want %q", found.ID(), place.ID())
+	}
+
+	if _, err := repo.FindByName(ctx, "does not exist"); err == nil {
+		t.Fatal("expected an error for an unknown name, got nil")
+	}
+}

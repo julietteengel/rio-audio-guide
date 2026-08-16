@@ -43,6 +43,16 @@ func (r *PlaceRepository) FindByID(ctx context.Context, id string) (*domain.Plac
 	return scanPlace(row)
 }
 
+func (r *PlaceRepository) FindByName(ctx context.Context, name string) (*domain.Place, error) {
+	row := r.pool.QueryRow(ctx, `
+		SELECT id, name, category, ST_Y(geom::geometry), ST_X(geom::geometry),
+		       COALESCE(wikidata_qid, ''), source, COALESCE(source_richness, ''),
+		       status, COALESCE(removed_reason, '')
+		FROM places WHERE name = $1
+	`, name)
+	return scanPlace(row)
+}
+
 func (r *PlaceRepository) FindActiveInBoundingBox(ctx context.Context, minLat, minLon, maxLat, maxLon float64) ([]*domain.Place, error) {
 	rows, err := r.pool.Query(ctx, `
 		SELECT id, name, category, ST_Y(geom::geometry), ST_X(geom::geometry),
