@@ -13,6 +13,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 
 	"rioaudioguide/backend/internal/domain"
+	"rioaudioguide/backend/internal/ports"
 )
 
 type fakeScriptRepo struct {
@@ -87,7 +88,7 @@ func TestWorker_ProcessesJobEndToEnd(t *testing.T) {
 	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
 	_ = audioFileRepo.Save(context.Background(), audioFile)
 
-	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{})
+	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{}, fakeTTSGenerator{})
 	if err != nil {
 		t.Fatalf("new worker: %v", err)
 	}
@@ -123,6 +124,75 @@ func TestWorker_ProcessesJobEndToEnd(t *testing.T) {
 				savedScript, _ := scriptRepo.FindByID(context.Background(), script.ID())
 				if savedScript.Status() != domain.ScriptStatusPublished {
 					t.Fatalf("got script status %v, want published", savedScript.Status())
+				}
+				return
+			}
+		}
+	}
+}
+
+type fakeTTSGenerator struct{}
+
+func (fakeTTSGenerator) Generate(_ context.Context, text, _, _ string) ([]byte, time.Duration, error) {
+	return []byte("FAKE-AUDIO:" + text), 5 * time.Second, nil
+}
+
+type failingTTSGenerator struct{ err error }
+
+func (f failingTTSGenerator) Generate(_ context.Context, _, _, _ string) ([]byte, time.Duration, error) {
+	return nil, 0, f.err
+}
+
+func TestWorker_PermanentTTSError_MarksAudioFileFailedAndAcks(t *testing.T) {
+	channel := testChannel(t)
+
+	scriptRepo := newFakeScriptRepo()
+	audioFileRepo := newFakeAudioFileRepo()
+
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript("place-1", domain.LanguageFR, text, "source")
+	_ = script.MarkReviewed("julie")
+	_ = scriptRepo.Save(context.Background(), script)
+
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	_ = audioFileRepo.Save(context.Background(), audioFile)
+
+	permErr := &ports.PermanentError{StatusCode: 401, Body: "invalid api key"}
+	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{}, failingTTSGenerator{err: permErr})
+	if err != nil {
+		t.Fatalf("new worker: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	go func() { _ = worker.Run(ctx) }()
+
+	body, _ := json.Marshal(ttsJobMessage{
+		AudioFileID: audioFile.ID(),
+		ScriptID:    script.ID(),
+		Text:        "Texte",
+		Language:    "fr",
+		VoiceID:     "voice-1",
+	})
+	if err := channel.PublishWithContext(context.Background(), "", TTSJobQueue, false, false, amqp.Publishing{
+		ContentType: "application/json",
+		Body:        body,
+	}); err != nil {
+		t.Fatalf("publish test job: %v", err)
+	}
+
+	deadline := time.After(4 * time.Second)
+	tick := time.NewTicker(100 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		select {
+		case <-deadline:
+			t.Fatal("timed out waiting for job to be processed")
+		case <-tick.C:
+			found, err := audioFileRepo.FindByID(context.Background(), audioFile.ID())
+			if err == nil && found.Status() == domain.AudioFileStatusFailed {
+				if found.FailureReason() == "" {
+					t.Fatal("expected a non-empty failure reason")
 				}
 				return
 			}

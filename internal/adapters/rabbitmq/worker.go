@@ -3,8 +3,8 @@ package rabbitmq
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log"
-	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
@@ -17,16 +17,17 @@ type Worker struct {
 	scriptRepo    ports.ScriptRepository
 	audioFileRepo ports.AudioFileRepository
 	storage       ports.AudioStorage
+	ttsGenerator  ports.TTSGenerator
 }
 
-func NewWorker(channel *amqp.Channel, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, storage ports.AudioStorage) (*Worker, error) {
+func NewWorker(channel *amqp.Channel, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, storage ports.AudioStorage, ttsGenerator ports.TTSGenerator) (*Worker, error) {
 	// Même déclaration que côté publisher — idempotente, et nécessaire ici
 	// aussi : rien ne garantit que le publisher aura tourné avant le worker
 	// au premier démarrage (deux binaires séparés, cmd/api et cmd/worker).
 	if _, err := channel.QueueDeclare(TTSJobQueue, true, false, false, false, nil); err != nil {
 		return nil, err
 	}
-	return &Worker{channel: channel, scriptRepo: scriptRepo, audioFileRepo: audioFileRepo, storage: storage}, nil
+	return &Worker{channel: channel, scriptRepo: scriptRepo, audioFileRepo: audioFileRepo, storage: storage, ttsGenerator: ttsGenerator}, nil
 }
 
 // Run consomme tts_jobs jusqu'à annulation du ctx. Bloquant — à lancer dans
@@ -72,9 +73,9 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 		return
 	}
 
-	// Marque l'AudioFile "generating" AVANT le travail lent (le stub, puis
-	// un jour ElevenLabs) — pendant que ça tourne, Postgres reflète l'état
-	// réel plutôt qu'un mensonge ("queued" alors que ça travaille déjà).
+	// Marque l'AudioFile "generating" AVANT le travail lent (l'appel
+	// ElevenLabs) — pendant que ça tourne, Postgres reflète l'état réel
+	// plutôt qu'un mensonge ("queued" alors que ça travaille déjà).
 	if err := application.StartAudioGeneration(ctx, w.audioFileRepo, job.AudioFileID); err != nil {
 		log.Printf("tts worker: start generation failed for %s: %v", job.AudioFileID, err)
 		// requeue=true ici : contrairement au message malformé, une erreur
@@ -84,15 +85,27 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 		return
 	}
 
-	// Stub explicite : pas de vrai appel ElevenLabs ici, juste des octets et
-	// une durée plausibles, pour exercer réellement le reste du pipeline
-	// (upload, Postgres, transition Script→published) sans dépendre d'une
-	// clé API. À remplacer plus tard par un vrai appel TTS.
-	audioBytes, duration := generateAudioStub(job.Text)
+	audioBytes, duration, err := w.ttsGenerator.Generate(ctx, job.Text, job.Language, job.VoiceID)
+	if err != nil {
+		var permErr *ports.PermanentError
+		if errors.As(err, &permErr) {
+			log.Printf("tts worker: permanent TTS error for %s, marking failed: %v", job.AudioFileID, err)
+			if failErr := application.FailAudioGeneration(ctx, w.audioFileRepo, job.AudioFileID, err.Error()); failErr != nil {
+				log.Printf("tts worker: mark failed also failed for %s: %v", job.AudioFileID, failErr)
+			}
+			// Ack, pas Nack : réessayer le même message ne changera rien à une
+			// clé invalide ou un texte/voice_id rejeté.
+			_ = msg.Ack(false)
+			return
+		}
+		log.Printf("tts worker: TTS generation failed for %s: %v", job.AudioFileID, err)
+		_ = msg.Nack(false, true)
+		return
+	}
 
-	// Le fichier "audio" (factice pour l'instant) part sur S3 via le port
-	// AudioStorage, jamais dans RabbitMQ — la queue ne transporte que de
-	// petits messages de contrôle (voir ttsJobMessage côté publisher).
+	// Le fichier audio part sur S3 via le port AudioStorage, jamais dans
+	// RabbitMQ — la queue ne transporte que de petits messages de contrôle
+	// (voir ttsJobMessage côté publisher).
 	storageURL, err := w.storage.Upload(ctx, job.AudioFileID+".mp3", audioBytes, "audio/mpeg")
 	if err != nil {
 		log.Printf("tts worker: upload failed for %s: %v", job.AudioFileID, err)
@@ -111,14 +124,4 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	// Tout a réussi : on accuse réception, RabbitMQ peut supprimer le
 	// message de la queue pour de bon.
 	_ = msg.Ack(false)
-}
-
-// generateAudioStub remplace le vrai appel TTS (ElevenLabs) — pas construit ici,
-// nécessiterait une clé API et sa propre conception. Renvoie un résultat
-// plausible mais factice pour exercer réellement le reste du pipeline (upload,
-// Postgres, transition Script→published).
-func generateAudioStub(text string) (audioBytes []byte, duration time.Duration) {
-	wordCount := len(text) / 5
-	duration = time.Duration(wordCount) * 400 * time.Millisecond
-	return []byte("STUB-AUDIO:" + text), duration
 }
