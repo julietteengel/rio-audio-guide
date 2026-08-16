@@ -43,12 +43,16 @@ func (r *PlaceRepository) FindByID(ctx context.Context, id string) (*domain.Plac
 	return scanPlace(row)
 }
 
+// FindByName sert surtout à l'import CSV (cmd/import) pour éviter de recréer un
+// lieu déjà présent. places.name n'a pas de contrainte d'unicité : on filtre
+// donc les lieux retirés et on ordonne par created_at pour que deux appels
+// identiques renvoient toujours la même ligne.
 func (r *PlaceRepository) FindByName(ctx context.Context, name string) (*domain.Place, error) {
 	row := r.pool.QueryRow(ctx, `
 		SELECT id, name, category, ST_Y(geom::geometry), ST_X(geom::geometry),
 		       COALESCE(wikidata_qid, ''), source, COALESCE(source_richness, ''),
 		       status, COALESCE(removed_reason, '')
-		FROM places WHERE name = $1
+		FROM places WHERE name = $1 AND status = 'active' ORDER BY created_at LIMIT 1
 	`, name)
 	return scanPlace(row)
 }

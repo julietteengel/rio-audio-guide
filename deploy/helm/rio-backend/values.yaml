@@ -21,4 +21,8 @@ s3:
   bucket: rio-audio-guide
 
 secrets:
-  name: rio-backend-secrets # créé hors chart (kubectl create secret), jamais commité
+  name: rio-backend-secrets # créé hors chart, jamais commité :
+  # kubectl create secret generic rio-backend-secrets \
+  #   --from-literal=database-url=... \
+  #   --from-literal=rabbitmq-url=... \
+  #   --from-literal=elevenlabs-api-key=...

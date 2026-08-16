@@ -4,8 +4,10 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -102,12 +104,12 @@ func TestPlaceRepository_FindActiveInBoundingBox(t *testing.T) {
 	}
 }
 
-func TestPlaceRepository_FindByName(t *testing.T) {
-	pool := testPool(t)
-	repo := NewPlaceRepository(pool)
-	ctx := context.Background()
-
-	name, err := domain.NewPlaceName("Theatro Municipal")
+// savePlaceFixture insère un lieu au nom unique. places.name n'a pas de
+// contrainte d'unicité et les tests ne nettoient pas derrière eux : réutiliser
+// un nom fixe ferait dépendre le résultat des exécutions précédentes.
+func savePlaceFixture(t *testing.T, repo *PlaceRepository, rawName string) *domain.Place {
+	t.Helper()
+	name, err := domain.NewPlaceName(rawName)
 	if err != nil {
 		t.Fatalf("unexpected error building fixture: %v", err)
 	}
@@ -116,11 +118,21 @@ func TestPlaceRepository_FindByName(t *testing.T) {
 		t.Fatalf("unexpected error building fixture: %v", err)
 	}
 	place := domain.NewPlace(name, "monument", coords, "", "overture", "correct")
-	if err := repo.Save(ctx, place); err != nil {
+	if err := repo.Save(context.Background(), place); err != nil {
 		t.Fatalf("save fixture: %v", err)
 	}
+	return place
+}
 
-	found, err := repo.FindByName(ctx, "Theatro Municipal")
+func TestPlaceRepository_FindByName(t *testing.T) {
+	pool := testPool(t)
+	repo := NewPlaceRepository(pool)
+	ctx := context.Background()
+
+	uniqueName := fmt.Sprintf("Theatro Municipal %d", time.Now().UnixNano())
+	place := savePlaceFixture(t, repo, uniqueName)
+
+	found, err := repo.FindByName(ctx, uniqueName)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -130,5 +142,37 @@ func TestPlaceRepository_FindByName(t *testing.T) {
 
 	if _, err := repo.FindByName(ctx, "does not exist"); err == nil {
 		t.Fatal("expected an error for an unknown name, got nil")
+	}
+}
+
+// Un lieu retiré ne doit pas ressortir de FindByName : sinon cmd/import le
+// prendrait pour un lieu existant et rattacherait des scripts à un lieu que le
+// domaine considère comme supprimé.
+func TestPlaceRepository_FindByName_IgnoresRemovedPlaces(t *testing.T) {
+	pool := testPool(t)
+	repo := NewPlaceRepository(pool)
+	ctx := context.Background()
+
+	uniqueName := fmt.Sprintf("Lieu retiré %d", time.Now().UnixNano())
+	place := savePlaceFixture(t, repo, uniqueName)
+	if err := place.Remove("doublon"); err != nil {
+		t.Fatalf("remove place: %v", err)
+	}
+	if err := repo.Save(ctx, place); err != nil {
+		t.Fatalf("save removed place: %v", err)
+	}
+
+	if _, err := repo.FindByName(ctx, uniqueName); err == nil {
+		t.Fatal("expected an error for a removed place, got nil")
+	}
+
+	// Même nom, mais actif cette fois : c'est celui-là qu'on doit retrouver.
+	active := savePlaceFixture(t, repo, uniqueName)
+	found, err := repo.FindByName(ctx, uniqueName)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if found.ID() != active.ID() {
+		t.Fatalf("got ID %q, want the active place %q", found.ID(), active.ID())
 	}
 }
