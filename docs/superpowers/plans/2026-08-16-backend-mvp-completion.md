@@ -1362,6 +1362,9 @@ git commit -m "Add pipeline-to-Postgres import command"
 
 ### Task 9: CI/CD — GitHub Actions
 
+**Révisé le 2026-08-16** — structure en jobs parallèles puis séquentiels, inspirée de
+`fiap-dclt-aula02/ci-multistage.yml` (cours FIAP de l'autrice), pas un seul job monolithique.
+
 **Files:**
 - Modify: `.github/workflows/backend-ci.yml`
 
@@ -1378,8 +1381,55 @@ on:
     branches: [backend]
 
 jobs:
+  # Étage 1 — en parallèle, aucun "needs" entre eux
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - name: Vet
+        run: go vet ./...
+
   test:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - name: Unit tests
+        run: go test ./...
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+      - name: Scan for known vulnerabilities
+        run: govulncheck ./...
+
+  # Étage 2 — dépend des trois précédents
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test, security]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+      - name: Build
+        run: go build ./...
+
+  # Étage 3 — dépend du build, tests d'intégration contre de vrais services
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: build
     services:
       postgres:
         image: postgis/postgis:16-3.4
@@ -1394,46 +1444,43 @@ jobs:
       rabbitmq:
         image: rabbitmq:3-management
         ports: ["5672:5672"]
-      localstack:
-        image: localstack/localstack
-        env:
-          SERVICES: s3
-        ports: ["4566:4566"]
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
-
       - name: Apply schema
         run: |
           sudo apt-get update && sudo apt-get install -y postgresql-client
           PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -f internal/adapters/postgres/schema.sql
-
-      - name: Build
-        run: go build ./...
-
-      - name: Vet
-        run: go vet ./...
-
-      - name: Unit tests
-        run: go test ./...
-
-      - name: Integration tests
+      - name: Integration tests (Postgres + RabbitMQ; S3 skips — no S3_TEST_BUCKET in CI yet)
         env:
           TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
         run: go test -tags=integration ./...
 ```
 
-- [ ] **Step 2: Vérifier localement que les commandes du workflow fonctionnent**
+Le test S3 (`internal/adapters/s3/audio_storage_test.go`) appelle `t.Skip` si `S3_TEST_BUCKET` n'est
+pas défini — donc il se met de côté proprement en CI tant qu'on n'a pas ajouté d'identifiants AWS en
+GitHub Secrets, sans faire échouer le workflow.
 
-Run (avec Postgres/RabbitMQ déjà lancés localement, et les identifiants AWS déjà exportés dans le terminal) :
+- [ ] **Step 2: Vérifier localement que les commandes de chaque job fonctionnent**
+
+Run (avec Postgres/RabbitMQ déjà lancés localement) :
 ```bash
-go build ./... && go vet ./... && go test ./... && TEST_DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" go test -tags=integration ./...
+go vet ./... && go test ./... && go build ./... && TEST_DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" go test -tags=integration ./...
 ```
 Expected : tout passe, avant même de pousser sur GitHub.
+
+- [ ] **Step 3: Commit et pousser pour voir les 5 jobs tourner réellement**
+
+```bash
+git add .github/workflows/backend-ci.yml
+git commit -m "Add GitHub Actions CI: parallel lint/test/security, then build, then integration"
+git push origin backend
+```
+
+Vérifier l'onglet Actions du repo — les jobs `lint`/`test`/`security` doivent apparaître en parallèle,
+puis `build`, puis `integration-test`.
 
 - [ ] **Step 3: Commit et pousser pour voir le workflow tourner réellement**
 
