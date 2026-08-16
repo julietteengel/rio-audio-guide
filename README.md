@@ -121,6 +121,30 @@ Unlike the plain-Docker setup above, `kind` runs a real (if single-host) Kuberne
 autoscaling logic for free before spending on real cloud infrastructure. See
 `docs/superpowers/plans/2026-08-16-backend-mvp-completion.md`, Task 11, for the full walkthrough.
 
+Postgres, RabbitMQ and Redis are installed as *separate* releases, not as `Chart.yaml` dependencies —
+`deploy/helm/rio-backend` only deploys the API and the worker, and points at whatever is already
+running under those service names:
+
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami && helm repo update
+helm install demo-postgres bitnami/postgresql --set auth.postgresPassword=postgres --set auth.database=postgres
+helm install demo-redis bitnami/redis --set auth.enabled=false
+```
+
+`auth.enabled=false` on Redis is deliberate, not laziness: the cache client (`cmd/api/main.go`) takes
+only `REDIS_ADDR`, with no password env var — a password-protected Redis would fail every command,
+and the cache's fail-open design would swallow that silently forever. Nothing secret transits the
+cache anyway (public place listings and presigned URLs).
+
+RabbitMQ has no Bitnami line here on purpose: that chart hits the Bitnami license wall
+(`ImagePullBackOff`), so it's deployed as a minimal `Deployment`+`Service` named `demo-rabbitmq` —
+see Task 11 Step 3 of the plan above for the manifest. The Postgres and Redis charts are both still
+free to pull.
+
+Service names matter: `values.yaml` defaults to `demo-redis-master:6379` (the Bitnami Redis chart's
+master `Service`), so the release must be named `demo-redis` for that default to resolve — otherwise
+override `redis.addr`.
+
 ## Testing
 
 ```bash
