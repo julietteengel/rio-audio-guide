@@ -1365,8 +1365,19 @@ git commit -m "Add pipeline-to-Postgres import command"
 **Révisé le 2026-08-16** — structure en jobs parallèles puis séquentiels, inspirée de
 `fiap-dclt-aula02/ci-multistage.yml` (cours FIAP de l'autrice), pas un seul job monolithique.
 
+**Fait le 2026-08-16.** `backend-ci.yml` écrit, vérifié localement (les 5 commandes de chaque job
+tournent en clair, y compris les tests d'intégration contre un vrai Postgres/RabbitMQ), commité.
+`docker-build.yml` (push ECR) et `k8s-deploy.yml` (déploiement EKS via Helm) — hors scope initial de
+cette tâche, prévus pour un cycle ultérieur — ont aussi été écrits le soir même (décision reprise en
+session, voir `docs/superpowers/specs/2026-08-16-backend-mvp-completion-design.md` sous-système 5) :
+tous deux syntaxiquement validés, aucun des deux encore exécuté en réel (`docker-build.yml` a besoin
+des dépôts ECR `rio-api`/`rio-worker`, pas encore créés ; `k8s-deploy.yml` a besoin d'un vrai cluster
+EKS, pas encore monté).
+
 **Files:**
 - Modify: `.github/workflows/backend-ci.yml`
+- Create: `.github/workflows/docker-build.yml`
+- Create: `.github/workflows/k8s-deploy.yml`
 
 - [ ] **Step 1: Écrire le workflow**
 
@@ -1496,25 +1507,34 @@ git push origin backend
 Vérifier l'onglet Actions du repo — les jobs `lint`/`test`/`security` doivent apparaître en parallèle,
 puis `build`, puis `integration-test`.
 
-- [ ] **Step 3: Commit et pousser pour voir le workflow tourner réellement**
-
-```bash
-git add .github/workflows/backend-ci.yml
-git commit -m "Add GitHub Actions CI: build, vet, unit + integration tests"
-git push -u origin backend
-```
-
-Vérifier l'onglet Actions du repo GitHub — c'est la vraie preuve, pas juste le fichier YAML.
-
 ---
 
-### Task 10: Manifests Kubernetes (écrits, pas déployés)
+### Task 10: Chart Helm + manifests Kubernetes
 
-**Files:**
-- Modify: `deploy/docker/Dockerfile.api`
-- Modify: `deploy/docker/Dockerfile.worker`
-- Modify: `deploy/k8s/api-deployment.yaml`, `api-service.yaml`, `api-hpa.yaml`
-- Modify: `deploy/k8s/worker-deployment.yaml`, `worker-scaledobject.yaml`
+**Révisé le 2026-08-16** — voir `docs/superpowers/specs/2026-08-16-backend-mvp-completion-design.md`,
+Sous-système 6, pour le raisonnement complet (Helm plutôt que YAML bruts, canary Istio et blue-green
+comme deux stratégies alternatives documentées séparément — pas combinées, pas déployées simultanément —,
+Karpenter documenté à titre d'illustration).
+
+**Fait le 2026-08-16 (écriture + validation locale) :** Dockerfiles écrits, les deux images
+(`rio-api:local`, `rio-worker:local`) buildent sans erreur. Chart Helm écrit, `helm lint` et `helm
+template` passent sans erreur. Manifests `canary-istio/` et `blue-green/` écrits, syntaxe YAML validée.
+`karpenter-nodepool-example.yaml` écrit à titre illustratif (ses CRDs n'existent que sur un cluster EKS
+avec Karpenter installé, non validable hors cluster réel). Tout commité.
+
+**Reste à faire — décision reprise en session (2026-08-16, soirée) :** initialement "écrit, pas
+déployé" restait la ligne d'arrivée de cette tâche. L'autrice a explicitement choisi de monter un vrai
+cluster EKS ce soir pour valider le déploiement de bout en bout (coût/risque d'infra live assumés en
+connaissance de cause, cluster prévu pour être détruit après validation, pas laissé tourner pendant
+l'entretien) — voir Tâche 11 pour ce déploiement réel.
+
+**Files :**
+- Create: `deploy/docker/Dockerfile.api`
+- Create: `deploy/docker/Dockerfile.worker`
+- Create: `deploy/helm/rio-backend/Chart.yaml`, `values.yaml`, `templates/*.yaml`
+- Create: `deploy/k8s/canary-istio/*.yaml`
+- Create: `deploy/k8s/blue-green/*.yaml`
+- Create: `deploy/k8s/karpenter-nodepool-example.yaml`
 
 - [ ] **Step 1: Dockerfiles multi-stage**
 
@@ -1552,123 +1572,499 @@ ENTRYPOINT ["/worker"]
 Run: `docker build -f deploy/docker/Dockerfile.api -t rio-api:local .` puis pareil pour worker.
 Expected : build réussi, deux images locales.
 
-- [ ] **Step 3: Manifests API — Deployment, Service, HPA (scaling sur charge)**
+- [ ] **Step 3: Chart Helm — squelette (`Chart.yaml`, `values.yaml`)**
 
 ```yaml
-# deploy/k8s/api-deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: rio-api
-spec:
-  replicas: 2
-  selector:
-    matchLabels: { app: rio-api }
-  template:
-    metadata:
-      labels: { app: rio-api }
-    spec:
-      containers:
-        - name: api
-          image: rio-api:local
-          ports: [{ containerPort: 8080 }]
-          env:
-            - { name: DATABASE_URL, valueFrom: { secretKeyRef: { name: rio-backend-secrets, key: database-url } } }
-            - { name: RABBITMQ_URL, valueFrom: { secretKeyRef: { name: rio-backend-secrets, key: rabbitmq-url } } }
+# deploy/helm/rio-backend/Chart.yaml
+apiVersion: v2
+name: rio-backend
+description: Rio Audio Guide backend (API + worker)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
 ```
 
 ```yaml
-# deploy/k8s/api-service.yaml
+# deploy/helm/rio-backend/values.yaml
+api:
+  image:
+    repository: rio-api
+    tag: local
+  replicas: 2
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilization: 70
+
+worker:
+  image:
+    repository: rio-worker
+    tag: local
+  minReplicas: 0
+  maxReplicas: 10
+  rabbitmq:
+    queueName: tts_jobs
+    queueLength: "5" # jobs en attente par réplique avant de scaler
+
+s3:
+  bucket: rio-audio-guide
+
+secrets:
+  name: rio-backend-secrets # créé hors chart (kubectl create secret), jamais commité
+```
+
+- [ ] **Step 4: Templates Helm — API (Deployment, Service, HPA sur CPU)**
+
+```yaml
+# deploy/helm/rio-backend/templates/api-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels: { app: {{ .Release.Name }}-api }
+  template:
+    metadata:
+      labels: { app: {{ .Release.Name }}-api }
+    spec:
+      containers:
+        - name: api
+          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
+          ports: [{ containerPort: 8080 }]
+          env:
+            - name: DATABASE_URL
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: database-url } }
+            - name: RABBITMQ_URL
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: rabbitmq-url } }
+```
+
+```yaml
+# deploy/helm/rio-backend/templates/api-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: rio-api
+  name: {{ .Release.Name }}-api
 spec:
-  selector: { app: rio-api }
+  selector: { app: {{ .Release.Name }}-api }
   ports:
     - { port: 80, targetPort: 8080 }
 ```
 
 ```yaml
-# deploy/k8s/api-hpa.yaml
+# deploy/helm/rio-backend/templates/api-hpa.yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: rio-api
+  name: {{ .Release.Name }}-api
 spec:
-  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: rio-api }
-  minReplicas: 2
-  maxReplicas: 10
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: {{ .Release.Name }}-api }
+  minReplicas: {{ .Values.api.minReplicas }}
+  maxReplicas: {{ .Values.api.maxReplicas }}
   metrics:
     - type: Resource
-      resource: { name: cpu, target: { type: Utilization, averageUtilization: 70 } }
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: {{ .Values.api.targetCPUUtilization }} }
 ```
 
-- [ ] **Step 4: Manifests worker — Deployment, ScaledObject KEDA (scaling sur profondeur de queue)**
+- [ ] **Step 5: Templates Helm — worker (Deployment, ScaledObject KEDA sur profondeur de queue)**
 
 ```yaml
-# deploy/k8s/worker-deployment.yaml
+# deploy/helm/rio-backend/templates/worker-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rio-worker
+  name: {{ .Release.Name }}-worker
 spec:
   replicas: 1
   selector:
-    matchLabels: { app: rio-worker }
+    matchLabels: { app: {{ .Release.Name }}-worker }
   template:
     metadata:
-      labels: { app: rio-worker }
+      labels: { app: {{ .Release.Name }}-worker }
     spec:
       containers:
         - name: worker
-          image: rio-worker:local
+          image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag }}"
           env:
-            - { name: DATABASE_URL, valueFrom: { secretKeyRef: { name: rio-backend-secrets, key: database-url } } }
-            - { name: RABBITMQ_URL, valueFrom: { secretKeyRef: { name: rio-backend-secrets, key: rabbitmq-url } } }
-            - { name: S3_BUCKET, value: "rio-audio-guide" }
+            - name: DATABASE_URL
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: database-url } }
+            - name: RABBITMQ_URL
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: rabbitmq-url } }
+            - name: S3_BUCKET
+              value: "{{ .Values.s3.bucket }}"
 ```
 
 ```yaml
-# deploy/k8s/worker-scaledobject.yaml
+# deploy/helm/rio-backend/templates/worker-scaledobject.yaml
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: rio-worker
+  name: {{ .Release.Name }}-worker
 spec:
-  scaleTargetRef: { name: rio-worker }
-  minReplicaCount: 0
-  maxReplicaCount: 10
+  scaleTargetRef: { name: {{ .Release.Name }}-worker }
+  minReplicaCount: {{ .Values.worker.minReplicas }}
+  maxReplicaCount: {{ .Values.worker.maxReplicas }}
   triggers:
     - type: rabbitmq
       metadata:
-        queueName: tts_jobs
+        queueName: {{ .Values.worker.rabbitmq.queueName }}
         mode: QueueLength
-        value: "5" # 5 jobs en attente par réplique avant de scaler
+        value: "{{ .Values.worker.rabbitmq.queueLength }}"
       authenticationRef:
-        name: rio-rabbitmq-auth
+        name: {{ .Release.Name }}-rabbitmq-auth
 ```
 
-- [ ] **Step 5: Valider la syntaxe sans déployer**
+- [ ] **Step 6: Valider le chart sans déployer**
 
-Run: `kubectl apply --dry-run=client -f deploy/k8s/` (nécessite un contexte kubectl configuré, même
-vide/local type kind — valide juste la syntaxe YAML/schema, ne contacte pas de vrai cluster de prod).
-Expected : pas d'erreur de syntaxe. Si aucun contexte kubectl n'est disponible, `kubectl apply
---dry-run=client --validate=false -f deploy/k8s/ -o yaml` ou un linter YAML suffit pour cette étape.
+Run: `helm lint deploy/helm/rio-backend` puis `helm template rio deploy/helm/rio-backend`.
+Expected : `helm lint` ne remonte aucune erreur ; `helm template` produit du YAML valide (Deployment,
+Service, HPA, ScaledObject) sans contacter de cluster. Si `helm` n'est pas installé, `brew install
+helm` (ou équivalent) avant cette étape.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Canary Istio — Gateway, VirtualService, DestinationRule, deux Deployments**
+
+Stratégie 1/2 : bascule progressive du trafic par pourcentage (nécessite un maillage Istio installé sur
+le cluster). Le `Service` `rio-api` reste unique et sélectionne les deux versions ; c'est le
+`DestinationRule` qui distingue les sous-ensembles `stable`/`canary` par label, et le `VirtualService`
+qui répartit le trafic entre eux.
+
+```yaml
+# deploy/k8s/canary-istio/gateway.yaml
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: rio-api-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port: { number: 80, name: http, protocol: HTTP }
+      hosts: ["*"]
+```
+
+```yaml
+# deploy/k8s/canary-istio/destinationrule.yaml
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: rio-api
+spec:
+  host: rio-api
+  subsets:
+    - name: stable
+      labels: { version: stable }
+    - name: canary
+      labels: { version: canary }
+```
+
+```yaml
+# deploy/k8s/canary-istio/virtualservice.yaml
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: rio-api
+spec:
+  hosts: ["*"]
+  gateways: [rio-api-gateway]
+  http:
+    - route:
+        - destination: { host: rio-api, subset: stable }
+          weight: 90
+        - destination: { host: rio-api, subset: canary }
+          weight: 10 # à monter progressivement (10 → 50 → 100) une fois le canary validé
+```
+
+```yaml
+# deploy/k8s/canary-istio/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rio-api
+spec:
+  selector: { app: rio-api } # sélectionne stable ET canary — Istio fait la distinction, pas ce Service
+  ports:
+    - { port: 80, targetPort: 8080 }
+```
+
+```yaml
+# deploy/k8s/canary-istio/deployment-stable.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rio-api-stable
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: rio-api, version: stable }
+  template:
+    metadata:
+      labels: { app: rio-api, version: stable }
+    spec:
+      containers:
+        - name: api
+          image: rio-api:v1.0.0
+          ports: [{ containerPort: 8080 }]
+```
+
+```yaml
+# deploy/k8s/canary-istio/deployment-canary.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rio-api-canary
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: rio-api, version: canary }
+  template:
+    metadata:
+      labels: { app: rio-api, version: canary }
+    spec:
+      containers:
+        - name: api
+          image: rio-api:v1.1.0-rc1
+          ports: [{ containerPort: 8080 }]
+```
+
+- [ ] **Step 8: Blue-green — deux Deployments, un Service qui bascule intégralement**
+
+Stratégie 2/2, alternative à l'étape précédente (pas combinée avec Istio) : pas de répartition en
+pourcentage, le `Service` pointe entièrement sur `blue` ou entièrement sur `green` — plus simple, pas
+besoin de maillage de service.
+
+```yaml
+# deploy/k8s/blue-green/deployment-blue.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rio-api-blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: rio-api, slot: blue }
+  template:
+    metadata:
+      labels: { app: rio-api, slot: blue }
+    spec:
+      containers:
+        - name: api
+          image: rio-api:v1.0.0
+          ports: [{ containerPort: 8080 }]
+```
+
+```yaml
+# deploy/k8s/blue-green/deployment-green.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rio-api-green
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: rio-api, slot: green }
+  template:
+    metadata:
+      labels: { app: rio-api, slot: green }
+    spec:
+      containers:
+        - name: api
+          image: rio-api:v1.1.0
+          ports: [{ containerPort: 8080 }]
+```
+
+```yaml
+# deploy/k8s/blue-green/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rio-api
+spec:
+  selector: { app: rio-api, slot: blue } # bascule : kubectl patch service rio-api -p '{"spec":{"selector":{"slot":"green"}}}'
+  ports:
+    - { port: 80, targetPort: 8080 }
+```
+
+- [ ] **Step 9: Karpenter — exemple de `NodePool` (documenté, pas déployé)**
+
+Illustre le scaling de **nœuds** EC2 (différent de HPA/KEDA, qui scalent des **pods**) — pertinent
+seulement une fois un vrai cluster EKS monté, pas avant.
+
+```yaml
+# deploy/k8s/karpenter-nodepool-example.yaml
+# Exemple illustratif — nécessite Karpenter installé sur un vrai cluster EKS, pas déployé ici.
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: rio-backend-nodepool
+spec:
+  template:
+    spec:
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: rio-backend
+  limits:
+    cpu: "100"
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 30s
+---
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: rio-backend
+spec:
+  amiFamily: AL2023
+  subnetSelectorTerms:
+    - tags: { karpenter.sh/discovery: rio-audio-guide }
+  securityGroupSelectorTerms:
+    - tags: { karpenter.sh/discovery: rio-audio-guide }
+```
+
+- [ ] **Step 10: Valider la syntaxe des manifests bruts sans déployer**
+
+Run: `kubectl apply --dry-run=client -f deploy/k8s/canary-istio/ -f deploy/k8s/blue-green/` (nécessite
+un contexte kubectl configuré, même vide/local type `kind` — valide juste la syntaxe YAML/schema, ne
+contacte pas de vrai cluster de prod ; `deploy/k8s/karpenter-nodepool-example.yaml` est exclu de cette
+validation puisque ses CRDs `karpenter.sh`/`karpenter.k8s.aws` ne sont installées que sur un vrai
+cluster EKS avec Karpenter). Expected : pas d'erreur de syntaxe. Si aucun contexte kubectl n'est
+disponible, `kubectl apply --dry-run=client --validate=false -f ... -o yaml` ou un linter YAML suffit
+pour cette étape.
+
+- [ ] **Step 11: Commit**
 
 ```bash
 git add deploy/
-git commit -m "Add Dockerfiles and K8s manifests (API: HPA, worker: KEDA) — not deployed"
+git commit -m "Add Helm chart (API HPA, worker KEDA), canary-istio and blue-green manifests, Karpenter example — not deployed"
 ```
+
+---
+
+### Task 11: Déploiement réel sur un cluster EKS (ajoutée le 2026-08-16, décision reprise en session)
+
+Initialement hors scope de ce plan (voir la note "Ce que ce plan ne couvre pas" plus bas, écrite avant
+cette tâche) : monter un vrai cluster EKS coûte de l'argent et du temps de provisioning, et le spec
+associé recommandait explicitement d'éviter toute infra live avant l'entretien. L'autrice a choisi en
+connaissance de cause de le faire quand même ce soir, pour une pratique concrète Docker/EKS/Helm à
+défendre en entretien — cluster prévu pour être détruit après validation (Step 9), jamais laissé
+tourner pendant l'entretien lui-même.
+
+**Prérequis côté autrice, pas exécutables par Claude :** identifiants AWS valides dans l'environnement
+(`aws sts get-caller-identity` doit réussir), `eksctl` installé (`brew install eksctl`).
+
+**Files:** aucun nouveau fichier — commandes d'infrastructure uniquement.
+
+- [ ] **Step 1: Créer les deux dépôts ECR**
+
+Run:
+```bash
+aws ecr create-repository --repository-name rio-api --region us-east-1
+aws ecr create-repository --repository-name rio-worker --region us-east-1
+```
+Expected : deux dépôts créés, visibles via `aws ecr describe-repositories --region us-east-1`.
+
+- [ ] **Step 2: Créer le cluster EKS**
+
+Run:
+```bash
+eksctl create cluster --name rio-audio-guide --region us-east-1 --nodes 2 --node-type t3.medium --managed
+```
+Expected : ~15-20 minutes, se termine par un cluster prêt (`kubectl get nodes` affiche 2 nœuds `Ready`).
+C'est l'étape qui facture réellement (control plane + 2 nœuds EC2) tant que le cluster existe.
+
+- [ ] **Step 3: Installer Postgres et RabbitMQ dans le cluster (pour la démo, pas de RDS/Amazon MQ managés — plus rapide et moins cher ce soir)**
+
+Run:
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm install demo-postgres bitnami/postgresql --set auth.postgresPassword=postgres --set auth.database=postgres
+helm install demo-rabbitmq bitnami/rabbitmq --set auth.username=guest --set auth.password=guest
+```
+Expected : `kubectl get pods` montre `demo-postgres-postgresql-0` et `demo-rabbitmq-0` en `Running`
+après quelques minutes.
+
+- [ ] **Step 4: Charger le schéma Postgres**
+
+Run:
+```bash
+kubectl run psql-client --rm -it --image=postgres:16 --restart=Never -- \
+  psql "postgresql://postgres:postgres@demo-postgres-postgresql:5432/postgres" \
+  -f - < internal/adapters/postgres/schema.sql
+```
+Expected : les tables `places`, `scripts`, `audio_files` existent (`\dt` dans un client psql pour
+vérifier).
+
+- [ ] **Step 5: Créer le Secret Kubernetes `rio-backend-secrets`**
+
+Run:
+```bash
+kubectl create secret generic rio-backend-secrets \
+  --from-literal=database-url="postgresql://postgres:postgres@demo-postgres-postgresql:5432/postgres" \
+  --from-literal=rabbitmq-url="amqp://guest:guest@demo-rabbitmq:5672/"
+```
+Expected : `kubectl get secret rio-backend-secrets` le montre créé. Jamais commité — créé directement
+sur le cluster, cohérent avec `values.yaml` qui référence son nom sans jamais le contenu.
+
+- [ ] **Step 6: Déclencher `docker-build.yml` pour pousser les images vers ECR**
+
+Run (depuis GitHub, onglet Actions, ou en poussant un commit sur `backend`) : le workflow
+`docker-build.yml` (Tâche 9) build et pousse `rio-api`/`rio-worker` vers les dépôts créés au Step 1.
+Expected : deux images visibles dans ECR avec le tag du SHA du commit.
+
+- [ ] **Step 7: Déployer avec Helm (manuellement, ou en laissant `k8s-deploy.yml` le faire après le Step 6)**
+
+Run:
+```bash
+aws eks update-kubeconfig --name rio-audio-guide --region us-east-1
+ECR_REGISTRY=$(aws ecr describe-repositories --repository-names rio-api --region us-east-1 --query 'repositories[0].repositoryUri' --output text | cut -d/ -f1)
+helm upgrade --install rio deploy/helm/rio-backend \
+  --set api.image.repository=$ECR_REGISTRY/rio-api \
+  --set api.image.tag=<SHA_DU_COMMIT> \
+  --set worker.image.repository=$ECR_REGISTRY/rio-worker \
+  --set worker.image.tag=<SHA_DU_COMMIT> \
+  --wait --timeout 5m
+```
+Expected : `kubectl rollout status deployment/rio-api` et `deployment/rio-worker` confirment un rollout
+réussi.
+
+- [ ] **Step 8: Vérifier que ça tourne réellement**
+
+Run:
+```bash
+kubectl get pods
+kubectl port-forward svc/rio-api 8080:80
+curl http://localhost:8080/places
+```
+Expected : réponse JSON (liste vide ou avec les lieux importés si la Tâche 8 a été faite avant) — preuve
+que l'API tourne réellement sur EKS, connectée à Postgres, pas juste un déploiement qui existe sur le
+papier.
+
+- [ ] **Step 9: Détruire le cluster**
+
+Run:
+```bash
+eksctl delete cluster --name rio-audio-guide --region us-east-1
+```
+Expected : cluster et nœuds EC2 supprimés — confirmer via `aws eks list-clusters --region us-east-1`
+(liste vide) avant de considérer cette tâche terminée, pour ne pas laisser de facturation tourner sans
+surveillance.
 
 ---
 
 ## Ce que ce plan ne couvre pas
 
-- Déploiement réel sur un cluster K8s (les manifests sont écrits, vérifiés en syntaxe, jamais appliqués
-  à un vrai cluster dans ce plan).
-- Vraie intégration TTS (ElevenLabs) — le stub reste un stub.
+- Vraie intégration TTS (ElevenLabs) — le stub reste un stub à ce stade ; si l'autrice fournit une clé
+  API ce soir, ce sera une tâche à concevoir et documenter séparément (nouveau port `TTSGenerator`,
+  nouvel adaptateur), pas ajoutée ici tant qu'elle n'est pas commencée pour éviter une doc spéculative.
 - Authentification sur l'API HTTP.
 - Secrets réels (`rio-backend-secrets` référencé mais jamais créé) — à faire au moment du déploiement réel.

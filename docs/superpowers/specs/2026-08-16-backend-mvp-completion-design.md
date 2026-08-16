@@ -92,18 +92,27 @@ premier.
 
 ### `docker-build.yml` — sur push vers `backend`, seulement si `cmd/**`, `internal/**` ou un Dockerfile changent
 
-Calqué sur `fiap-dclt-aula03/docker-build.yml` : `docker/setup-buildx-action`, `aws-actions/configure-
-aws-credentials` (identifiants en GitHub Secrets, jamais en clair), `aws-actions/amazon-ecr-login`, puis
-`docker/build-push-action` pour les deux images (`Dockerfile.api`, `Dockerfile.worker`) vers un vrai
-ECR — tags `latest` et SHA du commit. Nécessite d'avoir fait le sous-système 6 (Dockerfiles) d'abord.
+**Écrit le 2026-08-16**, plus tôt que prévu initialement (décision reprise en cours de session, la
+soirée du 16 étant la seule disponible avant l'entretien). Calqué sur `fiap-dclt-aula03/docker-
+build.yml` : `docker/setup-buildx-action`, `aws-actions/configure-aws-credentials` (identifiants en
+GitHub Secrets, jamais en clair), `aws-actions/amazon-ecr-login`, puis `docker/build-push-action` pour
+les deux images (`Dockerfile.api`, `Dockerfile.worker`) — deux dépôts ECR séparés (`rio-api`,
+`rio-worker`, pas encore créés sur le compte AWS à ce stade) plutôt qu'un seul dépôt à deux tags,
+tags `latest` et SHA du commit. Fichier écrit et validé en syntaxe ; pas encore exécuté en réel
+(dépôts ECR à créer, identifiants AWS à rafraîchir côté autrice).
 
-### `k8s-deploy.yml` — gardé en réserve, pas écrit dans ce cycle
+### `k8s-deploy.yml`
 
-Le pattern de `fiap-dclt-aula03/k8s-deploy.yml` (déclenché par `workflow_run` une fois `docker-
-build.yml` réussi, `aws eks update-kubeconfig`, Kustomize pour le tag d'image, `kubectl apply -k`,
-smoke test contre le LoadBalancer) est directement réutilisable, mais seulement au moment du vrai
-déploiement EKS — pas avant, cohérent avec "manifests écrits, pas déployés" du sous-système 6 tant que
-ce moment n'est pas venu.
+**Écrit le 2026-08-16**, réserve initialement prévue levée en cours de session (même décision que
+ci-dessus). Différence assumée avec `fiap-dclt-aula03/k8s-deploy.yml` : **Helm plutôt que Kustomize**
+pour appliquer le déploiement (`helm upgrade --install rio deploy/helm/rio-backend --set
+api.image.tag=...`), cohérent avec le choix Helm du sous-système 6 — pas de mélange des deux outils.
+Sinon même structure : déclenché par `workflow_run` une fois `docker-build.yml` réussi, `aws eks
+update-kubeconfig`, smoke test contre le LoadBalancer. Fichier écrit et validé en syntaxe ; nécessite
+un vrai cluster EKS pour tourner, pas encore monté à ce stade — décision de monter un cluster réel ce
+soir prise explicitement par l'autrice malgré le risque d'infra live déjà noté plus haut (coût/temps
+de provisioning acceptés consciemment, cluster à détruire après validation, pas laissé tourner pendant
+l'entretien).
 
 ## Sous-système 6 — Chart Helm + manifests Kubernetes (écrits, pas déployés)
 
