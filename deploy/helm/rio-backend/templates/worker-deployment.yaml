@@ -20,3 +20,5 @@ spec:
               valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: rabbitmq-url } }
             - name: S3_BUCKET
               value: "{{ .Values.s3.bucket }}"
+            - name: ELEVENLABS_API_KEY
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: elevenlabs-api-key } }

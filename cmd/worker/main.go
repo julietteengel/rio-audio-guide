@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	amqp "github.com/rabbitmq/amqp091-go"
 
+	"rioaudioguide/backend/internal/adapters/elevenlabs"
 	"rioaudioguide/backend/internal/adapters/postgres"
 	"rioaudioguide/backend/internal/adapters/rabbitmq"
 	"rioaudioguide/backend/internal/adapters/s3"
@@ -67,8 +68,9 @@ func main() {
 
 	scriptRepo := postgres.NewScriptRepository(pool)
 	audioFileRepo := postgres.NewAudioFileRepository(pool)
+	ttsGenerator := elevenlabs.NewGenerator(mustEnv("ELEVENLABS_API_KEY"))
 
-	worker, err := rabbitmq.NewWorker(channel, scriptRepo, audioFileRepo, storage)
+	worker, err := rabbitmq.NewWorker(channel, scriptRepo, audioFileRepo, storage, ttsGenerator)
 	if err != nil {
 		log.Fatalf("set up worker: %v", err)
 	}
@@ -85,4 +87,12 @@ func envOr(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+func mustEnv(key string) string {
+	v := os.Getenv(key)
+	if v == "" {
+		log.Fatalf("%s is required", key)
+	}
+	return v
 }
