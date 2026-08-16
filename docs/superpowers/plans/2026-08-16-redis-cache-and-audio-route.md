@@ -1138,51 +1138,77 @@ git commit -m "Add cache-aside to GET /places and GET /places/:id/audio"
 
 ---
 
-### Task 7: Helm — Redis dans le chart
+### Task 7: Helm — Redis dans le chart, et fermer un vrai trou trouvé pendant la Tâche 4
 
 **Files:**
-- Modify: `deploy/helm/rio-backend/Chart.yaml` (Redis en dépendance, même pattern que Postgres)
-- Modify: `deploy/helm/rio-backend/values.yaml`
 - Modify: `deploy/helm/rio-backend/templates/api-deployment.yaml`
+- Modify: `cmd/api/main.go`, `cmd/worker/main.go` (nom de bucket par défaut incohérent, trouvé pendant
+  la Tâche 4)
 
 **Interfaces:**
-- Consumes: rien de nouveau côté code — uniquement le chart.
-- Produces: `REDIS_URL` disponible sur `rio-api` (pas sur `rio-worker`, qui ne sert pas de lectures).
+- Consumes: rien de nouveau côté code pour Redis — uniquement le chart.
+- Produces: `REDIS_URL`, `S3_BUCKET`, et les credentials AWS optionnels disponibles sur `rio-api` (pas
+  `REDIS_URL` sur `rio-worker`, qui ne sert pas de lectures — mais `rio-worker` a déjà `S3_BUCKET`/AWS).
 
-- [ ] **Step 1: Check the existing Postgres dependency pattern**
+**Contexte** : `Chart.yaml` n'a aucune dépendance déclarée (vérifié — pas de section `dependencies`) ;
+Postgres et RabbitMQ sur `kind` sont des releases Bitnami séparées (`helm install demo-postgres
+bitnami/postgresql`), pas des dépendances de chart formelles — Redis suit le même pattern, documenté
+plutôt que déclaré dans `Chart.yaml`.
 
-Run: `cat deploy/helm/rio-backend/Chart.yaml` — la démo `kind` a utilisé `demo-postgres` comme release
-Bitnami séparée plutôt qu'une dépendance de chart formelle (`helm install demo-postgres
-bitnami/postgresql`, vu dans le plan Task 11 précédent) ; vérifier laquelle des deux approches ce fichier
-utilise réellement avant d'écrire quoi que ce soit, pour rester cohérent avec l'existant plutôt que
-d'halluciner un pattern.
+**Trou trouvé pendant la Tâche 4** (pas anticipé au moment d'écrire ce plan) : `api-deployment.yaml`
+n'a aujourd'hui que `DATABASE_URL`/`RABBITMQ_URL` — aucun `S3_BUCKET` ni credentials AWS, alors que
+`cmd/api/main.go` (Tâche 4) charge maintenant la config AWS et crée un client S3 pour la présignation.
+Sans ça, chaque appel réel à la nouvelle route échouerait en 500 sur un vrai déploiement (aucune
+credential résolvable au moment de signer). `rio-worker` a déjà ce câblage — on le reproduit ici.
 
-- [ ] **Step 2: Add Redis the same way Postgres is already declared**
+- [ ] **Step 1: Add Redis, S3_BUCKET, and AWS creds to the API deployment**
 
-Selon ce que l'étape 1 révèle : soit ajouter `redis` comme dépendance de chart dans `Chart.yaml`
-(`bitnami/redis`), soit documenter la commande `helm install demo-redis bitnami/redis` équivalente à
-`demo-postgres` dans le README/les notes de déploiement — reproduire le pattern déjà en place, pas en
-inventer un nouveau.
-
-- [ ] **Step 3: Add `REDIS_URL` to the API deployment**
-
-In `deploy/helm/rio-backend/templates/api-deployment.yaml`, add alongside the existing `DATABASE_URL`/
-`RABBITMQ_URL` env entries:
+In `deploy/helm/rio-backend/templates/api-deployment.yaml`, add after the existing `RABBITMQ_URL` entry
+(mirrors `worker-deployment.yaml`'s existing `S3_BUCKET`/AWS block exactly, plus the new `REDIS_URL`):
 
 ```yaml
             - name: REDIS_URL
               value: "{{ .Values.redis.url | default "demo-redis-master:6379" }}"
+            - name: S3_BUCKET
+              value: "{{ .Values.s3.bucket }}"
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: aws-access-key-id, optional: true } }
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: aws-secret-access-key, optional: true } }
+            - name: AWS_SESSION_TOKEN
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: aws-session-token, optional: true } }
+            - name: AWS_REGION
+              value: "{{ .Values.s3.region | default "us-east-1" }}"
 ```
 
-(Valeur par défaut alignée sur le nom de release `demo-redis` si l'étape 2 confirme le pattern
-"release Bitnami séparée" plutôt qu'une dépendance de chart formelle — ajuster si l'étape 1 révèle
-l'inverse.)
-
-- [ ] **Step 4: Verify the chart renders**
+- [ ] **Step 2: Verify the chart renders**
 
 Run: `helm template deploy/helm/rio-backend`
-Expected: no errors; `REDIS_URL` appears in the rendered `rio-api` Deployment's env, absent from
-`rio-worker`'s.
+Expected: no errors; `REDIS_URL`, `S3_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`,
+`AWS_SESSION_TOKEN`, `AWS_REGION` all appear in the rendered `rio-api` Deployment's env; `REDIS_URL` is
+absent from `rio-worker`'s (it doesn't serve reads); `rio-worker`'s pre-existing `S3_BUCKET`/AWS block is
+unchanged.
+
+- [ ] **Step 3: Fix the mismatched bucket-name fallback default**
+
+Found alongside the gap above: `cmd/worker/main.go` and (Task 4's new) `cmd/api/main.go` both fall back to
+`envOr("S3_BUCKET", "rio-audioguide-bucket")` — but the real bucket (created tonight, in
+`values.yaml`'s `s3.bucket`) is `rio-audio-guide` (with hyphens). Low real risk today (the Helm chart
+always sets `S3_BUCKET` explicitly, so the fallback is dead code in practice) but confusing and worth
+fixing while touching this area. In both files, change the fallback string from `"rio-audioguide-bucket"`
+to `"rio-audio-guide"`.
+
+- [ ] **Step 4: Verify**
+
+Run: `go build ./...`
+Expected: clean.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add deploy/helm/rio-backend/templates/api-deployment.yaml cmd/api/main.go cmd/worker/main.go
+git commit -m "Wire Redis/S3/AWS into the API deployment, fix mismatched bucket fallback"
+```
 
 - [ ] **Step 5: Commit**
 
