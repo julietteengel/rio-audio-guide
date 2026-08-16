@@ -30,8 +30,15 @@ many scripts across languages; a script's audio generation lifecycle is distinct
 itself). See `docs/superpowers/specs/2026-08-12-backend-domain-model-design.md` for the full
 reasoning.
 
-TTS generation is currently a stub (`generateAudioStub` in `internal/adapters/rabbitmq/worker.go`) —
-it exercises the real pipeline (RabbitMQ → Postgres → S3 → Postgres) without a real ElevenLabs call.
+TTS generation calls the real ElevenLabs API (`internal/adapters/elevenlabs/generator.go`, model
+`eleven_multilingual_v2`) — the worker classifies failures as transient (429/5xx/408, requeued with a
+2s delay) or permanent (other 4xx — bad API key, unknown `voice_id`, rejected text — marks the
+`AudioFile` failed and stops retrying). Requires `ELEVENLABS_API_KEY`.
+
+`cmd/import` is a separate, manually-run CLI (not a long-lived service) that bridges the Python
+sourcing/curation pipeline's output (`pipeline/curation/places_clean_vN.csv` +
+`pipeline/curation/narrations_multi_full.csv`, produced on the `sourcing-pipeline` branch) into
+Postgres as `Place`/`Script` rows, before any of the above can run against real content.
 
 ## Requirements
 
@@ -42,11 +49,20 @@ it exercises the real pipeline (RabbitMQ → Postgres → S3 → Postgres) witho
 
 ## Running locally
 
+Plain Docker containers for Postgres/RabbitMQ, `cmd/api`/`cmd/worker` run as normal local Go processes
+(no Kubernetes involved at all — see "Running on `kind`" below if you specifically want to exercise the
+Helm chart or autoscaling).
+
 ```bash
 docker run -d --name rio-postgres -p 5433:5432 -e POSTGRES_PASSWORD=postgres postgis/postgis:16-3.4
 docker run -d --name rio-rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 
 psql "postgres://postgres:postgres@localhost:5433/postgres" -f internal/adapters/postgres/schema.sql
+
+# One-time (or repeatable) import: Places/Scripts from the Python pipeline's CSVs into Postgres.
+# See ../sourcing-pipeline/pipeline/curation/ for how those CSVs are produced.
+DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
+  go run ./cmd/import -places=<path>/places_clean_vN.csv -narrations=<path>/narrations_multi_full.csv
 
 DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
 RABBITMQ_URL="amqp://guest:guest@localhost:5672/" \
@@ -55,8 +71,26 @@ RABBITMQ_URL="amqp://guest:guest@localhost:5672/" \
 DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
 RABBITMQ_URL="amqp://guest:guest@localhost:5672/" \
 S3_BUCKET="rio-audioguide-bucket" \
+ELEVENLABS_API_KEY="<your key>" \
   go run ./cmd/worker
 ```
+
+Trigger generation for an imported script (get a `voice_id` from the ElevenLabs voice library, or clone
+one with `pipeline/curation/clone_voice.py`):
+
+```bash
+curl -X POST localhost:8080/scripts/<script-id>/review \
+  -d '{"reviewer":"you","voice_id":"<voice_id>"}'
+```
+
+### Running on `kind` (local Kubernetes — to exercise the Helm chart/autoscaling)
+
+Unlike the plain-Docker setup above, `kind` runs a real (if single-host) Kubernetes cluster, so
+`deploy/helm/rio-backend` deploys as actual Pods/Deployments, and KEDA genuinely scales the worker on
+`tts_jobs` queue depth (including scale-to-zero). It does not simulate real multi-node/cloud elasticity
+(Karpenter node autoscaling needs a real cluster, e.g. EKS) — it's for validating the chart and
+autoscaling logic for free before spending on real cloud infrastructure. See
+`docs/superpowers/plans/2026-08-16-backend-mvp-completion.md`, Task 11, for the full walkthrough.
 
 ## Testing
 
