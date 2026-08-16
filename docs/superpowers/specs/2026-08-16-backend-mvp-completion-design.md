@@ -69,12 +69,41 @@ importées en masse.
 
 ## Sous-système 5 — CI/CD (GitHub Actions)
 
-`.github/workflows/backend-ci.yml` : `go build`, `go vet`, tests unitaires (`go test ./...`, sans le tag
-`integration`) sur chaque push. Tests d'intégration via `services:` du workflow pour Postgres
-(`postgis/postgis`) et RabbitMQ, démarrés par GitHub Actions lui-même. Le vrai bucket S3 (révisé
-2026-08-16) n'a pas de `services:` équivalent — les tests S3 en CI utiliseraient des identifiants AWS
-en GitHub Secrets plutôt qu'un conteneur, à préciser si ce sous-système est repris (dépriorisé pour
-l'instant au profit d'AWS/Docker/K8s réels).
+**Révisé le 2026-08-16, inspiré des cours FIAP de l'autrice** (`fiap-dclt-aula01/02/03`, module CI/CD —
+patterns déjà éprouvés dans ses propres travaux, adaptés de Node.js à Go). Trois workflows séparés, pas
+un seul monolithique, chacun avec un déclencheur distinct :
+
+### `backend-ci.yml` — sur chaque push/PR vers `backend`
+
+Structure en deux étages, comme `fiap-dclt-aula02/ci-multistage.yml` : un premier étage de jobs **en
+parallèle** (aucun `needs` entre eux, donc ils tournent simultanément), un second étage qui dépend du
+premier.
+
+- **Étage 1 (parallèle)** : `lint` (`go vet ./...`), `test` (`go test ./...`, tests unitaires seulement,
+  sans le tag `integration`), `security` (`govulncheck ./...` — l'équivalent Go de `npm audit`, scan de
+  vulnérabilités officiel de l'équipe Go).
+- **Étage 2** : `build` (`needs: [lint, test, security]`) — `go build ./...`, la preuve que tout
+  s'assemble une fois les trois vérifications passées.
+- **Étage 3** : `integration-test` (`needs: build`) — `go test -tags=integration ./...` contre des
+  `services:` Postgres (`postgis/postgis`) et RabbitMQ démarrés par GitHub Actions lui-même. Le bucket
+  S3 réel n'a pas d'équivalent `services:` — ces tests-là liraient des identifiants AWS depuis GitHub
+  Secrets plutôt qu'un conteneur (à instrumenter si repris ; sinon `S3_TEST_BUCKET` reste absent en CI
+  et le test S3 se `Skip` proprement, comme il le fait déjà en local sans la variable).
+
+### `docker-build.yml` — sur push vers `backend`, seulement si `cmd/**`, `internal/**` ou un Dockerfile changent
+
+Calqué sur `fiap-dclt-aula03/docker-build.yml` : `docker/setup-buildx-action`, `aws-actions/configure-
+aws-credentials` (identifiants en GitHub Secrets, jamais en clair), `aws-actions/amazon-ecr-login`, puis
+`docker/build-push-action` pour les deux images (`Dockerfile.api`, `Dockerfile.worker`) vers un vrai
+ECR — tags `latest` et SHA du commit. Nécessite d'avoir fait le sous-système 6 (Dockerfiles) d'abord.
+
+### `k8s-deploy.yml` — gardé en réserve, pas écrit dans ce cycle
+
+Le pattern de `fiap-dclt-aula03/k8s-deploy.yml` (déclenché par `workflow_run` une fois `docker-
+build.yml` réussi, `aws eks update-kubeconfig`, Kustomize pour le tag d'image, `kubectl apply -k`,
+smoke test contre le LoadBalancer) est directement réutilisable, mais seulement au moment du vrai
+déploiement EKS — pas avant, cohérent avec "manifests écrits, pas déployés" du sous-système 6 tant que
+ce moment n'est pas venu.
 
 ## Sous-système 6 — Manifests Kubernetes (écrits, pas déployés)
 
