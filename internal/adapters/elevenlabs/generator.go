@@ -69,7 +69,11 @@ func (g *Generator) Generate(ctx context.Context, text, language, voiceID string
 	// 404 (voice_id inexistant) et 403 (tier/permission) : tous définitifs.
 	if resp.StatusCode >= 400 && resp.StatusCode < 500 &&
 		resp.StatusCode != http.StatusRequestTimeout && resp.StatusCode != http.StatusTooManyRequests {
-		return nil, 0, &ports.PermanentError{StatusCode: resp.StatusCode, Body: string(respBody)}
+		// Préfixe "elevenlabs" pour la même raison que côté S3 : ports.PermanentError
+		// est partagé entre les deux adaptateurs, son message ne dit donc plus d'où
+		// vient l'erreur. Sans ça, un failure_reason stocké en base est ambigu.
+		// Même convention que le fmt.Errorf juste en dessous.
+		return nil, 0, &ports.PermanentError{StatusCode: resp.StatusCode, Body: "elevenlabs: " + string(respBody)}
 	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, 0, fmt.Errorf("elevenlabs: unexpected status %d: %s", resp.StatusCode, string(respBody))
