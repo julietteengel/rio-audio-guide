@@ -75,6 +75,17 @@ ajouté au secret Helm existant (`deploy/helm/rio-backend`), jamais committé.
   En pratique, l'import tourne sur un CSV figé une fois par génération de contenu ; si un besoin réel de
   ré-import partiel apparaît, ajouter `FindByPlaceIDAndLanguage` à ce moment-là plutôt que par
   anticipation.
+
+**Limitation assumée — provenance du grounding non conservée en Postgres** : `Script.sourceText` est
+écrit vide (`""`) par l'import, faute de colonne de grounding dans le CSV de narrations
+(`build_narrations_multi.py` ne produit que le texte final, pas sa source). Une fois en Postgres, rien ne
+distingue donc une narration bien groundée d'une autre — alors que c'est exactement l'invariant que
+`CLAUDE.md` protège le plus explicitement ("a place without real grounding gets no narration"). Ce n'est
+pas une perte de données : les CSV de curation restent des checkpoints archivés (jamais écrasés en place,
+par convention `pipeline/curation/`), donc la provenance reste retrouvable en croisant le CSV source, juste
+pas interrogeable depuis Postgres seul. Si ce besoin devient réel (audit de grounding depuis le backend),
+ajouter une colonne de grounding-ref à `build_narrations_multi.py` et la faire transiter par l'import —
+hors scope de ce plan.
 - Flag `--dry-run` : parse et affiche les comptes (lieux/scripts à créer) sans écrire.
 
 La logique de jointure/validation des lignes est écrite en pur (given deux jeux de lignes en mémoire →
