@@ -9,10 +9,12 @@ import (
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	amqp "github.com/rabbitmq/amqp091-go"
+	goredis "github.com/redis/go-redis/v9"
 
 	httpadapter "rioaudioguide/backend/internal/adapters/http"
 	"rioaudioguide/backend/internal/adapters/postgres"
 	"rioaudioguide/backend/internal/adapters/rabbitmq"
+	"rioaudioguide/backend/internal/adapters/redis"
 	"rioaudioguide/backend/internal/adapters/s3"
 )
 
@@ -68,7 +70,10 @@ func main() {
 	s3Client := awss3.NewFromConfig(awsCfg)
 	storage := s3.NewAudioStorage(s3Client, envOr("S3_BUCKET", "rio-audioguide-bucket"))
 
-	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, publisher, storage)
+	redisClient := goredis.NewClient(&goredis.Options{Addr: envOr("REDIS_URL", "localhost:6379")})
+	cache := redis.NewCache(redisClient)
+
+	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, publisher, storage, cache)
 	log.Println("api ready, listening on :8080")
 	if err := server.Start(":8080"); err != nil {
 		log.Fatalf("http server: %v", err)

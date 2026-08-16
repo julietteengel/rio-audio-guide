@@ -1,12 +1,16 @@
 package http
 
 import (
+	"encoding/json"
+	"net/http"
+	"time"
+
 	"github.com/labstack/echo/v4"
 
 	"rioaudioguide/backend/internal/ports"
 )
 
-// Server regroupe l'instance Echo et les cinq ports dont l'API a besoin (les adaptateurs ne doivent jamais se connaître entre eux, seulement connaître les ports.)
+// Server regroupe l'instance Echo et les six ports dont l'API a besoin (les adaptateurs ne doivent jamais se connaître entre eux, seulement connaître les ports.)
 type Server struct {
 	echo          *echo.Echo
 	placeRepo     ports.PlaceRepository
@@ -14,9 +18,10 @@ type Server struct {
 	audioFileRepo ports.AudioFileRepository
 	publisher     ports.AudioJobPublisher
 	storage       ports.AudioStorage
+	cache         ports.Cache
 }
 
-func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage) *Server {
+func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage, cache ports.Cache) *Server {
 	s := &Server{
 		echo:          echo.New(),
 		placeRepo:     placeRepo,
@@ -24,6 +29,7 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 		audioFileRepo: audioFileRepo,
 		publisher:     publisher,
 		storage:       storage,
+		cache:         cache,
 	}
 	s.echo.GET("/places", s.listPlaces)
 	s.echo.GET("/places/:id/audio", s.getPlaceAudio)
@@ -33,4 +39,31 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 
 func (s *Server) Start(addr string) error {
 	return s.echo.Start(addr)
+}
+
+const cacheTTL = 5 * time.Minute
+
+// cachedJSON essaie le cache d'abord ; sur miss ou erreur (fail-open), appelle
+// compute, sert le résultat, et tente de le mettre en cache pour la prochaine
+// fois — une erreur d'écriture cache est loguée mais ne fait jamais échouer la
+// requête.
+func (s *Server) cachedJSON(c echo.Context, key string, compute func() (any, int, error)) error {
+	if cached, found, err := s.cache.Get(c.Request().Context(), key); err == nil && found {
+		return c.JSONBlob(http.StatusOK, []byte(cached))
+	}
+
+	value, status, err := compute()
+	if err != nil {
+		return err
+	}
+	if status != http.StatusOK {
+		return c.JSON(status, value)
+	}
+
+	body, err := json.Marshal(value)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+	}
+	_ = s.cache.Set(c.Request().Context(), key, string(body), cacheTTL) // fail-open: erreur ignorée
+	return c.JSONBlob(http.StatusOK, body)
 }

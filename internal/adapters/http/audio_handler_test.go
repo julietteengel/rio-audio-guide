@@ -36,7 +36,7 @@ func TestGetPlaceAudio_Ready(t *testing.T) {
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
 	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo,
-		&fakePublisher{}, fakeAudioStorage{})
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache())
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -64,7 +64,7 @@ func TestGetPlaceAudio_NotReadyYet(t *testing.T) {
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
 	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo,
-		&fakePublisher{}, fakeAudioStorage{})
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache())
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -85,7 +85,7 @@ func TestGetPlaceAudio_NoScriptForLanguage(t *testing.T) {
 
 	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}},
 		&fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{})
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache())
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()

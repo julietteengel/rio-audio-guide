@@ -1,6 +1,7 @@
 package http
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strings"
@@ -30,6 +31,11 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "language query param is required"})
 	}
 
+	key := "audio:" + placeID + ":" + language
+	if cached, found, err := s.cache.Get(c.Request().Context(), key); err == nil && found {
+		return c.JSONBlob(http.StatusOK, []byte(cached))
+	}
+
 	script, err := s.scriptRepo.FindByPlaceIDAndLanguage(c.Request().Context(), placeID, language)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -50,17 +56,22 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 		return c.JSON(http.StatusAccepted, audioNotReadyResponse{Status: string(audioFile.Status())})
 	}
 
-	key, err := parseS3Key(audioFile.Audio().StorageURL())
+	s3Key, err := parseS3Key(audioFile.Audio().StorageURL())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
-	url, err := s.storage.PresignURL(c.Request().Context(), key, presignExpiry)
+	url, err := s.storage.PresignURL(c.Request().Context(), s3Key, presignExpiry)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, audioResponse{URL: url})
+	body, err := json.Marshal(audioResponse{URL: url})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+	}
+	_ = s.cache.Set(c.Request().Context(), key, string(body), cacheTTL)
+	return c.JSONBlob(http.StatusOK, body)
 }
 
 // parseS3Key extrait la clé d'objet d'un storage_url au format s3://bucket/clé

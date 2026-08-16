@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 
@@ -79,6 +80,33 @@ func (f *fakePublisher) PublishTTSJob(_ context.Context, _, _, _, _, _ string) e
 	return nil
 }
 
+type fakeCache struct {
+	data map[string]string
+	sets int
+}
+
+func newFakeCache() *fakeCache { return &fakeCache{data: map[string]string{}} }
+
+func (f *fakeCache) Get(_ context.Context, key string) (string, bool, error) {
+	v, ok := f.data[key]
+	return v, ok, nil
+}
+
+func (f *fakeCache) Set(_ context.Context, key, value string, _ time.Duration) error {
+	f.data[key] = value
+	f.sets++
+	return nil
+}
+
+type erroringCache struct{}
+
+func (erroringCache) Get(_ context.Context, _ string) (string, bool, error) {
+	return "", false, errors.New("redis unavailable")
+}
+func (erroringCache) Set(_ context.Context, _, _ string, _ time.Duration) error {
+	return errors.New("redis unavailable")
+}
+
 func TestListPlaces(t *testing.T) {
 	name, _ := domain.NewPlaceName("Cristo Redentor")
 	coords, _ := domain.NewCoordinates(-22.9519, -43.2105)
@@ -86,7 +114,7 @@ func TestListPlaces(t *testing.T) {
 
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{})
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache())
 
 	req := httptest.NewRequest(http.MethodGet, "/places", nil)
 	rec := httptest.NewRecorder()
@@ -107,7 +135,7 @@ func TestReviewScript(t *testing.T) {
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}
 	publisher := &fakePublisher{}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, publisher, fakeAudioStorage{})
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, publisher, fakeAudioStorage{}, newFakeCache())
 
 	body := strings.NewReader(`{"reviewer":"julie","voice_id":"voice-1"}`)
 	req := httptest.NewRequest(http.MethodPost, "/scripts/"+script.ID()+"/review", body)
@@ -120,5 +148,47 @@ func TestReviewScript(t *testing.T) {
 	}
 	if publisher.published != 1 {
 		t.Fatalf("got %d published jobs, want 1", publisher.published)
+	}
+}
+
+func TestListPlaces_CachesOnSecondCall(t *testing.T) {
+	name, _ := domain.NewPlaceName("Cristo Redentor")
+	coords, _ := domain.NewCoordinates(-22.9519, -43.2105)
+	place := domain.NewPlace(name, "monument", coords, "", "wikidata", "rich")
+
+	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
+	cache := newFakeCache()
+	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, cache)
+
+	for i := 0; i < 2; i++ {
+		req := httptest.NewRequest(http.MethodGet, "/places", nil)
+		rec := httptest.NewRecorder()
+		server.echo.ServeHTTP(rec, req)
+		if rec.Code != http.StatusOK {
+			t.Fatalf("call %d: got status %d, want 200", i, rec.Code)
+		}
+	}
+
+	if cache.sets != 1 {
+		t.Fatalf("got %d cache writes, want exactly 1 (second call should have hit the cache)", cache.sets)
+	}
+}
+
+func TestListPlaces_FailsOpenWhenCacheErrors(t *testing.T) {
+	name, _ := domain.NewPlaceName("Cristo Redentor")
+	coords, _ := domain.NewCoordinates(-22.9519, -43.2105)
+	place := domain.NewPlace(name, "monument", coords, "", "wikidata", "rich")
+
+	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
+	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, erroringCache{})
+
+	req := httptest.NewRequest(http.MethodGet, "/places", nil)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want 200 — a cache error must never fail the request", rec.Code)
 	}
 }
