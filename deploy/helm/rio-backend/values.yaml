@@ -22,7 +22,9 @@ s3:
   region: us-east-1
 
 redis:
-  url: demo-redis-master:6379
+  # "hôte:port", pas une URL — c'est ce que goredis.Options.Addr attend
+  # (cf. REDIS_ADDR dans cmd/api/main.go).
+  addr: demo-redis-master:6379
 
 secrets:
   name: rio-backend-secrets # créé hors chart, jamais commité :

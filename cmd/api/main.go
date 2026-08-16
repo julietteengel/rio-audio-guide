@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
@@ -70,7 +71,21 @@ func main() {
 	s3Client := awss3.NewFromConfig(awsCfg)
 	storage := s3.NewAudioStorage(s3Client, envOr("S3_BUCKET", "rio-audio-guide"))
 
-	redisClient := goredis.NewClient(&goredis.Options{Addr: envOr("REDIS_URL", "localhost:6379")})
+	// Timeouts courts + retries quasi désactivés : le cache est en fail-open (toute
+	// erreur Redis = miss), mais avec les valeurs par défaut du SDK (dial 5s, 3
+	// retries, backoff jusqu'à 1s) un Redis en panne transformerait ce fail-open en
+	// fail-slow — un seul Get pourrait bloquer ~20s, puis le Set du chemin miss
+	// autant, largement de quoi faire expirer la requête HTTP entière. La variable
+	// s'appelle REDIS_ADDR (et pas REDIS_URL comme DATABASE_URL/RABBITMQ_URL) parce
+	// que goredis.Options.Addr attend un "hôte:port", pas une URL : y mettre
+	// "redis://..." échouerait silencieusement, masqué par le fail-open.
+	redisClient := goredis.NewClient(&goredis.Options{
+		Addr:         envOr("REDIS_ADDR", "localhost:6379"),
+		DialTimeout:  200 * time.Millisecond,
+		ReadTimeout:  200 * time.Millisecond,
+		WriteTimeout: 200 * time.Millisecond,
+		MaxRetries:   1,
+	})
 	cache := redis.NewCache(redisClient)
 
 	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, publisher, storage, cache)
