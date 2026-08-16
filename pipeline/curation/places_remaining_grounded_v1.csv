@@ -1,0 +1,524 @@
+id,name,category,source,lat,lon,wikidata_qid,matched_wikipedia_title,grounding_text,grounding_distance_m,boundary_municipality,grounding_status
+overture:Museu Oi Futuro - Museu das Telecomunisações RJ:-22.91971:-43.17184,Museu Oi Futuro - Museu das Telecomunisações RJ,museum,overture,-22.919710159301758,-43.17184066772461,,,,,,no_match
+overture:Museu da Cidade:-22.90114:-43.17701,Museu da Cidade,art_museum,overture,-22.90114402770996,-43.177005767822266,,,,,,no_match
+overture:Centro de Tradições Ylê Asè Egi Omim:-22.93820:-43.20837,Centro de Tradições Ylê Asè Egi Omim,cultural_center,overture,-22.938201904296875,-43.20836639404297,,,,,,no_match
+overture:Centro Cultural Municipal Laurinda Santos Lobo:-22.92002:-43.18856,Centro Cultural Municipal Laurinda Santos Lobo,cultural_center,overture,-22.920024871826172,-43.188560485839844,,,,,,no_match
+overture:Largo do Guimaraes:-22.92141:-43.18598,Largo do Guimaraes,landmark_and_historical_building,overture,-22.921405792236328,-43.185977935791016,,,,,,no_match
+overture:Museu do Chocolate:-22.90133:-43.20309,Museu do Chocolate,museum,overture,-22.901330947875977,-43.203086853027344,,,,,,no_match
+wikidata:Igreja Nossa Senhora Mãe dos Homens (Rio de Janeiro):-22.90177:-43.17839,Igreja Nossa Senhora Mãe dos Homens (Rio de Janeiro),heritage_site,wikidata,-22.901768,-43.178394,Q55264666,,,,,no_match
+overture:Fundação Anita Mantuano de Artes do Estado do Rio de Janeiro:-22.90641:-43.17948,Fundação Anita Mantuano de Artes do Estado do Rio de Janeiro,museum,overture,-22.906410217285156,-43.17947769165039,,,,,,no_match
+overture:Portal da Antiga Academia de Belas Artes:-22.96601:-43.22652,Portal da Antiga Academia de Belas Artes,landmark_and_historical_building,overture,-22.966007232666016,-43.22651672363281,,,,,,no_match
+overture:Centro Cultural Jerusalém:-22.88164:-43.27538,Centro Cultural Jerusalém,cultural_center,overture,-22.881643295288086,-43.27537536621094,,,,,,no_match
+"overture:Júpiter, Quinto Planeta del Sistema Solar.:-22.86302:-43.44258","Júpiter, Quinto Planeta del Sistema Solar.",monument,overture,-22.86302375793457,-43.44258117675781,,,,,,no_match
+overture:Museum Dom João VI:-22.86241:-43.22301,Museum Dom João VI,art_museum,overture,-22.86240577697754,-43.22301483154297,,,,,,no_match
+overture:Instituto Casa Roberto Marinho (ICRM):-22.93993:-43.20409,Instituto Casa Roberto Marinho (ICRM),art_museum,overture,-22.93992805480957,-43.20408630371094,,,,,,no_match
+wikidata:Ponte do Guandu:-22.87226:-43.67706,Ponte do Guandu,heritage_site,wikidata,-22.8722557,-43.677064,Q10351458,,,,,no_match
+overture:Memorial Bernardo Monteverde:-22.91124:-43.17794,Memorial Bernardo Monteverde,history_museum,overture,-22.911237716674805,-43.17793655395508,,,,,,no_match
+overture:Centro Cultural Cândido José de Araújo:-22.89560:-43.19220,Centro Cultural Cândido José de Araújo,cultural_center,overture,-22.895601272583008,-43.192203521728516,,,,,,no_match
+overture:Submarino Museu Riachuelo:-22.90412:-43.17204,Submarino Museu Riachuelo,museum,overture,-22.90412139892578,-43.17204284667969,,,,,,no_match
+overture:Estátua de João Cândido:-22.90216:-43.17340,Estátua de João Cândido,landmark_and_historical_building,overture,-22.902158737182617,-43.173397064208984,,,,,,no_match
+overture:Museu da Cultura Puri:-22.91428:-43.19998,Museu da Cultura Puri,art_museum,overture,-22.914276123046875,-43.199981689453125,,,,,,no_match
+overture:Casa dos Açores:-22.92093:-43.22099,Casa dos Açores,cultural_center,overture,-22.92093276977539,-43.22099304199219,,,,,,no_match
+overture:TK Souvenir:-22.92209:-43.17625,TK Souvenir,museum,overture,-22.922090530395508,-43.176246643066406,,,,,,no_match
+overture:Museu Histórico da Cidade do Rio de Janeiro:-22.98120:-43.24038,Museu Histórico da Cidade do Rio de Janeiro,museum,overture,-22.981197357177734,-43.240379333496094,,,,,,no_match
+overture:Associação Cultural Grupo Afrolaje:-22.90385:-43.30330,Associação Cultural Grupo Afrolaje,cultural_center,overture,-22.903852462768555,-43.30330276489258,,,,,,no_match
+overture:Exposição Pessach:-22.93586:-43.18978,Exposição Pessach,art_museum,overture,-22.935863494873047,-43.189781188964844,,,,,,no_match
+overture:Coreto de Sepetiba Rj:-22.97089:-43.70963,Coreto de Sepetiba Rj,landmark_and_historical_building,overture,-22.97089385986328,-43.70962905883789,,,,,,no_match
+overture:Areninha Cultural Joao Bosco de Vista Alegre:-22.83230:-43.31245,Areninha Cultural Joao Bosco de Vista Alegre,cultural_center,overture,-22.83230209350586,-43.31244659423828,,,,,,no_match
+overture:Museu do Cárcere:-23.02817:-43.46785,Museu do Cárcere,history_museum,overture,-23.02817153930664,-43.46785354614258,,,,,,no_match
+overture:Jaime Arôxa Lapa - Centro Cultural Arariboia:-22.90763:-43.18428,Jaime Arôxa Lapa - Centro Cultural Arariboia,cultural_center,overture,-22.907634735107422,-43.18428039550781,,,,,,no_match
+overture:Instituto Antônio Carlos Jobim:-22.97061:-43.22487,Instituto Antônio Carlos Jobim,cultural_center,overture,-22.970609664916992,-43.22486877441406,,,,,,no_match
+overture:Casa Roberto Marinho:-22.94003:-43.20423,Casa Roberto Marinho,modern_art_museum,overture,-22.940027236938477,-43.204227447509766,,,,,,no_match
+overture:Casa Subversa:-22.90691:-43.18388,Casa Subversa,cultural_center,overture,-22.906911849975586,-43.183876037597656,,,,,,no_match
+overture:Espaço Sequência:-22.92347:-43.20695,Espaço Sequência,museum,overture,-22.923473358154297,-43.206947326660156,,,,,,no_match
+overture:Museu da Força Expedicionária Brasileira:-22.91225:-43.17831,Museu da Força Expedicionária Brasileira,museum,overture,-22.91225242614746,-43.17831039428711,,,,,,no_match
+overture:Ictiologia Museu Nacional:-22.90792:-43.22490,Ictiologia Museu Nacional,museum,overture,-22.907922744750977,-43.22489929199219,,,,,,no_match
+wikidata:Lago do Campo de Santana:-22.90759:-43.18802,Lago do Campo de Santana,heritage_site,wikidata,-22.9075885,-43.188024,Q67205544,Campo de Santana (Rio de Janeiro),"O Campo de Santana, também conhecido como Praça da República, é um parque localizado no Centro do município do Rio de Janeiro, no estado do Rio de Janeiro, no Brasil. O nome da praça é uma referência ao fato de ela se localizar nas proximidades de onde ocorreu a proclamação da República do Brasil em 1889.",118,Rio de Janeiro,ok
+overture:Aqueduto - Ilha Grande:-22.93612:-43.24556,Aqueduto - Ilha Grande,monument,overture,-22.93612289428711,-43.24556350708008,,,,,,no_match
+overture:Museu Histórico do Exército:-22.98578:-43.18667,Museu Histórico do Exército,history_museum,overture,-22.98578453063965,-43.186668395996094,,,,,,no_match
+overture:Centro Cultural Omo Yoruba:-22.89212:-43.34472,Centro Cultural Omo Yoruba,cultural_center,overture,-22.89212417602539,-43.34471893310547,,,,,,no_match
+overture:Parque das Ruínas:-22.91780:-43.18232,Parque das Ruínas,landmark_and_historical_building,overture,-22.917797088623047,-43.182315826416016,,,,,,no_match
+overture:Barracão da Unidos do Viradouro:-22.89993:-43.20647,Barracão da Unidos do Viradouro,topic_concert_venue,overture,-22.899932861328125,-43.20647048950195,,,,,,no_match
+overture:Arcos Da Lapa - Vida Boemia Do Rio De Janeiro:-22.91295:-43.18325,Arcos Da Lapa - Vida Boemia Do Rio De Janeiro,landmark_and_historical_building,overture,-22.912952423095703,-43.18324661254883,,,,,,no_match
+overture:Escola de Samba Portela:-22.87094:-43.34318,Escola de Samba Portela,topic_concert_venue,overture,-22.87093734741211,-43.34318161010742,,,,,,no_match
+overture:Telhadão do Tuiuti:-22.89895:-43.23426,Telhadão do Tuiuti,topic_concert_venue,overture,-22.89894676208496,-43.23426055908203,,,,,,no_match
+overture:Joao e Maria Museum:-22.90084:-43.18162,Joao e Maria Museum,museum,overture,-22.900840759277344,-43.18162155151367,,,,,,no_match
+overture:Casarão Cultural dos Arcos:-22.91343:-43.18073,Casarão Cultural dos Arcos,landmark_and_historical_building,overture,-22.913434982299805,-43.18073272705078,,,,,,no_match
+overture:Escadaria da Marechal Mascarenhas de Morais:-22.96413:-43.18336,Escadaria da Marechal Mascarenhas de Morais,landmark_and_historical_building,overture,-22.964126586914062,-43.1833610534668,,,,,,no_match
+"overture:Grande Méier - Engenho Novo, RJ:-22.90448:-43.26954","Grande Méier - Engenho Novo, RJ",monument,overture,-22.904478073120117,-43.269535064697266,,,,,,no_match
+overture:Biblioteca do Museu Nacional da UFRJ:-22.90836:-43.22607,Biblioteca do Museu Nacional da UFRJ,museum,overture,-22.908361434936523,-43.22606658935547,,,,,,no_match
+overture:Memorial Guido Schäffer:-22.90837:-43.17123,Memorial Guido Schäffer,monument,overture,-22.90836524963379,-43.171234130859375,,,,,,no_match
+overture:Casa Carnaval | Centro:-22.90166:-43.17522,Casa Carnaval | Centro,cultural_center,overture,-22.901662826538086,-43.17522430419922,,,,,,no_match
+overture:Museu Africano Rio de Janeiro:-22.96817:-43.18468,Museu Africano Rio de Janeiro,museum,overture,-22.96817398071289,-43.18467712402344,,,,,,no_match
+overture:GRES União da Ilha do Governador:-22.81377:-43.18890,GRES União da Ilha do Governador,topic_concert_venue,overture,-22.813766479492188,-43.188899993896484,,,,,,no_match
+overture:MAAS Museu Arquidiocesano de Arte Sacra do Rio de Janeiro:-22.91072:-43.18043,MAAS Museu Arquidiocesano de Arte Sacra do Rio de Janeiro,art_museum,overture,-22.910724639892578,-43.18042755126953,,,,,,no_match
+overture:Museu de Arte Sacra:-22.97358:-43.20780,Museu de Arte Sacra,museum,overture,-22.973583221435547,-43.207801818847656,,,,,,no_match
+overture:Lona Cultural Terra Caetano Veloso:-22.83997:-43.37852,Lona Cultural Terra Caetano Veloso,cultural_center,overture,-22.839969635009766,-43.37852478027344,,,,,,no_match
+overture:Museu de Bangu:-22.87881:-43.46346,Museu de Bangu,museum,overture,-22.878812789916992,-43.46345901489258,,,,,,no_match
+overture:Museu Do Passo Imperial:-22.83699:-43.28207,Museu Do Passo Imperial,history_museum,overture,-22.836990356445312,-43.282073974609375,,,,,,no_match
+wikidata:edifício-sede da Associação Brasileira de Imprensa:-22.90915:-43.17484,edifício-sede da Associação Brasileira de Imprensa,heritage_site,wikidata,-22.90915,-43.17484,Q18275922,,,,,no_match
+overture:Quinta da Boa Vista - Museu Nacional:-22.92644:-43.21583,Quinta da Boa Vista - Museu Nacional,museum,overture,-22.926443099975586,-43.2158317565918,,,,,,no_match
+overture:Fórum de Ciência e Cultura da UFRJ:-22.94284:-43.17472,Fórum de Ciência e Cultura da UFRJ,cultural_center,overture,-22.942842483520508,-43.174720764160156,,,,,,no_match
+overture:Cultura Conecta:-22.89334:-43.17909,Cultura Conecta,museum,overture,-22.893342971801758,-43.17909240722656,,,,,,no_match
+overture:Praça Inhangá Copacabana:-22.96602:-43.18147,Praça Inhangá Copacabana,topic_concert_venue,overture,-22.966018676757812,-43.18147277832031,,,,,,no_match
+overture:Espaço Cultural Escola Sesc:-22.96029:-43.35923,Espaço Cultural Escola Sesc,cultural_center,overture,-22.96029281616211,-43.359230041503906,,,,,,no_match
+overture:Centro Cultural Prof Dila:-22.89694:-43.35447,Centro Cultural Prof Dila,cultural_center,overture,-22.896940231323242,-43.354469299316406,,,,,,no_match
+overture:BAC - Barracão de Arte e Cultura Sepetiba:-22.96741:-43.69054,BAC - Barracão de Arte e Cultura Sepetiba,cultural_center,overture,-22.9674129486084,-43.6905403137207,,,,,,no_match
+overture:Espaço Cultural Arlindo Cruz:-22.87435:-43.42841,Espaço Cultural Arlindo Cruz,topic_concert_venue,overture,-22.874351501464844,-43.42841339111328,,,,,,no_match
+overture:Teatro do Liceu:-22.90725:-43.19314,Teatro do Liceu,topic_concert_venue,overture,-22.907245635986328,-43.193138122558594,,,,,,no_match
+overture:Museu de Cera:-22.89328:-43.19242,Museu de Cera,history_museum,overture,-22.893280029296875,-43.192420959472656,,,,,,no_match
+overture:Centro Cultural Educar:-22.88001:-43.25290,Centro Cultural Educar,cultural_center,overture,-22.8800106048584,-43.252899169921875,,,,,,no_match
+overture:Centro Cultural Benjamin Peret:-22.91720:-43.17892,Centro Cultural Benjamin Peret,cultural_center,overture,-22.91719627380371,-43.17892074584961,,,,,,no_match
+overture:Pequena África:-22.89813:-43.18748,Pequena África,cultural_center,overture,-22.89813232421875,-43.18748474121094,,,,,,no_match
+overture:Centro Cultural Itaporã:-22.92054:-43.21086,Centro Cultural Itaporã,cultural_center,overture,-22.920541763305664,-43.21086120605469,,,,,,no_match
+overture:Museu da Imagem e do Som:-22.97902:-43.18939,Museu da Imagem e do Som,art_museum,overture,-22.979015350341797,-43.189388275146484,,,,,,no_match
+overture:Centro Cultural Sindicato dos Rodoviários do Município do Rio de Janeiro:-22.89964:-43.18770,Centro Cultural Sindicato dos Rodoviários do Município do Rio de Janeiro,cultural_center,overture,-22.89963722229004,-43.18770217895508,,,,,,no_match
+wikidata:Rua do Catete:-22.92592:-43.17625,Rua do Catete,heritage_site,wikidata,-22.92592,-43.176251,Q10365024,,,,,no_match
+overture:Centro Cultural Oduvaldo Viana Filho:-22.93027:-43.17459,Centro Cultural Oduvaldo Viana Filho,cultural_center,overture,-22.930269241333008,-43.17458724975586,,,,,,no_match
+overture:Capacete Centro Cultural:-22.92139:-43.18113,Capacete Centro Cultural,cultural_center,overture,-22.9213924407959,-43.18112564086914,,,,,,no_match
+overture:Centro Cultural do Capoeira Mestre Touro:-22.84566:-43.27918,Centro Cultural do Capoeira Mestre Touro,cultural_center,overture,-22.845664978027344,-43.27918243408203,,,,,,no_match
+overture:Museu Histórico da Cidade do Rio de Janeiro (MHCRJ):-22.98046:-43.24163,Museu Histórico da Cidade do Rio de Janeiro (MHCRJ),history_museum,overture,-22.98046112060547,-43.24163055419922,,,,,,no_match
+overture:Museu Nacional:-23.01977:-43.46478,Museu Nacional,museum,overture,-23.019765853881836,-43.46478271484375,,,,,,no_match
+overture:Museu Nacional dos Povos Indígenas OBS: Apenas os jardins estão abertos!:-22.95188:-43.19114,Museu Nacional dos Povos Indígenas OBS: Apenas os jardins estão abertos!,museum,overture,-22.951879501342773,-43.19114303588867,,,,,,no_match
+overture:Praça São Salvador:-22.93660:-43.17743,Praça São Salvador,landmark_and_historical_building,overture,-22.936595916748047,-43.177433013916016,,,,,,no_match
+overture:Centro EcoCultural Sueli Pontes:-23.00124:-43.34104,Centro EcoCultural Sueli Pontes,cultural_center,overture,-23.001243591308594,-43.341041564941406,,,,,,no_match
+overture:Havana Carioca rj:-22.91200:-43.18158,Havana Carioca rj,museum,overture,-22.912002563476562,-43.181583404541016,,,,,,no_match
+wikidata:Fazenda do Capão do Bispo:-22.88317:-43.27814,Fazenda do Capão do Bispo,heritage_site,wikidata,-22.883174,-43.278144,Q83904475,,,,,no_match
+overture:LaDQuim:-22.86524:-43.22918,LaDQuim,museum,overture,-22.86524200439453,-43.22917938232422,,,,,,no_match
+overture:Museu de História Natural da Quinta da Boavista:-22.95443:-43.18161,Museu de História Natural da Quinta da Boavista,museum,overture,-22.95443344116211,-43.181610107421875,,,,,,no_match
+overture:Centro Carnavalesco Onça Preta:-22.89941:-43.18793,Centro Carnavalesco Onça Preta,cultural_center,overture,-22.8994083404541,-43.18793487548828,,,,,,no_match
+overture:Praça Paulo Da Portela Madureira:-22.86993:-43.49866,Praça Paulo Da Portela Madureira,topic_concert_venue,overture,-22.86992835998535,-43.4986572265625,,,,,,no_match
+overture:Armazém Cultural das Artes:-22.89411:-43.19020,Armazém Cultural das Artes,cultural_center,overture,-22.894107818603516,-43.1901969909668,,,,,,no_match
+overture:Casa do Recreio Arte e Cultura:-23.02154:-43.47924,Casa do Recreio Arte e Cultura,cultural_center,overture,-23.021535873413086,-43.47924041748047,,,,,,no_match
+overture:Cristo Redentor - RJ:-22.91068:-43.65784,Cristo Redentor - RJ,landmark_and_historical_building,overture,-22.910680770874023,-43.6578369140625,,,,,,no_match
+overture:Sala Cultural Mestra Joana Cavalcante:-22.89510:-43.57402,Sala Cultural Mestra Joana Cavalcante,topic_concert_venue,overture,-22.895103454589844,-43.57402038574219,,,,,,no_match
+overture:Funarte:-22.90868:-43.17335,Funarte,cultural_center,overture,-22.908681869506836,-43.17334747314453,,,,,,no_match
+overture:GRES Estácio de Sá:-22.91261:-43.20177,GRES Estácio de Sá,topic_concert_venue,overture,-22.912607192993164,-43.2017707824707,,,,,,no_match
+overture:Centro Cultural do Ministério da Saúde (CCMS):-22.90504:-43.16882,Centro Cultural do Ministério da Saúde (CCMS),cultural_center,overture,-22.905038833618164,-43.168819427490234,,,,,,no_match
+overture:Turismo Cultural no Bairro Imperial de São Cristóvão:-22.90526:-43.22335,Turismo Cultural no Bairro Imperial de São Cristóvão,history_museum,overture,-22.905258178710938,-43.223350524902344,,,,,,no_match
+overture:Teatro Iracema de Alencar:-22.93350:-43.35720,Teatro Iracema de Alencar,topic_concert_venue,overture,-22.933502197265625,-43.35719680786133,,,,,,no_match
+overture:CRAB Sebrae - Centro de Referencia do Artesanato Brasileiro:-22.90736:-43.18382,CRAB Sebrae - Centro de Referencia do Artesanato Brasileiro,cultural_center,overture,-22.90735626220703,-43.18382263183594,,,,,,no_match
+overture:Casarao dos Prazeres:-22.92063:-43.18491,Casarao dos Prazeres,history_museum,overture,-22.92063331604004,-43.184906005859375,,,,,,no_match
+overture:Estátua de Ibrahim Sued:-22.96770:-43.17858,Estátua de Ibrahim Sued,monument,overture,-22.967700958251953,-43.1785774230957,,,,,,no_match
+overture:Centro Cultural Professor Horacio Macedo:-22.85841:-43.23224,Centro Cultural Professor Horacio Macedo,cultural_center,overture,-22.85840606689453,-43.232242584228516,,,,,,no_match
+overture:Interser:-22.97412:-43.18854,Interser,museum,overture,-22.974117279052734,-43.188541412353516,,,,,,no_match
+wikidata:Hangar de Zepelins do Aeroporto Bartolomeu de Gusmão:-22.92274:-43.70353,Hangar de Zepelins do Aeroporto Bartolomeu de Gusmão,heritage_site,wikidata,-22.922736,-43.703531,Q111922313,,,,,no_match
+overture:Museu do Primeiro Reinado:-22.90461:-43.21698,Museu do Primeiro Reinado,history_museum,overture,-22.90460968017578,-43.216976165771484,,,,,,no_match
+overture:Casa Cultural Manacá:-22.90875:-43.19495,Casa Cultural Manacá,cultural_center,overture,-22.908748626708984,-43.1949462890625,,,,,,no_match
+overture:Museu do Samba:-22.90155:-43.24081,Museu do Samba,museum,overture,-22.90155029296875,-43.240806579589844,,,,,,no_match
+overture:Terreirão Samba:-22.90768:-43.19609,Terreirão Samba,topic_concert_venue,overture,-22.907682418823242,-43.19609069824219,,,,,,no_match
+overture:Laje Michael Jackson:-22.94713:-43.19484,Laje Michael Jackson,monument,overture,-22.947126388549805,-43.19483947753906,,,,,,no_match
+overture:Areninha Carioca Hermeto Pascoal:-22.87733:-43.47283,Areninha Carioca Hermeto Pascoal,cultural_center,overture,-22.87732696533203,-43.47283172607422,,,,,,no_match
+overture:Sambódromo:-22.96419:-43.17361,Sambódromo,landmark_and_historical_building,overture,-22.964191436767578,-43.173606872558594,,,,,,no_match
+wikidata:Chafariz Rua do Riachuelo:-22.91505:-43.18637,Chafariz Rua do Riachuelo,heritage_site,wikidata,-22.91505,-43.186372,Q104906121,,,,,no_match
+overture:Muretinha:-22.94349:-43.16000,Muretinha,monument,overture,-22.94349479675293,-43.15999984741211,,,,,,no_match
+overture:Portão Monumental da Quinta da Boa Vista:-22.90462:-43.22036,Portão Monumental da Quinta da Boa Vista,monument,overture,-22.904624938964844,-43.220359802246094,,,,,,no_match
+overture:MIS Museu da Imagem e do Som:-22.97893:-43.18943,MIS Museu da Imagem e do Som,museum,overture,-22.978931427001953,-43.18943405151367,,,,,,no_match
+manual:Confeitaria Colombo,Confeitaria Colombo,landmark_and_historical_building,manual_curation,-22.9068,-43.1786,,,,,,no_match
+overture:Centro Cultural Solar de Botafogo:-22.95633:-43.18626,Centro Cultural Solar de Botafogo,cultural_center,overture,-22.956327438354492,-43.18626403808594,,,,,,no_match
+overture:Istituto Italiano di Cultura di Rio de Janeiro:-22.91024:-43.17163,Istituto Italiano di Cultura di Rio de Janeiro,cultural_center,overture,-22.910240173339844,-43.171630859375,,,,,,no_match
+overture:Moinho Fluminense:-22.89627:-43.19144,Moinho Fluminense,landmark_and_historical_building,overture,-22.896270751953125,-43.191436767578125,,,,,,no_match
+overture:Casa da Vo Catarina:-22.88673:-43.41344,Casa da Vo Catarina,monument,overture,-22.886730194091797,-43.41343688964844,,,,,,no_match
+overture:Christ the Redeemer:-22.94047:-43.19849,Christ the Redeemer,museum,overture,-22.94046974182129,-43.198490142822266,,,,,,no_match
+overture:Theatro Municipal do Rio de Janeiro:-22.88461:-43.29129,Theatro Municipal do Rio de Janeiro,topic_concert_venue,overture,-22.884613037109375,-43.291290283203125,,,,,,no_match
+wikidata:Solar da Imperatriz:-22.96786:-43.24040,Solar da Imperatriz,heritage_site,wikidata,-22.9678611,-43.2403981,Q64847884,,,,,no_match
+overture:Galaxion:-22.99656:-43.25963,Galaxion,museum,overture,-22.996559143066406,-43.2596321105957,,,,,,no_match
+overture:Museu Casa Bumba Meu Boi:-22.85610:-43.47367,Museu Casa Bumba Meu Boi,museum,overture,-22.85610008239746,-43.473670959472656,,,,,,no_match
+overture:Museu Fluminense FC:-22.93624:-43.18465,Museu Fluminense FC,museum,overture,-22.93624496459961,-43.18465042114258,,,,,,no_match
+overture:Fio Cruz Museu da Vida:-22.87182:-43.56262,Fio Cruz Museu da Vida,museum,overture,-22.8718204498291,-43.562618255615234,,,,,,no_match
+overture:Casa de Artes Paquetá:-22.75325:-43.11126,Casa de Artes Paquetá,cultural_center,overture,-22.753250122070312,-43.11125564575195,,,,,,no_match
+overture:Centro Cultural da Caixa Econômica Federal:-22.90769:-43.17330,Centro Cultural da Caixa Econômica Federal,cultural_center,overture,-22.907690048217773,-43.173301696777344,,,,,,no_match
+overture:Clube Militar:-22.95633:-43.16476,Clube Militar,landmark_and_historical_building,overture,-22.95632553100586,-43.16476058959961,,,,,,no_match
+overture:Musehum:-22.92996:-43.17651,Musehum,museum,overture,-22.929960250854492,-43.176513671875,,,,,,no_match
+overture:CASARTI Casa do Artista Independente:-22.82613:-43.31207,CASARTI Casa do Artista Independente,cultural_center,overture,-22.826129913330078,-43.31207275390625,,,,,,no_match
+overture:Casa de Viseu:-22.84538:-43.30367,Casa de Viseu,cultural_center,overture,-22.845378875732422,-43.303672790527344,,,,,,no_match
+overture:Feira de São Cristóvão:-22.90729:-43.22304,Feira de São Cristóvão,cultural_center,overture,-22.90729331970215,-43.22304153442383,,,,,,no_match
+overture:Casa da Tia Ciata:-22.89803:-43.18751,Casa da Tia Ciata,cultural_center,overture,-22.898033142089844,-43.18750762939453,,,,,,no_match
+overture:Museum of Tiles:-22.88507:-43.27763,Museum of Tiles,museum,overture,-22.885074615478516,-43.27762985229492,,,,,,no_match
+overture:Leão Etíope do Méier:-22.90203:-43.27982,Leão Etíope do Méier,art_museum,overture,-22.90203285217285,-43.279823303222656,,,,,,no_match
+overture:Museu Histórico da Cidade RJ:-22.89843:-43.34912,Museu Histórico da Cidade RJ,history_museum,overture,-22.898433685302734,-43.34912109375,,,,,,no_match
+overture:Museu do Exercito:-22.91223:-43.23352,Museu do Exercito,museum,overture,-22.912229537963867,-43.2335205078125,,,,,,no_match
+overture:Arena Carioca Jovelina Pérola Negra:-22.80884:-43.36195,Arena Carioca Jovelina Pérola Negra,cultural_center,overture,-22.808841705322266,-43.36194610595703,,,,,,no_match
+overture:Centro de Arte Hélio Oiticica:-22.90593:-43.18338,Centro de Arte Hélio Oiticica,museum,overture,-22.905925750732422,-43.183380126953125,,,,,,no_match
+overture:Casa Cultural da Nossa Gente:-22.89432:-43.28986,Casa Cultural da Nossa Gente,cultural_center,overture,-22.89432144165039,-43.28986358642578,,,,,,no_match
+overture:Unidos Da Barra Da Tijuca:-23.00197:-43.34862,Unidos Da Barra Da Tijuca,cultural_center,overture,-23.001970291137695,-43.3486213684082,,,,,,no_match
+overture:Jongo Da Serrinha:-22.86482:-43.33043,Jongo Da Serrinha,cultural_center,overture,-22.864816665649414,-43.33042907714844,,,,,,no_match
+overture:Fla Memória:-22.97837:-43.21861,Fla Memória,museum,overture,-22.97837257385254,-43.218605041503906,,,,,,no_match
+overture:Quadra da Portela:-22.87089:-43.34296,Quadra da Portela,cultural_center,overture,-22.870887756347656,-43.34295654296875,,,,,,no_match
+overture:Teatro Bangu Shopping:-22.87868:-43.46589,Teatro Bangu Shopping,topic_concert_venue,overture,-22.878684997558594,-43.465885162353516,,,,,,no_match
+overture:Valao de Jardim America:-22.80757:-43.32420,Valao de Jardim America,monument,overture,-22.807573318481445,-43.32420349121094,,,,,,no_match
+overture:Memorial da Humanidade Ipharj:-22.81941:-43.39516,Memorial da Humanidade Ipharj,history_museum,overture,-22.81941032409668,-43.39516067504883,,,,,,no_match
+overture:Centro Cultural Goiabeira Coisa & Tal:-23.00764:-43.29489,Centro Cultural Goiabeira Coisa & Tal,museum,overture,-23.007640838623047,-43.294891357421875,,,,,,no_match
+overture:Teatro Brigitte Blair:-22.97797:-43.19111,Teatro Brigitte Blair,topic_concert_venue,overture,-22.977968215942383,-43.19111251831055,,,,,,no_match
+overture:Fundação Teatro Municipal do Rio de Janeiro:-22.88058:-43.27799,Fundação Teatro Municipal do Rio de Janeiro,topic_concert_venue,overture,-22.880582809448242,-43.277992248535156,,,,,,no_match
+wikidata:Alfândega do Rio de Janeiro:-22.90029:-43.17635,Alfândega do Rio de Janeiro,heritage_site,wikidata,-22.900285,-43.176353055,Q64363860,,,,,no_match
+overture:Canhão da Ilha:-22.81095:-43.17722,Canhão da Ilha,monument,overture,-22.81095314025879,-43.177215576171875,,,,,,no_match
+overture:Museu Cidade Olímpica:-22.89457:-43.29445,Museu Cidade Olímpica,history_museum,overture,-22.894573211669922,-43.29444885253906,,,,,,no_match
+overture:Polo Praça XV:-22.90282:-43.17458,Polo Praça XV,art_museum,overture,-22.902820587158203,-43.174583435058594,,Praça XV (Rio de Janeiro),"A Praça XV, também conhecida como Praça XV de Novembro, Praça 15 de Novembro, Praça Quinze de Novembro, Praça 15 ou Praça Quinze, é uma praça situada no bairro do Centro, na Zona Central da cidade do Rio de Janeiro. Além de estar localizada na Rua Primeiro de Março, a praça integra a Orla Conde, um passeio público que margeia a Baía de Guanabara.
+A praça, que existe desde o século XVI, foi reinaugurada no dia 29 de maio de 2016 após ser revitalizada. A revitalização da praça foi feita durante a gestão do prefeito Eduardo Paes no âmbito do Porto Maravilha, uma operação urbana que visa revitalizar a Zona Portuária do Rio de Janeiro.
+No interior do logradouro, situam-se a Parada Praça XV do VLT Carioca e a Estação Praça XV do sistema de barcas operado pela CCR Barcas. Já nas imediações, situam-se diversos pontos de interesse de importância histórica e política, como o Paço Imperial e o Palácio Tiradentes. A praça também possui quatro monumentos históricos: o Chafariz do Mestre Valentim; a Estátua Equestre de Dom João VI; a Estátua Equestre do General Osório; e a Estátua do Almirante Negro.
+Hoje, a Praça XV é considerada o coração do skateboarding no Rio de Janeiro. Embora o Decreto Municipal nº 17.746, de 22 de julho de 1999, tenha proibido a prática do esporte em praças, parques e jardins da cidade, o movimento de skatistas I Love XV conseguiu, em 2011, uma permissão da prefeitura para o uso da Praça XV como local de tráfego de skates em horários estipulados. No dia 8 de novembro de 2016, por meio de uma portaria, o presidente da Fundação Parques e Jardins concedeu autorização para o uso do skate na Praça XV e na Praça Marechal Âncora em qualquer horário.
+
+A praça recebeu esse nome por homenagear o dia 15 de novembro de 1889, marcado pela Proclamação da República do Brasil. Nesse dia, foi instaurada a república federativa presidencialista no Brasil, em substituição à monarquia constitucional parlamentarista em vigor desde 1822.",128,Rio de Janeiro,ok
+overture:Prédio onde morou Renato Russo:-22.98179:-43.20839,Prédio onde morou Renato Russo,landmark_and_historical_building,overture,-22.981792449951172,-43.20838928222656,,,,,,no_match
+overture:Historico da espanha:-22.90984:-43.17579,Historico da espanha,history_museum,overture,-22.909835815429688,-43.175785064697266,,,,,,no_match
+overture:Galpão Bela Maré:-22.85380:-43.24681,Galpão Bela Maré,cultural_center,overture,-22.853801727294922,-43.24680709838867,,,,,,no_match
+overture:Casarão Santa Teresa:-22.93140:-43.19787,Casarão Santa Teresa,topic_concert_venue,overture,-22.93140411376953,-43.197872161865234,,,,,,no_match
+overture:Casa Rústica Festas & Eventos:-22.90784:-43.54114,Casa Rústica Festas & Eventos,monument,overture,-22.907835006713867,-43.541141510009766,,,,,,no_match
+overture:Muzema Cit:-22.99031:-43.32258,Muzema Cit,museum,overture,-22.990306854248047,-43.32258224487305,,,,,,no_match
+wikidata:Solar del Rei:-22.75974:-43.10930,Solar del Rei,heritage_site,wikidata,-22.759742,-43.109302,Q104907436,,,,,no_match
+overture:Largo Alexandre Herculano:-22.90582:-43.18209,Largo Alexandre Herculano,landmark_and_historical_building,overture,-22.90581512451172,-43.18209457397461,,,,,,no_match
+overture:Palácio Pedro Ernesto:-22.90985:-43.17664,Palácio Pedro Ernesto,landmark_and_historical_building,overture,-22.909854888916016,-43.17664337158203,,,,,,no_match
+overture:Museu Casa França Brasil:-22.90557:-43.19355,Museu Casa França Brasil,museum,overture,-22.90557289123535,-43.19355392456055,,,,,,no_match
+overture:Salgueiro Histórico:-22.92198:-43.24410,Salgueiro Histórico,topic_concert_venue,overture,-22.92198371887207,-43.24409866333008,,,,,,no_match
+overture:Casa de Arte e Cultura Julieta de Serpa:-22.93641:-43.17448,Casa de Arte e Cultura Julieta de Serpa,cultural_center,overture,-22.936410903930664,-43.17448043823242,,,,,,no_match
+overture:Feira das Yabás:-22.86780:-43.34438,Feira das Yabás,topic_concert_venue,overture,-22.8677978515625,-43.344383239746094,,,,,,no_match
+"overture:Vasco da Gama, Rio de Janeiro:-22.89194:-43.22695","Vasco da Gama, Rio de Janeiro",landmark_and_historical_building,overture,-22.891944885253906,-43.22694778442383,,"Vasco da Gama, Rio de Janeiro","Vasco da Gama is a neighborhood of Rio de Janeiro, Brazil. It was created in honor of the centenary of the football club CR Vasco da Gama in 1998, where its stadium, São Januário, is located. The club was named after the Portuguese explorer Vasco da Gama. Until 1997, it was part of the São Cristóvão neighborhood.",0,Rio de Janeiro,ok
+overture:Museu Casa do Pontal:-23.02386:-43.51019,Museu Casa do Pontal,art_museum,overture,-23.02385902404785,-43.510189056396484,,,,,,no_match
+overture:Centro Cultural Lagoa:-22.96590:-43.20334,Centro Cultural Lagoa,cultural_center,overture,-22.96590232849121,-43.203338623046875,,,,,,no_match
+overture:Palácio de são cristóvão:-22.90583:-43.22445,Palácio de são cristóvão,landmark_and_historical_building,overture,-22.905834197998047,-43.22444534301758,,Paço de São Cristóvão,"Paço de São Cristóvão (Portuguese pronunciation: [ˈpasu d(ʒi) sɐ̃w kɾisˈtɔvɐ̃w]; English: Palace of Saint Christopher; also known as Palácio Imperial or Palácio Imperial de São Cristóvão) was an imperial palace located in the Quinta da Boa Vista park in the Imperial Neighbourhood of São Cristóvão, Rio de Janeiro, Brazil. It served as residence to the Portuguese royal family and later to the Brazilian imperial family until 1889, when the country became a republic through a coup d'état deposing Emperor Pedro II. The palace briefly served as a public building by the provisional government for the constituent assembly of the first republican constitution. It housed the major part (92.5%) of the collections of the National Museum of Brazil, which, together with the building, were largely destroyed by a fire on 2 September 2018. The palace was reopened after restoration in 2025.",146,Rio de Janeiro,ok
+overture:Lona Cultural Jacob do Bandolim:-22.89737:-43.35273,Lona Cultural Jacob do Bandolim,cultural_center,overture,-22.89737319946289,-43.35273361206055,,,,,,no_match
+overture:Lona Cultural de Anchieta:-22.82546:-43.40273,Lona Cultural de Anchieta,cultural_center,overture,-22.825456619262695,-43.40272521972656,,,,,,no_match
+overture:grande cia. de mystérios e novidades:-22.89766:-43.19271,grande cia. de mystérios e novidades,art_museum,overture,-22.897661209106445,-43.19271469116211,,,,,,no_match
+overture:Centro Cultural Casa da FEB:-22.91218:-43.17823,Centro Cultural Casa da FEB,cultural_center,overture,-22.91217803955078,-43.1782341003418,,,,,,no_match
+overture:Centro Cultural FGV:-22.94097:-43.18013,Centro Cultural FGV,cultural_center,overture,-22.94097137451172,-43.18012619018555,,,,,,no_match
+overture:Velha Guarda do Dendê:-22.79771:-43.19326,Velha Guarda do Dendê,cultural_center,overture,-22.797710418701172,-43.19325637817383,,,,,,no_match
+overture:Renascença Clube:-22.92433:-43.24929,Renascença Clube,cultural_center,overture,-22.924327850341797,-43.24929428100586,,,,,,no_match
+overture:Marechal Hermes:-22.85624:-43.37374,Marechal Hermes,landmark_and_historical_building,overture,-22.85624122619629,-43.37373733520508,,,,,,no_match
+overture:Mirante do Cristo. BR 040. Serra de Petropolis:-22.90020:-43.23320,Mirante do Cristo. BR 040. Serra de Petropolis,monument,overture,-22.90020179748535,-43.23320007324219,,,,,,no_match
+overture:Centro Cultural Correia Lima:-22.92682:-43.17942,Centro Cultural Correia Lima,cultural_center,overture,-22.92682456970215,-43.179420471191406,,,,,,no_match
+overture:Fazenda Imperial de Santa Cruz:-22.91000:-43.68531,Fazenda Imperial de Santa Cruz,landmark_and_historical_building,overture,-22.910003662109375,-43.685306549072266,,Santa Cruz Estate,"The Santa Cruz Estate is a former imperial country retreat in Santa Cruz, Rio de Janeiro. Originally a Jesuit estate and convent dating from 1570, it became a residence of the Portuguese viceroys in Brazil at the end of the 18th century. When King John VI and the royal family moved the court to Brazil in 1808, the palace became a royal residence. After the King's return to Portugal, the Prince Regent Pedro I continued to use the palace. Upon his marriage to Princess Leopoldina in 1818, they spent their honeymoon in the palace. The estate became one of the imperial palaces with the independence of Brazil in 1822. Emperor Pedro II later used the palace as a summer residence.
+Following proclamation of a republic in 1889, the palace was converted to a military school. It has continued to function as an academy to the present.",1,Rio de Janeiro,ok
+overture:Arcos da Lapa:-22.91285:-43.17978,Arcos da Lapa,landmark_and_historical_building,overture,-22.912853240966797,-43.179779052734375,,,,,,no_match
+overture:Mast:-22.89592:-43.22304,Mast,history_museum,overture,-22.895915985107422,-43.22304153442383,,,,,,no_match
+overture:Casa de Cultura Laura Alvim:-22.98658:-43.19923,Casa de Cultura Laura Alvim,cultural_center,overture,-22.9865779876709,-43.19922637939453,,,,,,no_match
+overture:Forte De Copacabana - Jornal Extra:-22.98330:-43.18955,Forte De Copacabana - Jornal Extra,topic_concert_venue,overture,-22.98330307006836,-43.189552307128906,,,,,,no_match
+overture:Museu dos Azulejos:-22.85662:-43.32791,Museu dos Azulejos,museum,overture,-22.85662269592285,-43.32790756225586,,,,,,no_match
+"overture:Fortaleza De Sao João, Urca:-22.83379:-43.31466","Fortaleza De Sao João, Urca",landmark_and_historical_building,overture,-22.833791732788086,-43.314659118652344,,,,,,no_match
+overture:Ladeira Dos Tabajaras:-22.96518:-43.18890,Ladeira Dos Tabajaras,landmark_and_historical_building,overture,-22.965179443359375,-43.188899993896484,,,,,,no_match
+"overture:Santa Teresa, Largo Das Neves:-22.91716:-43.19015","Santa Teresa, Largo Das Neves",topic_concert_venue,overture,-22.91716194152832,-43.19015121459961,,,,,,no_match
+overture:Centro Cultural Silva Tavares:-22.87751:-43.34251,Centro Cultural Silva Tavares,cultural_center,overture,-22.877506256103516,-43.34251403808594,,,,,,no_match
+overture:Forte Duque de Caxias:-22.96197:-43.16481,Forte Duque de Caxias,history_museum,overture,-22.961973190307617,-43.1648063659668,,,,,,no_match
+overture:Museu Vascaino:-22.89118:-43.22891,Museu Vascaino,museum,overture,-22.89118003845215,-43.22890853881836,,,,,,no_match
+overture:Associação de Amigos do Museu Aeroespacial:-22.88255:-43.39005,Associação de Amigos do Museu Aeroespacial,museum,overture,-22.882553100585938,-43.390045166015625,,,,,,no_match
+overture:Caixa Cultural Rj:-22.90828:-43.17692,Caixa Cultural Rj,cultural_center,overture,-22.908283233642578,-43.17692184448242,,,,,,no_match
+overture:Polo Novo Rio Antigo:-22.90826:-43.18393,Polo Novo Rio Antigo,landmark_and_historical_building,overture,-22.90826416015625,-43.18393325805664,,,,,,no_match
+overture:Parque das Ruínas / Museu da Chácara do Céu:-22.91279:-43.17715,Parque das Ruínas / Museu da Chácara do Céu,museum,overture,-22.912790298461914,-43.177146911621094,,,,,,no_match
+overture:Monumento a São Sebastião:-22.92189:-43.17419,Monumento a São Sebastião,monument,overture,-22.921894073486328,-43.1741943359375,,,,,,no_match
+overture:Ddp Diretoria:-22.97994:-43.22676,Ddp Diretoria,monument,overture,-22.97994041442871,-43.22675704956055,,,,,,no_match
+overture:Museu Cartográfico do Seviço Geográfico do Exército:-22.89968:-43.18273,Museu Cartográfico do Seviço Geográfico do Exército,museum,overture,-22.899677276611328,-43.1827278137207,,,,,,no_match
+overture:Paço Real:-22.90393:-43.22131,Paço Real,landmark_and_historical_building,overture,-22.903932571411133,-43.22130584716797,,,,,,no_match
+overture:Colônia de Pescadores Z-14:-23.00250:-43.64121,Colônia de Pescadores Z-14,museum,overture,-23.002498626708984,-43.64120864868164,,,,,,no_match
+overture:Museu Mar Praça Mauá:-22.99924:-43.24754,Museu Mar Praça Mauá,history_museum,overture,-22.999235153198242,-43.247535705566406,,,,,,no_match
+overture:Quadra Da Unidos De Padre Miguel:-22.87079:-43.44744,Quadra Da Unidos De Padre Miguel,topic_concert_venue,overture,-22.870786666870117,-43.447444915771484,,,,,,no_match
+overture:Casa de Cultura José Bonifácio:-22.76375:-43.10957,Casa de Cultura José Bonifácio,art_museum,overture,-22.763750076293945,-43.10957336425781,,,,,,no_match
+overture:Centro cultural Pedro II - Santíssimo:-22.88464:-43.55293,Centro cultural Pedro II - Santíssimo,cultural_center,overture,-22.8846378326416,-43.55292892456055,,,,,,no_match
+overture:GRES Unidos de Vila Isabel:-22.91373:-43.23657,GRES Unidos de Vila Isabel,topic_concert_venue,overture,-22.91373062133789,-43.236568450927734,,,,,,no_match
+overture:Жардим Ботанико (исторический район Рио-де-Жанейро):-22.96667:-43.21667,Жардим Ботанико (исторический район Рио-де-Жанейро),landmark_and_historical_building,overture,-22.96666717529297,-43.21666717529297,,,,,,no_match
+overture:Monumento à Princesa Isabel:-22.96397:-43.17402,Monumento à Princesa Isabel,monument,overture,-22.963966369628906,-43.17401885986328,,,,,,no_match
+overture:Palácio de Kensington:-22.93295:-43.18328,Palácio de Kensington,monument,overture,-22.932954788208008,-43.183284759521484,,,,,,no_match
+overture:Sítio Arqueológico Casa dos Pilões:-22.96798:-43.22710,Sítio Arqueológico Casa dos Pilões,history_museum,overture,-22.967981338500977,-43.22710037231445,,,,,,no_match
+wikidata:Igreja de São José:-22.90450:-43.17410,Igreja de São José,heritage_site,wikidata,-22.9045,-43.1741,Q64578365,,,,,no_match
+overture:Estação Vlt - Parada dos Museus:-22.89281:-43.19192,Estação Vlt - Parada dos Museus,museum,overture,-22.892812728881836,-43.19192123413086,,,,,,no_match
+overture:Centro Cultural Municipal Parque das Ruínas:-22.91747:-43.18248,Centro Cultural Municipal Parque das Ruínas,cultural_center,overture,-22.917470932006836,-43.18247985839844,,,,,,no_match
+overture:A Casa dos Budas Ditosos:-22.90265:-43.28197,A Casa dos Budas Ditosos,monument,overture,-22.902650833129883,-43.2819709777832,,,,,,no_match
+overture:Sitio Histórico Monte Zumba:-22.98735:-43.27915,Sitio Histórico Monte Zumba,museum,overture,-22.98735237121582,-43.27914810180664,,,,,,no_match
+overture:Lona Cultural de Jacarepaguá:-22.92414:-43.35836,Lona Cultural de Jacarepaguá,topic_concert_venue,overture,-22.92413902282715,-43.35835647583008,,,,,,no_match
+wikidata:Pinturas de Leandro Joaquim:-22.91746:-43.18409,Pinturas de Leandro Joaquim,heritage_site,wikidata,-22.917465,-43.184089,Q111923608,,,,,no_match
+overture:Mam - Museu de Arte Moderna:-22.88981:-43.27639,Mam - Museu de Arte Moderna,modern_art_museum,overture,-22.88981056213379,-43.27638626098633,,,,,,no_match
+overture:Aldeia Maracanã:-22.91103:-43.22773,Aldeia Maracanã,art_museum,overture,-22.911029815673828,-43.22772979736328,,,,,,no_match
+overture:Casa Amarela centro cultural e atelier:-22.85329:-43.36957,Casa Amarela centro cultural e atelier,cultural_center,overture,-22.853288650512695,-43.369571685791016,,,,,,no_match
+overture:Centro Cultural do Ministerio da Saude:-22.90480:-43.16955,Centro Cultural do Ministerio da Saude,cultural_center,overture,-22.904802322387695,-43.169551849365234,,,,,,no_match
+overture:Museu Amsterdam Sauer:-22.98337:-43.21254,Museu Amsterdam Sauer,museum,overture,-22.98337173461914,-43.21253967285156,,,,,,no_match
+overture:Sambadromo:-22.97485:-43.18774,Sambadromo,topic_concert_venue,overture,-22.974849700927734,-43.18773651123047,,,,,,no_match
+overture:Centro Cultural Mordechai Anilevitch:-22.95189:-43.19150,Centro Cultural Mordechai Anilevitch,cultural_center,overture,-22.951889038085938,-43.191497802734375,,,,,,no_match
+overture:Lona Cultural Municipal Jacob do Bandolim:-22.92399:-43.35865,Lona Cultural Municipal Jacob do Bandolim,cultural_center,overture,-22.92399024963379,-43.358646392822266,,,,,,no_match
+overture:Onde Tudo Começou - OTC:-22.90582:-43.22657,Onde Tudo Começou - OTC,museum,overture,-22.905824661254883,-43.226566314697266,,,,,,no_match
+feiras_registry:Feira de Tijuca (Sexta-Feira):-22.92065:-43.22496,Feira de Tijuca (Sexta-Feira),recurring_cultural_event,feiras_registry,-22.9206461,-43.2249591,,,,,,no_match
+overture:Pedro II - Carvalho Ramos:-22.88773:-43.58929,Pedro II - Carvalho Ramos,cultural_center,overture,-22.88772964477539,-43.589290618896484,,,,,,no_match
+overture:AssociaÇÃO Dos Amigos Do Museu Aeroespacial:-22.90240:-43.17410,AssociaÇÃO Dos Amigos Do Museu Aeroespacial,museum,overture,-22.90239906311035,-43.174095153808594,,,,,,no_match
+"feiras_registry:Feira de Recreio Dos
+Bandeirantes (Sábado):-23.02329:-43.48553","Feira de Recreio Dos
+Bandeirantes (Sábado)",recurring_cultural_event,feiras_registry,-23.0232945,-43.4855252,,,,,,no_match
+overture:Associação Cultural Espaço Carioca:-22.87378:-43.31511,Associação Cultural Espaço Carioca,cultural_center,overture,-22.873783111572266,-43.31510543823242,,,,,,no_match
+overture:Museu da Marinha:-22.90052:-43.17472,Museu da Marinha,museum,overture,-22.900516510009766,-43.174720764160156,,,,,,no_match
+overture:Sala Museal Artes e Idéias:-22.90167:-43.18148,Sala Museal Artes e Idéias,museum,overture,-22.90167236328125,-43.18148422241211,,,,,,no_match
+overture:Espaço Cultural Rose Baiana - Palco Marina Garcia:-22.79026:-43.18498,Espaço Cultural Rose Baiana - Palco Marina Garcia,topic_concert_venue,overture,-22.790260314941406,-43.18498229980469,,,,,,no_match
+overture:CCBB Rio de Janeiro:-22.90094:-43.17645,CCBB Rio de Janeiro,cultural_center,overture,-22.900941848754883,-43.17645263671875,,,,,,no_match
+overture:Espaço Tom Jobim:-22.97078:-43.22482,Espaço Tom Jobim,cultural_center,overture,-22.970783233642578,-43.224822998046875,,,,,,no_match
+overture:Meninas com Ciência - Museu Nacional/UFRJ:-22.90507:-43.22277,Meninas com Ciência - Museu Nacional/UFRJ,museum,overture,-22.905073165893555,-43.22277069091797,,,,,,no_match
+overture:Museu da Imagem e do Som:-22.90578:-43.17094,Museu da Imagem e do Som,museum,overture,-22.905780792236328,-43.170936584472656,,,,,,no_match
+"overture:Celaron's Step, Lapa:-22.91182:-43.18465","Celaron's Step, Lapa",monument,overture,-22.911823272705078,-43.18465042114258,,,,,,no_match
+overture:Museu da Limpeza Urbana:-22.87881:-43.21182,Museu da Limpeza Urbana,museum,overture,-22.878807067871094,-43.21181869506836,,,,,,no_match
+overture:Estátua do Bellini:-22.91347:-43.22778,Estátua do Bellini,monument,overture,-22.91346549987793,-43.227783203125,,,,,,no_match
+overture:Museu da Imagem e do Som (MIS):-22.97860:-43.18895,Museu da Imagem e do Som (MIS),museum,overture,-22.978595733642578,-43.18894958496094,,,,,,no_match
+overture:Centro Cultural Santa Cruz Dr. Antônio Nicolau Jorge:-22.92345:-43.69308,Centro Cultural Santa Cruz Dr. Antônio Nicolau Jorge,cultural_center,overture,-22.923450469970703,-43.693077087402344,,,,,,no_match
+overture:Monumento à Paz Mundial:-22.91053:-43.16861,Monumento à Paz Mundial,monument,overture,-22.910526275634766,-43.16860580444336,,,,,,no_match
+overture:Centro Cultural Pedro II - Posse:-22.88286:-43.55149,Centro Cultural Pedro II - Posse,cultural_center,overture,-22.882858276367188,-43.55149459838867,,,,,,no_match
+overture:Museu de Folclore Edison Carneiro:-22.93129:-43.17467,Museu de Folclore Edison Carneiro,history_museum,overture,-22.931289672851562,-43.1746711730957,,,,,,no_match
+overture:Centro Cultural AfroRio:-22.87791:-43.32758,Centro Cultural AfroRio,cultural_center,overture,-22.877906799316406,-43.32757568359375,,,,,,no_match
+overture:Museu Histórico de Campos dos Goytacazes:-22.93385:-43.17990,Museu Histórico de Campos dos Goytacazes,museum,overture,-22.933853149414062,-43.179901123046875,,,,,,no_match
+overture:Centro Cultural Nossa Senhora das Mercês:-22.80789:-43.37109,Centro Cultural Nossa Senhora das Mercês,cultural_center,overture,-22.807893753051758,-43.371089935302734,,,,,,no_match
+overture:Centro Cultural e Universitário de Botafogo:-22.95571:-43.18745,Centro Cultural e Universitário de Botafogo,cultural_center,overture,-22.955713272094727,-43.18745040893555,,,,,,no_match
+overture:Palácio das Águias - Museu da República:-22.93322:-43.17540,Palácio das Águias - Museu da República,history_museum,overture,-22.93321990966797,-43.1754035949707,,,,,,no_match
+overture:Casa Cambaio:-22.89220:-43.58385,Casa Cambaio,museum,overture,-22.892200469970703,-43.5838508605957,,,,,,no_match
+overture:Centro Cultural Banco Do Brasil:-22.80200:-43.20460,Centro Cultural Banco Do Brasil,cultural_center,overture,-22.802000045776367,-43.2046012878418,,,,,,no_match
+overture:Centro Cultural Cecília Conde:-22.85952:-43.26014,Centro Cultural Cecília Conde,cultural_center,overture,-22.859516143798828,-43.26013946533203,,,,,,no_match
+overture:Casa Rosa da Gávea:-22.97883:-43.23455,Casa Rosa da Gávea,cultural_center,overture,-22.978830337524414,-43.23455047607422,,,,,,no_match
+overture:Museu e Centro Cultural da Casa da Moeda do Brasil:-22.90767:-43.18674,Museu e Centro Cultural da Casa da Moeda do Brasil,history_museum,overture,-22.90767478942871,-43.186737060546875,,,,,,no_match
+overture:Ecomuseu de Sepetiba:-22.97085:-43.70991,Ecomuseu de Sepetiba,museum,overture,-22.97085189819336,-43.70990753173828,,,,,,no_match
+overture:Centro Cultural Phabrika de Arthes:-22.82617:-43.35363,Centro Cultural Phabrika de Arthes,cultural_center,overture,-22.826168060302734,-43.353633880615234,,,,,,no_match
+overture:Pau-brasil:-22.96973:-43.22517,Pau-brasil,landmark_and_historical_building,overture,-22.9697265625,-43.22516632080078,,,,,,no_match
+overture:Areninha Cultural Renato Russo:-22.80505:-43.17955,Areninha Cultural Renato Russo,cultural_center,overture,-22.8050479888916,-43.1795539855957,,,,,,no_match
+overture:Centro cultural tia Eulália:-22.86504:-43.33367,Centro cultural tia Eulália,cultural_center,overture,-22.86504364013672,-43.33366775512695,,,,,,no_match
+overture:Museu Arqueológico e Histórico de Lima:-23.02842:-43.47789,Museu Arqueológico e Histórico de Lima,history_museum,overture,-23.028419494628906,-43.47789001464844,,,,,,no_match
+overture:Petit Trianon:-22.90942:-43.17274,Petit Trianon,art_museum,overture,-22.9094181060791,-43.17273712158203,,,,,,no_match
+overture:Museu Aeroterrestre:-22.85926:-43.38924,Museu Aeroterrestre,history_museum,overture,-22.859264373779297,-43.38923645019531,,,,,,no_match
+overture:Statue General Osorio:-22.90317:-43.17460,Statue General Osorio,monument,overture,-22.90317153930664,-43.174598693847656,,,,,,no_match
+overture:Ateliê Esmero Único:-22.76746:-43.11024,Ateliê Esmero Único,museum,overture,-22.76746368408203,-43.11024475097656,,,,,,no_match
+overture:Arena Cultural Dicró:-22.83920:-43.28770,Arena Cultural Dicró,cultural_center,overture,-22.839202880859375,-43.28770446777344,,,,,,no_match
+overture:Casa de Artes e Culturas Percília Teles da Silva:-22.89181:-43.34465,Casa de Artes e Culturas Percília Teles da Silva,cultural_center,overture,-22.891809463500977,-43.34464645385742,,,,,,no_match
+overture:Arco do Teles:-22.86372:-43.37260,Arco do Teles,landmark_and_historical_building,overture,-22.863719940185547,-43.37260055541992,,,,,,no_match
+overture:Mesa do Imperado:-22.96851:-43.25685,Mesa do Imperado,landmark_and_historical_building,overture,-22.968505859375,-43.25685119628906,,,,,,no_match
+overture:GRES Império Serrano:-22.89435:-43.19639,GRES Império Serrano,topic_concert_venue,overture,-22.894351959228516,-43.19639205932617,,,,,,no_match
+overture:Nave do Conhecimento Engenhão - 1ª Arena E-sports Pública do BR:-22.89480:-43.29410,Nave do Conhecimento Engenhão - 1ª Arena E-sports Pública do BR,museum,overture,-22.894798278808594,-43.29410171508789,,,,,,no_match
+overture:Centro Cultural Veneza:-22.95098:-43.17593,Centro Cultural Veneza,cultural_center,overture,-22.95098304748535,-43.175926208496094,,,,,,no_match
+overture:Jardim Botânico - Museu de Tom Jobim:-22.96455:-43.22531,Jardim Botânico - Museu de Tom Jobim,museum,overture,-22.964548110961914,-43.22530746459961,,,,,,no_match
+overture:Centro Cultural Lóttus:-22.90509:-43.29285,Centro Cultural Lóttus,cultural_center,overture,-22.905094146728516,-43.29285430908203,,,,,,no_match
+overture:Casa de Arte e Cultura Luiz Januário:-22.92275:-43.22023,Casa de Arte e Cultura Luiz Januário,cultural_center,overture,-22.92275047302246,-43.2202262878418,,,,,,no_match
+overture:Galeria Mestre Vitalino:-22.92574:-43.17659,Galeria Mestre Vitalino,art_museum,overture,-22.925739288330078,-43.17658996582031,,,,,,no_match
+overture:Museu Mac Ibirapuera- São Paulo:-22.92437:-43.25622,Museu Mac Ibirapuera- São Paulo,history_museum,overture,-22.924373626708984,-43.256221771240234,,,,,,no_match
+overture:Centro da Memória da Eletricidade no Brasil:-22.89855:-43.17907,Centro da Memória da Eletricidade no Brasil,history_museum,overture,-22.89855194091797,-43.179073333740234,,,,,,no_match
+overture:Diretoria do Patrimônio Histórico e Documentação da Marinha:-22.90392:-43.17326,Diretoria do Patrimônio Histórico e Documentação da Marinha,museum,overture,-22.90392303466797,-43.17326354980469,,,,,,no_match
+overture:MIS / Museu da Imagem e do Som:-22.91409:-43.17860,MIS / Museu da Imagem e do Som,museum,overture,-22.91408920288086,-43.17859649658203,,,,,,no_match
+overture:Centro Cultural Ilha do Governador:-22.80045:-43.19773,Centro Cultural Ilha do Governador,cultural_center,overture,-22.80044937133789,-43.19773483276367,,,,,,no_match
+overture:Estátua Pixinguinha:-22.90367:-43.17757,Estátua Pixinguinha,monument,overture,-22.903671264648438,-43.17757034301758,,,,,,no_match
+overture:Teatro Clara Nunes:-22.96779:-43.23140,Teatro Clara Nunes,topic_concert_venue,overture,-22.967790603637695,-43.23140335083008,,,,,,no_match
+overture:Centro Coreográfico:-22.92718:-43.23924,Centro Coreográfico,topic_concert_venue,overture,-22.927183151245117,-43.23923873901367,,,,,,no_match
+overture:Centro Cultural Calça Larga:-22.92988:-43.22659,Centro Cultural Calça Larga,cultural_center,overture,-22.929880142211914,-43.226585388183594,,,,,,no_match
+overture:Museu do Cocuruto:-22.95574:-43.16704,Museu do Cocuruto,museum,overture,-22.955738067626953,-43.16703796386719,,,,,,no_match
+overture:Cine Lapa:-22.91375:-43.17929,Cine Lapa,topic_concert_venue,overture,-22.913753509521484,-43.179290771484375,,,,,,no_match
+overture:Centro Cultural do Poder Judiciário (CCPJ-Rio):-22.90466:-43.17294,Centro Cultural do Poder Judiciário (CCPJ-Rio),cultural_center,overture,-22.9046630859375,-43.172935485839844,,,,,,no_match
+overture:Mural de Eduardo Kobra em homenagem a Ayrton Senna:-22.91417:-43.17902,Mural de Eduardo Kobra em homenagem a Ayrton Senna,monument,overture,-22.914173126220703,-43.17902374267578,,,,,,no_match
+overture:Académicos do Dendê Raízes:-22.79741:-43.19304,Académicos do Dendê Raízes,cultural_center,overture,-22.79741096496582,-43.19303512573242,,,,,,no_match
+overture:Museu do Meio Ambiente:-22.97045:-43.22325,Museu do Meio Ambiente,museum,overture,-22.97044563293457,-43.22324752807617,,,,,,no_match
+overture:Teatro Silvio Monteiro:-22.97154:-43.36233,Teatro Silvio Monteiro,topic_concert_venue,overture,-22.971542358398438,-43.362327575683594,,,,,,no_match
+overture:Forte de Copacabana Rio de Janiero:-22.98367:-43.21163,Forte de Copacabana Rio de Janiero,history_museum,overture,-22.983673095703125,-43.211631774902344,,,,,,no_match
+overture:Ecomuseu Ilha Grande:-22.85938:-43.49663,Ecomuseu Ilha Grande,museum,overture,-22.8593807220459,-43.49663162231445,,,,,,no_match
+overture:Igreja Nossa Senhora do Rosário e São Benedito dos Homens Pretos - RJ:-22.89030:-43.23451,Igreja Nossa Senhora do Rosário e São Benedito dos Homens Pretos - RJ,history_museum,overture,-22.890295028686523,-43.23451232910156,,,,,,no_match
+overture:CRAB - Centro Sebrae de Referência do Artesanato Brasileiro:-22.90767:-43.18382,CRAB - Centro Sebrae de Referência do Artesanato Brasileiro,cultural_center,overture,-22.907665252685547,-43.18381881713867,,,,,,no_match
+overture:Ponto De Cultura Samba Teresa:-22.89420:-43.28885,Ponto De Cultura Samba Teresa,topic_concert_venue,overture,-22.894195556640625,-43.288848876953125,,,,,,no_match
+overture:Instituto de Pesquisas das Culturas Negras:-22.91202:-43.18729,Instituto de Pesquisas das Culturas Negras,cultural_center,overture,-22.912015914916992,-43.18729019165039,,,,,,no_match
+overture:Estátua de José Bonifácio:-22.90512:-43.18084,Estátua de José Bonifácio,monument,overture,-22.905115127563477,-43.18083572387695,,,,,,no_match
+overture:Instituto Brasileiro de Museus - Ibram:-22.91745:-43.18290,Instituto Brasileiro de Museus - Ibram,museum,overture,-22.917451858520508,-43.18289566040039,,,,,,no_match
+overture:Centro Cultural do Rio de Janeiro:-22.89856:-43.27171,Centro Cultural do Rio de Janeiro,cultural_center,overture,-22.898557662963867,-43.27170944213867,,,,,,no_match
+overture:Instituto Cervantes:-22.94601:-43.18466,Instituto Cervantes,cultural_center,overture,-22.946006774902344,-43.18465805053711,,,,,,no_match
+wikidata:Antigo Solar do Visconde do Rio Seco:-22.90747:-43.18379,Antigo Solar do Visconde do Rio Seco,heritage_site,wikidata,-22.907468,-43.183786,Q69362807,,,,,no_match
+overture:Casa de Cultura Elbe de Holanda:-22.81745:-43.19964,Casa de Cultura Elbe de Holanda,cultural_center,overture,-22.81744956970215,-43.199642181396484,,,,,,no_match
+overture:Centro Cultural Japão:-22.93235:-43.17491,Centro Cultural Japão,cultural_center,overture,-22.932350158691406,-43.17491149902344,,,,,,no_match
+overture:Centro Cultural do Poder Judiciário - CCPJ-RJ:-22.90499:-43.17378,Centro Cultural do Poder Judiciário - CCPJ-RJ,cultural_center,overture,-22.904985427856445,-43.17378234863281,,,,,,no_match
+overture:Museu Raymundo Ottoni Castro Maya:-22.91778:-43.18159,Museu Raymundo Ottoni Castro Maya,art_museum,overture,-22.917781829833984,-43.18159103393555,,,,,,no_match
+overture:Museu de Odontologia Professor Salles Cunha:-22.92292:-43.21181,Museu de Odontologia Professor Salles Cunha,museum,overture,-22.922924041748047,-43.211814880371094,,,,,,no_match
+"overture:Porto do Rio de Janeiro, Armazém 24.:-22.89166:-43.21445","Porto do Rio de Janeiro, Armazém 24.",topic_concert_venue,overture,-22.89166259765625,-43.21445083618164,,,,,,no_match
+overture:Centro Cultural Carioca:-22.90631:-43.18180,Centro Cultural Carioca,cultural_center,overture,-22.906307220458984,-43.18179702758789,,,,,,no_match
+overture:Museu da Escravidão e da Liberdade:-22.89622:-43.19428,Museu da Escravidão e da Liberdade,museum,overture,-22.896217346191406,-43.194278717041016,,,,,,no_match
+overture:Casa Histórica de Deodoro:-22.90556:-43.19090,Casa Histórica de Deodoro,history_museum,overture,-22.90555763244629,-43.190895080566406,,,,,,no_match
+overture:Museu do Esporte do Exercito:-22.94528:-43.16315,Museu do Esporte do Exercito,museum,overture,-22.945280075073242,-43.16314697265625,,,,,,no_match
+overture:Porto Maravilha:-22.89715:-43.20277,Porto Maravilha,landmark_and_historical_building,overture,-22.897151947021484,-43.2027702331543,,,,,,no_match
+overture:Estadio Jornalista Mario Filho - Estadio Do Maracana:-22.98280:-43.21789,Estadio Jornalista Mario Filho - Estadio Do Maracana,topic_concert_venue,overture,-22.982803344726562,-43.217891693115234,,,,,,no_match
+overture:Teatro Tom Jobim:-22.97094:-43.22482,Teatro Tom Jobim,topic_concert_venue,overture,-22.970943450927734,-43.224822998046875,,,,,,no_match
+overture:Espaço Cultural Trem do Corcovado:-22.93989:-43.20326,Espaço Cultural Trem do Corcovado,history_museum,overture,-22.939891815185547,-43.2032585144043,,,,,,no_match
+overture:Conjunto Cultural da Caixa:-22.90794:-43.17710,Conjunto Cultural da Caixa,cultural_center,overture,-22.907943725585938,-43.17710494995117,,,,,,no_match
+overture:Boulevard Olímpico - Porto Maravilha:-22.89284:-43.19196,Boulevard Olímpico - Porto Maravilha,topic_concert_venue,overture,-22.892841339111328,-43.19195556640625,,,,,,no_match
+overture:Museu de Sitio Arqueologico da Antiga Se:-22.90390:-43.17582,Museu de Sitio Arqueologico da Antiga Se,history_museum,overture,-22.903898239135742,-43.17581558227539,,Igreja de Nossa Senhora do Carmo da Antiga Sé,"A Igreja de Nossa Senhora do Carmo da Antiga Sé ou Antiga Sé, como é popularmente conhecida, é uma paróquia da Igreja Católica Romana, localizada à Rua Sete de Setembro, nº 14 com a Rua Primeiro de Março, no centro histórico do Rio de Janeiro. Foi a sede episcopal da Arquidiocese de São Sebastião do Rio de Janeiro até 1976, quando foi concluída a nova Catedral de São Sebastião do Rio de Janeiro, razão pela qual também é referida como Antiga Sé.
+A igreja localiza-se em frente à histórica Praça XV de Novembro, ao lado dos edifícios coloniais do antigo Convento do Carmo e da Igreja da Ordem Terceira do Carmo (que é mais propriamente a igreja cuja titular é Nossa Senhora do Monte do Carmo).",76,Rio de Janeiro,ok
+overture:Centro Cultural PGE-RJ:-22.90392:-43.17575,Centro Cultural PGE-RJ,cultural_center,overture,-22.903919219970703,-43.175750732421875,,,,,,no_match
+overture:Centro Loyola de Fé e Cultura:-22.98210:-43.24013,Centro Loyola de Fé e Cultura,cultural_center,overture,-22.982099533081055,-43.24013137817383,,,,,,no_match
+overture:MAM Rio:-22.91342:-43.17183,MAM Rio,museum,overture,-22.913419723510742,-43.17182922363281,,,,,,no_match
+overture:A Maison | Espaço Cultural da França:-22.91019:-43.17154,A Maison | Espaço Cultural da França,cultural_center,overture,-22.910192489624023,-43.17153549194336,,,,,,no_match
+"overture:Praça Oito de Maio, Monumento de Homenagem aos Pracinhas.:-22.85422:-43.35188","Praça Oito de Maio, Monumento de Homenagem aos Pracinhas.",monument,overture,-22.85422134399414,-43.35187530517578,,,,,,no_match
+overture:Cidade das artes:-22.99778:-43.36503,Cidade das artes,topic_concert_venue,overture,-22.99777603149414,-43.365028381347656,,,,,,no_match
+overture:Centro Cultural João XXIII:-22.94747:-43.18579,Centro Cultural João XXIII,cultural_center,overture,-22.947467803955078,-43.185791015625,,,,,,no_match
+overture:Caravana da Ciência:-22.91870:-43.17715,Caravana da Ciência,museum,overture,-22.918703079223633,-43.177146911621094,,,,,,no_match
+overture:Fonte Wallace:-22.96992:-43.22438,Fonte Wallace,landmark_and_historical_building,overture,-22.969919204711914,-43.22438049316406,,,,,,no_match
+overture:Mac - Niterói Contemporary Art Museum:-22.82836:-43.28694,Mac - Niterói Contemporary Art Museum,art_museum,overture,-22.8283634185791,-43.28694152832031,,,,,,no_match
+overture:Pomnik Fryderyka Chopina w Rio de Janeiro:-22.95511:-43.16510,Pomnik Fryderyka Chopina w Rio de Janeiro,monument,overture,-22.95511245727539,-43.16510009765625,,,,,,no_match
+overture:Centro Cultural Vera Cruz - Capoeira:-22.85038:-43.33092,Centro Cultural Vera Cruz - Capoeira,cultural_center,overture,-22.85038185119629,-43.3309211730957,,,,,,no_match
+overture:Museu de Artes Ivan Del Blanco:-22.97591:-43.18983,Museu de Artes Ivan Del Blanco,art_museum,overture,-22.975910186767578,-43.1898307800293,,,,,,no_match
+overture:Deck Aterro Flamengo:-22.93574:-43.17002,Deck Aterro Flamengo,landmark_and_historical_building,overture,-22.935739517211914,-43.17002487182617,,,,,,no_match
+overture:Museu da Chácara do Céu:-22.91736:-43.18418,Museu da Chácara do Céu,art_museum,overture,-22.9173641204834,-43.18417739868164,,,,,,no_match
+overture:Museu do Horto:-22.96727:-43.22858,Museu do Horto,history_museum,overture,-22.967267990112305,-43.22857666015625,,,,,,no_match
+overture:G.R.E.S. Império Serrano:-22.87420:-43.33647,G.R.E.S. Império Serrano,topic_concert_venue,overture,-22.874202728271484,-43.33647155761719,,,,,,no_match
+overture:Nova Cedae:-22.90639:-43.56119,Nova Cedae,monument,overture,-22.906391143798828,-43.56119155883789,,,,,,no_match
+overture:Navio Museu Bauru:-23.00312:-43.42890,Navio Museu Bauru,museum,overture,-23.003124237060547,-43.42890167236328,,,,,,no_match
+overture:Rio Museu Olímpico:-22.97544:-43.39299,Rio Museu Olímpico,museum,overture,-22.975435256958008,-43.39298629760742,,,,,,no_match
+overture:Museu Sacro Franciscano:-22.90683:-43.17915,Museu Sacro Franciscano,art_museum,overture,-22.906829833984375,-43.17914962768555,,,,,,no_match
+overture:Chafariz do Mestre Valentim:-22.90271:-43.17392,Chafariz do Mestre Valentim,landmark_and_historical_building,overture,-22.902713775634766,-43.17392349243164,,,,,,no_match
+"overture:Christ Redeemer, Rio de Janeiro, Brazil:-22.95165:-43.21084","Christ Redeemer, Rio de Janeiro, Brazil",monument,overture,-22.95165252685547,-43.210838317871094,,Christ the Redeemer (statue),"Christ the Redeemer (Portuguese: Cristo Redentor, standard Brazilian Portuguese: [ˈkɾistu ʁedẽˈtoʁ]) is an Art Deco statue of Jesus in Rio de Janeiro, Brazil, created by French-Polish sculptor Paul Landowski and built by Brazilian engineer Heitor da Silva Costa, in collaboration with French engineer Albert Caquot and Romanian sculptor Gheorghe Leonida who sculpted the face. Constructed between 1922 and 1931, the statue is 30 metres (98 ft) high, excluding its 8-metre (26 ft) pedestal, and faces east. The arms stretch 28 metres (92 ft) wide. It is made of reinforced concrete and soapstone. Christ the Redeemer differs considerably from its original design, as the initial plan was a large Christ with a globe in one hand and a cross in the other. Although the project organizers originally accepted the design, it later changed to the statue of today, with the arms spread out wide.
+The statue weighs 635 metric tons (625 long, 700 short tons), and is located at the peak of the 700-metre (2,300 ft) Corcovado mountain in the Tijuca National Park overlooking the city of Rio de Janeiro. This statue is the largest Art Deco–style sculpture in the world. A symbol of Christianity around the world, the statue has also become a cultural icon of both Rio de Janeiro and Brazil and was voted one of the New 7 Wonders of the World.",43,Rio de Janeiro,ok
+overture:Monumento Tom Jobim:-22.96752:-43.22404,Monumento Tom Jobim,monument,overture,-22.967519760131836,-43.22404098510742,,,,,,no_match
+overture:Espaço Cultural Libanês:-22.95152:-43.18903,Espaço Cultural Libanês,history_museum,overture,-22.951520919799805,-43.18903350830078,,,,,,no_match
+overture:Museo de Bellas Artes de Rio de Janeiro:-22.98778:-43.19389,Museo de Bellas Artes de Rio de Janeiro,museum,overture,-22.987783432006836,-43.19388961791992,,,,,,no_match
+overture:Incaer - Instituto Histórico-Cultural da Aeronáutica:-22.90546:-43.16860,Incaer - Instituto Histórico-Cultural da Aeronáutica,museum,overture,-22.905460357666016,-43.16859817504883,,,,,,no_match
+overture:Citibank Hall:-22.98313:-43.36281,Citibank Hall,topic_concert_venue,overture,-22.983131408691406,-43.36281204223633,,,,,,no_match
+overture:Centro Cultural China Brasil Yuan Aiping:-23.00439:-43.31968,Centro Cultural China Brasil Yuan Aiping,cultural_center,overture,-23.004392623901367,-43.319679260253906,,,,,,no_match
+overture:Museu do Corpo de Fuzileiros Navais:-22.89268:-43.60121,Museu do Corpo de Fuzileiros Navais,history_museum,overture,-22.892683029174805,-43.6012077331543,,,,,,no_match
+overture:Municipal Cultural Center Dyla Sylvia de Sa:-22.89711:-43.35424,Municipal Cultural Center Dyla Sylvia de Sa,cultural_center,overture,-22.89710807800293,-43.3542366027832,,,,,,no_match
+overture:Morro do Sampaio:-22.90478:-43.26143,Morro do Sampaio,monument,overture,-22.904783248901367,-43.26142501831055,,,,,,no_match
+overture:Monumento Carlos Drummond de Andrade:-22.96881:-43.18029,Monumento Carlos Drummond de Andrade,monument,overture,-22.968812942504883,-43.1802864074707,,,,,,no_match
+overture:Museu CBF Experience:-22.99600:-43.36407,Museu CBF Experience,museum,overture,-22.996002197265625,-43.36406707763672,,,,,,no_match
+overture:Centro de Cultura Social - RJ:-22.91463:-43.25048,Centro de Cultura Social - RJ,cultural_center,overture,-22.914630889892578,-43.2504768371582,,,,,,no_match
+overture:Cantina do Mam:-22.91401:-43.17272,Cantina do Mam,art_museum,overture,-22.914005279541016,-43.17272186279297,,,,,,no_match
+overture:Jardim de Alah:-22.98355:-43.21624,Jardim de Alah,landmark_and_historical_building,overture,-22.98354721069336,-43.21623611450195,,,,,,no_match
+overture:Instituto Cultural Cravo Albin:-22.94869:-43.16356,Instituto Cultural Cravo Albin,cultural_center,overture,-22.948686599731445,-43.16355514526367,,,,,,no_match
+overture:Casa de Cultura Ife Ominira:-22.86266:-43.36122,Casa de Cultura Ife Ominira,art_museum,overture,-22.862659454345703,-43.36122131347656,,,,,,no_match
+overture:Museu Matheus Martani:-22.94015:-43.17823,Museu Matheus Martani,museum,overture,-22.94014549255371,-43.17823028564453,,,,,,no_match
+overture:Centro Cultural Lado B:-22.90257:-43.17544,Centro Cultural Lado B,cultural_center,overture,-22.902565002441406,-43.17544174194336,,,,,,no_match
+overture:Sala Histórica do HCA:-22.91820:-43.21218,Sala Histórica do HCA,history_museum,overture,-22.918197631835938,-43.212181091308594,,,,,,no_match
+overture:Praça da Maria Quitéria:-22.85081:-43.47036,Praça da Maria Quitéria,monument,overture,-22.850812911987305,-43.47036361694336,,,,,,no_match
+overture:Jazzmania:-22.98698:-43.19724,Jazzmania,topic_concert_venue,overture,-22.986982345581055,-43.19723892211914,,,,,,no_match
+overture:Complexo de Bondes de Santa Teresa:-22.92012:-43.18587,Complexo de Bondes de Santa Teresa,history_museum,overture,-22.920120239257812,-43.18587112426758,,,,,,no_match
+overture:Quilombo de Irajá:-22.84754:-43.32512,Quilombo de Irajá,topic_concert_venue,overture,-22.84754180908203,-43.32511901855469,,,,,,no_match
+overture:Frida Kahlo Imersiva:-22.98579:-43.18633,Frida Kahlo Imersiva,museum,overture,-22.98578643798828,-43.18632507324219,,,,,,no_match
+overture:Centro Cultural Tambor de Cumba:-22.90363:-43.17763,Centro Cultural Tambor de Cumba,cultural_center,overture,-22.90363311767578,-43.17763137817383,,,,,,no_match
+overture:Palmeira Imperial:-22.96955:-43.22469,Palmeira Imperial,landmark_and_historical_building,overture,-22.96954917907715,-43.22468566894531,,,,,,no_match
+overture:Centro de Artes Calouste Gulbenkian:-22.90807:-43.19578,Centro de Artes Calouste Gulbenkian,cultural_center,overture,-22.908071517944336,-43.19578170776367,,,,,,no_match
+overture:Recanto do Museu:-22.98560:-43.18666,Recanto do Museu,museum,overture,-22.985599517822266,-43.1866569519043,,,,,,no_match
+overture:Castelo Fiocruz Rj Brasil:-22.91194:-43.18394,Castelo Fiocruz Rj Brasil,cultural_center,overture,-22.91193962097168,-43.183937072753906,,,,,,no_match
+overture:Centro Cultural Oca dos Curumins:-22.86018:-43.26770,Centro Cultural Oca dos Curumins,cultural_center,overture,-22.86018180847168,-43.267696380615234,,,,,,no_match
+overture:Madureira Pertinho do Divino:-22.86313:-43.33255,Madureira Pertinho do Divino,monument,overture,-22.863128662109375,-43.33255386352539,,,,,,no_match
+wikidata:Acervo do Museu de Imagens do Inconsciente:-22.90091:-43.30067,Acervo do Museu de Imagens do Inconsciente,heritage_site,wikidata,-22.900912,-43.30067,Q111920771,,,,,no_match
+feiras_registry:Feira de Cidade De Deus (Quarta-Feira):-22.94809:-43.35928,Feira de Cidade De Deus (Quarta-Feira),recurring_cultural_event,feiras_registry,-22.9480908,-43.3592755,,,,,,no_match
+overture:Lona Cultural Sandra de Sá:-22.90210:-43.70736,Lona Cultural Sandra de Sá,topic_concert_venue,overture,-22.902097702026367,-43.707359313964844,,,,,,no_match
+overture:Casa de Oswaldo Cruz - COC | Fiocruz:-22.84209:-43.25230,Casa de Oswaldo Cruz - COC | Fiocruz,museum,overture,-22.842090606689453,-43.252296447753906,,,,,,no_match
+overture:Concentração do Sambódromo:-22.90466:-43.19086,Concentração do Sambódromo,topic_concert_venue,overture,-22.9046573638916,-43.190860748291016,,,,,,no_match
+overture:Casa Suíça de Nova Friburgo:-22.89281:-43.53647,Casa Suíça de Nova Friburgo,history_museum,overture,-22.892805099487305,-43.536468505859375,,,,,,no_match
+overture:Turbulências:-22.89689:-43.18195,Turbulências,museum,overture,-22.89689064025879,-43.18194580078125,,,,,,no_match
+overture:Instituto Cultural Brasil Japão:-22.90967:-43.17149,Instituto Cultural Brasil Japão,cultural_center,overture,-22.909669876098633,-43.17148971557617,,,,,,no_match
+overture:Museu de História dos Bombeiros:-22.90880:-43.18766,Museu de História dos Bombeiros,history_museum,overture,-22.908803939819336,-43.18765640258789,,,,,,no_match
+overture:Museu da Justiça:-22.90498:-43.17282,Museu da Justiça,museum,overture,-22.904979705810547,-43.17282485961914,,,,,,no_match
+overture:Teatro Ii do Ccbb:-22.90110:-43.17648,Teatro Ii do Ccbb,topic_concert_venue,overture,-22.901100158691406,-43.176483154296875,,,,,,no_match
+overture:Escada de Acesso ao Morro da Conceicao:-22.89747:-43.18117,Escada de Acesso ao Morro da Conceicao,landmark_and_historical_building,overture,-22.897470474243164,-43.18117141723633,,,,,,no_match
+overture:Museu Histórico da Cidade do Rio de Janeiro - Gávea:-22.97869:-43.24475,Museu Histórico da Cidade do Rio de Janeiro - Gávea,history_museum,overture,-22.97868537902832,-43.244747161865234,,,,,,no_match
+overture:Centro de Cultura Italiana:-22.91730:-43.23524,Centro de Cultura Italiana,cultural_center,overture,-22.91730499267578,-43.23524475097656,,,,,,no_match
+overture:Centro Cultural Pedro II:-22.92007:-43.67872,Centro Cultural Pedro II,cultural_center,overture,-22.920072555541992,-43.67871856689453,,,,,,no_match
+overture:Associação dos Amigos da Lona Cultural Hermeto Pascoal:-22.87739:-43.47266,Associação dos Amigos da Lona Cultural Hermeto Pascoal,cultural_center,overture,-22.877389907836914,-43.47265625,,,,,,no_match
+overture:Museu de Geologia da Urca:-22.95432:-43.16732,Museu de Geologia da Urca,museum,overture,-22.954320907592773,-43.167320251464844,,,,,,no_match
+overture:National Museum of Brazil:-22.90577:-43.22653,National Museum of Brazil,museum,overture,-22.905765533447266,-43.22652816772461,,National Museum of Brazil,"The National Museum of Brazil (Portuguese: Museu Nacional) is the oldest scientific institution of Brazil. It is located in the city of Rio de Janeiro, where it is installed in the Paço de São Cristóvão (Saint Christopher's Palace), which is inside the Quinta da Boa Vista. The main building was originally the residence of the House of Braganza in colonial Brazil, as the Portuguese royal family between 1808 and 1821 and then as the Brazilian imperial family between 1822 and 1889. After the monarchy was deposed, it hosted the Republican Constituent Assembly from 1889 to 1891 before being assigned to the use of the museum in 1892. The building was listed as Brazilian National Heritage in 1938 and was largely destroyed by a fire in 2018.
+Founded by King João VI of Portugal, Brazil and the Algarves on 6 June 1818, under the name of ""Royal Museum"", the institution was initially housed at the Campo de Santana park, where it exhibited the collections incorporated from the former House of Natural History, popularly known as Casa dos Pássaros (""House of the Birds""), created in 1784 by the Viceroy of Brazil, Luís de Vasconcelos e Sousa, 4th Count of Figueiró, as well as collections of mineralogy and zoology. The museum foundation was intended to address the interests of promoting the socioeconomic development of the country by the diffusion of education, culture, and science. In the 19th century, the institution was already established as the most important South American museum of its type. In 1946, it was incorporated into the Federal University of Rio de Janeiro.
+The National Museum held a vast collection with more than 20 million objects, one of the largest collections of natural history and anthropological artifacts in the world, encompassing some of the most important material records regarding natural science and anthropology in Brazil, as well as numerous items that came from other regions of the world and were produced by several cultures and ancient civilizations. Built-up over more than two centuries through expeditions, excavations, acquisitions, donations and exchanges, the collection was subdivided into seven main nuclei: geology, paleontology, botany, zoology, biological anthropology, archaeology, and ethnology. The collection was the principal basis for the research conducted by the academic departments of the museum – which are responsible for carrying out activities in all the regions of the Brazilian territory and several places of the world, including the Antarctic continent. The museum holds one of the largest scientific libraries of Brazil, with over 470,000 volumes and 2,400 rare works.
+In the area of education, the museum offers specializations, extension and post-graduation courses in several fields of the knowledge, in addition to hosting temporary and permanent exhibitions and educational activities open to the general public. The museum manages the Horto Botânico (Botanical Garden), adjacent to the Paço de São Cristóvão, as well as an advanced campus in the city of Santa Teresa, in Espírito Santo – the Santa Lúcia Biological Station, jointly managed with the Museum of Biology Prof. Mello Leitão. A third site, located in the city of Saquarema, is used as a support and logistics center for field activities. Finally, the museum is also dedicated to editorial production, outstanding in that field the Archivos do Museu Nacional, the oldest scientific journal of Brazil, continuously published since 1876.
+The palace, which housed a large part of the collection, was destroyed in a fire on the night of 2 September 2018. The building had been called a ""firetrap"" by critics, who argued the fire was predictable and could have been prevented. The fire began in the air-conditioning system of the auditorium on the ground floor. One of the three devices did not have external grounding, there was no individual circuit breaker for each of them, and a wire was without insulation in contact with metal. In the wake of the fire, the ruined edifice was being treated as an archaeological site and undergoing reconstruction efforts, with a metallic roof covering a 5,000 m2 area including debris.
+In 2019, more than 30,000 pieces of the imperial family's past were found during archaeological works on Rio de Janeiro Zoological Garden nearby, part of Quinta da Boa Vista. Among the finds are many items such as fragments of crockery, cups, plates, cutlery, horseshoes and even buttons and brooches with imperial coat of arms from military clothing. Those items were given to the museum. After being destroyed by fire, the National Museum has received donations to the amount of R$ 1.1 million in seven months towards rebuilding efforts.",43,Rio de Janeiro,ok
+overture:Monumento do Soldado Desconhecido:-22.91058:-43.17110,Monumento do Soldado Desconhecido,monument,overture,-22.91057586669922,-43.17109680175781,,,,,,no_match
+overture:Centro Cultural Pedro Storani:-22.87936:-43.40737,Centro Cultural Pedro Storani,cultural_center,overture,-22.879356384277344,-43.40736770629883,,,,,,no_match
+overture:Centro Cultural Pedro I:-22.88216:-43.58867,Centro Cultural Pedro I,cultural_center,overture,-22.88216209411621,-43.58867263793945,,,,,,no_match
+overture:Museu do amanhã:-22.96655:-43.18284,Museu do amanhã,museum,overture,-22.966554641723633,-43.18284225463867,,,,,,no_match
+overture:Armazem da Utopia:-22.89419:-43.19883,Armazem da Utopia,landmark_and_historical_building,overture,-22.894193649291992,-43.19882583618164,,,,,,no_match
+overture:Museu Aeroespacial:-22.88069:-43.38501,Museu Aeroespacial,museum,overture,-22.880685806274414,-43.385009765625,,,,,,no_match
+overture:Casa De Cultura:-22.88469:-43.30369,Casa De Cultura,cultural_center,overture,-22.88469123840332,-43.303688049316406,,,,,,no_match
+overture:Fort Copacabana:-22.98618:-43.18653,Fort Copacabana,landmark_and_historical_building,overture,-22.986177444458008,-43.1865348815918,,Forte de Copacabana,"O Forte de Copacabana localiza-se na ponta de Copacabana, ao final da praia e bairro de mesmo nome, na cidade do Rio de Janeiro, no Brasil.
+Oficialmente denominado como Museu Histórico do Exército / Forte de Copacabana (MHEx/FC), computa atualmente um fluxo de cerca de dez mil visitantes por mês, constituindo-se em um dos mais belos cartões-postais da cidade. O turista pode escolher entre a visita restrita (apenas às áreas externas) e a completa (incluindo o interior do forte e o Museu histórico-militar).",134,Rio de Janeiro,ok
+overture:Teatro Dirceu De Mattos:-22.93355:-43.20044,Teatro Dirceu De Mattos,topic_concert_venue,overture,-22.933551788330078,-43.200443267822266,,,,,,no_match
+overture:Casa Quissama Museum:-22.87053:-43.45274,Casa Quissama Museum,museum,overture,-22.870529174804688,-43.452735900878906,,,,,,no_match
+overture:Centro Cultural Banco Do Brasil:-22.98717:-43.19620,Centro Cultural Banco Do Brasil,cultural_center,overture,-22.98717498779297,-43.19620132446289,,,,,,no_match
+overture:Forte Do Leme:-22.88125:-43.35560,Forte Do Leme,landmark_and_historical_building,overture,-22.88124656677246,-43.35559844970703,,,,,,no_match
+overture:E-Museu Inclusivo Tocando em Você:-22.92678:-43.23027,E-Museu Inclusivo Tocando em Você,modern_art_museum,overture,-22.926780700683594,-43.23027038574219,,,,,,no_match
+overture:Espaco Cafe Cultural / CDPD-RJ Theater:-22.95223:-43.19585,Espaco Cafe Cultural / CDPD-RJ Theater,topic_concert_venue,overture,-22.95223045349121,-43.19585037231445,,,,,,no_match
+overture:Época De Glória Feira De Antiguidades e Artes:-22.92008:-43.17052,Época De Glória Feira De Antiguidades e Artes,topic_concert_venue,overture,-22.920080184936523,-43.17052459716797,,,,,,no_match
+overture:Centro De Arte E Cultura:-22.85715:-43.32933,Centro De Arte E Cultura,cultural_center,overture,-22.857152938842773,-43.32932662963867,,,,,,no_match
+overture:Museu de Favela MUF:-22.98194:-43.19754,Museu de Favela MUF,museum,overture,-22.981935501098633,-43.197540283203125,,,,,,no_match
+overture:Museu do Futebol:-22.91015:-43.23030,Museu do Futebol,museum,overture,-22.91014862060547,-43.23030471801758,,,,,,no_match
+wikidata:Igreja de Nossa Senhora do Desterro:-23.00595:-43.63431,Igreja de Nossa Senhora do Desterro,heritage_site,wikidata,-23.005952,-43.634309,Q104904969,,,,,no_match
+overture:Jardim Histórico do Museu da República:-22.87331:-43.31144,Jardim Histórico do Museu da República,history_museum,overture,-22.873306274414062,-43.31143569946289,,,,,,no_match
+overture:General José de San Martín:-22.97543:-43.19789,General José de San Martín,landmark_and_historical_building,overture,-22.97542953491211,-43.19789123535156,,,,,,no_match
+overture:Centro Cultural Acao da Cidadania:-22.89664:-43.18660,Centro Cultural Acao da Cidadania,cultural_center,overture,-22.896638870239258,-43.18660354614258,,,,,,no_match
+overture:Sala Marília Pêra:-22.98092:-43.22281,Sala Marília Pêra,topic_concert_venue,overture,-22.980924606323242,-43.222808837890625,,,,,,no_match
+overture:Museu de pedras preciosas:-22.98370:-43.20927,Museu de pedras preciosas,museum,overture,-22.98370361328125,-43.20927429199219,,,,,,no_match
+overture:Vivo Rio:-22.92123:-43.55054,Vivo Rio,topic_concert_venue,overture,-22.92123031616211,-43.55054473876953,,,,,,no_match
+overture:Centro de Letras e Artes:-22.95481:-43.17012,Centro de Letras e Artes,cultural_center,overture,-22.954805374145508,-43.17012023925781,,,,,,no_match
+overture:Museu do Pontal:-22.99417:-43.39838,Museu do Pontal,art_museum,overture,-22.994173049926758,-43.39838409423828,,,,,,no_match
+overture:Casa de Cultura - Volta do Mundo e Conexões do Beco da Cultura:-22.90137:-43.17522,Casa de Cultura - Volta do Mundo e Conexões do Beco da Cultura,cultural_center,overture,-22.9013729095459,-43.17522048950195,,,,,,no_match
+overture:Praça dos Expedicionários:-22.90522:-43.17142,Praça dos Expedicionários,landmark_and_historical_building,overture,-22.905221939086914,-43.171424865722656,,,,,,no_match
+overture:Gabinete Real:-22.90527:-43.17251,Gabinete Real,landmark_and_historical_building,overture,-22.9052734375,-43.17251205444336,,,,,,no_match
+overture:Museu da Pediatria:-22.94082:-43.19725,Museu da Pediatria,museum,overture,-22.94082260131836,-43.19725036621094,,,,,,no_match
+overture:Centro Cultural Waly Salomão:-22.80681:-43.30365,Centro Cultural Waly Salomão,cultural_center,overture,-22.806812286376953,-43.303646087646484,,,,,,no_match
+overture:Capela Magdalena e Roberto de Regina:-22.97850:-43.58982,Capela Magdalena e Roberto de Regina,museum,overture,-22.978500366210938,-43.58981704711914,,,,,,no_match
+overture:Monumento Natural Estadual Peter Lund:-22.84340:-43.31567,Monumento Natural Estadual Peter Lund,museum,overture,-22.843402862548828,-43.31566619873047,,,,,,no_match
+overture:Centro Cultural Infinito:-22.93351:-43.20042,Centro Cultural Infinito,cultural_center,overture,-22.933513641357422,-43.20042037963867,,,,,,no_match
+overture:Fábrica Bhering:-22.90106:-43.20338,Fábrica Bhering,landmark_and_historical_building,overture,-22.90106201171875,-43.2033805847168,,,,,,no_match
+overture:Museu Arquidiocesano de Arte Sacra do Rio de Janeiro (MAAS):-22.91014:-43.18058,Museu Arquidiocesano de Arte Sacra do Rio de Janeiro (MAAS),art_museum,overture,-22.910140991210938,-43.180580139160156,,,,,,no_match
+overture:MUHCAB Museu da História e da Cultura Afro-Brasileira:-22.89623:-43.19428,MUHCAB Museu da História e da Cultura Afro-Brasileira,history_museum,overture,-22.89622688293457,-43.19428253173828,,,,,,no_match
+overture:Centro Cultural Atriz Chica Xa:-22.84918:-43.26642,Centro Cultural Atriz Chica Xa,cultural_center,overture,-22.84918212890625,-43.266422271728516,,,,,,no_match
+overture:Escola de Samba Mocidade:-22.86116:-43.44831,Escola de Samba Mocidade,topic_concert_venue,overture,-22.861164093017578,-43.448307037353516,,,,,,no_match
+overture:Ibrahim Sued Statue:-22.96881:-43.18029,Ibrahim Sued Statue,landmark_and_historical_building,overture,-22.968812942504883,-43.1802864074707,,,,,,no_match
+overture:Monumento Estácio de Sá:-22.94039:-43.17006,Monumento Estácio de Sá,monument,overture,-22.940385818481445,-43.17005920410156,,,,,,no_match
+overture:Casa de Cultura:-22.87691:-43.27013,Casa de Cultura,cultural_center,overture,-22.87691307067871,-43.2701301574707,,,,,,no_match
+overture:E & B Festas E Eventos:-22.87939:-43.29750,E & B Festas E Eventos,monument,overture,-22.879390716552734,-43.29750061035156,,,,,,no_match
+wikidata:Conjunto Arquitetônico da Avenida Central:-22.90983:-43.17589,Conjunto Arquitetônico da Avenida Central,heritage_site,wikidata,-22.909834,-43.175895,Q56641304,,,,,no_match
+overture:Casa de Cultura de Jacarepaguá:-22.92227:-43.37772,Casa de Cultura de Jacarepaguá,cultural_center,overture,-22.922273635864258,-43.377716064453125,,,,,,no_match
+overture:Lona Cultural Gilberto Gil:-22.87811:-43.41576,Lona Cultural Gilberto Gil,cultural_center,overture,-22.87810707092285,-43.4157600402832,,,,,,no_match
+overture:Ilê Orixá Odé Messan Orun:-22.84988:-43.52749,Ilê Orixá Odé Messan Orun,topic_concert_venue,overture,-22.849884033203125,-43.52749252319336,,,,,,no_match
+overture:Centro do Samba:-22.90530:-43.18119,Centro do Samba,cultural_center,overture,-22.90530014038086,-43.18118667602539,,,,,,no_match
+overture:Museu do Corpo de Bombeiros:-22.90927:-43.18697,Museu do Corpo de Bombeiros,history_museum,overture,-22.909271240234375,-43.18696975708008,,,,,,no_match
+overture:Cinemateca do MAM:-22.91382:-43.17284,Cinemateca do MAM,art_museum,overture,-22.913820266723633,-43.17283630371094,,,,,,no_match
+overture:Museo Naval Rio do Janeiro:-22.90612:-43.17680,Museo Naval Rio do Janeiro,museum,overture,-22.90612030029297,-43.17680358886719,,,,,,no_match
+overture:Museu da Pelada:-22.99871:-43.27261,Museu da Pelada,museum,overture,-22.998708724975586,-43.272605895996094,,,,,,no_match
+overture:Academicos do Engenho da Rainha:-22.87096:-43.29536,Academicos do Engenho da Rainha,topic_concert_venue,overture,-22.87095832824707,-43.29536437988281,,,,,,no_match
+overture:Petropolis - Cidade Imperial:-22.85264:-43.35839,Petropolis - Cidade Imperial,monument,overture,-22.85264015197754,-43.35839080810547,,,,,,no_match
+overture:Estátua de Noel Rosa:-22.91355:-43.23522,Estátua de Noel Rosa,monument,overture,-22.91355323791504,-43.23522186279297,,,,,,no_match
+overture:Museu Marechal Zenóbio da Costa:-22.92429:-43.23785,Museu Marechal Zenóbio da Costa,museum,overture,-22.924285888671875,-43.23784637451172,,,,,,no_match
+overture:Centro Cultural Zona Oeste:-22.88012:-43.45375,Centro Cultural Zona Oeste,cultural_center,overture,-22.880123138427734,-43.45375442504883,,,,,,no_match
+overture:Museu da Geodiversidade Ufrj:-22.82855:-43.31737,Museu da Geodiversidade Ufrj,museum,overture,-22.828550338745117,-43.3173713684082,,,,,,no_match
+overture:Museum of Humanity:-22.81946:-43.39518,Museum of Humanity,museum,overture,-22.819459915161133,-43.39517593383789,,,,,,no_match
+overture:Quadra do Salgueiro:-22.92143:-43.24425,Quadra do Salgueiro,topic_concert_venue,overture,-22.921428680419922,-43.2442512512207,,,,,,no_match
+overture:UTR-Rio Arroio fundo:-22.95529:-43.35808,UTR-Rio Arroio fundo,monument,overture,-22.955286026000977,-43.35807800292969,,,,,,no_match
+overture:Arquivo Geral da Cidade RJ:-22.90924:-43.20471,Arquivo Geral da Cidade RJ,museum,overture,-22.909242630004883,-43.2047119140625,,,,,,no_match
+overture:Museu do paço:-22.90289:-43.17331,Museu do paço,art_museum,overture,-22.902894973754883,-43.173309326171875,,Paço Imperial,"O Paço Imperial é um edifício histórico localizado na atual Praça XV de Novembro, no centro da cidade do Rio de Janeiro, Brasil.
+Construído no século XVIII para residência dos governadores da Capitania do Rio de Janeiro, passou a ser a casa de despachos, sucessivamente, do Vice-Rei do Brasil, do Rei de Portugal Dom João VI e dos Imperadores do Brasil, sofrendo ampliações no século XIX. Atualmente é um centro cultural. Pela sua importância histórica e estética, o Paço Imperial é considerado o mais importante dos edifícios civis coloniais do Brasil.",117,Rio de Janeiro,ok
+overture:Museu Do Graffiti:-22.81739:-43.35756,Museu Do Graffiti,art_museum,overture,-22.8173885345459,-43.35755920410156,,,,,,no_match
+overture:Quilombo das Neves-Centro de Preservaca o Cultural da Arte Capoeira-CPCAC:-22.91550:-43.19091,Quilombo das Neves-Centro de Preservaca o Cultural da Arte Capoeira-CPCAC,museum,overture,-22.91550064086914,-43.190914154052734,,,,,,no_match
+overture:Império Serrano:-22.87398:-43.33683,Império Serrano,topic_concert_venue,overture,-22.873981475830078,-43.33682632446289,,,,,,no_match
+overture:Centro Cultural Diversa:-22.90665:-43.18092,Centro Cultural Diversa,cultural_center,overture,-22.906648635864258,-43.1809196472168,,,,,,no_match
+overture:Museu da Imagem e do Som (MIS):-22.91399:-43.17856,Museu da Imagem e do Som (MIS),museum,overture,-22.91398811340332,-43.178558349609375,,,,,,no_match
+overture:Teatro dos Grandes Atores - Barra da Tijuca:-22.93578:-43.33853,Teatro dos Grandes Atores - Barra da Tijuca,topic_concert_venue,overture,-22.93578338623047,-43.338531494140625,,,,,,no_match
+overture:Centro de Artes da Maré:-22.85353:-43.24661,Centro de Artes da Maré,cultural_center,overture,-22.85352897644043,-43.24660873413086,,,,,,no_match
+wikidata:Palácio Universitário UFRJ:-22.95233:-43.17450,Palácio Universitário UFRJ,heritage_site,wikidata,-22.952333,-43.174504,Q56641177,,,,,no_match
+overture:Solarpucrio:-22.97897:-43.23339,Solarpucrio,museum,overture,-22.978971481323242,-43.2333869934082,,,,,,no_match
+overture:Casa de Tras Os Montes e Alto Douro:-22.92119:-43.22094,Casa de Tras Os Montes e Alto Douro,topic_concert_venue,overture,-22.921192169189453,-43.22093963623047,,,,,,no_match
+overture:Marechal Rondon:-22.85867:-43.38824,Marechal Rondon,history_museum,overture,-22.858673095703125,-43.38823699951172,,,,,,no_match
+overture:Associação Afrocultural Yorubá:-22.88366:-43.29517,Associação Afrocultural Yorubá,cultural_center,overture,-22.883657455444336,-43.29517364501953,,,,,,no_match
+overture:Darwin: Origens & Evolução:-22.97047:-43.22327,Darwin: Origens & Evolução,museum,overture,-22.970470428466797,-43.2232666015625,,,,,,no_match
+overture:Centro Cultural Dragão Do Mar:-22.94484:-43.34161,Centro Cultural Dragão Do Mar,cultural_center,overture,-22.944835662841797,-43.34160614013672,,,,,,no_match
+overture:Nau dos Descobrimentos:-22.90502:-43.16987,Nau dos Descobrimentos,landmark_and_historical_building,overture,-22.905017852783203,-43.16987228393555,,,,,,no_match
+overture:Escola de Samba Grande Rio:-22.89562:-43.20238,Escola de Samba Grande Rio,topic_concert_venue,overture,-22.89562225341797,-43.20238494873047,,,,,,no_match
+overture:Teatro Glaucio Rocha:-22.90755:-43.28867,Teatro Glaucio Rocha,topic_concert_venue,overture,-22.907550811767578,-43.288665771484375,,,,,,no_match
+overture:Monumento a Zumbi dos Palmares:-22.90686:-43.19649,Monumento a Zumbi dos Palmares,monument,overture,-22.906862258911133,-43.19648742675781,,,,,,no_match
+overture:Museu da Feb - Petrópolis - RJ:-22.86812:-43.43610,Museu da Feb - Petrópolis - RJ,museum,overture,-22.86811637878418,-43.43610382080078,,,,,,no_match
+overture:Sesc Tijuca:-22.92432:-43.24149,Sesc Tijuca,cultural_center,overture,-22.924320220947266,-43.24148941040039,,,,,,no_match
+overture:Teatro Quality:-22.93818:-43.34793,Teatro Quality,topic_concert_venue,overture,-22.938182830810547,-43.34792709350586,,,,,,no_match
+overture:Sugar Loaf Mountain:-22.95452:-43.16741,Sugar Loaf Mountain,monument,overture,-22.954519271850586,-43.16741180419922,,,,,,no_match
+overture:Centro Cultural Yoruba:-22.89564:-43.34933,Centro Cultural Yoruba,cultural_center,overture,-22.89564323425293,-43.34933090209961,,,,,,no_match
+overture:Ensaio Técnico de Rua Unidos da Tijuca:-22.90422:-43.20693,Ensaio Técnico de Rua Unidos da Tijuca,art_museum,overture,-22.90422248840332,-43.20692825317383,,,,,,no_match
+overture:Sugarloaf Mountain:-22.94975:-43.15623,Sugarloaf Mountain,monument,overture,-22.949750900268555,-43.15623474121094,,Sugarloaf Mountain,"Sugarloaf Mountain (Portuguese: Pão de Açúcar, pronounced [ˈpɐ̃w d(ʒi) aˈsukaʁ]) is a peak situated in Rio de Janeiro, Brazil, on a peninsula at the mouth of Guanabara Bay. Rising 396 m (1,299 ft) above the harbor, the peak is named for its resemblance to the traditional shape of concentrated refined sugarloaf. It is known worldwide for its  cable car and panoramic views of the city and beyond.
+The mountain is one of several monolithic granite and quartz mountains that rise straight from the water's edge around Rio de Janeiro. Geologically, it is considered part of a family of steep-sided rock outcroppings known as bornhardts.
+The mountain is protected by the Sugarloaf Mountain and Urca Hill Natural Monument, created in 2006.
+This became part of a World Heritage Site declared by UNESCO in 2012.",62,Rio de Janeiro,ok
+overture:Painel Etnias:-22.89513:-43.18488,Painel Etnias,landmark_and_historical_building,overture,-22.895132064819336,-43.184879302978516,,,,,,no_match
+overture:Areninha Cultural Gilberto Gil:-22.87810:-43.41579,Areninha Cultural Gilberto Gil,cultural_center,overture,-22.878103256225586,-43.415794372558594,,,,,,no_match
+overture:Centro Cultural Vovo Carlotinha Ccvocar:-22.91660:-43.20779,Centro Cultural Vovo Carlotinha Ccvocar,cultural_center,overture,-22.916603088378906,-43.207786560058594,,,,,,no_match
+overture:Raro Palacete Art Déco:-22.94629:-43.18512,Raro Palacete Art Déco,landmark_and_historical_building,overture,-22.9462947845459,-43.185123443603516,,,,,,no_match
+overture:Espaco Cultural Municipal Sergio Porto:-22.95869:-43.19934,Espaco Cultural Municipal Sergio Porto,cultural_center,overture,-22.958688735961914,-43.199344635009766,,,,,,no_match
+overture:Praça Renato Russo:-22.80416:-43.20437,Praça Renato Russo,monument,overture,-22.80416488647461,-43.204368591308594,,,,,,no_match
+overture:G.R.E.S. Mocidade Independente de Padre Miguel:-22.97305:-43.38464,G.R.E.S. Mocidade Independente de Padre Miguel,topic_concert_venue,overture,-22.973054885864258,-43.3846435546875,,,,,,no_match
+overture:Monumento Das Tintas:-22.91210:-43.21339,Monumento Das Tintas,monument,overture,-22.9121036529541,-43.21338653564453,,,,,,no_match
+overture:Catete Palace:-22.92588:-43.17620,Catete Palace,landmark_and_historical_building,overture,-22.925878524780273,-43.17620086669922,,Catete Palace,"The Catete Palace (Portuguese: Palácio do Catete, IPA: [paˈlasju du kaˈtetʃi]) is an urban mansion in the Flamengo neighborhood of Rio de Janeiro, Brazil. The property stretches from Rua do Catete (Catete Street) to Praia do Flamengo (Flamengo Beach). Construction began in 1858 and ended in 1867. It was Brazil's presidential palace from 1897 to 1960, and the site of Getúlio Vargas' suicide. It now houses the Museu da República (Republic Museum) and a theatre. The Catete underground rail station is adjacent.",14,Rio de Janeiro,ok
+overture:Centro de Arte Maria Teresa Vieira:-22.90699:-43.18151,Centro de Arte Maria Teresa Vieira,cultural_center,overture,-22.906991958618164,-43.181514739990234,,,,,,no_match
+overture:Acervo Cultural e Histórico do GRES Estácio de Sá:-22.91275:-43.20187,Acervo Cultural e Histórico do GRES Estácio de Sá,cultural_center,overture,-22.912750244140625,-43.201873779296875,,,,,,no_match
+overture:Museu do Surf - By Rico:-22.89749:-43.19595,Museu do Surf - By Rico,museum,overture,-22.897493362426758,-43.195945739746094,,,,,,no_match
+overture:GRES Imperatriz Leopoldinense:-22.85614:-43.26279,GRES Imperatriz Leopoldinense,topic_concert_venue,overture,-22.856142044067383,-43.26279067993164,,,,,,no_match
+overture:Rio Illusions | Museu de Ilusões:-22.95458:-43.16734,Rio Illusions | Museu de Ilusões,museum,overture,-22.9545841217041,-43.167335510253906,,,,,,no_match
+overture:Centro Cultural Inclusartiz:-22.89592:-43.19201,Centro Cultural Inclusartiz,cultural_center,overture,-22.89592170715332,-43.1920051574707,,,,,,no_match
+overture:Asé Pingo D'água:-22.96599:-43.64803,Asé Pingo D'água,cultural_center,overture,-22.965988159179688,-43.64802932739258,,,,,,no_match
+overture:Centro Cultural Capiberibe 27:-22.90228:-43.20415,Centro Cultural Capiberibe 27,cultural_center,overture,-22.90228271484375,-43.20414733886719,,,,,,no_match
+overture:Murals in the Lapa district:-22.91511:-43.17903,Murals in the Lapa district,landmark_and_historical_building,overture,-22.915111541748047,-43.17902755737305,,,,,,no_match

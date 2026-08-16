@@ -44,7 +44,8 @@ SELECT ?item ?itemLabel ?coord ?artPT ?artEN ?artFR ?artES WHERE {{
 
 STOPWORDS = {"museu", "museum", "casa", "centro", "instituto", "espaco",
              "cultural", "de", "da", "do", "dos", "das", "e", "praca", "parque",
-             "janeiro", "rio", "nacional", "catete"}
+             "janeiro", "rio", "nacional", "catete", "fundacao", "brasileira",
+             "brasileiro", "senhora"}
 
 NON_MAINSPACE_PREFIXES = {
     "wikipedia", "wikipédia", "wikipédia discussão", "wikipedia talk",

@@ -1349,5 +1349,89 @@
     "extract": "O Theatro Municipal do Rio de Janeiro é um dos mais importantes teatros brasileiros. Localiza-se no bairro da Cinelândia, centro do Rio de Janeiro.\nInaugurado em 14 de julho de 1909, durante a prefeitura de Sousa Aguiar, mas tendo a obra sido iniciada no governo anterior (de Pereira Passos), como parte do conjunto arquitetônico das obras de reurbanização do Rio de Janeiro e abertura da Avenida Central, exerce desde sua inauguração um importante papel para a cultura carioca e nacional, recebendo em seu palco importantes artistas, orquestras e companhias de balé.\nApesar do nome, o teatro não pertence ao município, mas está vinculado ao estado do Rio de Janeiro. Atualmente, o teatro é dirigido pela Fundação Theatro Municipal do Rio de Janeiro, que tem Clara Paulino como presidente, o cantor lírico Eric Herrero como diretor artístico e Maria Thereza Ribeiro Fortes como vice-presidente.\nPara suas temporadas líricas, o teatro conta com os seguintes corpos artísticos: Orquestra Sinfônica do Theatro Municipal do Rio de Janeiro, Coro do Theatro Municipal do Rio de Janeiro e Ballet do Theatro Municipal do Rio de Janeiro. Ligada também ao teatro, existe a Escola Estadual de Dança Maria Olenewa.",
     "qid": "Q1968538",
     "dist_m": 94.7
+  },
+  "wikidata:Lago do Campo de Santana:-22.90759:-43.18802": {
+    "title": "Campo de Santana (Rio de Janeiro)",
+    "lang": "pt",
+    "extract": "O Campo de Santana, também conhecido como Praça da República, é um parque localizado no Centro do município do Rio de Janeiro, no estado do Rio de Janeiro, no Brasil. O nome da praça é uma referência ao fato de ela se localizar nas proximidades de onde ocorreu a proclamação da República do Brasil em 1889.",
+    "qid": "Q67205544",
+    "dist_m": 118.0
+  },
+  "overture:Polo Praça XV:-22.90282:-43.17458": {
+    "title": "Praça XV (Rio de Janeiro)",
+    "lang": "pt",
+    "extract": "A Praça XV, também conhecida como Praça XV de Novembro, Praça 15 de Novembro, Praça Quinze de Novembro, Praça 15 ou Praça Quinze, é uma praça situada no bairro do Centro, na Zona Central da cidade do Rio de Janeiro. Além de estar localizada na Rua Primeiro de Março, a praça integra a Orla Conde, um passeio público que margeia a Baía de Guanabara.\nA praça, que existe desde o século XVI, foi reinaugurada no dia 29 de maio de 2016 após ser revitalizada. A revitalização da praça foi feita durante a gestão do prefeito Eduardo Paes no âmbito do Porto Maravilha, uma operação urbana que visa revitalizar a Zona Portuária do Rio de Janeiro.\nNo interior do logradouro, situam-se a Parada Praça XV do VLT Carioca e a Estação Praça XV do sistema de barcas operado pela CCR Barcas. Já nas imediações, situam-se diversos pontos de interesse de importância histórica e política, como o Paço Imperial e o Palácio Tiradentes. A praça também possui quatro monumentos históricos: o Chafariz do Mestre Valentim; a Estátua Equestre de Dom João VI; a Estátua Equestre do General Osório; e a Estátua do Almirante Negro.\nHoje, a Praça XV é considerada o coração do skateboarding no Rio de Janeiro. Embora o Decreto Municipal nº 17.746, de 22 de julho de 1999, tenha proibido a prática do esporte em praças, parques e jardins da cidade, o movimento de skatistas I Love XV conseguiu, em 2011, uma permissão da prefeitura para o uso da Praça XV como local de tráfego de skates em horários estipulados. No dia 8 de novembro de 2016, por meio de uma portaria, o presidente da Fundação Parques e Jardins concedeu autorização para o uso do skate na Praça XV e na Praça Marechal Âncora em qualquer horário.\n\nA praça recebeu esse nome por homenagear o dia 15 de novembro de 1889, marcado pela Proclamação da República do Brasil. Nesse dia, foi instaurada a república federativa presidencialista no Brasil, em substituição à monarquia constitucional parlamentarista em vigor desde 1822.",
+    "qid": "",
+    "dist_m": 128.0
+  },
+  "overture:Vasco da Gama, Rio de Janeiro:-22.89194:-43.22695": {
+    "title": "Vasco da Gama, Rio de Janeiro",
+    "lang": "en",
+    "extract": "Vasco da Gama is a neighborhood of Rio de Janeiro, Brazil. It was created in honor of the centenary of the football club CR Vasco da Gama in 1998, where its stadium, São Januário, is located. The club was named after the Portuguese explorer Vasco da Gama. Until 1997, it was part of the São Cristóvão neighborhood.",
+    "qid": "",
+    "dist_m": 0.0
+  },
+  "overture:Palácio de são cristóvão:-22.90583:-43.22445": {
+    "title": "Paço de São Cristóvão",
+    "lang": "en",
+    "extract": "Paço de São Cristóvão (Portuguese pronunciation: [ˈpasu d(ʒi) sɐ̃w kɾisˈtɔvɐ̃w]; English: Palace of Saint Christopher; also known as Palácio Imperial or Palácio Imperial de São Cristóvão) was an imperial palace located in the Quinta da Boa Vista park in the Imperial Neighbourhood of São Cristóvão, Rio de Janeiro, Brazil. It served as residence to the Portuguese royal family and later to the Brazilian imperial family until 1889, when the country became a republic through a coup d'état deposing Emperor Pedro II. The palace briefly served as a public building by the provisional government for the constituent assembly of the first republican constitution. It housed the major part (92.5%) of the collections of the National Museum of Brazil, which, together with the building, were largely destroyed by a fire on 2 September 2018. The palace was reopened after restoration in 2025.",
+    "qid": "",
+    "dist_m": 146.0
+  },
+  "overture:Fazenda Imperial de Santa Cruz:-22.91000:-43.68531": {
+    "title": "Santa Cruz Estate",
+    "lang": "en",
+    "extract": "The Santa Cruz Estate is a former imperial country retreat in Santa Cruz, Rio de Janeiro. Originally a Jesuit estate and convent dating from 1570, it became a residence of the Portuguese viceroys in Brazil at the end of the 18th century. When King John VI and the royal family moved the court to Brazil in 1808, the palace became a royal residence. After the King's return to Portugal, the Prince Regent Pedro I continued to use the palace. Upon his marriage to Princess Leopoldina in 1818, they spent their honeymoon in the palace. The estate became one of the imperial palaces with the independence of Brazil in 1822. Emperor Pedro II later used the palace as a summer residence.\nFollowing proclamation of a republic in 1889, the palace was converted to a military school. It has continued to function as an academy to the present.",
+    "qid": "",
+    "dist_m": 1.0
+  },
+  "overture:Museu de Sitio Arqueologico da Antiga Se:-22.90390:-43.17582": {
+    "title": "Igreja de Nossa Senhora do Carmo da Antiga Sé",
+    "lang": "pt",
+    "extract": "A Igreja de Nossa Senhora do Carmo da Antiga Sé ou Antiga Sé, como é popularmente conhecida, é uma paróquia da Igreja Católica Romana, localizada à Rua Sete de Setembro, nº 14 com a Rua Primeiro de Março, no centro histórico do Rio de Janeiro. Foi a sede episcopal da Arquidiocese de São Sebastião do Rio de Janeiro até 1976, quando foi concluída a nova Catedral de São Sebastião do Rio de Janeiro, razão pela qual também é referida como Antiga Sé.\nA igreja localiza-se em frente à histórica Praça XV de Novembro, ao lado dos edifícios coloniais do antigo Convento do Carmo e da Igreja da Ordem Terceira do Carmo (que é mais propriamente a igreja cuja titular é Nossa Senhora do Monte do Carmo).",
+    "qid": "",
+    "dist_m": 76.0
+  },
+  "overture:Christ Redeemer, Rio de Janeiro, Brazil:-22.95165:-43.21084": {
+    "title": "Christ the Redeemer (statue)",
+    "lang": "en",
+    "extract": "Christ the Redeemer (Portuguese: Cristo Redentor, standard Brazilian Portuguese: [ˈkɾistu ʁedẽˈtoʁ]) is an Art Deco statue of Jesus in Rio de Janeiro, Brazil, created by French-Polish sculptor Paul Landowski and built by Brazilian engineer Heitor da Silva Costa, in collaboration with French engineer Albert Caquot and Romanian sculptor Gheorghe Leonida who sculpted the face. Constructed between 1922 and 1931, the statue is 30 metres (98 ft) high, excluding its 8-metre (26 ft) pedestal, and faces east. The arms stretch 28 metres (92 ft) wide. It is made of reinforced concrete and soapstone. Christ the Redeemer differs considerably from its original design, as the initial plan was a large Christ with a globe in one hand and a cross in the other. Although the project organizers originally accepted the design, it later changed to the statue of today, with the arms spread out wide.\nThe statue weighs 635 metric tons (625 long, 700 short tons), and is located at the peak of the 700-metre (2,300 ft) Corcovado mountain in the Tijuca National Park overlooking the city of Rio de Janeiro. This statue is the largest Art Deco–style sculpture in the world. A symbol of Christianity around the world, the statue has also become a cultural icon of both Rio de Janeiro and Brazil and was voted one of the New 7 Wonders of the World.",
+    "qid": "",
+    "dist_m": 43.0
+  },
+  "overture:National Museum of Brazil:-22.90577:-43.22653": {
+    "title": "National Museum of Brazil",
+    "lang": "en",
+    "extract": "The National Museum of Brazil (Portuguese: Museu Nacional) is the oldest scientific institution of Brazil. It is located in the city of Rio de Janeiro, where it is installed in the Paço de São Cristóvão (Saint Christopher's Palace), which is inside the Quinta da Boa Vista. The main building was originally the residence of the House of Braganza in colonial Brazil, as the Portuguese royal family between 1808 and 1821 and then as the Brazilian imperial family between 1822 and 1889. After the monarchy was deposed, it hosted the Republican Constituent Assembly from 1889 to 1891 before being assigned to the use of the museum in 1892. The building was listed as Brazilian National Heritage in 1938 and was largely destroyed by a fire in 2018.\nFounded by King João VI of Portugal, Brazil and the Algarves on 6 June 1818, under the name of \"Royal Museum\", the institution was initially housed at the Campo de Santana park, where it exhibited the collections incorporated from the former House of Natural History, popularly known as Casa dos Pássaros (\"House of the Birds\"), created in 1784 by the Viceroy of Brazil, Luís de Vasconcelos e Sousa, 4th Count of Figueiró, as well as collections of mineralogy and zoology. The museum foundation was intended to address the interests of promoting the socioeconomic development of the country by the diffusion of education, culture, and science. In the 19th century, the institution was already established as the most important South American museum of its type. In 1946, it was incorporated into the Federal University of Rio de Janeiro.\nThe National Museum held a vast collection with more than 20 million objects, one of the largest collections of natural history and anthropological artifacts in the world, encompassing some of the most important material records regarding natural science and anthropology in Brazil, as well as numerous items that came from other regions of the world and were produced by several cultures and ancient civilizations. Built-up over more than two centuries through expeditions, excavations, acquisitions, donations and exchanges, the collection was subdivided into seven main nuclei: geology, paleontology, botany, zoology, biological anthropology, archaeology, and ethnology. The collection was the principal basis for the research conducted by the academic departments of the museum – which are responsible for carrying out activities in all the regions of the Brazilian territory and several places of the world, including the Antarctic continent. The museum holds one of the largest scientific libraries of Brazil, with over 470,000 volumes and 2,400 rare works.\nIn the area of education, the museum offers specializations, extension and post-graduation courses in several fields of the knowledge, in addition to hosting temporary and permanent exhibitions and educational activities open to the general public. The museum manages the Horto Botânico (Botanical Garden), adjacent to the Paço de São Cristóvão, as well as an advanced campus in the city of Santa Teresa, in Espírito Santo – the Santa Lúcia Biological Station, jointly managed with the Museum of Biology Prof. Mello Leitão. A third site, located in the city of Saquarema, is used as a support and logistics center for field activities. Finally, the museum is also dedicated to editorial production, outstanding in that field the Archivos do Museu Nacional, the oldest scientific journal of Brazil, continuously published since 1876.\nThe palace, which housed a large part of the collection, was destroyed in a fire on the night of 2 September 2018. The building had been called a \"firetrap\" by critics, who argued the fire was predictable and could have been prevented. The fire began in the air-conditioning system of the auditorium on the ground floor. One of the three devices did not have external grounding, there was no individual circuit breaker for each of them, and a wire was without insulation in contact with metal. In the wake of the fire, the ruined edifice was being treated as an archaeological site and undergoing reconstruction efforts, with a metallic roof covering a 5,000 m2 area including debris.\nIn 2019, more than 30,000 pieces of the imperial family's past were found during archaeological works on Rio de Janeiro Zoological Garden nearby, part of Quinta da Boa Vista. Among the finds are many items such as fragments of crockery, cups, plates, cutlery, horseshoes and even buttons and brooches with imperial coat of arms from military clothing. Those items were given to the museum. After being destroyed by fire, the National Museum has received donations to the amount of R$ 1.1 million in seven months towards rebuilding efforts.",
+    "qid": "",
+    "dist_m": 43.0
+  },
+  "overture:Fort Copacabana:-22.98618:-43.18653": {
+    "title": "Forte de Copacabana",
+    "lang": "pt",
+    "extract": "O Forte de Copacabana localiza-se na ponta de Copacabana, ao final da praia e bairro de mesmo nome, na cidade do Rio de Janeiro, no Brasil.\nOficialmente denominado como Museu Histórico do Exército / Forte de Copacabana (MHEx/FC), computa atualmente um fluxo de cerca de dez mil visitantes por mês, constituindo-se em um dos mais belos cartões-postais da cidade. O turista pode escolher entre a visita restrita (apenas às áreas externas) e a completa (incluindo o interior do forte e o Museu histórico-militar).",
+    "qid": "",
+    "dist_m": 134.0
+  },
+  "overture:Museu do paço:-22.90289:-43.17331": {
+    "title": "Paço Imperial",
+    "lang": "pt",
+    "extract": "O Paço Imperial é um edifício histórico localizado na atual Praça XV de Novembro, no centro da cidade do Rio de Janeiro, Brasil.\nConstruído no século XVIII para residência dos governadores da Capitania do Rio de Janeiro, passou a ser a casa de despachos, sucessivamente, do Vice-Rei do Brasil, do Rei de Portugal Dom João VI e dos Imperadores do Brasil, sofrendo ampliações no século XIX. Atualmente é um centro cultural. Pela sua importância histórica e estética, o Paço Imperial é considerado o mais importante dos edifícios civis coloniais do Brasil.",
+    "qid": "",
+    "dist_m": 117.0
+  },
+  "overture:Sugarloaf Mountain:-22.94975:-43.15623": {
+    "title": "Sugarloaf Mountain",
+    "lang": "en",
+    "extract": "Sugarloaf Mountain (Portuguese: Pão de Açúcar, pronounced [ˈpɐ̃w d(ʒi) aˈsukaʁ]) is a peak situated in Rio de Janeiro, Brazil, on a peninsula at the mouth of Guanabara Bay. Rising 396 m (1,299 ft) above the harbor, the peak is named for its resemblance to the traditional shape of concentrated refined sugarloaf. It is known worldwide for its  cable car and panoramic views of the city and beyond.\nThe mountain is one of several monolithic granite and quartz mountains that rise straight from the water's edge around Rio de Janeiro. Geologically, it is considered part of a family of steep-sided rock outcroppings known as bornhardts.\nThe mountain is protected by the Sugarloaf Mountain and Urca Hill Natural Monument, created in 2006.\nThis became part of a World Heritage Site declared by UNESCO in 2012.",
+    "qid": "",
+    "dist_m": 62.0
+  },
+  "overture:Catete Palace:-22.92588:-43.17620": {
+    "title": "Catete Palace",
+    "lang": "en",
+    "extract": "The Catete Palace (Portuguese: Palácio do Catete, IPA: [paˈlasju du kaˈtetʃi]) is an urban mansion in the Flamengo neighborhood of Rio de Janeiro, Brazil. The property stretches from Rua do Catete (Catete Street) to Praia do Flamengo (Flamengo Beach). Construction began in 1858 and ended in 1867. It was Brazil's presidential palace from 1897 to 1960, and the site of Getúlio Vargas' suicide. It now houses the Museu da República (Republic Museum) and a theatre. The Catete underground rail station is adjacent.",
+    "qid": "",
+    "dist_m": 14.0
   }
 }

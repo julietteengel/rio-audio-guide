@@ -93,8 +93,15 @@ def geosearch_with_extract(lat, lon, name_hint, lang="pt"):
     # different one, and using it would misattribute facts. No accepted
     # candidate is a valid, honest outcome (grounding_status stays no_match),
     # not a bug to work around.
+    # "janeiro"/"rio"/"nacional"/"catete" added after real false-positive
+    # matches found in production (see bulk_wikidata_match.py's STOPWORDS,
+    # same fix applied there first): these words are common enough across
+    # unrelated Rio institutions that a shared-word match on them alone is
+    # not a reliable signal of "same place".
     STOPWORDS = {"museu", "museum", "casa", "centro", "instituto", "espaço",
-                 "espaco", "cultural", "de", "da", "do", "dos", "das", "e"}
+                 "espaco", "cultural", "de", "da", "do", "dos", "das", "e",
+                 "janeiro", "rio", "nacional", "catete", "fundação", "fundacao",
+                 "praça", "praca", "brasileira", "brasileiro", "senhora"}
     hint_words = set(w.lower() for w in name_hint.split() if len(w) > 3) - STOPWORDS
     if not hint_words:
         return None
