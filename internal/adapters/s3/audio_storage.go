@@ -34,7 +34,12 @@ func (a *AudioStorage) Upload(ctx context.Context, key string, data []byte, cont
 	if err != nil {
 		var apiErr smithy.APIError
 		if errors.As(err, &apiErr) && isPermanentS3Error(apiErr.ErrorCode()) {
-			return "", &ports.PermanentError{StatusCode: 0, Body: apiErr.ErrorMessage()}
+			// ErrorCode() (ex. "InvalidAccessKeyId") est le jeton actionnable ;
+			// ErrorMessage() est vide pour plusieurs codes S3. Garder les deux,
+			// préfixés par "s3 upload", rend le failure_reason stocké en base
+			// auto-descriptif — ports.PermanentError étant partagé avec la
+			// branche TTS, son message générique ne dit plus d'où vient l'erreur.
+			return "", &ports.PermanentError{StatusCode: 0, Body: fmt.Sprintf("s3 upload: %s: %s", apiErr.ErrorCode(), apiErr.ErrorMessage())}
 		}
 		return "", err
 	}

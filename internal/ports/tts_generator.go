@@ -22,5 +22,5 @@ type PermanentError struct {
 }
 
 func (e *PermanentError) Error() string {
-	return fmt.Sprintf("tts generator: permanent error (status %d): %s", e.StatusCode, e.Body)
+	return fmt.Sprintf("permanent error (status %d): %s", e.StatusCode, e.Body)
 }
