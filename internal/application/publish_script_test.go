@@ -54,3 +54,24 @@ func TestCompleteAudioGeneration(t *testing.T) {
 		t.Fatalf("got script status %v, want published", savedScript.Status())
 	}
 }
+
+func TestFailAudioGeneration(t *testing.T) {
+	audioFileRepo := newFakeAudioFileRepo()
+	ctx := context.Background()
+
+	audioFile, _ := domain.NewAudioFile("script-1", "voice-1")
+	_ = audioFile.MarkGenerating()
+	_ = audioFileRepo.Save(ctx, audioFile)
+
+	if err := FailAudioGeneration(ctx, audioFileRepo, audioFile.ID(), "TTS quota exceeded"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	saved, _ := audioFileRepo.FindByID(ctx, audioFile.ID())
+	if saved.Status() != domain.AudioFileStatusFailed {
+		t.Fatalf("got status %v, want failed", saved.Status())
+	}
+	if saved.FailureReason() != "TTS quota exceeded" {
+		t.Fatalf("got failure reason %q, want %q", saved.FailureReason(), "TTS quota exceeded")
+	}
+}

@@ -51,3 +51,14 @@ func CompleteAudioGeneration(
 	}
 	return scriptRepo.Save(ctx, script)
 }
+
+func FailAudioGeneration(ctx context.Context, audioFileRepo ports.AudioFileRepository, audioFileID, reason string) error {
+	audioFile, err := audioFileRepo.FindByID(ctx, audioFileID)
+	if err != nil {
+		return err
+	}
+	if err := audioFile.MarkFailed(reason); err != nil {
+		return err
+	}
+	return audioFileRepo.Save(ctx, audioFile)
+}
