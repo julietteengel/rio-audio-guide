@@ -64,7 +64,7 @@ func main() {
 		log.Fatalf("load aws config: %v", err)
 	}
 	s3Client := awss3.NewFromConfig(awsCfg)
-	storage := s3.NewAudioStorage(s3Client, envOr("S3_BUCKET", "rio-audioguide-bucket"))
+	storage := s3.NewAudioStorage(s3Client, envOr("S3_BUCKET", "rio-audio-guide"))
 
 	scriptRepo := postgres.NewScriptRepository(pool)
 	audioFileRepo := postgres.NewAudioFileRepository(pool)

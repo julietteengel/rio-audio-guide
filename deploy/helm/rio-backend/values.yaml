@@ -19,6 +19,10 @@ worker:
 
 s3:
   bucket: rio-audio-guide
+  region: us-east-1
+
+redis:
+  url: demo-redis-master:6379
 
 secrets:
   name: rio-backend-secrets # créé hors chart, jamais commité :
