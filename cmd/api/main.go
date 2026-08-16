@@ -14,20 +14,35 @@ import (
 )
 
 func main() {
+	// context.Context porte une deadline/annulation à travers un appel — ici on n'a
+	// ni timeout ni annulation à propager (le process tourne jusqu'à ce qu'on le tue),
+	// donc context.Background() (contexte "racine", vide) suffit. pgxpool.New(ctx, ...)
+	// l'utilise seulement pour pouvoir annuler la connexion initiale si besoin.
 	ctx := context.Background()
 
+	// pgxpool.Pool n'est PAS une connexion unique : c'est un pool de connexions
+	// PostgreSQL réutilisables. Chaque requête HTTP gérée par le serveur Echo emprunte
+	// une connexion du pool le temps de sa requête SQL, puis la rend au pool — sans pool,
+	// il faudrait ouvrir/fermer une connexion TCP par requête HTTP, beaucoup plus lent.
+	// pgxpool gère aussi le nombre max de connexions simultanées vers Postgres.
 	pool, err := pgxpool.New(ctx, envOr("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/postgres"))
 	if err != nil {
 		log.Fatalf("connect postgres: %v", err)
 	}
-	defer pool.Close()
+	defer pool.Close() // ferme toutes les connexions du pool à l'arrêt du process
 
+	// amqp.Dial ouvre la connexion TCP vers RabbitMQ (une seule, coûteuse à établir).
 	conn, err := amqp.Dial(envOr("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/"))
 	if err != nil {
 		log.Fatalf("connect rabbitmq: %v", err)
 	}
 	defer func() { _ = conn.Close() }()
 
+	// amqp.Channel : un canal logique multiplexé sur la connexion TCP unique — c'est LUI
+	// qu'on utilise pour publier/consommer des messages, jamais conn directement. Une
+	// seule connexion peut porter plusieurs channels (un par usage), ce qui évite de
+	// rouvrir une connexion TCP à chaque fois. Ce Channel AMQP n'a rien à voir avec un
+	// `chan` Go — c'est un concept du protocole RabbitMQ, pas une primitive du langage.
 	channel, err := conn.Channel()
 	if err != nil {
 		log.Fatalf("open rabbitmq channel: %v", err)
