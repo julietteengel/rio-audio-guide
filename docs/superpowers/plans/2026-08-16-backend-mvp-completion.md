@@ -1389,8 +1389,13 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
-      - name: Vet
+          cache: true
+      - name: Vet (vérifications basiques intégrées à Go)
         run: go vet ./...
+      - name: golangci-lint (équivalent Go d'ESLint — bugs probables, style, code mort)
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
 
   test:
     runs-on: ubuntu-latest
@@ -1399,6 +1404,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+          cache: true
       - name: Unit tests
         run: go test ./...
 
@@ -1409,6 +1415,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+          cache: true
       - name: Install govulncheck
         run: go install golang.org/x/vuln/cmd/govulncheck@latest
       - name: Scan for known vulnerabilities
@@ -1423,6 +1430,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+          cache: true
       - name: Build
         run: go build ./...
 
@@ -1449,6 +1457,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
+          cache: true
       - name: Apply schema
         run: |
           sudo apt-get update && sudo apt-get install -y postgresql-client
@@ -1458,6 +1467,11 @@ jobs:
           TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
         run: go test -tags=integration ./...
 ```
+
+`cache: true` sur chaque `setup-go` met en cache le module Go (`~/go/pkg/mod`) entre les runs, à partir
+d'une clé dérivée de `go.sum` — évite de retélécharger toutes les dépendances à chaque job, dans les 5
+jobs de ce workflow. `golangci-lint-action` télécharge et lance `golangci-lint` avec sa config par
+défaut (activable/configurable plus tard via un `.golangci.yml` si besoin de régler des règles précises).
 
 Le test S3 (`internal/adapters/s3/audio_storage_test.go`) appelle `t.Skip` si `S3_TEST_BUCKET` n'est
 pas défini — donc il se met de côté proprement en CI tant qu'on n'a pas ajouté d'identifiants AWS en
