@@ -5,12 +5,15 @@ import (
 	"log"
 	"os"
 
+	"github.com/aws/aws-sdk-go-v2/config"
+	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	amqp "github.com/rabbitmq/amqp091-go"
 
 	httpadapter "rioaudioguide/backend/internal/adapters/http"
 	"rioaudioguide/backend/internal/adapters/postgres"
 	"rioaudioguide/backend/internal/adapters/rabbitmq"
+	"rioaudioguide/backend/internal/adapters/s3"
 )
 
 func main() {
@@ -58,7 +61,14 @@ func main() {
 		log.Fatalf("set up audio job publisher: %v", err)
 	}
 
-	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, publisher)
+	awsCfg, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		log.Fatalf("load aws config: %v", err)
+	}
+	s3Client := awss3.NewFromConfig(awsCfg)
+	storage := s3.NewAudioStorage(s3Client, envOr("S3_BUCKET", "rio-audioguide-bucket"))
+
+	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, publisher, storage)
 	log.Println("api ready, listening on :8080")
 	if err := server.Start(":8080"); err != nil {
 		log.Fatalf("http server: %v", err)

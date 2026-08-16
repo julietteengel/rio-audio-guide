@@ -8,17 +8,21 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/jackc/pgx/v5"
+
 	"rioaudioguide/backend/internal/domain"
 )
+
+var errNotImplementedInFake = errors.New("not implemented in fake")
 
 type fakePlaceRepo struct{ places []*domain.Place }
 
 func (f *fakePlaceRepo) Save(_ context.Context, _ *domain.Place) error { return nil }
 func (f *fakePlaceRepo) FindByID(_ context.Context, _ string) (*domain.Place, error) {
-	return nil, errors.New("not implemented in fake")
+	return nil, errNotImplementedInFake
 }
 func (f *fakePlaceRepo) FindByName(_ context.Context, _ string) (*domain.Place, error) {
-	return nil, errors.New("not implemented in fake")
+	return nil, errNotImplementedInFake
 }
 func (f *fakePlaceRepo) FindActiveInBoundingBox(_ context.Context, _, _, _, _ float64) ([]*domain.Place, error) {
 	return f.places, nil
@@ -33,9 +37,17 @@ func (f *fakeScriptRepo) Save(_ context.Context, s *domain.Script) error {
 func (f *fakeScriptRepo) FindByID(_ context.Context, id string) (*domain.Script, error) {
 	s, ok := f.scripts[id]
 	if !ok {
-		return nil, errors.New("not found")
+		return nil, errNotImplementedInFake
 	}
 	return s, nil
+}
+func (f *fakeScriptRepo) FindByPlaceIDAndLanguage(_ context.Context, placeID, language string) (*domain.Script, error) {
+	for _, s := range f.scripts {
+		if s.PlaceID() == placeID && s.Language().String() == language {
+			return s, nil
+		}
+	}
+	return nil, pgx.ErrNoRows
 }
 
 type fakeAudioFileRepo struct{ files map[string]*domain.AudioFile }
@@ -47,9 +59,17 @@ func (f *fakeAudioFileRepo) Save(_ context.Context, a *domain.AudioFile) error {
 func (f *fakeAudioFileRepo) FindByID(_ context.Context, id string) (*domain.AudioFile, error) {
 	a, ok := f.files[id]
 	if !ok {
-		return nil, errors.New("not found")
+		return nil, errNotImplementedInFake
 	}
 	return a, nil
+}
+func (f *fakeAudioFileRepo) FindByScriptID(_ context.Context, scriptID string) (*domain.AudioFile, error) {
+	for _, a := range f.files {
+		if a.ScriptID() == scriptID {
+			return a, nil
+		}
+	}
+	return nil, pgx.ErrNoRows
 }
 
 type fakePublisher struct{ published int }
@@ -66,7 +86,7 @@ func TestListPlaces(t *testing.T) {
 
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{})
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places", nil)
 	rec := httptest.NewRecorder()
@@ -87,7 +107,7 @@ func TestReviewScript(t *testing.T) {
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}
 	publisher := &fakePublisher{}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, publisher)
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, publisher, fakeAudioStorage{})
 
 	body := strings.NewReader(`{"reviewer":"julie","voice_id":"voice-1"}`)
 	req := httptest.NewRequest(http.MethodPost, "/scripts/"+script.ID()+"/review", body)
