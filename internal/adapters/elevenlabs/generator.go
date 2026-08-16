@@ -33,6 +33,11 @@ type ttsRequest struct {
 	ModelID string `json:"model_id"`
 }
 
+// Generate appelle l'API ElevenLabs. Le paramètre `language` est volontairement
+// inutilisé : il fait partie du port ports.TTSGenerator (d'autres backends TTS
+// en auraient besoin), mais eleven_multilingual_v2 déduit la langue du texte
+// lui-même — le lui passer explicitement n'est pas prévu par l'API. Ce n'est
+// donc pas un oubli.
 func (g *Generator) Generate(ctx context.Context, text, language, voiceID string) ([]byte, time.Duration, error) {
 	body, err := json.Marshal(ttsRequest{Text: text, ModelID: "eleven_multilingual_v2"})
 	if err != nil {
@@ -58,16 +63,22 @@ func (g *Generator) Generate(ctx context.Context, text, language, voiceID string
 		return nil, 0, fmt.Errorf("elevenlabs: read response: %w", err)
 	}
 
-	// 401 (clé invalide) et 400 (texte/voice_id rejeté) ne se corrigeront pas
-	// en réessayant le même message — tout le reste (429, 5xx) peut l'être.
-	if resp.StatusCode == http.StatusUnauthorized || resp.StatusCode == http.StatusBadRequest {
+	// 4xx = la requête elle-même est en cause, réessayer à l'identique ne changera
+	// rien — sauf 408 (timeout) et 429 (rate limit), qui sont temporels.
+	// ElevenLabs renvoie notamment 422 (model_id inconnu, texte trop long),
+	// 404 (voice_id inexistant) et 403 (tier/permission) : tous définitifs.
+	if resp.StatusCode >= 400 && resp.StatusCode < 500 &&
+		resp.StatusCode != http.StatusRequestTimeout && resp.StatusCode != http.StatusTooManyRequests {
 		return nil, 0, &ports.PermanentError{StatusCode: resp.StatusCode, Body: string(respBody)}
 	}
 	if resp.StatusCode != http.StatusOK {
 		return nil, 0, fmt.Errorf("elevenlabs: unexpected status %d: %s", resp.StatusCode, string(respBody))
 	}
 
-	wordCount := len(text) / 5
+	// Estimation grossière (~5 caractères par mot, ~400ms par mot). Plancher à 1
+	// mot : un texte très court ("Oi!") donnerait sinon une durée de 0, que
+	// domain.NewGeneratedAudio rejette.
+	wordCount := max(1, len(text)/5)
 	duration := time.Duration(wordCount) * 400 * time.Millisecond
 	return respBody, duration, nil
 }
