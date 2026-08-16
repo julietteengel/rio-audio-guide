@@ -11,6 +11,23 @@ CATEGORY_ALLOWLIST = {
     "modern_art_museum",
     "topic_concert_venue",
     "cultural_center",
+    "art_gallery",
+    "music_venue",
+    "theatre",
+    "venue_and_event_space",
+    "performing_arts",
+    "science_museum",
+    "contemporary_art_museum",
+    "design_museum",
+    "childrens_museum",
+    "civilization_museum",
+    "community_museum",
+    "state_museum",
+    "sports_museum",
+    "cartooning_museum",
+    "aviation_museum",
+    "costume_museum",
+    "church_cathedral",
 }
 
 # Explicitly excluded, not forgotten: "beach", "botanical_garden", "national_park".
@@ -18,6 +35,14 @@ CATEGORY_ALLOWLIST = {
 # ones. landmark_and_historical_building still needs its own cultural-vs-natural
 # triage downstream (it mixes built heritage with hills/rocks/waterfalls/viewpoints
 # under the same Overture category).
+#
+# "church_cathedral" added deliberately narrow: Overture also has
+# "religious_organization", "evangelical_church", "pentecostal_church",
+# "baptist_church", "catholic_church" etc. in this bbox, at far higher volume
+# (tens of thousands combined) and overwhelmingly ordinary neighborhood
+# congregations with no heritage/touristic relevance. church_cathedral alone
+# still needs its own cultural-vs-noise triage downstream, same as
+# landmark_and_historical_building.
 
 DEFAULT_RELEASE = "2026-06-17.0"
 
