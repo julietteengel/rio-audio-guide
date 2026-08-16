@@ -6,11 +6,11 @@ ni dans `2026-07-23-roadmap-v2-agentic-architecture.md` : **la stack technique p
 
 ## Contexte de la décision
 
-En cherchant un projet portfolio pour une candidature (Senior Software Engineer, Powens, équipe EMI —
-Go, hexagonal, DDD, Kubernetes, RabbitMQ, SQL/NoSQL, Redis, Kafka, Docker), une piste a été explorée
-dans une conversation séparée : construire un projet fintech dédié (ledger de paiements) pour coller
-exactement à la fiche de poste. Cette piste a été écartée — la fintech n'est pas un intérêt réel, et un
-projet qu'on ne trouve pas intéressant ne se termine pas.
+En explorant des idées de projet portfolio pour démontrer des compétences backend (Go, hexagonal, DDD,
+Kubernetes, RabbitMQ, SQL/NoSQL, Redis, Kafka, Docker), une piste a été explorée dans une conversation
+séparée : construire un projet fintech dédié (ledger de paiements) pour coller exactement à une liste de
+compétences ciblées. Cette piste a été écartée — la fintech n'est pas un intérêt réel, et un projet qu'on
+ne trouve pas intéressant ne se termine pas.
 
 La piste retenue à la place : **l'audioguide reste le projet unique**, et son backend (jamais construit
 à ce jour — seul le pipeline Python de sourcing/curation existe) est conçu pour couvrir légitimement les
@@ -18,11 +18,10 @@ compétences ciblées, sans ajouter de technologie qui ne sert pas un vrai besoi
 
 **Point de vigilance explicite** : une proposition initiale pour ce backend listait Postgres + MongoDB +
 Redis + RabbitMQ + Kafka + Kubernetes simultanément, présentés comme des besoins du produit alors qu'ils
-étaient choisis pour matcher une liste de mots-clés de fiche de poste. Ce risque est nommé ici pour ne
-pas se reproduire : une techno qui ne se justifie qu'en entretien par "c'était dans l'offre d'emploi" est
-disqualifiante, pas valorisante, pour un poste qui évalue explicitement le "sound judgment" — et contredit
-le principe déjà posé dans le design doc v1 (hébergement pragmatique, ne pas sur-dimensionner pour un
-produit naissant).
+étaient choisis pour matcher une liste de mots-clés de compétences ciblées. Ce risque est nommé ici pour
+ne pas se reproduire : une techno qui ne se justifie que par "c'était sur la liste de compétences visées"
+est un mauvais raisonnement d'ingénierie, peu importe le contexte — et contredit le principe déjà posé
+dans le design doc v1 (hébergement pragmatique, ne pas sur-dimensionner pour un produit naissant).
 
 ## Stack backend retenue
 
@@ -57,7 +56,7 @@ jugé "petit coût, cas d'usage réel". En relisant ce choix à la lumière du m
 Kafka/MongoDB, il ne tient pas mieux qu'eux : **il n'y a aujourd'hui aucune requête mesurée lente et
 aucun trafic réel à rate-limiter** — le produit n'a pas encore d'utilisateurs. C'est le même biais
 que Kafka/MongoDB sous une forme plus discrète (un "petit coût" reste un coût, et une brique de plus
-à opérer, tester, et expliquer en entretien si elle n'a jamais servi à rien de concret).
+à opérer, tester, et justifier si elle n'a jamais servi à rien de concret).
 
 PostGIS seul encaisse largement le volume attendu au lancement (2230 lieux, requêtes géo simples).
 Redis est retardé, pas supprimé : à ajouter seulement quand un besoin mesuré apparaît (une requête
@@ -96,5 +95,27 @@ sous-système 5 (ici renommé backend, distinct du dashboard admin/app mobile) q
 2. Guide runtime agentique (sous-système 3) — reste la priorité d'apprentissage la plus haute, à écrire
    à la main en premier.
 3. Backend (Go/hexagonal/DDD/Postgres+PostGIS/RabbitMQ/Redis/K8s, ce document) — écrit à la main pour
-   les mêmes raisons : c'est la partie directement évaluée par la fiche de poste visée.
+   les mêmes raisons : c'est la partie qui démontre le plus directement les compétences visées.
 4. Ops en profondeur (sous-système 4), dashboard admin + app mobile (sous-système 5 restant).
+
+## Kafka et Redis — déclencheurs de reconsidération, précisés (2026-08-16)
+
+Reconsidérés une nouvelle fois le 2026-08-16 et écartés à nouveau, pour
+la même raison qu'au 2026-08-04. Ce qui manquait jusqu'ici : un déclencheur assez précis pour savoir
+*quand* revenir dessus, pas juste "un jour peut-être". Précisé ici pour ne pas avoir à redécouvrir le
+raisonnement à chaque fois que la question revient (elle est déjà revenue trois fois) :
+
+- **Kafka** — déclencheur : un besoin réel de télémétrie d'écoute (quels lieux sont écoutés, dans quelle
+  langue, quand) avec **plusieurs consommateurs indépendants** du même flux (ex. moteur de
+  recommandation + dashboard analytics + déclencheur marketing, chacun lisant le flux à son propre
+  rythme, avec besoin de rejouer l'historique). RabbitMQ ne couvre pas bien ce cas (pas de rejeu, un
+  seul consommateur prévu par message) — Kafka le couvrirait légitimement. N'existe pas tant qu'il n'y
+  a pas d'utilisateurs réels ni de pipeline de télémétrie construit.
+- **Redis** — deux déclencheurs séparés, l'un ou l'autre suffit : (1) une requête identifiée comme
+  **mesurée lente** en usage réel (pas supposée lente) sur les lieux/recherche géo — cache avec TTL ;
+  (2) un **abus constaté** (pas anticipé) sur un endpoint public une fois l'API exposée — rate limiting.
+  PostGIS seul suffit tant qu'aucun des deux n'est mesuré.
+
+Aucun des deux déclencheurs n'est atteint à cette date — zéro utilisateur réel, zéro trafic public,
+zéro requête mesurée lente. Documenté ici précisément pour qu'une future relecture (la mienne, plus
+tard) trouve une réponse vérifiable plutôt qu'un principe vague.
