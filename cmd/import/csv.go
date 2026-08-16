@@ -17,6 +17,19 @@ func columnIndex(header []string) map[string]int {
 	return idx
 }
 
+// requireColumns checks that every name in names has an entry in idx. Without
+// this, a missing/misspelled CSV header column silently resolves to the zero
+// value (column 0) on lookup rather than erroring — quietly substituting the
+// wrong column's data instead of failing loudly.
+func requireColumns(idx map[string]int, names ...string) error {
+	for _, n := range names {
+		if _, ok := idx[n]; !ok {
+			return fmt.Errorf("missing required column %q", n)
+		}
+	}
+	return nil
+}
+
 func readPlacesCSV(path string) ([]placeRow, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -30,6 +43,9 @@ func readPlacesCSV(path string) ([]placeRow, error) {
 		return nil, err
 	}
 	idx := columnIndex(header)
+	if err := requireColumns(idx, "name", "category", "source", "lat", "lon", "wikidata_qid"); err != nil {
+		return nil, err
+	}
 
 	var rows []placeRow
 	for {
@@ -73,6 +89,9 @@ func readNarrationsCSV(path string) ([]narrationRow, error) {
 		return nil, err
 	}
 	idx := columnIndex(header)
+	if err := requireColumns(idx, "name", "narration_fr", "narration_en", "narration_es", "narration_pt"); err != nil {
+		return nil, err
+	}
 
 	var rows []narrationRow
 	for {

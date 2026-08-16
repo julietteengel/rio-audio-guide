@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -53,8 +54,13 @@ func main() {
 
 	placeIDs := make(map[string]string, len(matchedPlaces))
 	for _, p := range matchedPlaces {
-		if existing, err := placeRepo.FindByName(ctx, p.Name); err == nil {
+		existing, err := placeRepo.FindByName(ctx, p.Name)
+		if err == nil {
 			placeIDs[p.Name] = existing.ID()
+			continue
+		}
+		if !errors.Is(err, pgx.ErrNoRows) {
+			log.Printf("check existing place %q: %v", p.Name, err)
 			continue
 		}
 
