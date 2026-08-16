@@ -27,6 +27,11 @@ func TestGetPlaceAudio_Ready(t *testing.T) {
 
 	text, _ := domain.NewScriptText("Texte")
 	script := domain.NewScript(place.ID(), domain.LanguageFR, text, "source")
+	// Un audio "ready" va normalement de pair avec un Script publié — c'est
+	// CompleteAudioGeneration qui fait les deux. La route refuse de servir l'URL
+	// autrement (cf. TestGetPlaceAudio_ScriptNotPublished).
+	_ = script.MarkReviewed("julie")
+	_ = script.Publish()
 
 	audio, _ := domain.NewGeneratedAudio("s3://rio-audio-guide/abc123.mp3", "", 30*time.Second)
 	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
@@ -57,6 +62,11 @@ func TestGetPlaceAudio_FailsOpenWhenCacheErrors(t *testing.T) {
 
 	text, _ := domain.NewScriptText("Texte")
 	script := domain.NewScript(place.ID(), domain.LanguageFR, text, "source")
+	// Un audio "ready" va normalement de pair avec un Script publié — c'est
+	// CompleteAudioGeneration qui fait les deux. La route refuse de servir l'URL
+	// autrement (cf. TestGetPlaceAudio_ScriptNotPublished).
+	_ = script.MarkReviewed("julie")
+	_ = script.Publish()
 
 	audio, _ := domain.NewGeneratedAudio("s3://rio-audio-guide/abc123.mp3", "", 30*time.Second)
 	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
@@ -87,6 +97,10 @@ func TestGetPlaceAudio_NotReadyYet(t *testing.T) {
 
 	text, _ := domain.NewScriptText("Texte")
 	script := domain.NewScript(place.ID(), domain.LanguageFR, text, "source")
+	// Pendant la génération, le Script est "reviewed", pas encore publié — c'est
+	// l'état réel du cas courant, et il doit répondre "generating" (l'info utile)
+	// plutôt que "script not yet published".
+	_ = script.MarkReviewed("julie")
 
 	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
 	_ = audioFile.MarkGenerating()
@@ -105,6 +119,44 @@ func TestGetPlaceAudio_NotReadyYet(t *testing.T) {
 	}
 	if !strings.Contains(rec.Body.String(), "generating") {
 		t.Fatalf("expected status \"generating\" in the response, got %s", rec.Body.String())
+	}
+}
+
+// TestGetPlaceAudio_ScriptNotPublished couvre l'état incohérent que
+// CompleteAudioGeneration peut laisser derrière lui : il sauve l'AudioFile
+// "ready" PUIS publie le Script, en deux écritures non transactionnelles. Un
+// crash entre les deux laisse exactement ce couple — audio prêt, script encore
+// "reviewed". La route ne doit alors pas servir l'URL d'un contenu jamais
+// publié.
+func TestGetPlaceAudio_ScriptNotPublished(t *testing.T) {
+	placeName, _ := domain.NewPlaceName("Ilha Fiscal")
+	coords, _ := domain.NewCoordinates(-22.8967, -43.1667)
+	place := domain.NewPlace(placeName, "monument", coords, "", "wikidata", "rich")
+
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript(place.ID(), domain.LanguageFR, text, "source")
+	_ = script.MarkReviewed("julie") // reviewed, PAS published
+
+	audio, _ := domain.NewGeneratedAudio("s3://rio-audio-guide/abc123.mp3", "", 30*time.Second)
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	_ = audioFile.MarkGenerating()
+	_ = audioFile.MarkReady(audio)
+
+	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
+	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo,
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache())
+
+	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusAccepted {
+		t.Fatalf("got status %d, want 202 — a ready audio file on an unpublished script must not be served: %s",
+			rec.Code, rec.Body.String())
+	}
+	if strings.Contains(rec.Body.String(), "presigned.example.com") {
+		t.Fatalf("expected no presigned URL for an unpublished script, got %s", rec.Body.String())
 	}
 }
 

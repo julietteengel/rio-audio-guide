@@ -10,6 +10,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
+
+	"rioaudioguide/backend/internal/domain"
 )
 
 // presignExpiry : durée de vie de l'URL présignée renvoyée au client — assez
@@ -59,8 +61,24 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
-	if audioFile.Status() != "ready" {
+	if audioFile.Status() != domain.AudioFileStatusReady {
 		return c.JSON(http.StatusAccepted, audioNotReadyResponse{Status: string(audioFile.Status())})
+	}
+
+	// "audio ready" ne suffit pas comme feu vert. CompleteAudioGeneration fait DEUX
+	// sauvegardes non transactionnelles : l'AudioFile passe "ready" et est sauvé,
+	// PUIS le Script est publié et sauvé. Un crash entre les deux laisse un audio
+	// "ready" accroché à un Script encore "reviewed" — et cette route est le premier
+	// chemin de lecture public sur ces données. Rendre les deux sauvegardes atomiques
+	// est le vrai correctif (côté application layer) ; en attendant, on refuse de
+	// servir l'URL plutôt que d'exposer un contenu jamais publié.
+	//
+	// Vérifié ici, après le statut de l'AudioFile, et pas avant : le cas courant
+	// "génération en cours" a un Script encore "reviewed", et doit répondre
+	// "generating" (l'info utile pour le client), pas "script not yet published".
+	// Seul le chemin qui sert réellement l'URL a besoin de cette garde.
+	if script.Status() != domain.ScriptStatusPublished {
+		return c.JSON(http.StatusAccepted, audioNotReadyResponse{Status: "script not yet published"})
 	}
 
 	s3Key, err := parseS3Key(audioFile.Audio().StorageURL())
