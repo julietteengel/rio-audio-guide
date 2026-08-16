@@ -13,6 +13,11 @@ func StartAudioGeneration(ctx context.Context, audioFileRepo ports.AudioFileRepo
 	if err != nil {
 		return err
 	}
+	// Redelivery après un échec transitoire : le fichier est déjà "generating",
+	// rien à refaire — sinon MarkGenerating rejette et le message boucle.
+	if audioFile.Status() == domain.AudioFileStatusGenerating {
+		return nil
+	}
 	if err := audioFile.MarkGenerating(); err != nil {
 		return err
 	}

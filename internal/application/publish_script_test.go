@@ -25,6 +25,29 @@ func TestStartAudioGeneration(t *testing.T) {
 	}
 }
 
+// Un message RabbitMQ redelivré rejoue StartAudioGeneration sur un AudioFile
+// déjà "generating" : ce doit être un no-op, pas une erreur — sinon le worker
+// nack/requeue en boucle et le fichier reste bloqué à jamais.
+func TestStartAudioGeneration_IsIdempotentWhenAlreadyGenerating(t *testing.T) {
+	audioFileRepo := newFakeAudioFileRepo()
+	ctx := context.Background()
+
+	audioFile, _ := domain.NewAudioFile("script-1", "voice-1")
+	_ = audioFileRepo.Save(ctx, audioFile)
+
+	if err := StartAudioGeneration(ctx, audioFileRepo, audioFile.ID()); err != nil {
+		t.Fatalf("unexpected error on first call: %v", err)
+	}
+	if err := StartAudioGeneration(ctx, audioFileRepo, audioFile.ID()); err != nil {
+		t.Fatalf("unexpected error on redelivery: %v", err)
+	}
+
+	saved, _ := audioFileRepo.FindByID(ctx, audioFile.ID())
+	if saved.Status() != domain.AudioFileStatusGenerating {
+		t.Fatalf("got status %v, want generating", saved.Status())
+	}
+}
+
 func TestCompleteAudioGeneration(t *testing.T) {
 	scriptRepo := newFakeScriptRepo()
 	audioFileRepo := newFakeAudioFileRepo()

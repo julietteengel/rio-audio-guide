@@ -21,7 +21,9 @@ type fakeScriptRepo struct {
 	scripts map[string]*domain.Script
 }
 
-func newFakeScriptRepo() *fakeScriptRepo { return &fakeScriptRepo{scripts: map[string]*domain.Script{}} }
+func newFakeScriptRepo() *fakeScriptRepo {
+	return &fakeScriptRepo{scripts: map[string]*domain.Script{}}
+}
 
 func (f *fakeScriptRepo) Save(_ context.Context, s *domain.Script) error {
 	f.mu.Lock()
@@ -135,6 +137,90 @@ type fakeTTSGenerator struct{}
 
 func (fakeTTSGenerator) Generate(_ context.Context, text, _, _ string) ([]byte, time.Duration, error) {
 	return []byte("FAKE-AUDIO:" + text), 5 * time.Second, nil
+}
+
+// onceFailingTTSGenerator échoue transitoirement au PREMIER appel puis réussit
+// — exactement le scénario qui déclenchait la boucle infinie : le message est
+// requeué, redelivré, et StartAudioGeneration retrouve l'AudioFile déjà
+// "generating".
+type onceFailingTTSGenerator struct {
+	mu     sync.Mutex
+	failed bool
+}
+
+func (g *onceFailingTTSGenerator) Generate(_ context.Context, text, _, _ string) ([]byte, time.Duration, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	if !g.failed {
+		g.failed = true
+		return nil, 0, errors.New("simulated transient failure")
+	}
+	return []byte("FAKE-AUDIO:" + text), 5 * time.Second, nil
+}
+
+func TestWorker_TransientTTSError_RetriesOnRedeliveryAndSucceeds(t *testing.T) {
+	channel := testChannel(t)
+
+	scriptRepo := newFakeScriptRepo()
+	audioFileRepo := newFakeAudioFileRepo()
+
+	text, _ := domain.NewScriptText("Texte à réessayer")
+	script := domain.NewScript("place-1", domain.LanguageFR, text, "source")
+	if err := script.MarkReviewed("julie"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	_ = scriptRepo.Save(context.Background(), script)
+
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	_ = audioFileRepo.Save(context.Background(), audioFile)
+
+	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{}, &onceFailingTTSGenerator{})
+	if err != nil {
+		t.Fatalf("new worker: %v", err)
+	}
+
+	// Le chemin transitoire dort 2s avant chaque Nack — la fenêtre doit couvrir
+	// l'échec + le délai + la redelivery réussie.
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	go func() { _ = worker.Run(ctx) }()
+
+	body, _ := json.Marshal(ttsJobMessage{
+		AudioFileID: audioFile.ID(),
+		ScriptID:    script.ID(),
+		Text:        "Texte à réessayer",
+		Language:    "fr",
+		VoiceID:     "voice-1",
+	})
+	if err := channel.PublishWithContext(context.Background(), "", TTSJobQueue, false, false, amqp.Publishing{
+		ContentType: "application/json",
+		Body:        body,
+	}); err != nil {
+		t.Fatalf("publish test job: %v", err)
+	}
+
+	deadline := time.After(12 * time.Second)
+	tick := time.NewTicker(100 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		select {
+		case <-deadline:
+			found, findErr := audioFileRepo.FindByID(context.Background(), audioFile.ID())
+			if findErr == nil {
+				t.Fatalf("timed out waiting for retry to succeed, audio file stuck in status %v", found.Status())
+			}
+			t.Fatal("timed out waiting for retry to succeed")
+		case <-tick.C:
+			found, err := audioFileRepo.FindByID(context.Background(), audioFile.ID())
+			if err == nil && found.Status() == domain.AudioFileStatusReady {
+				savedScript, _ := scriptRepo.FindByID(context.Background(), script.ID())
+				if savedScript.Status() != domain.ScriptStatusPublished {
+					t.Fatalf("got script status %v, want published", savedScript.Status())
+				}
+				return
+			}
+		}
+	}
 }
 
 type failingTTSGenerator struct{ err error }
