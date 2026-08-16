@@ -93,3 +93,37 @@ func TestAudioFileRepository_QueuedHasNoAudioYet(t *testing.T) {
 		t.Fatalf("expected no storage URL yet, got %q", found.Audio().StorageURL())
 	}
 }
+
+func TestAudioFileRepository_FindByScriptID(t *testing.T) {
+	pool := testPool(t)
+	ctx := context.Background()
+
+	placeName, _ := domain.NewPlaceName("Real Gabinete")
+	coords, _ := domain.NewCoordinates(-22.9, -43.18)
+	place := domain.NewPlace(placeName, "museum", coords, "", "overture", "correct")
+	placeRepo := NewPlaceRepository(pool)
+	_ = placeRepo.Save(ctx, place)
+
+	scriptText, _ := domain.NewScriptText("Text")
+	script := domain.NewScript(place.ID(), domain.LanguageEN, scriptText, "source")
+	scriptRepo := NewScriptRepository(pool)
+	_ = scriptRepo.Save(ctx, script)
+
+	audioRepo := NewAudioFileRepository(pool)
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	if err := audioRepo.Save(ctx, audioFile); err != nil {
+		t.Fatalf("save: %v", err)
+	}
+
+	found, err := audioRepo.FindByScriptID(ctx, script.ID())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if found.ID() != audioFile.ID() {
+		t.Fatalf("got ID %q, want %q", found.ID(), audioFile.ID())
+	}
+
+	if _, err := audioRepo.FindByScriptID(ctx, "does-not-exist"); err == nil {
+		t.Fatal("expected an error for an unknown script ID, got nil")
+	}
+}

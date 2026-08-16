@@ -62,3 +62,35 @@ func (r *AudioFileRepository) FindByID(ctx context.Context, id string) (*domain.
 
 	return domain.ReconstructAudioFile(audioFileID, scriptID, voiceID, domain.AudioFileStatus(status), audio, failureReason), nil
 }
+
+// FindByScriptID renvoie l'AudioFile le plus récent pour ce script. Pas de
+// contrainte UNIQUE sur script_id en base (contrairement à scripts.place_id+
+// language) — le flux normal (ReviewAndRequestAudio, appelé une fois par
+// script grâce à la garde MarkReviewed) ne crée jamais qu'une ligne, mais
+// ORDER BY + LIMIT rend le choix déterministe si ça arrivait quand même.
+func (r *AudioFileRepository) FindByScriptID(ctx context.Context, scriptID string) (*domain.AudioFile, error) {
+	row := r.pool.QueryRow(ctx, `
+		SELECT id, script_id, voice_id, status, COALESCE(storage_url, ''),
+		       COALESCE(timestamps_url, ''), COALESCE(duration_ms, 0), COALESCE(failure_reason, '')
+		FROM audio_files WHERE script_id = $1
+		ORDER BY created_at DESC LIMIT 1
+	`, scriptID)
+
+	var audioFileID, scriptIDCol, voiceID, status, storageURL, timestampsURL, failureReason string
+	var durationMs int64
+	if err := row.Scan(&audioFileID, &scriptIDCol, &voiceID, &status, &storageURL, &timestampsURL,
+		&durationMs, &failureReason); err != nil {
+		return nil, err
+	}
+
+	var audio domain.GeneratedAudio
+	if storageURL != "" {
+		var err error
+		audio, err = domain.NewGeneratedAudio(storageURL, timestampsURL, time.Duration(durationMs)*time.Millisecond)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return domain.ReconstructAudioFile(audioFileID, scriptIDCol, voiceID, domain.AudioFileStatus(status), audio, failureReason), nil
+}
