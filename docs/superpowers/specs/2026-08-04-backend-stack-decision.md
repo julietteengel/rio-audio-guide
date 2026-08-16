@@ -119,3 +119,26 @@ raisonnement à chaque fois que la question revient (elle est déjà revenue tro
 Aucun des deux déclencheurs n'est atteint à cette date — zéro utilisateur réel, zéro trafic public,
 zéro requête mesurée lente. Documenté ici précisément pour qu'une future relecture (la mienne, plus
 tard) trouve une réponse vérifiable plutôt qu'un principe vague.
+
+## Redis — déclencheur mesuré atteint (2026-08-16, second réexamen le même jour)
+
+Le raisonnement initial pour rouvrir Redis aujourd'hui ("beaucoup de touristes au même lieu pourraient
+surcharger Postgres") a été explicitement rejeté à la relecture — c'est un besoin anticipé, pas mesuré,
+exactement ce que la section précédente exclut. Plutôt que de trancher sur ce raisonnement, une vraie
+mesure a été prise contre le cluster `kind` réel (57 lieux importés, requête `GET /places` en bounding
+box) :
+
+- **Charge HTTP concurrente** (`hey -n 500 -c 50` contre le vrai chemin applicatif) : p50 18ms, p75 72ms,
+  p90 255ms, **p95 374ms, p99 453ms** — écart x25 entre la médiane et la queue, mesuré, pas supposé.
+- **`EXPLAIN ANALYZE` direct sur la requête bounding-box**, répété 3 fois : temps d'exécution trivial
+  (0.09-0.33ms — les données elles-mêmes, 57 lignes avec index GiST, ne sont pas le problème) mais **temps
+  de planification constant à 58-88ms**, y compris en répétition. Le coût réel est dans la planification
+  PostGIS, pas dans l'exécution.
+- Réserve méthodologique : la mesure directe Postgres utilise des connexions `psql` fraîches à chaque
+  fois, contrairement à l'app réelle qui passe par un pool `pgxpool` avec cache de requêtes préparées par
+  connexion — le vrai comportement en usage réel pourrait être meilleur. Le signal HTTP (chemin
+  applicatif réel) reste la mesure la plus fiable, et il est net.
+
+**Déclencheur (1) de la section précédente — "requête identifiée comme mesurée lente en usage réel" — est
+donc atteint**, avec des chiffres reproductibles, pas un scénario anticipé. Redis réintroduit sur cette
+base ; conception détaillée dans `2026-08-16-redis-cache-and-audio-route-design.md`.
