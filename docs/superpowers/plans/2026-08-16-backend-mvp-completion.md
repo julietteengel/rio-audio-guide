@@ -14,7 +14,8 @@ Postgres déjà faits). Ajoute les adaptateurs restants (RabbitMQ complet, S3), 
 adaptateur entrant, et l'outillage (import, CI, déploiement).
 
 **Tech Stack:** Go 1.25, `github.com/rabbitmq/amqp091-go`, `github.com/aws/aws-sdk-go-v2` (+`config`,
-`credentials`, `service/s3`), `github.com/labstack/echo/v4`, LocalStack (tests S3), GitHub Actions.
+`credentials`, `service/s3`), `github.com/labstack/echo/v4`, un vrai bucket AWS S3 (tests, révisé
+2026-08-16 — plus LocalStack/MinIO), GitHub Actions.
 
 ## Global Constraints
 
@@ -528,12 +529,15 @@ git commit -m "Add RabbitMQ worker: consumes tts_jobs, drives the domain workflo
 **Interfaces:**
 - Produces: `NewAudioStorage(client *s3.Client, bucket string) *AudioStorage` satisfaisant `ports.AudioStorage`.
 
-Nécessite LocalStack : `docker run --rm -d --name rio-localstack -p 4566:4566 -e SERVICES=s3 localstack/localstack`
+**Révisé le 2026-08-16 : vrai bucket AWS S3 (`rio-audioguide-bucket`), plus LocalStack/MinIO** —
+pratique AWS réelle, cohérent avec la maîtrise visée. Identifiants dans l'environnement du terminal
+(`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_SESSION_TOKEN`/`AWS_REGION`), jamais dans le code ni
+codés en dur — le SDK les lit automatiquement via `config.LoadDefaultConfig`.
 
 - [ ] **Step 1: Ajouter les dépendances**
 
 ```bash
-go get github.com/aws/aws-sdk-go-v2/aws github.com/aws/aws-sdk-go-v2/config github.com/aws/aws-sdk-go-v2/credentials github.com/aws/aws-sdk-go-v2/service/s3
+go get github.com/aws/aws-sdk-go-v2/aws github.com/aws/aws-sdk-go-v2/config github.com/aws/aws-sdk-go-v2/service/s3
 ```
 
 - [ ] **Step 2: Écrire le test qui échoue**
@@ -546,40 +550,37 @@ package s3
 
 import (
 	"context"
+	"os"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 func testClient(t *testing.T) *s3.Client {
 	t.Helper()
-	cfg, err := config.LoadDefaultConfig(context.Background(),
-		config.WithRegion("us-east-1"),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("test", "test", "")),
-	)
+	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
 		t.Fatalf("load aws config: %v", err)
 	}
-	return s3.NewFromConfig(cfg, func(o *s3.Options) {
-		o.BaseEndpoint = aws.String("http://localhost:4566")
-		o.UsePathStyle = true
-	})
+	return s3.NewFromConfig(cfg)
+}
+
+func testBucket(t *testing.T) string {
+	t.Helper()
+	bucket := os.Getenv("S3_TEST_BUCKET")
+	if bucket == "" {
+		t.Skip("S3_TEST_BUCKET not set — skipping real-S3 integration test")
+	}
+	return bucket
 }
 
 func TestAudioStorage_Upload(t *testing.T) {
 	client := testClient(t)
-	ctx := context.Background()
-	bucket := "rio-audio-guide-test"
-
-	if _, err := client.CreateBucket(ctx, &s3.CreateBucketInput{Bucket: aws.String(bucket)}); err != nil {
-		t.Logf("create bucket (peut déjà exister): %v", err)
-	}
+	bucket := testBucket(t)
 
 	storage := NewAudioStorage(client, bucket)
-	url, err := storage.Upload(ctx, "test/audio.mp3", []byte("fake audio bytes"), "audio/mpeg")
+	url, err := storage.Upload(context.Background(), "test/audio.mp3", []byte("fake audio bytes"), "audio/mpeg")
 	if err != nil {
 		t.Fatalf("upload: %v", err)
 	}
@@ -589,6 +590,10 @@ func TestAudioStorage_Upload(t *testing.T) {
 	}
 }
 ```
+
+Pas de `CreateBucket` dans le test — le bucket existe déjà, créé à la main dans la console AWS.
+`testBucket` lit `S3_TEST_BUCKET` (à exporter toi-même, ex. `export S3_TEST_BUCKET=rio-audioguide-bucket`)
+plutôt que de coder le nom en dur dans le test.
 
 - [ ] **Step 3: Vérifier que ça échoue**
 
@@ -1028,9 +1033,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -1062,18 +1065,15 @@ func main() {
 	}
 	defer channel.Close()
 
-	awsCfg, err := config.LoadDefaultConfig(ctx,
-		config.WithRegion("us-east-1"),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("test", "test", "")),
-	)
+	// Vrai AWS : LoadDefaultConfig lit AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/
+	// AWS_SESSION_TOKEN/AWS_REGION depuis l'environnement (ou ~/.aws/credentials)
+	// automatiquement — rien à coder en dur, pas d'endpoint local à forcer.
+	awsCfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		log.Fatalf("load aws config: %v", err)
 	}
-	s3Client := awss3.NewFromConfig(awsCfg, func(o *awss3.Options) {
-		o.BaseEndpoint = aws.String(envOr("S3_ENDPOINT", "http://localhost:4566"))
-		o.UsePathStyle = true
-	})
-	storage := s3.NewAudioStorage(s3Client, envOr("S3_BUCKET", "rio-audio-guide"))
+	s3Client := awss3.NewFromConfig(awsCfg)
+	storage := s3.NewAudioStorage(s3Client, envOr("S3_BUCKET", "rio-audioguide-bucket"))
 
 	scriptRepo := postgres.NewScriptRepository(pool)
 	audioFileRepo := postgres.NewAudioFileRepository(pool)
@@ -1098,7 +1098,7 @@ func envOr(key, fallback string) string {
 }
 ```
 
-- [ ] **Step 2: Lancer contre les conteneurs (Postgres, RabbitMQ, LocalStack)**
+- [ ] **Step 2: Lancer contre Postgres, RabbitMQ (conteneurs) et le vrai bucket S3**
 
 ```bash
 go run ./cmd/worker
@@ -1429,7 +1429,7 @@ jobs:
 
 - [ ] **Step 2: Vérifier localement que les commandes du workflow fonctionnent**
 
-Run (avec Postgres/RabbitMQ/LocalStack déjà lancés localement) :
+Run (avec Postgres/RabbitMQ déjà lancés localement, et les identifiants AWS déjà exportés dans le terminal) :
 ```bash
 go build ./... && go vet ./... && go test ./... && TEST_DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" go test -tags=integration ./...
 ```

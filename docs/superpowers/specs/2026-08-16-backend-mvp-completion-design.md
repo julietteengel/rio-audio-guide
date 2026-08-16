@@ -28,7 +28,10 @@ côté publisher (`ttsJobMessage`), même package.
 
 Nouveau port, absent du plan initial : `ports.AudioStorage` — `Upload(ctx, key string, data []byte)
 (url string, err error)`. Implémentation `internal/adapters/s3/audio_storage.go` avec le SDK AWS v2.
-Testé contre **LocalStack** (mêmes appels SDK réels, endpoint local, pas de compte AWS ni coût) — la
+**Révisé le 2026-08-16 : testé contre un vrai bucket AWS S3** (`rio-audioguide-bucket`, compte AWS déjà
+disponible) plutôt que LocalStack (mur de licence rencontré en pratique) ou MinIO — pratique AWS réelle,
+cohérente avec l'objectif de maîtrise. Identifiants uniquement dans l'environnement, jamais dans le code.
+La
 même implémentation pointerait vers un vrai bucket en changeant seulement l'endpoint/la config, pas le
 code. Le worker (sous-système 1) l'appelle avant `CompleteAudioGeneration`.
 
@@ -67,9 +70,11 @@ importées en masse.
 ## Sous-système 5 — CI/CD (GitHub Actions)
 
 `.github/workflows/backend-ci.yml` : `go build`, `go vet`, tests unitaires (`go test ./...`, sans le tag
-`integration`) sur chaque push. Tests d'intégration via `services:` du workflow — conteneurs Postgres
-(`postgis/postgis`), RabbitMQ, LocalStack, démarrés par GitHub Actions lui-même, pas par l'autrice à la
-main — puis `go test -tags=integration ./...` contre ces services.
+`integration`) sur chaque push. Tests d'intégration via `services:` du workflow pour Postgres
+(`postgis/postgis`) et RabbitMQ, démarrés par GitHub Actions lui-même. Le vrai bucket S3 (révisé
+2026-08-16) n'a pas de `services:` équivalent — les tests S3 en CI utiliseraient des identifiants AWS
+en GitHub Secrets plutôt qu'un conteneur, à préciser si ce sous-système est repris (dépriorisé pour
+l'instant au profit d'AWS/Docker/K8s réels).
 
 ## Sous-système 6 — Manifests Kubernetes (écrits, pas déployés)
 
