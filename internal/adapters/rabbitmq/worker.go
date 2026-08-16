@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 
@@ -61,6 +62,13 @@ func (w *Worker) Run(ctx context.Context) error {
 	}
 }
 
+// requeueDelay temporise chaque remise en queue. Sans elle, un 429 persistant
+// devient une boucle serrée qui martèle ElevenLabs aussi vite que le réseau le
+// permet — le meilleur moyen de se faire throttler au niveau du compte. Le
+// worker traite les messages en série (un seul handle() à la fois dans Run),
+// donc dormir ici ne bloque rien d'autre.
+const requeueDelay = 2 * time.Second
+
 func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	var job ttsJobMessage
 	if err := json.Unmarshal(msg.Body, &job); err != nil {
@@ -81,6 +89,7 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 		// requeue=true ici : contrairement au message malformé, une erreur
 		// de repository est probablement transitoire (base momentanément
 		// indisponible) — retenter a du sens.
+		time.Sleep(requeueDelay)
 		_ = msg.Nack(false, true)
 		return
 	}
@@ -99,6 +108,7 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 			return
 		}
 		log.Printf("tts worker: TTS generation failed for %s: %v", job.AudioFileID, err)
+		time.Sleep(requeueDelay)
 		_ = msg.Nack(false, true)
 		return
 	}
@@ -109,6 +119,7 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	storageURL, err := w.storage.Upload(ctx, job.AudioFileID+".mp3", audioBytes, "audio/mpeg")
 	if err != nil {
 		log.Printf("tts worker: upload failed for %s: %v", job.AudioFileID, err)
+		time.Sleep(requeueDelay)
 		_ = msg.Nack(false, true)
 		return
 	}
@@ -117,6 +128,7 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	// de domaine "audio prêt → script publié" qu'on avait nommé plus tôt).
 	if err := application.CompleteAudioGeneration(ctx, w.scriptRepo, w.audioFileRepo, job.AudioFileID, storageURL, "", duration); err != nil {
 		log.Printf("tts worker: complete generation failed for %s: %v", job.AudioFileID, err)
+		time.Sleep(requeueDelay)
 		_ = msg.Nack(false, true)
 		return
 	}
