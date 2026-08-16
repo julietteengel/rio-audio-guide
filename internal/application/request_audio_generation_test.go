@@ -29,6 +29,10 @@ func (f *fakeScriptRepo) FindByID(_ context.Context, id string) (*domain.Script,
 	return s, nil
 }
 
+func (f *fakeScriptRepo) FindByPlaceIDAndLanguage(_ context.Context, _, _ string) (*domain.Script, error) {
+	return nil, errors.New("not implemented in fake")
+}
+
 type fakeAudioFileRepo struct {
 	files map[string]*domain.AudioFile
 }
@@ -48,6 +52,10 @@ func (f *fakeAudioFileRepo) FindByID(_ context.Context, id string) (*domain.Audi
 		return nil, errors.New("audio file not found")
 	}
 	return a, nil
+}
+
+func (f *fakeAudioFileRepo) FindByScriptID(_ context.Context, _ string) (*domain.AudioFile, error) {
+	return nil, errors.New("not implemented in fake")
 }
 
 type fakePublisher struct {
