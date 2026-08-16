@@ -6,10 +6,10 @@ sixième ajouté en cours de discussion. Il complète `2026-08-12-backend-domain
 ports, adaptateurs Postgres — déjà faits) et la Tâche 10/11 du plan associé (adaptateur RabbitMQ
 publisher, câblage `main.go` — déjà planifiées, pas encore faites).
 
-Contexte : préparation d'un entretien technique Powens (2026-08-18). Objectif explicite de l'autrice :
-un backend qui tourne réellement, pas une démo figée — Postgres avec de vraies données du pipeline,
-RabbitMQ réel, une API HTTP réelle, du CI/CD réel. Le frontend et le déploiement K8s réel restent hors
-scope pour l'instant (le second est esquissé comme artefact, pas déployé — voir sous-système 6).
+Contexte : objectif explicite de l'autrice — un backend qui tourne réellement, pas une démo figée —
+Postgres avec de vraies données du pipeline, RabbitMQ réel, une API HTTP réelle, du CI/CD réel. Le
+frontend et le déploiement K8s réel restent hors scope pour l'instant (le second est esquissé comme
+artefact, pas déployé — voir sous-système 6).
 
 ## Sous-système 1 — Worker RabbitMQ (rôle entrant, driving adapter)
 
@@ -93,7 +93,7 @@ premier.
 ### `docker-build.yml` — sur push vers `backend`, seulement si `cmd/**`, `internal/**` ou un Dockerfile changent
 
 **Écrit le 2026-08-16**, plus tôt que prévu initialement (décision reprise en cours de session, la
-soirée du 16 étant la seule disponible avant l'entretien). Calqué sur `fiap-dclt-aula03/docker-
+soirée du 16 étant le créneau disponible). Calqué sur `fiap-dclt-aula03/docker-
 build.yml` : `docker/setup-buildx-action`, `aws-actions/configure-aws-credentials` (identifiants en
 GitHub Secrets, jamais en clair), `aws-actions/amazon-ecr-login`, puis `docker/build-push-action` pour
 les deux images (`Dockerfile.api`, `Dockerfile.worker`) — deux dépôts ECR séparés (`rio-api`,
@@ -111,8 +111,8 @@ Sinon même structure : déclenché par `workflow_run` une fois `docker-build.ym
 update-kubeconfig`, smoke test contre le LoadBalancer. Fichier écrit et validé en syntaxe ; nécessite
 un vrai cluster EKS pour tourner, pas encore monté à ce stade — décision de monter un cluster réel ce
 soir prise explicitement par l'autrice malgré le risque d'infra live déjà noté plus haut (coût/temps
-de provisioning acceptés consciemment, cluster à détruire après validation, pas laissé tourner pendant
-l'entretien).
+de provisioning acceptés consciemment, cluster prévu pour être détruit après validation, pas laissé
+tourner sans raison).
 
 ## Sous-système 6 — Chart Helm + manifests Kubernetes (écrits, pas déployés)
 
@@ -122,8 +122,8 @@ suite à relecture du CV de l'autrice qui liste explicitement Helm/HPA/KEDA/Isti
 de scaling différents — exactement la situation où Kubernetes devient pertinent plutôt qu'artificiel,
 cohérent avec `2026-08-04-backend-stack-decision.md` qui anticipait déjà KEDA pour ce worker précis.
 
-**Écrit maintenant, déployé plus tard** — pas de cluster réel monté avant l'entretien (même raisonnement
-que pour la démo : une infra live pendant l'entretien est un risque, pas une preuve) :
+**Écrit maintenant, déployé plus tard** — pas de cluster réel monté dans un premier temps (même
+raisonnement que pour la démo : une infra live non surveillée est un risque, pas une preuve) :
 
 - **Dockerfiles** — un par binaire (`cmd/api`, `cmd/worker`).
 - **Chart Helm** (`deploy/helm/rio-backend/`), pas des YAML bruts — `Chart.yaml`, `values.yaml`
@@ -152,6 +152,6 @@ second temps, hors de la contrainte de temps actuelle.
 
 - Vraie intégration TTS (ElevenLabs) — le stub reste un stub, une vraie intégration est sa propre
   conception (clé API, gestion des quotas, format de réponse).
-- Déploiement K8s réel (cluster monté, manifests appliqués) — reporté après l'entretien.
+- Déploiement K8s réel (cluster monté, manifests appliqués) — reporté à plus tard.
 - Authentification/autorisation sur l'API HTTP — les deux routes restent ouvertes, cohérent avec
   l'absence de modèle `users`/`partners` dans le backend à ce stade.

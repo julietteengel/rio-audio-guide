@@ -1,11 +1,10 @@
-# AI judgment in software engineering — research summary (prep note)
+# AI judgment in software engineering — research summary
 
 Recherche multi-sources, vérifiée de manière adversariale (24 sources fetchées, 108 affirmations
 extraites, 25 vérifiées par vote 3-0 indépendant), sur la question : où est la limite entre laisser
-l'IA tout faire et rester un "bon développeur" — dans le contexte de la candidature Powens (fiche
-exigeant explicitement "sound judgment in using AI tools, with good review practices").
+l'IA tout faire et rester un "bon développeur".
 
-Sert deux usages : cadrer la pratique de travail sur ce repo, et préparer des réponses d'entretien.
+Sert à cadrer la pratique de travail sur ce repo.
 
 ## Constat central
 
@@ -55,14 +54,14 @@ La vérification adversariale a tué 12 affirmations séduisantes mais non fond�
 chiffres très partagés mais non confirmés (source secondaire Faros.ai) : "+54% de bugs", "+242,7%
 d'incidents par PR", "+441% de temps de revue", "31% de PRs mergées sans revue". La tendance
 directionnelle (l'instabilité augmente avec l'adoption IA) reste vraie ; ces chiffres précis, non.
-Ne pas les répéter en entretien.
+Ne pas les citer comme faits établis.
 
 ## Angle mort assumé
 
-Aucune source n'a passé la vérification sur ce que les recruteurs fintech/EMI testent concrètement
-pour "sound judgment in AI tools" (Coinbase et Canva ont publié sur le sujet, mais leurs affirmations
-n'ont pas survécu au vote à 3). C'est une pratique de recrutement émergente, pas encore codifiée —
-à traiter par principes généraux, pas par un script d'entretien tout fait.
+Aucune source n'a passé la vérification sur ce qui est concrètement évalué en pratique pour "sound
+judgment in AI tools" en entreprise (quelques entreprises ont publié sur le sujet, mais leurs
+affirmations n'ont pas survécu au vote à 3). C'est une pratique émergente, pas encore codifiée — à
+traiter par principes généraux, pas par une réponse toute faite.
 
 ## Application à ce projet
 
@@ -70,6 +69,6 @@ n'ont pas survécu au vote à 3). C'est une pratique de recrutement émergente, 
   `sourcing-pipeline`, jamais mergée à ce jour faute de cette revue).
 - Confirme le choix d'écrire le guide runtime et le backend Go/hexagonal/DDD à la main plutôt que de
   les laisser générer — c'est exactement la zone non-délégable identifiée par la recherche.
-- Action d'entretien concrète : préparer 2-3 exemples précis où une sortie IA a été rejetée, corrigée
-  ou fortement éditée. Le rejet de Kafka/Mongo dans `2026-08-04-backend-stack-decision.md` en est un,
-  daté et documenté — plus convaincant qu'une déclaration d'intention générale.
+- Utile pour soi : garder 2-3 exemples précis où une sortie IA a été rejetée, corrigée ou fortement
+  éditée. Le rejet de Kafka/Mongo dans `2026-08-04-backend-stack-decision.md` en est un, daté et
+  documenté — plus convaincant qu'une déclaration d'intention générale.

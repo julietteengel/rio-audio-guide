@@ -50,14 +50,14 @@ see Phases below and the 2026-08-15 note on the rest of the backend.
 | Sourcing pipeline | Python (Overture Maps, Wikidata, feiras registry) | Built, tested, **not yet merged to master** (pending human code review) |
 | Content pipeline (batch) | Python (grounding, narration, translation, anti-hallucination judge) | In progress — see status below |
 | Guide runtime (v1 scope) | Mobile app logic (React Native) — proximity-triggered narration + local tour memory, no server-side agent | Not started. Scope resolved 2026-08-12 — live Q&A/tool calling/human-in-the-loop deferred to Phase 2, per `docs/superpowers/specs/2026-08-12-guide-runtime-v1-scope-design.md` |
-| Backend | Go, hexagonal architecture + DDD, PostgreSQL/PostGIS, RabbitMQ (TTS job queue), K8s (EKS demo)/Scaleway (real prod) | In progress — domain layer (Place/Script/AudioFile) and ports **written by hand** by the founder. Remaining layers (Postgres/RabbitMQ adapters, HTTP API, CI/CD) switched to **AI-written, human-reviewed** on 2026-08-15 — a deliberate, time-boxed call ahead of a 2026-08-18 interview, not a silent default. See note below. |
+| Backend | Go, hexagonal architecture + DDD, PostgreSQL/PostGIS, RabbitMQ (TTS job queue), K8s (EKS demo)/Scaleway (real prod) | In progress — domain layer (Place/Script/AudioFile) and ports **written by hand** by the founder. Remaining layers (Postgres/RabbitMQ adapters, HTTP API, CI/CD) switched to **AI-written, human-reviewed** on 2026-08-15 — a deliberate, time-boxed call, not a silent default. See note below. |
 | Ops depth | CI/CD canary+rollback, distributed observability, security guardrails, compliance | Not started — explicitly scoped in depth, not minimal, per roadmap v2 |
 | Admin dashboard + mobile app | React Native app, admin dashboard | Not started |
 
 Redis and Kafka were both proposed and then explicitly cut (2026-08-04) for lack of a measured,
 current need — see the backend-stack-decision spec before re-adding either. Raised again on
-2026-08-15 (interview prep pressure) and cut again for the same reason: adding either now would
-contradict the founder's own documented reasoning, not extend it.
+2026-08-15 and cut again for the same reason: adding either now would contradict the founder's own
+documented reasoning, not extend it.
 
 **Note on the 2026-08-15 hand-written → AI-written switch, refined same day:** domain/ports stayed
 hand-written throughout. The remaining backend layers briefly switched to "AI writes by default" —

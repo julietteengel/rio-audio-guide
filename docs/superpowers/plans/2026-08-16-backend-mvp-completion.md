@@ -1525,8 +1525,8 @@ avec Karpenter installé, non validable hors cluster réel). Tout commité.
 **Reste à faire — décision reprise en session (2026-08-16, soirée) :** initialement "écrit, pas
 déployé" restait la ligne d'arrivée de cette tâche. L'autrice a explicitement choisi de monter un vrai
 cluster EKS ce soir pour valider le déploiement de bout en bout (coût/risque d'infra live assumés en
-connaissance de cause, cluster prévu pour être détruit après validation, pas laissé tourner pendant
-l'entretien) — voir Tâche 11 pour ce déploiement réel.
+connaissance de cause, cluster prévu pour être détruit après validation, pas laissé tourner sans
+raison) — voir Tâche 11 pour ce déploiement réel.
 
 **Files :**
 - Create: `deploy/docker/Dockerfile.api`
@@ -1953,9 +1953,8 @@ git commit -m "Add Helm chart (API HPA, worker KEDA), canary-istio and blue-gree
 
 Initialement hors scope de ce plan (voir la note "Ce que ce plan ne couvre pas" plus bas, écrite avant
 cette tâche) : monter un vrai cluster EKS coûte de l'argent et du temps de provisioning, et le spec
-associé recommandait explicitement d'éviter toute infra live avant l'entretien. L'autrice a choisi en
-connaissance de cause de le faire quand même ce soir, pour une pratique concrète Docker/K8s/Helm à
-défendre en entretien.
+associé recommandait explicitement d'éviter toute infra live sans supervision. L'autrice a choisi en
+connaissance de cause de le faire quand même ce soir, pour une pratique concrète Docker/K8s/Helm.
 
 **Pivot EKS → `kind`, décidé en session :** la première tentative (`eksctl create cluster --name
 rio-audio-guide --region us-east-1`) a échoué immédiatement — le rôle IAM du compte utilisé (un AWS
