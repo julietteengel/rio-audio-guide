@@ -50,6 +50,36 @@ func TestGetPlaceAudio_Ready(t *testing.T) {
 	}
 }
 
+func TestGetPlaceAudio_FailsOpenWhenCacheErrors(t *testing.T) {
+	placeName, _ := domain.NewPlaceName("Cristo Redentor")
+	coords, _ := domain.NewCoordinates(-22.9519, -43.2105)
+	place := domain.NewPlace(placeName, "monument", coords, "", "wikidata", "rich")
+
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript(place.ID(), domain.LanguageFR, text, "source")
+
+	audio, _ := domain.NewGeneratedAudio("s3://rio-audio-guide/abc123.mp3", "", 30*time.Second)
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	_ = audioFile.MarkGenerating()
+	_ = audioFile.MarkReady(audio)
+
+	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
+	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo,
+		&fakePublisher{}, fakeAudioStorage{}, erroringCache{})
+
+	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want 200 — a cache error must never fail the request: %s", rec.Code, rec.Body.String())
+	}
+	if !strings.Contains(rec.Body.String(), "presigned.example.com/abc123.mp3") {
+		t.Fatalf("expected a presigned URL in the response, got %s", rec.Body.String())
+	}
+}
+
 func TestGetPlaceAudio_NotReadyYet(t *testing.T) {
 	placeName, _ := domain.NewPlaceName("Cais do Valongo")
 	coords, _ := domain.NewCoordinates(-22.8966, -43.1871)
