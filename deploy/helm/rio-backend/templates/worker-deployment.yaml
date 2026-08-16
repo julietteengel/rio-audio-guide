@@ -22,3 +22,14 @@ spec:
               value: "{{ .Values.s3.bucket }}"
             - name: ELEVENLABS_API_KEY
               valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: elevenlabs-api-key } }
+            # AWS creds via explicit secret keys, optional: true — only needed on kind (no IAM role
+            # attached to nodes). On real EKS with IRSA, these keys are absent and the SDK's default
+            # credential chain picks up the pod's assumed role instead.
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: aws-access-key-id, optional: true } }
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: aws-secret-access-key, optional: true } }
+            - name: AWS_SESSION_TOKEN
+              valueFrom: { secretKeyRef: { name: {{ .Values.secrets.name }}, key: aws-session-token, optional: true } }
+            - name: AWS_REGION
+              value: "{{ .Values.s3.region | default "us-east-1" }}"
