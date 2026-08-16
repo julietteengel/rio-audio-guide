@@ -308,7 +308,12 @@ func (f failingStorage) PresignURL(_ context.Context, _ string, _ time.Duration)
 }
 
 func TestWorker_PermanentS3Error_MarksAudioFileFailedAndAcks(t *testing.T) {
+	// Deux connexions distinctes : le worker consomme sur la sienne, le test
+	// publie et vérifie sur l'autre. C'est ce qui rend l'assertion "queue vidée"
+	// ci-dessous possible — il faut pouvoir couper le consumer du worker sans
+	// perdre le canal qui sert à interroger la queue.
 	channel := testChannel(t)
+	workerChannel := testChannel(t)
 
 	scriptRepo := newFakeScriptRepo()
 	audioFileRepo := newFakeAudioFileRepo()
@@ -322,9 +327,16 @@ func TestWorker_PermanentS3Error_MarksAudioFileFailedAndAcks(t *testing.T) {
 	_ = audioFileRepo.Save(context.Background(), audioFile)
 
 	permErr := &ports.PermanentError{StatusCode: 0, Body: "InvalidAccessKeyId"}
-	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, failingStorage{err: permErr}, fakeTTSGenerator{})
+	worker, err := NewWorker(workerChannel, scriptRepo, audioFileRepo, failingStorage{err: permErr}, fakeTTSGenerator{})
 	if err != nil {
 		t.Fatalf("new worker: %v", err)
+	}
+
+	// Après NewWorker (qui déclare la queue) : repart d'une queue vide, sinon un
+	// résidu d'un run précédent ferait échouer l'assertion finale pour la
+	// mauvaise raison.
+	if _, err := channel.QueuePurge(TTSJobQueue, false); err != nil {
+		t.Fatalf("purge queue: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -358,8 +370,51 @@ func TestWorker_PermanentS3Error_MarksAudioFileFailedAndAcks(t *testing.T) {
 				if found.FailureReason() == "" {
 					t.Fatal("expected a non-empty failure reason")
 				}
+				assertQueueDrained(t, channel, workerChannel)
 				return
 			}
+		}
+	}
+}
+
+// assertQueueDrained prouve que la delivery a bien été Ack'ée, et pas Nack'ée
+// avec requeue — c'est-à-dire exactement le bug (boucle de redelivery infinie)
+// que la classification des erreurs S3 permanentes existe pour corriger. Sans
+// cette vérification, le test passerait aussi avec un Nack(requeue=true).
+//
+// Compter les messages pendant que le worker consomme encore ne prouverait
+// rien : une delivery non-Ack'ée est "unacked", pas "ready", et n'est donc PAS
+// comptée par QueueDeclarePassive — un message coincé en boucle de redelivery
+// serait invisible presque tout le temps. Il faut d'abord couper le consumer
+// (fermer son canal), ce qui force le broker à rendre à la queue tout ce qui
+// n'a pas été Ack'é ; ce qui reste à 0 après ça n'y est vraiment plus.
+func assertQueueDrained(t *testing.T, channel, workerChannel *amqp.Channel) {
+	t.Helper()
+
+	if err := workerChannel.Close(); err != nil {
+		t.Fatalf("close worker channel: %v", err)
+	}
+
+	// Le retour en queue par le broker est asynchrone, d'où le polling plutôt
+	// qu'une lecture unique : sur un Ack le compteur reste à 0, sur un requeue
+	// il monte à 1 et y reste (plus aucun consumer pour le reprendre).
+	deadline := time.After(3 * time.Second)
+	tick := time.NewTicker(50 * time.Millisecond)
+	defer tick.Stop()
+	last := -1
+	for {
+		select {
+		case <-deadline:
+			t.Fatalf("got %d message(s) still in queue, want 0 (the delivery should have been Ack'd, not left for redelivery)", last)
+		case <-tick.C:
+			q, err := channel.QueueDeclarePassive(TTSJobQueue, true, false, false, false, nil)
+			if err != nil {
+				t.Fatalf("queue declare passive: %v", err)
+			}
+			if q.Messages == 0 {
+				return
+			}
+			last = q.Messages
 		}
 	}
 }
