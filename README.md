@@ -30,6 +30,35 @@ many scripts across languages; a script's audio generation lifecycle is distinct
 itself). See `docs/superpowers/specs/2026-08-12-backend-domain-model-design.md` for the full
 reasoning.
 
+### What each layer actually does — traced through one request
+
+The four `internal/` folders aren't just organizational — each one answers a different question, and
+the dependency direction (`adapters → ports → application → domain`, never the reverse) means inner
+layers never know the outer ones exist. Concretely, tracing `POST /scripts/{id}/review`:
+
+1. **`adapters/http`** (`server.go`) parses the HTTP request (JSON body, path param) and calls into
+   `application`. It knows about Echo, JSON, HTTP status codes — nothing below it does.
+2. **`application`** (`ReviewAndRequestAudio` in `publish_script.go`) is the *use case*: the ordered
+   steps a real request goes through, with no knowledge of Postgres, HTTP, or RabbitMQ specifics — only
+   `domain` types and `ports` interfaces. Here: fetch the `Script` (via a port), tell it to transition
+   to reviewed (a `domain` method), save it (via a port), create an `AudioFile` (`domain`), save it
+   (via a port), publish a TTS job (via a port). This is the layer that would change if the *business
+   process* changed (e.g. "require two reviewers") — not if the database changed.
+3. **`ports`** (`ScriptRepository`, `AudioFileRepository`, `AudioJobPublisher` interfaces) is the
+   *contract* `application` depends on — "something that can find/save a Script by ID," with zero
+   detail about how. `application` is written entirely against these interfaces, never against a
+   concrete Postgres type.
+4. **`domain`** (`Script.MarkReviewed()`, `domain.NewAudioFile(...)`) enforces the actual business
+   rules — e.g. `MarkReviewed()` refuses if the script isn't currently `draft`. This code has zero
+   imports from this project outside `domain` itself — no SQL, no HTTP, no JSON tags.
+5. **`adapters/postgres`**/**`adapters/rabbitmq`** are where the `ports` interfaces actually get
+   implemented — real SQL, real AMQP calls. `application` never imports these packages directly; `main.go`
+   is the only place that wires a concrete adapter into a port.
+
+Why bother: `application`/`domain` can be unit-tested with fakes (no real Postgres/RabbitMQ needed —
+see the `fake*Repo` types in the `_test.go` files), and swapping Postgres for something else would only
+touch `adapters/postgres`, never the business logic.
+
 TTS generation calls the real ElevenLabs API (`internal/adapters/elevenlabs/generator.go`, model
 `eleven_multilingual_v2`) — the worker classifies failures as transient (429/5xx/408, requeued with a
 2s delay) or permanent (other 4xx — bad API key, unknown `voice_id`, rejected text — marks the
