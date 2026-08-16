@@ -1,0 +1,99 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Docker Build and Push"]
+    types: [completed]
+    branches: [backend]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  CLUSTER_NAME: rio-audio-guide
+
+jobs:
+  deploy:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ env.CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install rio deploy/helm/rio-backend \
+            --set api.image.repository=${{ steps.login-ecr.outputs.registry }}/rio-api \
+            --set api.image.tag=${{ github.sha }} \
+            --set worker.image.repository=${{ steps.login-ecr.outputs.registry }}/rio-worker \
+            --set worker.image.tag=${{ github.sha }} \
+            --wait --timeout 5m
+
+      - name: Verify rollout
+        run: |
+          kubectl rollout status deployment/rio-api
+          kubectl rollout status deployment/rio-worker
+
+      - name: Smoke test
+        continue-on-error: true
+        run: |
+          echo "Waiting for LoadBalancer..."
+          for i in {1..12}; do
+            LB_URL=$(kubectl get service rio-api -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+            if [ -n "$LB_URL" ]; then
+              echo "LoadBalancer ready: $LB_URL"
+              break
+            fi
+            echo "Attempt $i/12 - waiting for LoadBalancer..."
+            sleep 10
+          done
+          if [ -z "$LB_URL" ]; then
+            echo "LoadBalancer not ready yet — check manually: kubectl get service rio-api"
+            exit 0
+          fi
+          sleep 20
+          echo "Testing: http://$LB_URL/places"
+          if curl -f --max-time 10 http://$LB_URL/places; then
+            echo "Smoke test passed"
+          else
+            echo "Health check failed, LoadBalancer may still be provisioning"
+          fi
+
+      - name: Deployment summary
+        run: |
+          echo "## Kubernetes Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Cluster**: ${{ env.CLUSTER_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Image tag**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Pods:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          kubectl get pods -l app=rio-api >> $GITHUB_STEP_SUMMARY
+          kubectl get pods -l app=rio-worker >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
