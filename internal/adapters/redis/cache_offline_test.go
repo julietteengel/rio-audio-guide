@@ -18,6 +18,17 @@ func TestCache_GetConnectionError(t *testing.T) {
 	client := goredis.NewClient(&goredis.Options{
 		Addr:        "localhost:1", // rien n'écoute là — la connexion échoue toujours
 		DialTimeout: 100 * time.Millisecond,
+		// Contre une adresse délibérément morte, les défauts du SDK coûtent
+		// ~1.7s et 4 lignes de bruit sur stderr pour un résultat certain dès le
+		// 1er essai. Deux réglages distincts, les deux nécessaires :
+		//   - MaxRetries = -1 désactive les réessais de commande. Attention,
+		//     0 ne les désactive PAS : go-redis mappe 0 sur son défaut (3).
+		//   - DialerRetries = 1 coupe la boucle de reconnexion du pool
+		//     (défaut : 5 essais espacés de 100ms), qui est ce qui domine
+		//     réellement le temps ici.
+		// Mesuré : 1.7s → ~1ms, 4 lignes de bruit → 1.
+		MaxRetries:    -1,
+		DialerRetries: 1,
 	})
 	t.Cleanup(func() { _ = client.Close() })
 	cache := NewCache(client)

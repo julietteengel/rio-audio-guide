@@ -2,6 +2,7 @@ package http
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -45,10 +46,16 @@ const cacheTTL = 5 * time.Minute
 
 // cachedJSON essaie le cache d'abord ; sur miss ou erreur (fail-open), appelle
 // compute, sert le résultat, et tente de le mettre en cache pour la prochaine
-// fois — une erreur d'écriture cache est loguée mais ne fait jamais échouer la
-// requête.
+// fois — une erreur de cache (lecture comme écriture) est loguée (pas juste
+// ignorée) mais ne fait jamais échouer la requête. Sans ce log, un Redis mal
+// configuré ou injoignable resterait invisible indéfiniment : le fail-open
+// rend chaque réponse correcte, juste jamais servie depuis le cache.
 func (s *Server) cachedJSON(c echo.Context, key string, compute func() (any, int, error)) error {
-	if cached, found, err := s.cache.Get(c.Request().Context(), key); err == nil && found {
+	cached, found, err := s.cache.Get(c.Request().Context(), key)
+	if err != nil {
+		log.Printf("cache get failed for key %q: %v", key, err)
+	}
+	if err == nil && found {
 		return c.JSONBlob(http.StatusOK, []byte(cached))
 	}
 
@@ -64,6 +71,8 @@ func (s *Server) cachedJSON(c echo.Context, key string, compute func() (any, int
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
-	_ = s.cache.Set(c.Request().Context(), key, string(body), cacheTTL) // fail-open: erreur ignorée
+	if err := s.cache.Set(c.Request().Context(), key, string(body), cacheTTL); err != nil {
+		log.Printf("cache set failed for key %q: %v", key, err) // fail-open : logué, jamais fatal
+	}
 	return c.JSONBlob(http.StatusOK, body)
 }

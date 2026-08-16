@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -32,7 +33,13 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 	}
 
 	key := "audio:" + placeID + ":" + language
-	if cached, found, err := s.cache.Get(c.Request().Context(), key); err == nil && found {
+	cached, found, err := s.cache.Get(c.Request().Context(), key)
+	if err != nil {
+		// Fail-open : on continue vers la base, mais on le dit — sinon un Redis
+		// en panne est indistinguable d'un cache qui marche (cf. cachedJSON).
+		log.Printf("cache get failed for key %q: %v", key, err)
+	}
+	if err == nil && found {
 		return c.JSONBlob(http.StatusOK, []byte(cached))
 	}
 
@@ -70,7 +77,9 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
-	_ = s.cache.Set(c.Request().Context(), key, string(body), cacheTTL)
+	if err := s.cache.Set(c.Request().Context(), key, string(body), cacheTTL); err != nil {
+		log.Printf("cache set failed for key %q: %v", key, err) // fail-open : logué, jamais fatal
+	}
 	return c.JSONBlob(http.StatusOK, body)
 }
 
