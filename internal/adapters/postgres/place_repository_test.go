@@ -107,7 +107,7 @@ func TestPlaceRepository_FindByName(t *testing.T) {
 	repo := NewPlaceRepository(pool)
 	ctx := context.Background()
 
-	name, err := domain.NewPlaceName("Escadaria Selarón")
+	name, err := domain.NewPlaceName("Theatro Municipal")
 	if err != nil {
 		t.Fatalf("unexpected error building fixture: %v", err)
 	}
@@ -120,7 +120,7 @@ func TestPlaceRepository_FindByName(t *testing.T) {
 		t.Fatalf("save fixture: %v", err)
 	}
 
-	found, err := repo.FindByName(ctx, "Escadaria Selarón")
+	found, err := repo.FindByName(ctx, "Theatro Municipal")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

@@ -17,6 +17,9 @@ func (f *fakePlaceRepo) Save(_ context.Context, _ *domain.Place) error { return 
 func (f *fakePlaceRepo) FindByID(_ context.Context, _ string) (*domain.Place, error) {
 	return nil, errors.New("not implemented in fake")
 }
+func (f *fakePlaceRepo) FindByName(_ context.Context, _ string) (*domain.Place, error) {
+	return nil, errors.New("not implemented in fake")
+}
 func (f *fakePlaceRepo) FindActiveInBoundingBox(_ context.Context, _, _, _, _ float64) ([]*domain.Place, error) {
 	return f.places, nil
 }
