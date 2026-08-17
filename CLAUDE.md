@@ -20,6 +20,12 @@ it's had a real human code review pass (not just an automated one). When asked t
   are hand-written by the founder — Claude's role there stays explanation/review only, never editing
   those files directly. Everything from `internal/adapters/` onward (Postgres, RabbitMQ, HTTP, CI/CD)
   switched to AI-written/human-reviewed on 2026-08-15, a deliberate time-boxed call, not the default.
+- **`frontend` branch**, `.worktrees/frontend/` — user-facing apps for Memória Carioca, decomposed into
+  independent sub-projects (each with its own spec under `docs/superpowers/specs/`): a Next.js landing
+  page first (started 2026-08-18 — see `2026-08-18-landing-page-design.md`), then a React Native
+  mobile app targeting the App Store. The landing page is purely static (no backend calls, hosted on
+  Vercel — deliberately decoupled from the backend's AWS infrastructure) and reuses the brand, copy,
+  and visual design already validated in an earlier Claude Design prototype, not re-designed here.
 
 ```
 docs/superpowers/specs/   dated, point-in-time decision/research documents (design doc, roadmap
