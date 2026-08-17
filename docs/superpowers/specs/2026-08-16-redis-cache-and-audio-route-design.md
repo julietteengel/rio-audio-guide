@@ -78,6 +78,18 @@ PresignURL(ctx context.Context, key string, expiry time.Duration) (string, error
 Déclencheur mesuré : voir `2026-08-04-backend-stack-decision.md`, section "Redis — déclencheur mesuré
 atteint (2026-08-16)".
 
+**Cas d'usage concrets** (le produit, pas juste la mesure isolée) :
+- `GET /places` (vue carte) : rechargée à chaque ouverture d'app ou déplacement de carte. Les 57 lieux
+  changent rarement (pas de nouvelle publication toutes les 5 minutes) — le coût mesuré (58-88ms de
+  planification PostGIS, constant, indépendant du volume de données) est repayé à l'identique à chaque
+  requête identique sans cache.
+- `GET /places/:id/audio` : plusieurs touristes au même endroit dans la même fenêtre de 5 minutes (groupe
+  scannant le même QR code, visite guidée) tombent sur la même clé `audio:{placeID}:{language}` — sans
+  cache, chacun refait lookup script + lookup audio_file + calcul de signature S3 ; avec cache, un seul
+  calcul sert tout le groupe.
+- Effet de bord (pas la raison principale) : le presigned URL dure 15 minutes — un même touriste qui
+  relance l'audio plusieurs fois dans cette fenêtre retombe sur le cache plutôt que de re-signer.
+
 **Nouveau port** :
 ```go
 // internal/ports/cache.go
