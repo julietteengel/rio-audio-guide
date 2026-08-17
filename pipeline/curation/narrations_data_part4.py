@@ -32,14 +32,6 @@ DATA_PART4 = [
 "pt": "Antiga propriedade escondida nas alturas arborizadas do Alto da Boa Vista, esta residência foi transformada em museu. Faz parte do conjunto dos Museus Castro Maya. Um refúgio discreto, longe da agitação da cidade.",
 },
 {
-"id": "overture:Scalinata Selarón:-22.91570:-43.17896",
-"name": "Scalinata Selarón",
-"fr": "Un escalier entièrement recouvert de carreaux de céramique colorés, reliant Santa Teresa à Lapa : voilà l'œuvre de Jorge Selarón, artiste chilien installé de longue date au Brésil. Il l'a conçue comme un « hommage au peuple brésilien ». Aujourd'hui, c'est la troisième attraction touristique la plus recherchée de Rio, juste derrière le Christ Rédempteur et le Pain de Sucre.",
-"en": "A staircase entirely covered in colorful ceramic tiles, linking Santa Teresa to Lapa: this is the work of Jorge Selarón, a Chilean artist long settled in Brazil. He conceived it as a 'tribute to the Brazilian people'. Today it is the third most sought-after tourist attraction in Rio, just behind Christ the Redeemer and Sugarloaf Mountain.",
-"es": "Una escalera enteramente cubierta de azulejos de cerámica de colores, que une Santa Teresa con Lapa: es la obra de Jorge Selarón, artista chileno radicado desde hace mucho en Brasil. La concibió como un 'homenaje al pueblo brasileño'. Hoy es la tercera atracción turística más buscada de Río, justo detrás del Cristo Redentor y el Pan de Azúcar.",
-"pt": "Uma escadaria inteiramente coberta de azulejos coloridos, ligando Santa Teresa à Lapa: é a obra de Jorge Selarón, artista chileno radicado há muito no Brasil. Ele a concebeu como uma 'homenagem ao povo brasileiro'. Hoje é a terceira atração turística mais procurada do Rio, logo atrás do Cristo Redentor e do Pão de Açúcar.",
-},
-{
 "id": "overture:Centro Cultural Cartola:-22.90155:-43.24086",
 "name": "Centro Cultural Cartola",
 "fr": "À Mangueira, quartier indissociable du samba, cet institut veille sur la mémoire du carnaval carioca. Il a été créé en 2001 par les petits-enfants de Cartola et de Dona Zica, dont la muséologue Nilcemar Nogueira, pour préserver le souvenir du compositeur et documenter l'histoire du samba. Installé depuis 2003 dans un ancien hangar de l'IBGE, il est aujourd'hui chargé de la sauvegarde des « Matrizes do Samba », inscrites au patrimoine culturel immatériel brésilien. Un lieu où l'on prend le samba très au sérieux.",
@@ -898,10 +890,10 @@ DATA_PART4 = [
 {
 "id": "overture:Selaron Steps:-22.91553:-43.17966",
 "name": "Selaron Steps",
-"fr": "Un artiste chilien, installé de longue date au Brésil, a transformé cet escalier en œuvre d'art. Entre Santa Teresa et Lapa, Jorge Selarón l'a couvert de carreaux colorés, qu'il décrivait comme un « hommage au peuple brésilien ». C'est aujourd'hui la troisième attraction la plus recherchée des touristes à Rio, juste derrière le Christ Rédempteur et le Pain de Sucre.",
-"en": "A Chilean artist, long settled in Brazil, turned this stairway into a work of art. Between Santa Teresa and Lapa, Jorge Selarón covered it with colorful tiles, which he described as a 'tribute to the Brazilian people'. It is today the third most sought-after attraction for tourists in Rio, right behind Christ the Redeemer and the Sugarloaf.",
-"es": "Un artista chileno, radicado desde hace mucho en Brasil, convirtió esta escalera en una obra de arte. Entre Santa Teresa y Lapa, Jorge Selarón la cubrió de azulejos de colores, que él describía como un 'homenaje al pueblo brasileño'. Es hoy la tercera atracción más buscada por los turistas en Río, justo detrás del Cristo Redentor y el Pan de Azúcar.",
-"pt": "Um artista chileno, radicado há muito tempo no Brasil, transformou esta escadaria em obra de arte. Entre Santa Teresa e Lapa, Jorge Selarón a cobriu de azulejos coloridos, que ele descrevia como uma 'homenagem ao povo brasileiro'. É hoje a terceira atração mais procurada pelos turistas no Rio, logo atrás do Cristo Redentor e do Pão de Açúcar.",
+"fr": "Ces marches couvertes de mosaïques éclatantes sont l'œuvre d'un seul homme : l'artiste chilien Jorge Selarón. À partir de 1990, il a recouvert cet escalier entre Lapa et Santa Teresa de plus de deux mille carreaux venus du monde entier. Il y a travaillé jusqu'à sa mort, en 2013. Une déclaration d'amour au Brésil, à ciel ouvert.",
+"en": "These steps covered in dazzling mosaics are the work of a single man: Chilean artist Jorge Selarón. Starting in nineteen ninety, he covered this staircase between Lapa and Santa Teresa with more than two thousand tiles from all over the world. He kept working on it until his death in twenty thirteen. An open-air declaration of love for Brazil.",
+"es": "Estos escalones cubiertos de mosaicos deslumbrantes son obra de un solo hombre: el artista chileno Jorge Selarón. A partir de mil novecientos noventa, cubrió esta escalera entre la Lapa y Santa Teresa con más de dos mil azulejos venidos de todo el mundo. Trabajó en ella hasta su muerte, en dos mil trece. Una declaración de amor a Brasil, a cielo abierto.",
+"pt": "Estes degraus cobertos de mosaicos deslumbrantes são obra de um único homem: o artista chileno Jorge Selarón. A partir de 1990, ele cobriu esta escadaria entre Lapa e Santa Teresa com mais de duas mil peças vindas do mundo inteiro. Trabalhou nela até sua morte, em 2013. Uma declaração de amor ao Brasil, a céu aberto.",
 },
 {
 "id": "overture:Vista Chinesa:-22.97327:-43.24947",

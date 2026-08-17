@@ -226,11 +226,4 @@ DATA_PART2 = [
 "es": "Aferrada a la ladera sobre São Conrado, la Rocinha es la favela más grande de Brasil: una ciudad dentro de la ciudad, densa, ingeniosa y llena de vida. Visitas guiadas dirigidas por sus propios habitantes permiten descubrirla con respeto, lejos de los clichés, muy cerca del día a día carioca.",
 "pt": "Grudada na encosta acima de São Conrado, a Rocinha é a maior favela do Brasil: uma cidade dentro da cidade, densa, cheia de jeitinho e de vida. Visitas guiadas conduzidas por moradores permitem conhecê-la com respeito, longe dos clichês, bem perto do dia a dia carioca.",
 },
-{
-"name": "Lar",
-"fr": "Ces marches couvertes de mosaïques éclatantes sont l'œuvre d'un seul homme : l'artiste chilien Jorge Selarón. À partir de 1990, il a recouvert cet escalier entre Lapa et Santa Teresa de plus de deux mille carreaux venus du monde entier. Il y a travaillé jusqu'à sa mort, en 2013. Une déclaration d'amour au Brésil, à ciel ouvert.",
-"en": "These steps covered in dazzling mosaics are the work of a single man: Chilean artist Jorge Selarón. Starting in nineteen ninety, he covered this staircase between Lapa and Santa Teresa with more than two thousand tiles from all over the world. He kept working on it until his death in twenty thirteen. An open-air declaration of love for Brazil.",
-"es": "Estos escalones cubiertos de mosaicos deslumbrantes son obra de un solo hombre: el artista chileno Jorge Selarón. A partir de mil novecientos noventa, cubrió esta escalera entre la Lapa y Santa Teresa con más de dos mil azulejos venidos de todo el mundo. Trabajó en ella hasta su muerte, en dos mil trece. Una declaración de amor a Brasil, a cielo abierto.",
-"pt": "Essa escadaria coberta de mosaicos deslumbrantes é obra de um único homem: o artista chileno Jorge Selarón. A partir de mil novecentos e noventa, ele cobriu essa escadaria entre a Lapa e Santa Teresa com mais de dois mil azulejos vindos do mundo inteiro. Trabalhou nela até sua morte, em dois mil e treze. Uma declaração de amor ao Brasil, a céu aberto.",
-},
 ]

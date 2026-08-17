@@ -31,7 +31,7 @@ DATA_PART3 = [
 "pt": "Primeira parada do bondinho do Pão de Açúcar, esse morro de duzentos e vinte metros já oferece uma vista esplêndida de Botafogo, do Cristo e da baía. Também dá pra subir a pé por uma trilha a partir da Praia Vermelha. Lá em cima, restaurantes e, em algumas noites, um palco de shows ao ar livre.",
 },
 {
-"name": "Niterói",
+"name": "Museu de Arte Contemporânea de Niterói (MAC)",
 "fr": "De l'autre côté de la baie, cette soucoupe blanche posée sur la falaise est l'œuvre d'Oscar Niemeyer, inaugurée en 1996. Le Musée d'art contemporain de Niterói vaut autant pour ses expositions que pour sa silhouette et sa vue à 360° sur Rio. La traversée en ferry depuis la Praça XV fait partie du plaisir.",
 "en": "On the other side of the bay, this white flying-saucer shape perched on the cliff is the work of Oscar Niemeyer, opened in nineteen ninety-six. The Niterói Contemporary Art Museum is worth visiting as much for its exhibitions as for its silhouette and its full three-sixty view of Rio. The ferry crossing from Praça XV is part of the fun.",
 "es": "Al otro lado de la bahía, esta blanca forma de platillo volador posada sobre el acantilado es obra de Oscar Niemeyer, inaugurada en mil novecientos noventa y seis. El Museo de Arte Contemporáneo de Niterói vale tanto por sus exposiciones como por su silueta y su vista de trescientos sesenta grados sobre Río. La travesía en ferry desde la Praça XV forma parte del placer.",
