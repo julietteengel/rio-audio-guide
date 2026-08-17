@@ -119,3 +119,4 @@ raisonnement à chaque fois que la question revient (elle est déjà revenue tro
 Aucun des deux déclencheurs n'est atteint à cette date — zéro utilisateur réel, zéro trafic public,
 zéro requête mesurée lente. Documenté ici précisément pour qu'une future relecture (la mienne, plus
 tard) trouve une réponse vérifiable plutôt qu'un principe vague.
+
