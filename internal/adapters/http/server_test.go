@@ -19,8 +19,13 @@ var errNotImplementedInFake = errors.New("not implemented in fake")
 type fakePlaceRepo struct{ places []*domain.Place }
 
 func (f *fakePlaceRepo) Save(_ context.Context, _ *domain.Place) error { return nil }
-func (f *fakePlaceRepo) FindByID(_ context.Context, _ string) (*domain.Place, error) {
-	return nil, errNotImplementedInFake
+func (f *fakePlaceRepo) FindByID(_ context.Context, id string) (*domain.Place, error) {
+	for _, p := range f.places {
+		if p.ID() == id {
+			return p, nil
+		}
+	}
+	return nil, pgx.ErrNoRows
 }
 func (f *fakePlaceRepo) FindByName(_ context.Context, _ string) (*domain.Place, error) {
 	return nil, errNotImplementedInFake
