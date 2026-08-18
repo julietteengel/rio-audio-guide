@@ -1,0 +1,31 @@
+name: Frontend Web CI
+
+on:
+  push:
+    branches: [frontend]
+    paths: ["web/**"]
+  pull_request:
+    branches: [frontend]
+    paths: ["web/**"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Type-check
+        run: npx tsc --noEmit
+      - name: Lint (ESLint)
+        run: npm run lint
+      - name: Build (also proves the static export of all 4 locales)
+        run: npm run build
