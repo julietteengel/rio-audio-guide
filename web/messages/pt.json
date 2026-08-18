@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "title": "Memória Carioca",
+    "description": "Um guia de áudio offline, com fontes verificadas: a memória da cidade, não um passeio turístico."
+  },
+  "landing": {
+    "eyebrow": "Guia de áudio cultural · Rio de Janeiro",
+    "glossWord": "carioca",
+    "glossRest": ", adj.: natural do Rio de Janeiro",
+    "lede": "Caminhe pelo Rio e deixe cada lugar contar sua própria história. Um guia de áudio offline, com fontes verificadas: a memória da cidade, não um passeio turístico.",
+    "cta": "Baixar o app",
+    "f1h": "Offline, em toda a cidade",
+    "f1p": "42 lugares já mapeados, prontos para tocar assim que você se aproxima, sem precisar de conexão.",
+    "f2h": "Em quatro idiomas",
+    "f2p": "Português, inglês, francês, espanhol: cada história se lê e se ouve no seu idioma.",
+    "f3h": "Com fontes, nunca inventado",
+    "f3p": "Cada história se apoia em fontes verificadas. Um lugar sem fonte real não tem narração. Essa é a regra.",
+    "footerTagline": "carioca: do Rio de Janeiro",
+    "footerBottomRight": "Guia de áudio cultural · Rio de Janeiro",
+    "copyright": "© 2026 Memória Carioca"
+  }
+}
