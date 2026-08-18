@@ -39,6 +39,8 @@ export const dictionary = {
     placeDetail: {
       groundBadge: "Sources vérifiées · contrôle anti-hallucination",
       ask: "Poser une question sur ce lieu",
+      narrationPending: "La narration de ce lieu est en cours de préparation.",
+      narrationUnavailable: "Aucune narration n'est disponible pour ce lieu pour le moment.",
     },
     assistant: {
       roadmapBadge: "Roadmap · pas encore construit",
@@ -97,6 +99,8 @@ export const dictionary = {
     placeDetail: {
       groundBadge: "Verified sources · anti-hallucination check",
       ask: "Ask a question about this place",
+      narrationPending: "This place's narration is being prepared.",
+      narrationUnavailable: "No narration is available for this place yet.",
     },
     assistant: {
       roadmapBadge: "Roadmap · not built yet",
@@ -155,6 +159,8 @@ export const dictionary = {
     placeDetail: {
       groundBadge: "Fontes verificadas · controle anti-alucinação",
       ask: "Fazer uma pergunta sobre este lugar",
+      narrationPending: "A narração deste lugar está sendo preparada.",
+      narrationUnavailable: "Ainda não há narração disponível para este lugar.",
     },
     assistant: {
       roadmapBadge: "Roadmap · ainda não construído",
@@ -213,6 +219,8 @@ export const dictionary = {
     placeDetail: {
       groundBadge: "Fuentes verificadas · control anti-alucinación",
       ask: "Hacer una pregunta sobre este lugar",
+      narrationPending: "La narración de este lugar se está preparando.",
+      narrationUnavailable: "Todavía no hay narración disponible para este lugar.",
     },
     assistant: {
       roadmapBadge: "Roadmap · aún no construido",

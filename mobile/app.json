@@ -8,7 +8,11 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.memoriacarioca.app"
+      "bundleIdentifier": "com.memoriacarioca.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Memória Carioca uses your location to show which places are nearby on the map."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,16 +26,30 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#C1592E"
-    },
     "plugins": [
       "expo-font",
-      "expo-splash-screen",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#C1592E"
+        }
+      ],
       "expo-sqlite",
-      "expo-localization"
-    ]
+      "expo-localization",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Memória Carioca uses your location to show which places are nearby on the map."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "32aec4ab-d794-4380-b6ba-de1370e9ba09"
+      },
+      "apiBaseUrl": "http://192.168.0.45:8080"
+    }
   }
 }

@@ -30,8 +30,9 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
 
   if (!place) return null;
 
-  const minutes = Math.floor(place.audioDurationSeconds / 60);
-  const seconds = String(place.audioDurationSeconds % 60).padStart(2, "0");
+  const hasDuration = typeof place.audioDurationSeconds === "number";
+  const minutes = hasDuration ? Math.floor(place.audioDurationSeconds! / 60) : 0;
+  const seconds = hasDuration ? String(place.audioDurationSeconds! % 60).padStart(2, "0") : "--";
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 40 }}>
@@ -56,7 +57,7 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
         </SafeAreaView>
         <View style={styles.heroText}>
           <Text style={styles.eyebrow}>
-            {place.category} · {place.neighborhood}
+            {place.neighborhood ? `${place.category} · ${place.neighborhood}` : place.category}
           </Text>
           <Text style={styles.title}>{place.name}</Text>
         </View>
@@ -100,14 +101,23 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
         </View>
       </View>
 
-      <View style={styles.ground}>
-        <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-          <Polyline points="5 13 10 18 19 7" stroke={colors.groundText} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-        <Text style={styles.groundText}>{t.placeDetail.groundBadge}</Text>
-      </View>
-
-      <Text style={styles.body}>{place.body}</Text>
+      {place.narrationStatus === "ready" ? (
+        <>
+          <View style={styles.ground}>
+            <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
+              <Polyline points="5 13 10 18 19 7" stroke={colors.groundText} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+            </Svg>
+            <Text style={styles.groundText}>{t.placeDetail.groundBadge}</Text>
+          </View>
+          <Text style={styles.body}>{place.body}</Text>
+        </>
+      ) : (
+        <Text style={styles.body}>
+          {place.narrationStatus === "pending"
+            ? t.placeDetail.narrationPending
+            : t.placeDetail.narrationUnavailable}
+        </Text>
+      )}
 
       <Pressable
         style={styles.ask}

@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import * as Localization from "expo-localization";
 import { dictionary, DEFAULT_LOCALE, SUPPORTED_LOCALES, Locale, Dictionary } from "./dictionary";
+import { setPlacesRepositoryLocale } from "../data/PlacesRepository";
 
 function detectInitialLocale(): Locale {
   const deviceLocales = Localization.getLocales();
@@ -23,6 +24,13 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocale] = useState<Locale>(() => detectInitialLocale());
+
+  // HttpPlacesRepository.getById needs the current language for every
+  // request but isn't a React component — kept in sync via this module-level
+  // setter rather than threading locale through the repository interface.
+  useEffect(() => {
+    setPlacesRepositoryLocale(locale);
+  }, [locale]);
 
   const value = useMemo<LocaleContextValue>(
     () => ({ locale, setLocale, t: dictionary[locale] }),

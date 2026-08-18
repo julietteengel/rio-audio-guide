@@ -13,6 +13,7 @@ const RIO_PLACE: Place = {
   audioDurationSeconds: 135,
   body: "test",
   groundedSourceCount: 1,
+  narrationStatus: "ready",
 };
 
 const OTHER_CITY_PLACE: Place = { ...RIO_PLACE, id: "other", city: "São Paulo" };
