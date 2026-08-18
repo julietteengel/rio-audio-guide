@@ -1,4 +1,9 @@
-import { planCityDownload, estimateDownloadSizeBytes } from "../downloadManager";
+import {
+  planCityDownload,
+  estimateDownloadSizeBytes,
+  fetchCityManifest,
+  formatApproxSize,
+} from "../downloadManager";
 import type { Place } from "../types";
 
 const RIO_PLACE: Place = {
@@ -60,5 +65,70 @@ describe("estimateDownloadSizeBytes", () => {
     expect(estimateDownloadSizeBytes(twoPlaces)).toBeGreaterThan(
       estimateDownloadSizeBytes(onePlace),
     );
+  });
+});
+
+describe("formatApproxSize", () => {
+  it("uses Mo for French and MB for the other three languages", () => {
+    expect(formatApproxSize(184_000_000, "fr")).toBe("184 Mo");
+    expect(formatApproxSize(184_000_000, "en")).toBe("184 MB");
+    expect(formatApproxSize(184_000_000, "pt")).toBe("184 MB");
+    expect(formatApproxSize(184_000_000, "es")).toBe("184 MB");
+  });
+
+  it("keeps one decimal place under 10 MB", () => {
+    expect(formatApproxSize(4_200_000, "en")).toBe("4.2 MB");
+  });
+});
+
+describe("fetchCityManifest", () => {
+  const originalFetch = globalThis.fetch;
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  it("maps a successful manifest response to Place[] with narrationStatus ready", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      json: async () => ({
+        city: "rio",
+        language: "fr",
+        places: [
+          {
+            id: "cristo-redentor",
+            name: "Cristo Redentor",
+            category: "monument",
+            lat: -22.9519,
+            lon: -43.2105,
+            narration: "Inaugurée en 1931...",
+            source: "wikidata",
+            source_richness: "rich",
+            audio_url: "https://example.com/audio.mp3",
+          },
+        ],
+      }),
+    }) as unknown as typeof fetch;
+
+    const places = await fetchCityManifest("rio", "fr");
+
+    expect(places).toHaveLength(1);
+    expect(places[0]).toMatchObject({
+      id: "cristo-redentor",
+      name: "Cristo Redentor",
+      body: "Inaugurée en 1931...",
+      narrationStatus: "ready",
+      groundedSourceCount: 1,
+    });
+  });
+
+  it("returns an empty array when the backend responds with a non-200 status", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({ status: 404 }) as unknown as typeof fetch;
+    expect(await fetchCityManifest("unknown-city", "fr")).toEqual([]);
+  });
+
+  it("returns an empty array instead of throwing on a network failure", async () => {
+    globalThis.fetch = jest.fn().mockRejectedValue(new Error("network down")) as unknown as typeof fetch;
+    expect(await fetchCityManifest("rio", "fr")).toEqual([]);
   });
 });

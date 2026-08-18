@@ -2,6 +2,7 @@ import type { Place, NarrationStatus } from "./types";
 import { MOCK_PLACES } from "./types";
 import { API_BASE_URL } from "../config";
 import type { Locale } from "../i18n/dictionary";
+import { getOfflineDownloadSummary } from "./downloadManager";
 
 export interface PlacesRepository {
   listNearby(): Promise<Place[]>;
@@ -145,11 +146,8 @@ export class HttpPlacesRepository implements PlacesRepository {
   }
 
   async downloadedCount(): Promise<number> {
-    // "Downloaded" is a device-local concept (see downloadManager.ts) — this
-    // repository only knows about the live catalog, not what's cached on
-    // disk. Screens that need the real offline count read it from
-    // downloadManager's stored manifest instead of calling this.
-    return 0;
+    const summary = await getOfflineDownloadSummary();
+    return summary?.placeCount ?? 0;
   }
 }
 

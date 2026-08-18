@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Path, Polyline, Line } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -8,17 +8,57 @@ import { useLocale } from "../../i18n/LocaleContext";
 import { Dots } from "../../components/Dots";
 import { CityCard } from "../../components/CityCard";
 import { markOnboardingComplete } from "../../onboarding/onboardingStorage";
+import {
+  fetchCityManifest,
+  formatApproxSize,
+  planCityDownload,
+  estimateDownloadSizeBytes,
+  downloadCity,
+  RIO_CITY_SLUG,
+} from "../../data/downloadManager";
 import { colors, fonts, spacing, radii } from "../../theme/tokens";
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "Propose">;
 
+const CITY_NAME = "Rio de Janeiro";
+
 export function ProposeScreen({ navigation }: Props) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
+  const [preview, setPreview] = useState<{ count: number; sizeLabel: string } | null>(null);
+  const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchCityManifest(RIO_CITY_SLUG, locale).then((places) => {
+      if (cancelled) return;
+      const files = planCityDownload(places, CITY_NAME, locale);
+      setPreview({
+        count: places.length,
+        sizeLabel: formatApproxSize(estimateDownloadSizeBytes(files), locale),
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
 
   async function goToApp() {
     await markOnboardingComplete();
     navigation.getParent()?.reset({ index: 0, routes: [{ name: "App" as never }] });
   }
+
+  async function startDownload() {
+    setDownloading(true);
+    await downloadCity(RIO_CITY_SLUG, CITY_NAME, locale);
+    setDownloading(false);
+    navigation.navigate("DownloadSuccess");
+  }
+
+  const cityMeta = preview
+    ? t.propose.cityMeta
+        .replace("{count}", String(preview.count))
+        .replace("{size}", preview.sizeLabel)
+    : undefined;
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -41,18 +81,25 @@ export function ProposeScreen({ navigation }: Props) {
         </View>
       </View>
 
-      <CityCard city="Rio de Janeiro" meta={t.propose.cityMeta} />
+      {cityMeta ? (
+        <CityCard city={CITY_NAME} meta={cityMeta} />
+      ) : (
+        <View style={styles.loadingRow}>
+          <ActivityIndicator color={colors.terracotta} />
+        </View>
+      )}
       <Text style={styles.note}>{t.propose.note}</Text>
 
       <View style={styles.bottom}>
         <Dots total={3} activeIndex={1} />
-        <Pressable
-          style={styles.btn}
-          onPress={() => navigation.navigate("DownloadSuccess")}
-        >
-          <Text style={styles.btnText}>{t.propose.download}</Text>
+        <Pressable style={styles.btn} onPress={startDownload} disabled={downloading}>
+          {downloading ? (
+            <ActivityIndicator color={colors.cream} />
+          ) : (
+            <Text style={styles.btnText}>{t.propose.download}</Text>
+          )}
         </Pressable>
-        <Pressable style={styles.ghostBtn} onPress={goToApp}>
+        <Pressable style={styles.ghostBtn} onPress={goToApp} disabled={downloading}>
           <Text style={styles.ghostBtnText}>{t.propose.skip}</Text>
         </Pressable>
       </View>
@@ -83,6 +130,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginBottom: 26,
   },
+  loadingRow: { marginHorizontal: spacing.xl, paddingVertical: 20, alignItems: "flex-start" },
   note: {
     fontFamily: fonts.body,
     fontSize: 12.5,

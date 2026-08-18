@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Polyline } from "react-native-svg";
@@ -8,17 +8,33 @@ import { useLocale } from "../../i18n/LocaleContext";
 import { Dots } from "../../components/Dots";
 import { CityCard } from "../../components/CityCard";
 import { markOnboardingComplete } from "../../onboarding/onboardingStorage";
+import {
+  getOfflineDownloadSummary,
+  formatApproxSize,
+  type OfflineDownloadSummary,
+} from "../../data/downloadManager";
 import { colors, fonts, spacing, radii } from "../../theme/tokens";
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "DownloadSuccess">;
 
 export function DownloadSuccessScreen({ navigation }: Props) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
+  const [summary, setSummary] = useState<OfflineDownloadSummary | null>(null);
+
+  useEffect(() => {
+    getOfflineDownloadSummary().then(setSummary);
+  }, []);
 
   async function goToApp() {
     await markOnboardingComplete();
     navigation.getParent()?.reset({ index: 0, routes: [{ name: "App" as never }] });
   }
+
+  const cityMeta = summary
+    ? t.downloadSuccess.cityMeta
+        .replace("{count}", String(summary.placeCount))
+        .replace("{size}", formatApproxSize(summary.approxSizeBytes, locale))
+    : t.downloadSuccess.cityMeta.replace("{count}", "0").replace("{size}", formatApproxSize(0, locale));
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -33,7 +49,7 @@ export function DownloadSuccessScreen({ navigation }: Props) {
         </View>
       </View>
 
-      <CityCard city="Rio de Janeiro" meta={t.downloadSuccess.cityMeta} badgeLabel={t.downloadSuccess.badge} />
+      <CityCard city="Rio de Janeiro" meta={cityMeta} badgeLabel={t.downloadSuccess.badge} />
       <Text style={styles.hint}>{t.downloadSuccess.hint}</Text>
 
       <View style={styles.bottom}>
