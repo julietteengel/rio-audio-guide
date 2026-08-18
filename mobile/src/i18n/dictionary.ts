@@ -38,6 +38,7 @@ export const dictionary = {
       youAreHere: "Vous êtes ici",
       locatingYou: "Localisation en cours…",
       locationDenied: "Position indisponible",
+      webMapUnavailable: "La carte interactive n'est pas encore disponible sur navigateur — voici la liste des lieux.",
     },
     placeDetail: {
       groundBadge: "Sources vérifiées · contrôle anti-hallucination",
@@ -101,6 +102,7 @@ export const dictionary = {
       youAreHere: "You are here",
       locatingYou: "Locating you…",
       locationDenied: "Location unavailable",
+      webMapUnavailable: "The interactive map isn't available in the browser yet — here's the place list instead.",
     },
     placeDetail: {
       groundBadge: "Verified sources · anti-hallucination check",
@@ -164,6 +166,7 @@ export const dictionary = {
       youAreHere: "Você está aqui",
       locatingYou: "Localizando…",
       locationDenied: "Localização indisponível",
+      webMapUnavailable: "O mapa interativo ainda não está disponível no navegador — aqui está a lista de lugares.",
     },
     placeDetail: {
       groundBadge: "Fontes verificadas · controle anti-alucinação",
@@ -227,6 +230,7 @@ export const dictionary = {
       youAreHere: "Estás aquí",
       locatingYou: "Localizando…",
       locationDenied: "Ubicación no disponible",
+      webMapUnavailable: "El mapa interactivo aún no está disponible en el navegador — aquí está la lista de lugares.",
     },
     placeDetail: {
       groundBadge: "Fuentes verificadas · control anti-alucinación",

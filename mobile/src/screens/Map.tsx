@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import Svg, { Circle, Line, Path } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -11,6 +10,20 @@ import { placesRepository } from "../data/PlacesRepository";
 import type { Place } from "../data/types";
 import { haversineMeters, formatDistance, type LatLon } from "../utils/geo";
 import { colors, fonts, radii } from "../theme/tokens";
+
+// react-native-maps has no real web implementation — a static `import`
+// still gets bundled and executed by Metro's module system on every
+// platform, so it must be loaded through a runtime `require()` gated on
+// Platform.OS, not a top-level `import`, or the browser build throws at
+// load time before anything renders. Native (iOS/Android) gets the real
+// map; web gets a plain scrollable place list below (see WebPlaceList).
+let MapView: any = null;
+let Marker: any = null;
+if (Platform.OS !== "web") {
+  const Maps = require("react-native-maps");
+  MapView = Maps.default;
+  Marker = Maps.Marker;
+}
 
 type Props = NativeStackScreenProps<AppStackParamList, "Map">;
 
@@ -105,25 +118,44 @@ export function MapScreen({ navigation }: Props) {
       </SafeAreaView>
 
       <View style={styles.map}>
-        <MapView style={StyleSheet.absoluteFill} initialRegion={RIO_REGION}>
-          {places.map((p) => (
-            <Marker
-              key={p.id}
-              coordinate={{ latitude: p.lat, longitude: p.lon }}
-              onPress={() => navigation.navigate("PlaceDetail", { placeId: p.id })}
-              title={p.name}
-            >
-              <View style={styles.pin} />
-            </Marker>
-          ))}
-          {userLocation ? (
-            <Marker coordinate={userLocation} anchor={{ x: 0.5, y: 0.5 }} title={t.map.youAreHere}>
-              <View style={styles.me}>
-                <View style={styles.meDot} />
-              </View>
-            </Marker>
-          ) : null}
-        </MapView>
+        {Platform.OS === "web" ? (
+          <ScrollView style={StyleSheet.absoluteFill} contentContainerStyle={styles.webListContent}>
+            <Text style={styles.webListNotice}>{t.map.webMapUnavailable}</Text>
+            {places.map((p) => (
+              <Pressable
+                key={p.id}
+                style={styles.webListRow}
+                onPress={() => navigation.navigate("PlaceDetail", { placeId: p.id })}
+              >
+                <View style={styles.pin} />
+                <View style={styles.nearbyText}>
+                  <Text style={styles.nearbyTitle}>{p.name}</Text>
+                  <Text style={styles.nearbySub}>{p.category}</Text>
+                </View>
+              </Pressable>
+            ))}
+          </ScrollView>
+        ) : (
+          <MapView style={StyleSheet.absoluteFill} initialRegion={RIO_REGION}>
+            {places.map((p) => (
+              <Marker
+                key={p.id}
+                coordinate={{ latitude: p.lat, longitude: p.lon }}
+                onPress={() => navigation.navigate("PlaceDetail", { placeId: p.id })}
+                title={p.name}
+              >
+                <View style={styles.pin} />
+              </Marker>
+            ))}
+            {userLocation ? (
+              <Marker coordinate={userLocation} anchor={{ x: 0.5, y: 0.5 }} title={t.map.youAreHere}>
+                <View style={styles.me}>
+                  <View style={styles.meDot} />
+                </View>
+              </Marker>
+            ) : null}
+          </MapView>
+        )}
 
         <View style={styles.search}>
           <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
@@ -226,6 +258,23 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   searchText: { fontFamily: fonts.body, fontSize: 14, color: colors.inkFaint },
+  webListContent: { paddingTop: 76, paddingHorizontal: 16, paddingBottom: 100, gap: 10 },
+  webListNotice: {
+    fontFamily: fonts.body,
+    fontSize: 12.5,
+    color: colors.inkFaint,
+    marginBottom: 4,
+  },
+  webListRow: {
+    backgroundColor: colors.white,
+    borderRadius: radii.lg,
+    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
   pin: {
     width: 12,
     height: 12,
