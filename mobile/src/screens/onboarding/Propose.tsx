@@ -5,6 +5,7 @@ import Svg, { Path, Polyline, Line } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { useLocale } from "../../i18n/LocaleContext";
+import type { Locale } from "../../i18n/dictionary";
 import { Dots } from "../../components/Dots";
 import { CityCard } from "../../components/CityCard";
 import { markOnboardingComplete } from "../../onboarding/onboardingStorage";
@@ -22,13 +23,24 @@ type Props = NativeStackScreenProps<OnboardingStackParamList, "Propose">;
 
 const CITY_NAME = "Rio de Janeiro";
 
+// Même ordre/étiquettes que le sélecteur par lieu de PlaceDetail — le
+// téléchargement ne récupère jamais qu'une seule langue à la fois (voir
+// downloadManager : "never requests a language the user did not select"),
+// donc c'est ici, avant de lancer le téléchargement, qu'il faut choisir
+// laquelle. Choisir une langue ici change la langue par défaut de toute
+// l'app (setLocale global) — il n'y a qu'une seule notion de "langue" côté
+// app, pas une langue de téléchargement distincte de la langue d'interface.
+const LANG_ORDER: Locale[] = ["pt", "en", "fr", "es"];
+const LANG_LABEL: Record<Locale, string> = { pt: "PT", en: "EN", fr: "FR", es: "ES" };
+
 export function ProposeScreen({ navigation }: Props) {
-  const { t, locale } = useLocale();
+  const { t, locale, setLocale } = useLocale();
   const [preview, setPreview] = useState<{ count: number; sizeLabel: string } | null>(null);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    setPreview(null); // le compte/la taille dépendent de la langue — jamais affiché pendant qu'on recharge pour une autre
     fetchCityManifest(RIO_CITY_SLUG, locale).then((places) => {
       if (cancelled) return;
       const files = planCityDownload(places, CITY_NAME, locale);
@@ -81,6 +93,23 @@ export function ProposeScreen({ navigation }: Props) {
         </View>
       </View>
 
+      <View style={styles.langSection}>
+        <Text style={styles.langLabel}>{t.propose.languageLabel}</Text>
+        <View style={styles.langRow}>
+          {LANG_ORDER.map((l) => (
+            <Pressable
+              key={l}
+              onPress={() => setLocale(l)}
+              style={[styles.pill, l === locale && styles.pillActive]}
+            >
+              <Text style={[styles.pillText, l === locale && styles.pillTextActive]}>
+                {LANG_LABEL[l]}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
       {cityMeta ? (
         <CityCard city={CITY_NAME} meta={cityMeta} />
       ) : (
@@ -130,6 +159,20 @@ const styles = StyleSheet.create({
     marginTop: 30,
     marginBottom: 26,
   },
+  langSection: { marginHorizontal: spacing.xl, marginBottom: 18 },
+  langLabel: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 12,
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    color: colors.inkFaint,
+    marginBottom: 10,
+  },
+  langRow: { flexDirection: "row", gap: 8 },
+  pill: { borderRadius: radii.pill, paddingVertical: 8, paddingHorizontal: 16, backgroundColor: colors.sand },
+  pillActive: { backgroundColor: colors.terracotta },
+  pillText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.inkSoft },
+  pillTextActive: { color: colors.cream },
   loadingRow: { marginHorizontal: spacing.xl, paddingVertical: 20, alignItems: "flex-start" },
   note: {
     fontFamily: fonts.body,
