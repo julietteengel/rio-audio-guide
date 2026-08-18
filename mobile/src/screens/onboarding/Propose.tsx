@@ -23,36 +23,38 @@ type Props = NativeStackScreenProps<OnboardingStackParamList, "Propose">;
 
 const CITY_NAME = "Rio de Janeiro";
 
-// Même ordre/étiquettes que le sélecteur par lieu de PlaceDetail — le
-// téléchargement ne récupère jamais qu'une seule langue à la fois (voir
-// downloadManager : "never requests a language the user did not select"),
-// donc c'est ici, avant de lancer le téléchargement, qu'il faut choisir
-// laquelle. Choisir une langue ici change la langue par défaut de toute
-// l'app (setLocale global) — il n'y a qu'une seule notion de "langue" côté
-// app, pas une langue de téléchargement distincte de la langue d'interface.
+// Même ordre/étiquettes que le sélecteur par lieu de PlaceDetail. La langue
+// du téléchargement est un état LOCAL à cet écran, distinct de `locale`
+// (langue de l'interface, gérée globalement dans LocaleContext/Réglages) —
+// choisir la langue du guide ne doit jamais changer la langue dans laquelle
+// l'utilisateur lit l'app. Par défaut on propose la langue d'interface
+// actuelle (la meilleure hypothèse), mais rien n'empêche de télécharger dans
+// une autre langue sans changer un seul mot du reste de l'écran.
 const LANG_ORDER: Locale[] = ["pt", "en", "fr", "es"];
 const LANG_LABEL: Record<Locale, string> = { pt: "PT", en: "EN", fr: "FR", es: "ES" };
 
 export function ProposeScreen({ navigation }: Props) {
-  const { t, locale, setLocale } = useLocale();
+  const { t, locale } = useLocale();
+  const [downloadLocale, setDownloadLocale] = useState<Locale>(locale);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [preview, setPreview] = useState<{ count: number; sizeLabel: string } | null>(null);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setPreview(null); // le compte/la taille dépendent de la langue — jamais affiché pendant qu'on recharge pour une autre
-    fetchCityManifest(RIO_CITY_SLUG, locale).then((places) => {
+    fetchCityManifest(RIO_CITY_SLUG, downloadLocale).then((places) => {
       if (cancelled) return;
-      const files = planCityDownload(places, CITY_NAME, locale);
+      const files = planCityDownload(places, CITY_NAME, downloadLocale);
       setPreview({
         count: places.length,
-        sizeLabel: formatApproxSize(estimateDownloadSizeBytes(files), locale),
+        sizeLabel: formatApproxSize(estimateDownloadSizeBytes(files), downloadLocale),
       });
     });
     return () => {
       cancelled = true;
     };
-  }, [locale]);
+  }, [downloadLocale]);
 
   async function goToApp() {
     await markOnboardingComplete();
@@ -61,9 +63,14 @@ export function ProposeScreen({ navigation }: Props) {
 
   async function startDownload() {
     setDownloading(true);
-    await downloadCity(RIO_CITY_SLUG, CITY_NAME, locale);
+    await downloadCity(RIO_CITY_SLUG, CITY_NAME, downloadLocale);
     setDownloading(false);
     navigation.navigate("DownloadSuccess");
+  }
+
+  function pickDownloadLanguage(l: Locale) {
+    setDownloadLocale(l);
+    setPickerOpen(false);
   }
 
   const cityMeta = preview
@@ -94,20 +101,27 @@ export function ProposeScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.langSection}>
-        <Text style={styles.langLabel}>{t.propose.languageLabel}</Text>
-        <View style={styles.langRow}>
-          {LANG_ORDER.map((l) => (
-            <Pressable
-              key={l}
-              onPress={() => setLocale(l)}
-              style={[styles.pill, l === locale && styles.pillActive]}
-            >
-              <Text style={[styles.pillText, l === locale && styles.pillTextActive]}>
-                {LANG_LABEL[l]}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <Text style={styles.langStatement}>
+          {t.propose.willDownloadIn.replace("{language}", t.settings.languageNames[downloadLocale])}
+        </Text>
+        <Pressable onPress={() => setPickerOpen((v) => !v)}>
+          <Text style={styles.langChangeLink}>{t.propose.changeLanguage}</Text>
+        </Pressable>
+        {pickerOpen ? (
+          <View style={styles.langRow}>
+            {LANG_ORDER.map((l) => (
+              <Pressable
+                key={l}
+                onPress={() => pickDownloadLanguage(l)}
+                style={[styles.pill, l === downloadLocale && styles.pillActive]}
+              >
+                <Text style={[styles.pillText, l === downloadLocale && styles.pillTextActive]}>
+                  {LANG_LABEL[l]}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
       </View>
 
       {cityMeta ? (
@@ -160,15 +174,9 @@ const styles = StyleSheet.create({
     marginBottom: 26,
   },
   langSection: { marginHorizontal: spacing.xl, marginBottom: 18 },
-  langLabel: {
-    fontFamily: fonts.bodyBold,
-    fontSize: 12,
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    color: colors.inkFaint,
-    marginBottom: 10,
-  },
-  langRow: { flexDirection: "row", gap: 8 },
+  langStatement: { fontFamily: fonts.body, fontSize: 14, color: colors.inkSoft, marginBottom: 4 },
+  langChangeLink: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.terracotta },
+  langRow: { flexDirection: "row", gap: 8, marginTop: 12 },
   pill: { borderRadius: radii.pill, paddingVertical: 8, paddingHorizontal: 16, backgroundColor: colors.sand },
   pillActive: { backgroundColor: colors.terracotta },
   pillText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.inkSoft },
