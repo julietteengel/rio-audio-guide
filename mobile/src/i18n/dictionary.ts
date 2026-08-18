@@ -35,6 +35,9 @@ export const dictionary = {
       offlineBadge: "Hors ligne · {count} lieux",
       searchPlaceholder: "Rechercher un lieu",
       nearbyDistance: "{distance} · à portée d'écoute",
+      youAreHere: "Vous êtes ici",
+      locatingYou: "Localisation en cours…",
+      locationDenied: "Position indisponible",
     },
     placeDetail: {
       groundBadge: "Sources vérifiées · contrôle anti-hallucination",
@@ -95,6 +98,9 @@ export const dictionary = {
       offlineBadge: "Offline · {count} places",
       searchPlaceholder: "Search a place",
       nearbyDistance: "{distance} · within earshot",
+      youAreHere: "You are here",
+      locatingYou: "Locating you…",
+      locationDenied: "Location unavailable",
     },
     placeDetail: {
       groundBadge: "Verified sources · anti-hallucination check",
@@ -155,6 +161,9 @@ export const dictionary = {
       offlineBadge: "Offline · {count} lugares",
       searchPlaceholder: "Buscar um lugar",
       nearbyDistance: "{distance} · ao alcance",
+      youAreHere: "Você está aqui",
+      locatingYou: "Localizando…",
+      locationDenied: "Localização indisponível",
     },
     placeDetail: {
       groundBadge: "Fontes verificadas · controle anti-alucinação",
@@ -215,6 +224,9 @@ export const dictionary = {
       offlineBadge: "Sin conexión · {count} lugares",
       searchPlaceholder: "Buscar un lugar",
       nearbyDistance: "{distance} · al alcance",
+      youAreHere: "Estás aquí",
+      locatingYou: "Localizando…",
+      locationDenied: "Ubicación no disponible",
     },
     placeDetail: {
       groundBadge: "Fuentes verificadas · control anti-alucinación",

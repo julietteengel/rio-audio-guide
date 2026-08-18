@@ -1,36 +1,84 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 import Svg, { Circle, Line, Path } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
 import { placesRepository } from "../data/PlacesRepository";
 import type { Place } from "../data/types";
+import { haversineMeters, formatDistance, type LatLon } from "../utils/geo";
 import { colors, fonts, radii } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<AppStackParamList, "Map">;
 
-// Fixed placeholder positions matching the approved prototype — this is not a
-// real map (no map SDK is wired up yet, see the final report's backend/gap notes).
-const PIN_POSITIONS = [
-  { left: 66, top: 140 },
-  { left: 158, top: 150 },
-  { left: 108, top: 200 },
-  { left: 258, top: 128 },
-  { left: 78, top: 268 },
-  { left: 228, top: 288 },
-];
+// Rio de Janeiro municipality, roughly centered — matches the backend's own
+// bounding box for /places (rioMinLat/rioMaxLat in places_handler.go), not
+// an arbitrary choice.
+const RIO_REGION = {
+  latitude: -22.9068,
+  longitude: -43.1958,
+  latitudeDelta: 0.35,
+  longitudeDelta: 0.35,
+};
 
 export function MapScreen({ navigation }: Props) {
   const { t } = useLocale();
-  const [nearby, setNearby] = useState<Place | null>(null);
+  const [places, setPlaces] = useState<Place[]>([]);
   const [offlineCount, setOfflineCount] = useState(0);
+  const [userLocation, setUserLocation] = useState<LatLon | null>(null);
+  const [locationDenied, setLocationDenied] = useState(false);
 
   useEffect(() => {
-    placesRepository.listNearby().then((places) => setNearby(places[0] ?? null));
+    placesRepository.listNearby().then(setPlaces);
     placesRepository.downloadedCount().then(setOfflineCount);
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        if (!cancelled) setLocationDenied(true);
+        return;
+      }
+      try {
+        const position = await Location.getCurrentPositionAsync({});
+        if (!cancelled) {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        }
+      } catch {
+        if (!cancelled) setLocationDenied(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // The nearest place to the user's real position, with a real distance —
+  // only computable once location permission is granted and resolved. With
+  // no location, fall back to the first place and no distance rather than
+  // hiding the card entirely or showing a fabricated number.
+  const nearby = useMemo(() => {
+    if (places.length === 0) return null;
+    if (!userLocation) return { place: places[0], distanceMeters: null as number | null };
+    let closest = places[0];
+    let closestDistance = haversineMeters(userLocation, { latitude: closest.lat, longitude: closest.lon });
+    for (const p of places.slice(1)) {
+      const d = haversineMeters(userLocation, { latitude: p.lat, longitude: p.lon });
+      if (d < closestDistance) {
+        closest = p;
+        closestDistance = d;
+      }
+    }
+    return { place: closest, distanceMeters: closestDistance };
+  }, [places, userLocation]);
 
   return (
     <View style={styles.screen}>
@@ -57,6 +105,26 @@ export function MapScreen({ navigation }: Props) {
       </SafeAreaView>
 
       <View style={styles.map}>
+        <MapView style={StyleSheet.absoluteFill} initialRegion={RIO_REGION}>
+          {places.map((p) => (
+            <Marker
+              key={p.id}
+              coordinate={{ latitude: p.lat, longitude: p.lon }}
+              onPress={() => navigation.navigate("PlaceDetail", { placeId: p.id })}
+              title={p.name}
+            >
+              <View style={styles.pin} />
+            </Marker>
+          ))}
+          {userLocation ? (
+            <Marker coordinate={userLocation} anchor={{ x: 0.5, y: 0.5 }} title={t.map.youAreHere}>
+              <View style={styles.me}>
+                <View style={styles.meDot} />
+              </View>
+            </Marker>
+          ) : null}
+        </MapView>
+
         <View style={styles.search}>
           <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
             <Circle cx={11} cy={11} r={7} stroke={colors.inkFaint} strokeWidth={2} />
@@ -64,19 +132,12 @@ export function MapScreen({ navigation }: Props) {
           </Svg>
           <Text style={styles.searchText}>{t.map.searchPlaceholder}</Text>
         </View>
-
-        {PIN_POSITIONS.map((pos, i) => (
-          <View key={i} style={[styles.pin, { left: pos.left, top: pos.top }]} />
-        ))}
-        <View style={[styles.me, { left: 172, top: 218 }]}>
-          <View style={styles.meDot} />
-        </View>
       </View>
 
       {nearby ? (
         <Pressable
           style={styles.nearby}
-          onPress={() => navigation.navigate("PlaceDetail", { placeId: nearby.id })}
+          onPress={() => navigation.navigate("PlaceDetail", { placeId: nearby.place.id })}
         >
           <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
             <Path
@@ -89,9 +150,13 @@ export function MapScreen({ navigation }: Props) {
             <Circle cx={12} cy={10} r={2.5} stroke={colors.terracotta} strokeWidth={2} />
           </Svg>
           <View style={styles.nearbyText}>
-            <Text style={styles.nearbyTitle}>{nearby.name}</Text>
+            <Text style={styles.nearbyTitle}>{nearby.place.name}</Text>
             <Text style={styles.nearbySub}>
-              {t.map.nearbyDistance.replace("{distance}", `${nearby.distanceMeters} m`)}
+              {nearby.distanceMeters !== null
+                ? t.map.nearbyDistance.replace("{distance}", formatDistance(nearby.distanceMeters))
+                : locationDenied
+                  ? t.map.locationDenied
+                  : t.map.locatingYou}
             </Text>
           </View>
           <View style={styles.playBtn}>
@@ -162,7 +227,6 @@ const styles = StyleSheet.create({
   },
   searchText: { fontFamily: fonts.body, fontSize: 14, color: colors.inkFaint },
   pin: {
-    position: "absolute",
     width: 12,
     height: 12,
     borderRadius: 6,
@@ -171,7 +235,6 @@ const styles = StyleSheet.create({
     borderColor: colors.cream,
   },
   me: {
-    position: "absolute",
     width: 34,
     height: 34,
     borderRadius: 17,
