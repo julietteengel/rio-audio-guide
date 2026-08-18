@@ -1,0 +1,255 @@
+id,name,category,lat,lon,wikidata_qid
+overture:Casa França-Brasil:-22.90061:-43.17572,Casa França-Brasil,cultural_center,-22.900606155395508,-43.175724029541016,
+overture:Chácara do Céu:-22.91795:-43.18295,Chácara do Céu,museum,-22.91794776916504,-43.18294906616211,
+overture:Museu Casa do Pontal:-23.02386:-43.51019,Museu Casa do Pontal,museum,-23.02385902404785,-43.510189056396484,
+overture:Museu de Arte do Rio (MAR):-22.89688:-43.18177,Museu de Arte do Rio (MAR),museum,-22.896881103515625,-43.18177032470703,
+overture:Polo Praça XV:-22.90282:-43.17458,Polo Praça XV,public_square,-22.902820587158203,-43.174583435058594,
+wikidata:Q10352741,Praia de Botafogo,natural_landmark,-22.94437,-43.1809,Q10352741
+wikidata:Q63894,Praia de Copacabana,natural_landmark,-22.970958,-43.181649,Q63894
+wikidata:Q3390838,Praia de Ipanema,natural_landmark,-22.985,-43.205,Q3390838
+wikidata:Q22069130,Praia do Arpoador,natural_landmark,-22.987222222222,-43.196388888889,Q22069130
+wikidata:Q10353030,Praia do Leblon,natural_landmark,-22.98678,-43.2202,Q10353030
+wikidata:Q45242,Instituto De Pesquisas Jardim Botânico Do Rio De Janeiro,natural_landmark,-22.9675,-43.223889,Q45242
+wikidata:Q56695607,Sítio Roberto Burle Marx,natural_landmark,-23.02385,-43.54474,Q56695607
+wikidata:Q30939541,Centro Cultural Banco do Brasil (Rio de Janeiro),cultural_center,-22.90077607785679,-43.17643970730361,Q30939541
+overture:Centro Cultural Correios:-22.90116:-43.17590,Centro Cultural Correios,cultural_center,-22.90115737915039,-43.17589569091797,
+overture:Centro Cultural Fundição Progresso:-22.91251:-43.18025,Centro Cultural Fundição Progresso,cultural_center,-22.912513732910156,-43.18024826049805,
+overture:Centro Cultural Municipal Parque das Ruínas:-22.91747:-43.18248,Centro Cultural Municipal Parque das Ruínas,cultural_center,-22.917470932006836,-43.18247985839844,
+overture:Feira de São Cristóvão:-22.90729:-43.22304,Feira de São Cristóvão,market,-22.90729331970215,-43.22304153442383,
+wikidata:Q6041378,Instituto Moreira Salles (IMS Rio),cultural_center,-22.98185,-43.23922,Q6041378
+overture:Paço Imperial:-22.90355:-43.17431,Paço Imperial,historic_site,-22.90355110168457,-43.174312591552734,
+overture:Samba da Pedra do Sal:-22.89789:-43.18546,Samba da Pedra do Sal,memorial,-22.89789390563965,-43.185455322265625,
+wikidata:Biblioteca Nacional do Brasil:-22.90972:-43.17550,Biblioteca Nacional do Brasil,library,-22.909723,-43.175501,Q948882
+wikidata:Casa de Rui Barbosa:-22.94875:-43.18705,Casa de Rui Barbosa,museum,-22.948753553,-43.187046216,Q61000992
+wikidata:Q2411716,Catedral Metropolitana de São Sebastião,church,-22.910925,-43.180711,Q2411716
+wikidata:Convento de Santo Antônio:-22.90725:-43.17914,Convento de Santo Antônio,church,-22.90725,-43.179138888,Q14947966
+wikidata:Estádio Jornalista Mário Filho:-22.91222:-43.23028,Estádio Jornalista Mário Filho,historic_site,-22.912222222,-43.230277777,Q155174
+wikidata:Fortaleza de São João:-22.94337:-43.15646,Fortaleza de São João,historic_site,-22.943372,-43.156458,Q5472516
+wikidata:Forte de Copacabana:-22.98583:-43.18528,Forte de Copacabana,historic_site,-22.985833333,-43.185277777,Q5470982
+wikidata:Q82312,Igreja da Candelária,church,-22.900811111111,-43.177894444444,Q82312
+wikidata:Q10300392,Igreja da Glória do Outeiro,church,-22.92144722,-43.17543333,Q10300392
+wikidata:Igreja da Ordem Terceira do Carmo:-22.90309:-43.17556,Igreja da Ordem Terceira do Carmo,church,-22.90309444,-43.17555833,Q10300293
+wikidata:Q2942273,Igreja de N. S. do Carmo (Antiga Sé),church,-22.903333333333332,-43.175555555555555,Q2942273
+wikidata:Q10300289,Igreja de São Francisco da Penitência,church,-22.90680164594349,-43.17912972690945,Q10300289
+wikidata:Igreja de São Francisco de Paula:-22.90549:-43.18059,Igreja de São Francisco de Paula,church,-22.905493,-43.180594,Q10300739
+wikidata:Lagoa Rodrigo de Freitas:-22.97111:-43.21167,Lagoa Rodrigo de Freitas,natural_landmark,-22.971111111,-43.211666666,Q429897
+wikidata:Morro Dois Irmãos:-22.99080:-43.23960,Morro Dois Irmãos,natural_landmark,-22.9908,-43.2396,Q18476300
+wikidata:Mosteiro de São Bento:-22.89703:-43.17805,Mosteiro de São Bento,church,-22.8970349,-43.178051,Q2820360
+wikidata:Palácio Tiradentes:-22.90387:-43.17388,Palácio Tiradentes,historic_site,-22.90387009,-43.173877,Q2048490
+wikidata:Palácio do Itamaraty:-22.90292:-43.18795,Palácio do Itamaraty,historic_site,-22.902925,-43.18795,Q10344051
+wikidata:Parque Lage:-22.96060:-43.21200,Parque Lage,public_square,-22.9606,-43.212,Q7139641
+wikidata:Q5457206,Parque do Flamengo (Aterro),public_square,-22.921,-43.17,Q5457206
+wikidata:Passeio Público:-22.91380:-43.17599,Passeio Público,public_square,-22.91379722,-43.17598611,Q7142572
+wikidata:Sambódromo da Marquês de Sapucaí:-22.91138:-43.19685,Sambódromo da Marquês de Sapucaí,theater,-22.911384,-43.196851,Q281521
+overture:Espaço Cultural Trem do Corcovado:-22.93989:-43.20326,Espaço Cultural Trem do Corcovado,historic_site,-22.939891815185547,-43.2032585144043,
+overture:Museu Histórico Nacional:-22.90583:-43.16966,Museu Histórico Nacional,museum,-22.905832290649414,-43.16965866088867,
+overture:Museu Histórico da Cidade RJ:-22.89843:-43.34912,Museu Histórico da Cidade RJ,museum,-22.898433685302734,-43.34912109375,
+overture:Museu da República (Palácio do Catete):-22.92587:-43.17621,Museu da República (Palácio do Catete),museum,-22.925872802734375,-43.17620849609375,
+overture:Arcos Da Lapa - Vida Boemia Do Rio De Janeiro:-22.91295:-43.18325,Arcos Da Lapa - Vida Boemia Do Rio De Janeiro,historic_site,-22.912952423095703,-43.18324661254883,
+wikidata:Q26234737,Boulevard Olímpico — Mural Etnias,public_square,-22.89416667,-43.18722222,Q26234737
+overture:Cascatinha Taunay:-22.95877:-43.27726,Cascatinha Taunay,natural_landmark,-22.95877456665039,-43.27725601196289,
+overture:Comunidade do Vidigal:-22.91232:-43.18338,Comunidade do Vidigal,public_square,-22.912322998046875,-43.183380126953125,
+manual:Confeitaria Colombo,Confeitaria Colombo,historic_site,-22.9068,-43.1786,
+overture:Favela da Rocinha:-22.98342:-43.29302,Favela da Rocinha,public_square,-22.983417510986328,-43.29302215576172,
+overture:Mirante Dona Marta:-22.94500:-43.19642,Mirante Dona Marta,natural_landmark,-22.944995880126953,-43.19641876220703,
+overture:Mirante da Praia Vermelha:-22.95744:-43.16515,Mirante da Praia Vermelha,natural_landmark,-22.957441329956055,-43.16515350341797,
+overture:Mirante do Pão de Açúcar:-22.94959:-43.15663,Mirante do Pão de Açúcar,natural_landmark,-22.9495906829834,-43.1566276550293,
+overture:Morro da Urca:-22.95089:-43.16377,Morro da Urca,natural_landmark,-22.950889587402344,-43.16376876831055,
+overture:Museu de Arte Contemporânea de Niterói (MAC):-22.90735:-43.12577,Museu de Arte Contemporânea de Niterói (MAC),museum,-22.907350540161133,-43.125770568847656,
+overture:Palacio da Ilha Fiscal:-22.81294:-43.40663,Palacio da Ilha Fiscal,historic_site,-22.812936782836914,-43.4066276550293,
+overture:Pedra da Gávea - Rio de Janeiro:-22.90638:-43.60931,Pedra da Gávea - Rio de Janeiro,natural_landmark,-22.90637969970703,-43.60930633544922,
+overture:Praça Vista Chinesa:-22.92698:-43.37603,Praça Vista Chinesa,natural_landmark,-22.926984786987305,-43.37602996826172,
+overture:Mam - Museu de Arte Moderna:-22.88981:-43.27639,Mam - Museu de Arte Moderna,museum,-22.88981056213379,-43.27638626098633,
+wikidata:Q10353299,Praça General Osório (Feira Hippie),market,-22.98515,-43.19811,Q10353299
+wikidata:Q28679974,AquaRio - Aquário Marinho do Rio,museum,-22.893056,-43.192778,Q28679974
+overture:Espaço Cultural da Marinha:-22.89494:-43.17384,Espaço Cultural da Marinha,museum,-22.894939422607422,-43.17383575439453,
+overture:Museu Nacional:-23.01977:-43.46478,Museu Nacional,museum,-23.019765853881836,-43.46478271484375,
+overture:Museu Nacional de Belas Artes:-22.90935:-43.17569,Museu Nacional de Belas Artes,museum,-22.909351348876953,-43.17568588256836,
+overture:Museu da Imagem e do Som (MIS):-22.97860:-43.18895,Museu da Imagem e do Som (MIS),museum,-22.978595733642578,-43.18894958496094,
+overture:Museu de Favela MUF:-22.98194:-43.19754,Museu de Favela MUF,museum,-22.981935501098633,-43.197540283203125,
+wikidata:Q10333874,Museu do Amanhã,museum,-22.89413,-43.1794,Q10333874
+wikidata:Q10350276,Planetário da Gávea,museum,-22.9783,-43.23028,Q10350276
+overture:Cidade das artes:-22.99778:-43.36503,Cidade das artes,theater,-22.99777603149414,-43.365028381347656,
+wikidata:Q21857414,Circo Voador,theater,-22.912833333333,-43.180361111111,Q21857414
+overture:Theatro Municipal:-22.90836:-43.17729,Theatro Municipal,theater,-22.90835952758789,-43.17729187011719,
+overture:Museu das Telecomunicações:-22.92996:-43.17651,Museu das Telecomunicações,museum,-22.929960250854492,-43.176513671875,
+overture:Museu de Imagens do Inconsciente:-22.90349:-43.30137,Museu de Imagens do Inconsciente,museum,-22.903488159179688,-43.301368713378906,
+overture:Museu do Açude:-22.96483:-43.28209,Museu do Açude,museum,-22.964826583862305,-43.2820930480957,
+overture:Centro Cultural Cartola:-22.90155:-43.24086,Centro Cultural Cartola,cultural_center,-22.901554107666016,-43.2408561706543,
+overture:Centro Cultural José Bonifácio:-22.89622:-43.19428,Centro Cultural José Bonifácio,cultural_center,-22.896223068237305,-43.194278717041016,
+overture:Centro Cultural Justiça Federal:-22.91054:-43.17531,Centro Cultural Justiça Federal,cultural_center,-22.910539627075195,-43.17530822753906,
+overture:Centro Cultural Light:-22.90272:-43.18710,Centro Cultural Light,cultural_center,-22.90272331237793,-43.187095642089844,
+overture:Centro Cultural da Policia Militar:-22.90913:-43.19479,Centro Cultural da Policia Militar,cultural_center,-22.909130096435547,-43.19478988647461,
+overture:Centro Luiz Gonzaga de Tradições Nordestinas:-22.89765:-43.22031,Centro Luiz Gonzaga de Tradições Nordestinas,cultural_center,-22.89764976501465,-43.220314025878906,
+overture:Fundição Progresso:-22.91249:-43.18056,Fundição Progresso,theater,-22.912487030029297,-43.18055725097656,
+overture:Imperator - Centro Cultural João Nogueira:-22.90271:-43.28200,Imperator - Centro Cultural João Nogueira,cultural_center,-22.902711868286133,-43.28200149536133,
+overture:Memorial Getúlio Vargas:-22.92165:-43.17352,Memorial Getúlio Vargas,memorial,-22.921648025512695,-43.173519134521484,
+wikidata:Aqueduto da Colônia Juliano Moreira:-22.93628:-43.39974,Aqueduto da Colônia Juliano Moreira,memorial,-22.936277648,-43.399737187,Q104907381
+wikidata:Aterro do Flamengo:-22.92100:-43.17000,Aterro do Flamengo,public_square,-22.921,-43.17,Q5457206
+wikidata:Avenida Rio Branco:-22.90472:-43.17750,Avenida Rio Branco,public_square,-22.90472222,-43.1775,Q4828121
+wikidata:Bebedouro da Estrada Velha da Tijuca:-22.95203:-43.26208,Bebedouro da Estrada Velha da Tijuca,historic_site,-22.952029507,-43.262078825,Q67204058
+wikidata:Bica da Rainha:-22.94078:-43.19701,Bica da Rainha,historic_site,-22.94078,-43.197006,Q48862982
+wikidata:Capela Nossa Senhora da Cabeça Rio de Janeiro:-22.96096:-43.22087,Capela Nossa Senhora da Cabeça Rio de Janeiro,church,-22.960962,-43.22087,Q30935277
+wikidata:Casa da Marquesa de Santos:-22.90458:-43.21707,Casa da Marquesa de Santos,historic_site,-22.90458,-43.217068,Q10333920
+wikidata:Casa da Moeda do Brasil:-22.90649:-43.19078,Casa da Moeda do Brasil,historic_site,-22.90649,-43.190782,Q5047900
+wikidata:Casa das Canoas:-22.98590:-43.27288,Casa das Canoas,historic_site,-22.985902,-43.272883,Q6816788
+wikidata:Casa do Bispo:-22.92607:-43.21027,Casa do Bispo,historic_site,-22.926067,-43.210271,Q55608773
+wikidata:Chafariz Paulo Fernandes:-22.91153:-43.19456,Chafariz Paulo Fernandes,historic_site,-22.9115308,-43.1945616,Q67210687
+wikidata:Chafariz da Glória:-22.91843:-43.17710,Chafariz da Glória,historic_site,-22.9184257,-43.1771039,Q67203826
+wikidata:Chafariz das Saracuras:-22.98516:-43.19779,Chafariz das Saracuras,historic_site,-22.985160762,-43.197794625,Q67203719
+wikidata:Chafariz de Grandjean de Montigny:-22.96167:-43.27332,Chafariz de Grandjean de Montigny,historic_site,-22.961668055,-43.273318888,Q67203459
+wikidata:Chafariz do Lagarto:-22.91203:-43.19521,Chafariz do Lagarto,historic_site,-22.9120252,-43.1952142,Q67204031
+wikidata:Coleção Geyer:-22.94099:-43.20517,Coleção Geyer,museum,-22.94099,-43.205175,Q25419064
+wikidata:Colégio Militar do Rio de Janeiro:-22.91691:-43.22634,Colégio Militar do Rio de Janeiro,university,-22.91691,-43.226343,Q18473983
+wikidata:Colégio Pedro II:-22.90172:-43.18490,Colégio Pedro II,university,-22.9017223,-43.184904,Q1113098
+wikidata:Convento de Santa Teresa:-22.91553:-43.18045,Convento de Santa Teresa,church,-22.915529,-43.180453,Q18482673
+wikidata:Convento do Carmo:-22.90337:-43.17555,Convento do Carmo,church,-22.903371,-43.175553,Q4902626
+wikidata:Copacabana Palace:-22.96726:-43.17874,Copacabana Palace,historic_site,-22.96726,-43.17874,Q2637352
+wikidata:Cristo Redentor:-22.95192:-43.21046,Cristo Redentor,monument,-22.951915648,-43.210464122,Q79961
+wikidata:Edifício ''A Noite'':-22.89730:-43.18100,Edifício ''A Noite'',historic_site,-22.8973,-43.181,Q5338058
+wikidata:Edifício Docas de Santos:-22.90057:-43.17960,Edifício Docas de Santos,historic_site,-22.900569,-43.179598,Q69363749
+wikidata:Edifício Gustavo Capanema:-22.90920:-43.17383,Edifício Gustavo Capanema,historic_site,-22.9092,-43.17382778,Q2598551
+wikidata:Escola Nacional de Belas Artes:-22.90877:-43.17571,Escola Nacional de Belas Artes,university,-22.908769444,-43.175705555,Q55439919
+wikidata:Estação Central do Brasil:-22.90341:-43.19144,Estação Central do Brasil,historic_site,-22.903413888,-43.191444444,Q1274003
+wikidata:Estação Ferroviária Leopoldina - Barão de Mauá:-22.90771:-43.21045,Estação Ferroviária Leopoldina - Barão de Mauá,memorial,-22.907711078,-43.210454321,Q69363079
+wikidata:Estação Leopoldina:-22.90766:-43.21057,Estação Leopoldina,memorial,-22.90766242,-43.21057088,Q10275936
+wikidata:Estátua equestre de Dom Pedro I:-22.90695:-43.18282,Estátua equestre de Dom Pedro I,monument,-22.906954,-43.182824,Q18476242
+wikidata:Fazenda da Taquara:-22.92223:-43.38288,Fazenda da Taquara,historic_site,-22.922226662,-43.382882804,Q136421907
+wikidata:Fazenda do Engenho d’ Água:-22.95510:-43.35623,Fazenda do Engenho d’ Água,historic_site,-22.955095,-43.356234,Q104907313
+wikidata:Fortaleza de Nossa Senhora da Conceição (Rio de Janeiro):-22.89923:-43.18377,Fortaleza de Nossa Senhora da Conceição (Rio de Janeiro),historic_site,-22.899226,-43.183768,Q10283627
+wikidata:Fortaleza de São José da Ilha das Cobras:-22.89638:-43.17114,Fortaleza de São José da Ilha das Cobras,historic_site,-22.896382,-43.17114,Q10283639
+wikidata:Forte de São Tiago:-22.90591:-43.16952,Forte de São Tiago,memorial,-22.905908333,-43.169522222,Q10284072
+wikidata:Fortim de Caetano Madeira:-22.89650:-43.25960,Fortim de Caetano Madeira,historic_site,-22.8965,-43.2596,Q10284228
+wikidata:Hospital Escola São Francisco de Assis:-22.90907:-43.20139,Hospital Escola São Francisco de Assis,historic_site,-22.90907,-43.201393,Q10298377
+wikidata:Igreja Positivista do Brasil:-22.92058:-43.17938,Igreja Positivista do Brasil,church,-22.92058,-43.17938,Q10300201
+wikidata:Igreja de Nossa Senhora da Ajuda (Ilha do Governador):-22.79332:-43.17052,Igreja de Nossa Senhora da Ajuda (Ilha do Governador),church,-22.79332,-43.170516,Q10300340
+wikidata:Igreja de Nossa Senhora da Candelária:-22.90081:-43.17789,Igreja de Nossa Senhora da Candelária,church,-22.900811111,-43.177894444,Q82312
+wikidata:Igreja de Nossa Senhora da Conceição e Boa Morte:-22.90302:-43.17875,Igreja de Nossa Senhora da Conceição e Boa Morte,church,-22.903021,-43.178751,Q10300378
+wikidata:Igreja de Nossa Senhora da Glória do Outeiro:-22.92145:-43.17543,Igreja de Nossa Senhora da Glória do Outeiro,church,-22.92144722,-43.17543333,Q10300392
+wikidata:Igreja de Nossa Senhora da Lapa dos Mercadores:-22.90221:-43.17520,Igreja de Nossa Senhora da Lapa dos Mercadores,church,-22.90221,-43.1752,Q10300403
+wikidata:Igreja de Nossa Senhora da Pena:-22.94159:-43.34832,Igreja de Nossa Senhora da Pena,church,-22.941587,-43.3483199,Q104904890
+wikidata:Igreja de Nossa Senhora da Saúde:-22.89375:-43.19148,Igreja de Nossa Senhora da Saúde,church,-22.893746,-43.191477,Q104853267
+wikidata:Igreja do Santíssimo Sacramento da Antiga Sé:-22.90458:-43.18284,Igreja do Santíssimo Sacramento da Antiga Sé,church,-22.90458,-43.182841,Q10300936
+wikidata:Igreja de Nossa Senhora do Bonsucesso:-22.90647:-43.17059,Igreja de Nossa Senhora do Bonsucesso,church,-22.906467,-43.170585,Q10300498
+wikidata:Igreja de Nossa Senhora do Carmo:-22.90333:-43.17556,Igreja de Nossa Senhora do Carmo,church,-22.903333333,-43.175555555,Q2942273
+wikidata:Igreja de Nossa Senhora do Carmo da Lapa do Desterro:-22.91459:-43.17771,Igreja de Nossa Senhora do Carmo da Lapa do Desterro,church,-22.914592,-43.177707,Q96586968
+wikidata:Igreja de Nossa Senhora do Rosário e São Benedito (Rio de Janeiro):-22.90416:-43.18049,Igreja de Nossa Senhora do Rosário e São Benedito (Rio de Janeiro),church,-22.90416,-43.180492,Q10300555
+wikidata:Igreja de Santa Cruz dos Militares:-22.90216:-43.17568,Igreja de Santa Cruz dos Militares,church,-22.902158,-43.175682,Q10300620
+wikidata:Igreja de São Francisco da Prainha:-22.89781:-43.18363,Igreja de São Francisco da Prainha,church,-22.897811,-43.183628,Q48862348
+wikidata:Igreja do Bom Jesus da Coluna:-22.85948:-43.21230,Igreja do Bom Jesus da Coluna,church,-22.859478,-43.2123,Q56641219
+wikidata:Jardim Botânico do Rio de Janeiro:-22.96750:-43.22389,Jardim Botânico do Rio de Janeiro,natural_landmark,-22.9675,-43.223889,Q45242
+wikidata:Jardim e Morro do Valongo:-22.89856:-43.18643,Jardim e Morro do Valongo,university,-22.898558,-43.186426,Q56641218
+wikidata:Ladeira da Misericórdia:-22.90620:-43.17027,Ladeira da Misericórdia,public_square,-22.906195,-43.17027,Q10315482
+wikidata:Monumento aos Mortos da Segunda Guerra Mundial:-22.91667:-43.17361,Monumento aos Mortos da Segunda Guerra Mundial,monument,-22.91666667,-43.17361111,Q2017454
+wikidata:Morro da Babilônia:-22.96000:-43.17056,Morro da Babilônia,natural_landmark,-22.96,-43.17055556,Q6914185
+wikidata:Morro do Corcovado:-22.95250:-43.21167,Morro do Corcovado,natural_landmark,-22.9525,-43.211666666,Q506938
+wikidata:Observatório Nacional:-22.89588:-43.22498,Observatório Nacional,university,-22.8958759,-43.2249755,Q6621362
+wikidata:Palácio Guanabara:-22.93750:-43.18389,Palácio Guanabara,historic_site,-22.9375,-43.18388889,Q3813706
+wikidata:Palácio da Conceição:-22.89964:-43.18270,Palácio da Conceição,historic_site,-22.89964,-43.182697,Q10343988
+wikidata:Palácio das Laranjeiras:-22.93143:-43.18356,Palácio das Laranjeiras,historic_site,-22.93143,-43.183562,Q10343955
+wikidata:Parque Nacional da Tijuca:-22.95944:-43.27778,Parque Nacional da Tijuca,natural_landmark,-22.959444444,-43.277777777,Q1974494
+wikidata:Pavilhão Mourisco:-22.87495:-43.24543,Pavilhão Mourisco,historic_site,-22.8749473,-43.2454285,Q84971371
+wikidata:Praça XV de Novembro:-22.90300:-43.17369,Praça XV de Novembro,public_square,-22.903,-43.173694444,Q10353359
+wikidata:Quinta da Boa Vista:-22.90580:-43.22440,Quinta da Boa Vista,museum,-22.9058,-43.2244,Q2500590
+wikidata:Santa Casa de Misericórdia do Rio de Janeiro:-22.90752:-43.17114,Santa Casa de Misericórdia do Rio de Janeiro,historic_site,-22.907521,-43.171143,Q10367749
+wikidata:Santuário de Santa Rita de Cássia:-22.90038:-43.18066,Santuário de Santa Rita de Cássia,church,-22.900376,-43.18066,Q10300658
+wikidata:Solar Grandjean de Montigny:-22.97902:-43.23376,Solar Grandjean de Montigny,museum,-22.979022,-43.233756,Q18485129
+wikidata:Universidade Federal do Rio de Janeiro:-22.86250:-43.22389,Universidade Federal do Rio de Janeiro,university,-22.8625,-43.223888888,Q586904
+overture:Instituto Histórico e Geográfico Brasileiro:-22.91463:-43.17657,Instituto Histórico e Geográfico Brasileiro,library,-22.914628982543945,-43.176570892333984,
+overture:Instituto de Pesquisa e Memória Pretos Novos (IPN):-22.89598:-43.19291,Instituto de Pesquisa e Memória Pretos Novos (IPN),memorial,-22.89597511291504,-43.192909240722656,
+overture:Military Museum Conde de Linhares:-22.90490:-43.21927,Military Museum Conde de Linhares,museum,-22.904897689819336,-43.21927261352539,
+overture:Museu Histórico e Diplomático:-22.90347:-43.18834,Museu Histórico e Diplomático,museum,-22.90346908569336,-43.18833541870117,
+overture:Museu do Negro:-22.90431:-43.18052,Museu do Negro,museum,-22.90431022644043,-43.18052291870117,
+overture:Museu do Trem:-22.89525:-43.29181,Museu do Trem,museum,-22.895246505737305,-43.291805267333984,
+overture:Museu do Índio:-22.95186:-43.19106,Museu do Índio,museum,-22.95186424255371,-43.191062927246094,
+overture:Palácio do Catete:-22.92589:-43.17620,Palácio do Catete,historic_site,-22.925893783569336,-43.17620086669922,
+overture:Submarino-Museu Riachuelo S-22:-22.90047:-43.17464,Submarino-Museu Riachuelo S-22,museum,-22.900468826293945,-43.174644470214844,
+overture:Acueducto Carioca:-22.91260:-43.17985,Acueducto Carioca,historic_site,-22.91259765625,-43.17985153198242,
+overture:Apoteose:-22.91307:-43.19578,Apoteose,public_square,-22.913070678710938,-43.19578170776367,
+overture:Aqueduto da Carioca:-22.91260:-43.17985,Aqueduto da Carioca,historic_site,-22.91259765625,-43.17985153198242,
+overture:Baianas da Estação Primeira de Mangueira:-22.90352:-43.24060,Baianas da Estação Primeira de Mangueira,samba_school,-22.903520584106445,-43.240596771240234,
+overture:Cais do Valongo:-22.89665:-43.18717,Cais do Valongo,memorial,-22.896648406982422,-43.187171936035156,
+overture:Castelo Mourisco:-22.87491:-43.24537,Castelo Mourisco,historic_site,-22.87491226196289,-43.24536895751953,
+overture:Centro de Tradições Nordestinas Luiz Gonzaga:-22.89746:-43.22038,Centro de Tradições Nordestinas Luiz Gonzaga,cultural_center,-22.897462844848633,-43.220375061035156,
+overture:Cidade Universitária da UFRJ:-22.85306:-43.22583,Cidade Universitária da UFRJ,university,-22.853055953979492,-43.225833892822266,
+overture:Clube Naval:-22.90818:-43.17667,Clube Naval,historic_site,-22.908180236816406,-43.176673889160156,
+overture:Estatua Equestre de D. Pedro I:-22.90699:-43.18304,Estatua Equestre de D. Pedro I,monument,-22.906986236572266,-43.18304443359375,
+overture:Largo do Machado Station:-22.93090:-43.17831,Largo do Machado Station,public_square,-22.93090057373047,-43.178306579589844,
+"overture:Marechal Hermes, Rio de Janeiro:-22.86195:-43.37083","Marechal Hermes, Rio de Janeiro",historic_site,-22.861948013305664,-43.37083435058594,
+overture:Mirante do Valongo:-22.89891:-43.18705,Mirante do Valongo,natural_landmark,-22.898914337158203,-43.187049865722656,
+overture:Obelisco da Avenida Rio Branco:-22.91271:-43.17479,Obelisco da Avenida Rio Branco,monument,-22.9127140045166,-43.1747932434082,
+overture:Pala'cio - Parque Lage:-22.96018:-43.21217,Pala'cio - Parque Lage,public_square,-22.96018409729004,-43.21217346191406,
+overture:Paço de São Cristóvão:-22.90572:-43.22689,Paço de São Cristóvão,historic_site,-22.905723571777344,-43.22689437866211,
+overture:Portao Historico da Fortaleza de Sao Joao:-22.94354:-43.15702,Portao Historico da Fortaleza de Sao Joao,historic_site,-22.943544387817383,-43.157020568847656,
+overture:Sambódromo Setor 10-11-12-13:-22.91203:-43.19681,Sambódromo Setor 10-11-12-13,theater,-22.91203498840332,-43.19681167602539,
+overture:Selaron Steps:-22.91553:-43.17966,Selaron Steps,public_square,-22.9155330657959,-43.179656982421875,
+overture:Vista Chinesa:-22.97327:-43.24947,Vista Chinesa,natural_landmark,-22.9732666015625,-43.249473571777344,
+overture:Museu de Arte Moderna do Rio de Janeiro:-22.91367:-43.17186,Museu de Arte Moderna do Rio de Janeiro,museum,-22.913673400878906,-43.1718635559082,
+overture:Cristo del Corcovado:-22.95139:-43.21083,Cristo del Corcovado,monument,-22.95138931274414,-43.21083450317383,
+overture:Estátua de Carlos Drummond de Andrade:-22.98435:-43.18917,Estátua de Carlos Drummond de Andrade,monument,-22.98435401916504,-43.18916702270508,
+overture:Etnias - Mural de Graffiti:-22.89434:-43.18715,Etnias - Mural de Graffiti,historic_site,-22.894336700439453,-43.18714904785156,
+overture:Monumento Nacional aos Mortos da Segunda Guerra Mundial:-22.91658:-43.17340,Monumento Nacional aos Mortos da Segunda Guerra Mundial,memorial,-22.916582107543945,-43.173397064208984,
+overture:Monumento Retirada da Laguna:-22.95494:-43.16587,Monumento Retirada da Laguna,monument,-22.954940795898438,-43.165870666503906,
+overture:Monumento ao Almirante Barroso Barao do Amazonas:-22.91852:-43.17591,Monumento ao Almirante Barroso Barao do Amazonas,monument,-22.91851806640625,-43.1759147644043,
+overture:Monumento ao Barão de Mauá:-22.89607:-43.18098,Monumento ao Barão de Mauá,monument,-22.89607048034668,-43.18097686767578,
+overture:Monumento ao Senador Pinheiro Machado:-22.98432:-43.20597,Monumento ao Senador Pinheiro Machado,monument,-22.984315872192383,-43.20597457885742,
+overture:Monumento aos Pracinhas:-22.91658:-43.17391,Monumento aos Pracinhas,memorial,-22.916580200195312,-43.17390823364258,
+overture:Pedra da Gávea:-22.99787:-43.28473,Pedra da Gávea,natural_landmark,-22.99786949157715,-43.284732818603516,
+overture:Arquivo histórico do Banco do Brasil:-22.90105:-43.17653,Arquivo histórico do Banco do Brasil,cultural_center,-22.901046752929688,-43.1765251159668,
+overture:Casa Brasil:-22.90061:-43.17621,Casa Brasil,cultural_center,-22.90060806274414,-43.17620849609375,
+overture:Casa Museu Eva Klabin:-22.97601:-43.19844,Casa Museu Eva Klabin,museum,-22.976009368896484,-43.19844436645508,
+overture:Casa de Banho de Dom Joao VI:-22.87874:-43.21190,Casa de Banho de Dom Joao VI,museum,-22.87873649597168,-43.21189880371094,
+overture:Centro Nacional de Flocore e Cultura Popular:-22.92629:-43.17646,Centro Nacional de Flocore e Cultura Popular,cultural_center,-22.926292419433594,-43.17646408081055,
+overture:Fondation Moreira Sales:-22.98186:-43.23937,Fondation Moreira Sales,cultural_center,-22.98186492919922,-43.2393684387207,
+overture:Fundação Casa de Rui Barbosa:-22.94893:-43.18699,Fundação Casa de Rui Barbosa,museum,-22.948928833007812,-43.18698501586914,
+overture:Memorial Pretos Novos:-22.89604:-43.19298,Memorial Pretos Novos,memorial,-22.896039962768555,-43.1929817199707,
+overture:Museo Militar Copacabana:-22.98571:-43.18505,Museo Militar Copacabana,museum,-22.985713958740234,-43.185054779052734,
+overture:Museu Carmen Miranda:-22.94137:-43.17216,Museu Carmen Miranda,museum,-22.941368103027344,-43.17216110229492,
+overture:Museu Casa de Benjamin Constant:-22.92045:-43.18827,Museu Casa de Benjamin Constant,museum,-22.92045021057129,-43.18826675415039,
+overture:Museu Judaico do Rio de Janeiro:-22.90956:-43.17481,Museu Judaico do Rio de Janeiro,cultural_center,-22.90955924987793,-43.17481231689453,
+overture:Museu Light da Energia:-22.90253:-43.18707,Museu Light da Energia,cultural_center,-22.90252685546875,-43.187068939208984,
+overture:Museu Naval:-22.90394:-43.17298,Museu Naval,museum,-22.903940200805664,-43.172977447509766,
+overture:Museu Penitenciário:-22.91524:-43.19983,Museu Penitenciário,museum,-22.915241241455078,-43.199832916259766,
+overture:Museu Villa-Lobos:-22.95186:-43.19058,Museu Villa-Lobos,museum,-22.95186424255371,-43.190582275390625,
+overture:Museu da Geodiversidade:-22.85734:-43.23232,Museu da Geodiversidade,museum,-22.857337951660156,-43.23231506347656,
+overture:Museu da Ii Guerra Mundial:-22.91651:-43.17404,Museu da Ii Guerra Mundial,monument,-22.916513442993164,-43.174041748046875,
+overture:Museu de Luiz Gonzaga:-22.89750:-43.22041,Museu de Luiz Gonzaga,cultural_center,-22.897497177124023,-43.22040939331055,
+overture:Museu do Planetário:-22.97830:-43.23028,Museu do Planetário,museum,-22.978300094604492,-43.230281829833984,
+overture:Palácio Episcopal da Conceição:-22.89953:-43.18285,Palácio Episcopal da Conceição,historic_site,-22.899534225463867,-43.18285369873047,
+overture:Panteão Duque de Caxias:-22.90361:-43.18917,Panteão Duque de Caxias,historic_site,-22.903614044189453,-43.18916702270508,
+overture:Solar de Grandjean de Montigny:-22.97902:-43.23373,Solar de Grandjean de Montigny,museum,-22.979021072387695,-43.23373031616211,
+overture:Canecão | Rio de Janeiro RJ:-22.95600:-43.17757,Canecão | Rio de Janeiro RJ,theater,-22.956003189086914,-43.17757034301758,
+overture:Cidade do Samba RJ:-22.89572:-43.19756,Cidade do Samba RJ,samba_school,-22.89571762084961,-43.19755554199219,
+overture:Cordão da Bola Preta:-22.91024:-43.18332,Cordão da Bola Preta,samba_school,-22.910236358642578,-43.18332290649414,
+overture:Cristo Redentor Rio de Janeiro:-22.95205:-43.21074,Cristo Redentor Rio de Janeiro,monument,-22.952051162719727,-43.21074295043945,
+overture:D.R.I EAV Parque Lage:-22.96018:-43.21228,D.R.I EAV Parque Lage,university,-22.960180282592773,-43.212284088134766,
+overture:Palácio Maçônico do Lavradio:-22.91051:-43.18281,Palácio Maçônico do Lavradio,historic_site,-22.910512924194336,-43.18281173706055,
+overture:Teatro Justiça:-22.91043:-43.17558,Teatro Justiça,cultural_center,-22.910429000854492,-43.17558288574219,
+wikidata:Lago do Campo de Santana:-22.90759:-43.18802,Lago do Campo de Santana,public_square,-22.9075885,-43.188024,Q67205544
+"overture:Vasco da Gama, Rio de Janeiro:-22.89194:-43.22695","Vasco da Gama, Rio de Janeiro",public_square,-22.891944885253906,-43.22694778442383,
+overture:Palácio de são cristóvão:-22.90583:-43.22445,Palácio de são cristóvão,museum,-22.905834197998047,-43.22444534301758,
+overture:Fazenda Imperial de Santa Cruz:-22.91000:-43.68531,Fazenda Imperial de Santa Cruz,historic_site,-22.910003662109375,-43.685306549072266,
+overture:Museu de Sitio Arqueologico da Antiga Se:-22.90390:-43.17582,Museu de Sitio Arqueologico da Antiga Se,church,-22.903898239135742,-43.17581558227539,
+"overture:Christ Redeemer, Rio de Janeiro, Brazil:-22.95165:-43.21084","Christ Redeemer, Rio de Janeiro, Brazil",monument,-22.95165252685547,-43.210838317871094,
+overture:National Museum of Brazil:-22.90577:-43.22653,National Museum of Brazil,museum,-22.905765533447266,-43.22652816772461,
+overture:Fort Copacabana:-22.98618:-43.18653,Fort Copacabana,museum,-22.986177444458008,-43.1865348815918,
+overture:Museu do paço:-22.90289:-43.17331,Museu do paço,cultural_center,-22.902894973754883,-43.173309326171875,
+overture:Sugarloaf Mountain:-22.94975:-43.15623,Sugarloaf Mountain,natural_landmark,-22.949750900268555,-43.15623474121094,
+overture:Centro Cultural Benjamin Peret:-22.91720:-43.17892,Centro Cultural Benjamin Peret,cultural_center,-22.91719627380371,-43.17892074584961,
+overture:Centro Cultural Itaporã:-22.92054:-43.21086,Centro Cultural Itaporã,cultural_center,-22.920541763305664,-43.21086120605469,
+overture:Centro Cultural Oduvaldo Viana Filho:-22.93027:-43.17459,Centro Cultural Oduvaldo Viana Filho,cultural_center,-22.930269241333008,-43.17458724975586,
+overture:Centro Cultural Prof Dila:-22.89694:-43.35447,Centro Cultural Prof Dila,cultural_center,-22.896940231323242,-43.354469299316406,
+overture:Centro Cultural Sindicato dos Rodoviários do Município do Rio de Janeiro:-22.89964:-43.18770,Centro Cultural Sindicato dos Rodoviários do Município do Rio de Janeiro,cultural_center,-22.89963722229004,-43.18770217895508,
+overture:Espaço Cultural Arlindo Cruz:-22.87435:-43.42841,Espaço Cultural Arlindo Cruz,cultural_center,-22.874351501464844,-43.42841339111328,
+overture:Espaço Cultural Escola Sesc:-22.96029:-43.35923,Espaço Cultural Escola Sesc,cultural_center,-22.96029281616211,-43.359230041503906,
+overture:Fórum de Ciência e Cultura da UFRJ:-22.94284:-43.17472,Fórum de Ciência e Cultura da UFRJ,cultural_center,-22.942842483520508,-43.174720764160156,
+overture:GRES União da Ilha do Governador:-22.81377:-43.18890,GRES União da Ilha do Governador,samba_school,-22.813766479492188,-43.188899993896484,
+overture:Lona Cultural Terra Caetano Veloso:-22.83997:-43.37852,Lona Cultural Terra Caetano Veloso,cultural_center,-22.839969635009766,-43.37852478027344,
+overture:MAAS Museu Arquidiocesano de Arte Sacra do Rio de Janeiro:-22.91072:-43.18043,MAAS Museu Arquidiocesano de Arte Sacra do Rio de Janeiro,museum,-22.910724639892578,-43.18042755126953,
+overture:Museu de Bangu:-22.87881:-43.46346,Museu de Bangu,museum,-22.878812789916992,-43.46345901489258,
+overture:Pequena África:-22.89813:-43.18748,Pequena África,historic_site,-22.89813232421875,-43.18748474121094,
+overture:Praça Inhangá Copacabana:-22.96602:-43.18147,Praça Inhangá Copacabana,natural_landmark,-22.966018676757812,-43.18147277832031,
+overture:Quinta da Boa Vista - Museu Nacional:-22.92644:-43.21583,Quinta da Boa Vista - Museu Nacional,museum,-22.926443099975586,-43.2158317565918,
+wikidata:Rua do Catete:-22.92592:-43.17625,Rua do Catete,historic_site,-22.92592,-43.176251,Q10365024
+overture:Teatro do Liceu:-22.90725:-43.19314,Teatro do Liceu,theater,-22.907245635986328,-43.193138122558594,
+wikidata:edifício-sede da Associação Brasileira de Imprensa:-22.90915:-43.17484,edifício-sede da Associação Brasileira de Imprensa,historic_site,-22.90915,-43.17484,Q18275922
