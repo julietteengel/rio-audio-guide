@@ -99,6 +99,34 @@ func TestGetPlaceDetail_AcceptedWhenScriptNotPublished(t *testing.T) {
 	}
 }
 
+func TestListPlaces_FiltersByQueryParam(t *testing.T) {
+	christName, _ := domain.NewPlaceName("Cristo Redentor")
+	christCoords, _ := domain.NewCoordinates(-22.9519, -43.2105)
+	christ := domain.NewPlace(christName, "monument", christCoords, "", "wikidata", "rich")
+
+	stairsName, _ := domain.NewPlaceName("Escadaria Selarón")
+	stairsCoords, _ := domain.NewCoordinates(-22.9153, -43.1811)
+	stairs := domain.NewPlace(stairsName, "landmark", stairsCoords, "", "wikidata", "rich")
+
+	placeRepo := &fakePlaceRepo{places: []*domain.Place{christ, stairs}}
+	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache())
+
+	req := httptest.NewRequest(http.MethodGet, "/places?q=cristo", nil)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want 200: %s", rec.Code, rec.Body.String())
+	}
+	if !strings.Contains(rec.Body.String(), "Cristo Redentor") {
+		t.Fatalf("expected matching place in results, got %s", rec.Body.String())
+	}
+	if strings.Contains(rec.Body.String(), "Escadaria") {
+		t.Fatalf("non-matching place must be filtered out, got %s", rec.Body.String())
+	}
+}
+
 func TestGetPlaceDetail_RequiresLanguageParam(t *testing.T) {
 	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
 		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache())

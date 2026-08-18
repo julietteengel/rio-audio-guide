@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
@@ -27,8 +28,14 @@ type placeResponse struct {
 	Lon      float64 `json:"lon"`
 }
 
+// listPlaces sert aussi de recherche : ?q= filtre par sous-chaîne du nom
+// (insensible à la casse), en mémoire — pas de méthode de recherche dédiée
+// dans PlaceRepository, donc on filtre côté adaptateur plutôt que de changer
+// le port. Suffisant à l'échelle actuelle (~236 lieux au plus) ; un vrai index
+// de recherche serait à envisager si ça grossit beaucoup plus.
 func (s *Server) listPlaces(c echo.Context) error {
-	key := fmt.Sprintf("places:%v:%v:%v:%v", rioMinLat, rioMinLon, rioMaxLat, rioMaxLon)
+	query := strings.ToLower(strings.TrimSpace(c.QueryParam("q")))
+	key := fmt.Sprintf("places:%v:%v:%v:%v:q=%s", rioMinLat, rioMinLon, rioMaxLat, rioMaxLon, query)
 	return s.cachedJSON(c, key, func() (any, int, error) {
 		places, err := s.placeRepo.FindActiveInBoundingBox(c.Request().Context(), rioMinLat, rioMinLon, rioMaxLat, rioMaxLon)
 		if err != nil {
@@ -36,6 +43,9 @@ func (s *Server) listPlaces(c echo.Context) error {
 		}
 		resp := make([]placeResponse, 0, len(places))
 		for _, p := range places {
+			if query != "" && !strings.Contains(strings.ToLower(p.Name().String()), query) {
+				continue
+			}
 			resp = append(resp, placeResponse{
 				ID:       p.ID(),
 				Name:     p.Name().String(),

@@ -35,6 +35,7 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	s.echo.GET("/places", s.listPlaces)
 	s.echo.GET("/places/:id", s.getPlaceDetail)
 	s.echo.GET("/places/:id/audio", s.getPlaceAudio)
+	s.echo.GET("/cities/:city/manifest", s.getCityManifest)
 	s.echo.POST("/scripts/:id/review", s.reviewScript)
 	return s
 }
