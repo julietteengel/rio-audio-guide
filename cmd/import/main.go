@@ -3,13 +3,12 @@ package main
 
 import (
 	"context"
-	"errors"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"rioaudioguide/backend/internal/adapters/postgres"
@@ -54,22 +53,57 @@ func main() {
 	}
 	defer pool.Close()
 
-	placeRepo := postgres.NewPlaceRepository(pool)
-	scriptRepo := postgres.NewScriptRepository(pool)
+	// Tout le run passe dans une seule transaction : soit l'import complet
+	// rentre, soit rien n'est écrit. Sans ça, un plantage à mi-parcours laisse
+	// Postgres avec des lieux importés sans leurs scripts (ou l'inverse), un
+	// état bâtard qu'il faut ensuite deviner pour relancer proprement.
+	tx, err := pool.Begin(ctx)
+	if err != nil {
+		log.Fatalf("begin transaction: %v", err)
+	}
 
-	// placesCreated ne compte que les créations réelles : placeIDs contient aussi
-	// les lieux déjà présents (retrouvés par FindByName), ce qui gonflerait le
-	// total à chaque relance de l'import.
-	placesCreated := 0
-	placeIDs := make(map[string]string, len(matchedPlaces))
-	for _, p := range matchedPlaces {
-		existing, err := placeRepo.FindByName(ctx, p.Name)
-		if err == nil {
-			placeIDs[p.Name] = existing.ID()
-			continue
+	placesCreated, imported, err := runImport(ctx, tx, matchedPlaces, scripts)
+	if err != nil {
+		if rbErr := tx.Rollback(ctx); rbErr != nil {
+			log.Printf("rollback failed: %v", rbErr)
 		}
-		if !errors.Is(err, pgx.ErrNoRows) {
-			log.Printf("check existing place %q: %v", p.Name, err)
+		log.Fatalf("import failed, rolled back: %v", err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		log.Fatalf("commit import transaction: %v", err)
+	}
+
+	log.Printf("imported %d new places, %d scripts", placesCreated, imported)
+}
+
+// runImport does the actual writes for one import run, entirely inside the
+// given transaction. Existence checks (which places/scripts already exist)
+// are each a single batched round trip rather than one query per row, and
+// the writes themselves are sent as one pipelined pgx.Batch per entity type
+// instead of one round trip per row -- turning what used to be roughly
+// len(matchedPlaces)+len(scripts) individual statements into four round
+// trips total, regardless of import size.
+func runImport(ctx context.Context, tx pgx.Tx, matchedPlaces []placeRow, scripts []scriptToImport) (placesCreated, imported int, err error) {
+	placeRepo := postgres.NewPlaceRepository(tx)
+	scriptRepo := postgres.NewScriptRepository(tx)
+
+	names := make([]string, len(matchedPlaces))
+	for i, p := range matchedPlaces {
+		names[i] = p.Name
+	}
+	existingPlaceIDs, err := placeRepo.FindIDsByNames(ctx, names)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	// placeIDs couvre tous les lieux de l'import (existants + nouveaux) : les
+	// scripts en ont besoin pour savoir à quel Place se rattacher, que le lieu
+	// vienne d'être créé ou existait déjà.
+	placeIDs := make(map[string]string, len(matchedPlaces))
+	var newPlaces []*domain.Place
+	for _, p := range matchedPlaces {
+		if id, ok := existingPlaceIDs[p.Name]; ok {
+			placeIDs[p.Name] = id
 			continue
 		}
 
@@ -90,19 +124,33 @@ func main() {
 		}
 
 		place := domain.NewPlace(name, p.Category, coords, qid, p.Source, "")
-		if err := placeRepo.Save(ctx, place); err != nil {
-			log.Printf("save place %q: %v", p.Name, err)
-			continue
-		}
 		placeIDs[p.Name] = place.ID()
-		placesCreated++
+		newPlaces = append(newPlaces, place)
 	}
 
-	imported := 0
+	if err := sendPlacesBatch(ctx, tx, placeRepo, newPlaces); err != nil {
+		return 0, 0, err
+	}
+
+	allPlaceIDs := make([]string, 0, len(placeIDs))
+	for _, id := range placeIDs {
+		allPlaceIDs = append(allPlaceIDs, id)
+	}
+	existingLanguages, err := scriptRepo.FindExistingLanguages(ctx, allPlaceIDs)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	var newScripts []*domain.Script
+	skippedExisting := 0
 	for _, s := range scripts {
 		placeID, ok := placeIDs[s.PlaceName]
 		if !ok {
 			continue // le lieu correspondant a échoué plus haut — pas de script orphelin
+		}
+		if existingLanguages[placeID][s.Language] {
+			skippedExisting++
+			continue
 		}
 
 		language, err := domain.NewLanguage(s.Language)
@@ -116,24 +164,53 @@ func main() {
 			continue
 		}
 
-		script := domain.NewScript(placeID, language, text, "")
-		if err := scriptRepo.Save(ctx, script); err != nil {
-			if isUniqueViolation(err) {
-				log.Printf("script %q/%s already imported, skipping", s.PlaceName, s.Language)
-				continue
-			}
-			log.Printf("save script %q/%s: %v", s.PlaceName, s.Language, err)
-			continue
-		}
-		imported++
+		newScripts = append(newScripts, domain.NewScript(placeID, language, text, ""))
+	}
+	if skippedExisting > 0 {
+		log.Printf("%d scripts already imported, skipping", skippedExisting)
 	}
 
-	log.Printf("imported %d new places, %d scripts", placesCreated, imported)
+	if err := sendScriptsBatch(ctx, tx, scriptRepo, newScripts); err != nil {
+		return 0, 0, err
+	}
+
+	return len(newPlaces), len(newScripts), nil
 }
 
-func isUniqueViolation(err error) bool {
-	var pgErr *pgconn.PgError
-	return errors.As(err, &pgErr) && pgErr.Code == "23505"
+func sendPlacesBatch(ctx context.Context, tx pgx.Tx, placeRepo *postgres.PlaceRepository, places []*domain.Place) error {
+	if len(places) == 0 {
+		return nil
+	}
+	batch := &pgx.Batch{}
+	for _, place := range places {
+		placeRepo.QueueSave(batch, place)
+	}
+	results := tx.SendBatch(ctx, batch)
+	for _, place := range places {
+		if _, err := results.Exec(); err != nil {
+			_ = results.Close()
+			return fmt.Errorf("save place %q: %w", place.Name(), err)
+		}
+	}
+	return results.Close()
+}
+
+func sendScriptsBatch(ctx context.Context, tx pgx.Tx, scriptRepo *postgres.ScriptRepository, scripts []*domain.Script) error {
+	if len(scripts) == 0 {
+		return nil
+	}
+	batch := &pgx.Batch{}
+	for _, script := range scripts {
+		scriptRepo.QueueSave(batch, script)
+	}
+	results := tx.SendBatch(ctx, batch)
+	for _, script := range scripts {
+		if _, err := results.Exec(); err != nil {
+			_ = results.Close()
+			return fmt.Errorf("save script %q/%s: %w", script.PlaceID(), script.Language(), err)
+		}
+	}
+	return results.Close()
 }
 
 func envOr(key, fallback string) string {
