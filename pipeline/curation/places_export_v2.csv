@@ -185,7 +185,6 @@ Sambódromo Setor 10-11-12-13,theater,overture,-22.91203498840332,-43.1968116760
 Selaron Steps,public_square,overture,-22.9155330657959,-43.179656982421875,
 Vista Chinesa,natural_landmark,overture,-22.9732666015625,-43.249473571777344,
 Museu de Arte Moderna do Rio de Janeiro,museum,overture,-22.913673400878906,-43.1718635559082,
-Cristo del Corcovado,monument,overture,-22.95138931274414,-43.21083450317383,
 Estátua de Carlos Drummond de Andrade,monument,overture,-22.98435401916504,-43.18916702270508,
 Etnias - Mural de Graffiti,historic_site,overture,-22.894336700439453,-43.18714904785156,
 Monumento Nacional aos Mortos da Segunda Guerra Mundial,memorial,overture,-22.916582107543945,-43.173397064208984,
@@ -221,7 +220,6 @@ Solar de Grandjean de Montigny,museum,overture,-22.979021072387695,-43.233730316
 Canecão | Rio de Janeiro RJ,theater,overture,-22.956003189086914,-43.17757034301758,
 Cidade do Samba RJ,samba_school,overture,-22.89571762084961,-43.19755554199219,
 Cordão da Bola Preta,samba_school,overture,-22.910236358642578,-43.18332290649414,
-Cristo Redentor Rio de Janeiro,monument,overture,-22.952051162719727,-43.21074295043945,
 D.R.I EAV Parque Lage,university,overture,-22.960180282592773,-43.212284088134766,
 Palácio Maçônico do Lavradio,historic_site,overture,-22.910512924194336,-43.18281173706055,
 Teatro Justiça,cultural_center,overture,-22.910429000854492,-43.17558288574219,
@@ -253,3 +251,4 @@ Quinta da Boa Vista - Museu Nacional,museum,overture,-22.926443099975586,-43.215
 Rua do Catete,historic_site,wikidata,-22.92592,-43.176251,Q10365024
 Teatro do Liceu,theater,overture,-22.907245635986328,-43.193138122558594,
 edifício-sede da Associação Brasileira de Imprensa,historic_site,wikidata,-22.90915,-43.17484,Q18275922
+Escadaria Selarón,monument,wikidata,-22.915406,-43.179414,Q2200939
