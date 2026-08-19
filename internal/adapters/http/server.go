@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 
 	"rioaudioguide/backend/internal/ports"
 )
@@ -36,6 +37,16 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 		cache:         cache,
 		tokens:        tokens,
 	}
+	// Sans ce middleware, un navigateur (web/, mobile/ en cible web via
+	// react-native-web) bloque toute réponse de cette API -- curl et l'app
+	// mobile native, eux, n'appliquent jamais CORS, donc rien ne l'aurait
+	// révélé avant de tester depuis un vrai navigateur. AllowOrigins("*")
+	// est sûr ici précisément parce que l'auth passe par un header
+	// Authorization (JWT), jamais par un cookie -- pas de credentials
+	// ambiants qu'une origine tierce pourrait siphonner. À resserrer sur
+	// les domaines réels avant une vraie prod publique.
+	s.echo.Use(middleware.CORS())
+
 	s.echo.GET("/places", s.listPlaces)
 	s.echo.GET("/places/:id", s.getPlaceDetail)
 	s.echo.GET("/places/:id/audio", s.getPlaceAudio)
