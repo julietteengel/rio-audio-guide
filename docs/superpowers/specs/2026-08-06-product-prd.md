@@ -1,5 +1,12 @@
 # Rio Audio Guide
 
+> **2026-08-19 note**: moved here from `.claude/PRPs/prds/` (the `prp-core` plugin's own convention),
+> consolidating with this project's one actively-maintained documentation system. Frozen at 2026-08-06
+> — the Implementation Phases table below is stale (Phase 2 is now well past what's described, Phase 4
+> Backend has substantial real progress, `sourcing-pipeline`/`frontend` have since merged to `master`).
+> Kept as a snapshot for the real research/evidence/decisions-log content, not as current status —
+> see `mission.md` for that.
+
 > Generated via the PRP methodology (`prp-core`), retroactively — synthesized from existing project
 > artifacts (`docs/superpowers/specs/`, `mission.md`) rather than re-running the interactive discovery
 > questions, per explicit instruction not to relitigate decisions already made. Sections marked
@@ -173,7 +180,7 @@ already proven here).
 | # | Phase | Description | Status | Parallel | Depends | PRP Plan |
 |---|---|---|---|---|---|---|
 | 1 | Sourcing pipeline | Multi-source place candidates, deduplicated, city-wide | complete (code), **pending human review before merge** | - | - | `docs/superpowers/plans/2026-07-21-lieu-sourcing-pipeline.md` |
-| 2 | Content pipeline | Grounding, narration, translation, anti-hallucination verification, at acceptable coverage | in-progress | - | 1 | `.claude/PRPs/plans/content-pipeline.plan.md` |
+| 2 | Content pipeline | Grounding, narration, translation, anti-hallucination verification, at acceptable coverage | in-progress | - | 1 | `docs/superpowers/plans/2026-08-06-content-pipeline.plan.md` |
 | 3 | Guide runtime (agentic core) | Turn memory, tool calling, unplanned-question handling, voice I/O, prompt-injection guard | pending | - | 2 (partial coverage acceptable) | - |
 | 4 | Backend | Go/hexagonal/DDD API, Postgres/PostGIS, RabbitMQ TTS queue, K8s/Scaleway deploy | pending | with 3 | 1 | - |
 | 5 | Ops depth | CI/CD canary+rollback, distributed observability, security guardrails, compliance | pending | with 3, 4 | 4 | - |
@@ -189,7 +196,7 @@ already proven here).
 **Phase 2: Content pipeline**
 - **Goal**: Ground, narrate (FR), translate (EN/ES/PT), and anti-hallucination-verify enough of the
   2230 places to be a credible v1 launch set.
-- **Scope**: See `.claude/PRPs/plans/content-pipeline.plan.md` for current in-flight scope.
+- **Scope**: See `docs/superpowers/plans/2026-08-06-content-pipeline.plan.md` for current in-flight scope.
 - **Success signal**: A defined, non-noisy subset of places has 4-language narration that has passed
   the anti-hallucination judge — exact coverage bar is one of this PRD's open questions.
 

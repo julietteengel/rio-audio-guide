@@ -4,13 +4,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository structure — read this first
 
-`master` currently contains **only documentation** (`docs/`) — no application code. Each implemented
-subsystem lives on its own branch, checked out as a git worktree, and is not merged into `master` until
-it's had a real human code review pass (not just an automated one). When asked to work on one of these,
-`cd` into its worktree (or work directly in that branch) rather than looking for it on `master`:
+As of 2026-08-19, `master` contains real application code, not just documentation: the
+`sourcing-pipeline` and `frontend` branches have been merged in (PRs #2/#3) after a human review pass.
+`backend` is the one subsystem still developed on its own branch/worktree, not merged here yet — a
+subsystem only merges into `master` once it's had a real human code review, not just an automated one.
 
-- **`sourcing-pipeline` branch**, `.worktrees/sourcing-pipeline/` — the location-sourcing pipeline and
-  its curation scripts (Python).
+- **`pipeline/`** — the location-sourcing pipeline and its curation scripts (Python). Merged from
+  `sourcing-pipeline`; that branch/worktree (`.worktrees/sourcing-pipeline/`) may still be used for new,
+  not-yet-reviewed pipeline work before the next merge.
+- **`web/`** — the Next.js landing page (started 2026-08-18, see
+  `docs/superpowers/specs/2026-08-18-landing-page-design.md`). Purely static (no backend calls), hosted
+  on Vercel — deliberately decoupled from the backend's AWS infrastructure.
+- **`mobile/`** — the React Native (Expo) app targeting the App Store, iOS first (started 2026-08-18,
+  see `2026-08-18-mobile-app-design.md` for screens/navigation/architecture; see
+  `2026-08-19-mobile-real-backend-wiring-design.md` for the follow-up that wired it to the backend's
+  real routes, added a real map with a web fallback, and fixed a download-language/UI-language UX
+  bug; see `2026-08-19-mobile-account-design.md` for login/edit-profile/logout/delete-account, wired
+  to auth routes the founder built in parallel on `backend` — read all three, none repeats the last).
+  Both `web/` and `mobile/` reuse the brand, copy, and visual design already validated in an earlier
+  Claude Design prototype (ephemeral session scratch files, not part of this repo) — that prototype is
+  not re-designed here, and is no longer needed to continue this work: the specs above and the code
+  itself are the durable source of truth going forward. `web/`/`mobile/` (and the now-merged
+  `sourcing-pipeline` work) may still be developed further on the `frontend` branch/worktree
+  (`.worktrees/frontend/`) before the next merge.
 - **`backend` branch**, `.worktrees/backend/` — the Go backend (hexagonal architecture + DDD). Started
   2026-08-12 — see `docs/superpowers/specs/2026-08-12-backend-domain-model-design.md` for the domain
   model and `docs/superpowers/plans/2026-08-12-backend-domain-model.md` for the implementation plan.
@@ -20,39 +36,26 @@ it's had a real human code review pass (not just an automated one). When asked t
   are hand-written by the founder — Claude's role there stays explanation/review only, never editing
   those files directly. Everything from `internal/adapters/` onward (Postgres, RabbitMQ, HTTP, CI/CD)
   switched to AI-written/human-reviewed on 2026-08-15, a deliberate time-boxed call, not the default.
-- **`frontend` branch**, `.worktrees/frontend/` — user-facing apps for Memória Carioca, decomposed into
-  independent sub-projects, each with its own spec under `docs/superpowers/specs/`:
-  - `web/` — Next.js landing page (started 2026-08-18, see `2026-08-18-landing-page-design.md`).
-    Purely static (no backend calls), hosted on Vercel — deliberately decoupled from the backend's AWS
-    infrastructure.
-  - `mobile/` — React Native (Expo) app targeting the App Store, iOS first (started 2026-08-18, see
-    `2026-08-18-mobile-app-design.md` for screens/navigation/architecture; see
-    `2026-08-19-mobile-real-backend-wiring-design.md` for the follow-up that wired it to the backend's
-    real routes, added a real map with a web fallback, and fixed a download-language/UI-language UX
-    bug; see `2026-08-19-mobile-account-design.md` for login/edit-profile/logout/delete-account,
-    wired to auth routes the founder built in parallel on `backend` — read all three, none repeats
-    the last).
-  Both reuse the brand, copy, and visual design already validated in an earlier Claude Design
-  prototype (ephemeral session scratch files, not part of this repo) — that prototype is not
-  re-designed here, and is no longer needed to continue this work: the specs above and the code itself
-  are the durable source of truth going forward.
 
 ```
 docs/superpowers/specs/   dated, point-in-time decision/research documents (design doc, roadmap
-                           updates, stack decisions) — append-only history, not living docs
+                           updates, stack decisions, product PRD) — append-only history, not living
+                           docs. The single planning-doc convention this project uses — an earlier,
+                           short-lived parallel attempt under .claude/PRPs/ (a different plugin's own
+                           convention) was consolidated in here 2026-08-19, see
+                           2026-08-06-product-prd.md and 2026-08-06-content-pipeline.plan.md.
 docs/superpowers/plans/   per-feature TDD implementation plans (task-by-task, checkbox-tracked)
 pipeline/sourcing/        the tested package: one module per data source (Overture, Wikidata,
-                           feiras livres) + pure dedup logic + orchestrator — sourcing-pipeline
-                           branch only
+                           feiras livres) + pure dedup logic + orchestrator
 pipeline/curation/        one-off/ad-hoc scripts for content enrichment, narration generation,
                            and data cleanup — NOT a tested package, run manually, no test coverage
 ```
 
 On the `backend` branch/worktree, `go.mod`, `cmd/api`, and `internal/{domain,application,ports,
 adapters}` sit directly at the worktree root — the Go module root, playing the same role `pipeline/`
-plays on `sourcing-pipeline`.
+plays here on `master`.
 
-## Commands (run from `pipeline/` on the `sourcing-pipeline` branch/worktree)
+## Commands (run from `pipeline/`)
 
 ```bash
 python3.12 -m venv .venv && source .venv/bin/activate

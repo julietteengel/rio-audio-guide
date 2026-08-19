@@ -1,5 +1,12 @@
 # Feature: Content Pipeline — Phase 2 (grounding → narration → translation → verification)
 
+> **2026-08-19 note**: moved here from `.claude/PRPs/plans/` (the `prp-core` plugin's own convention),
+> consolidating with this project's one actively-maintained documentation system
+> (`docs/superpowers/plans/`). Frozen at 2026-08-06 — this phase has since progressed well past the
+> counts/tasks described below (see `mission.md` for current status). Kept as a snapshot of the
+> methodology (grounding source priority, narration style, anti-hallucination approach) actually used,
+> not as a live task list.
+
 > Retroactive plan: this phase was already ~40% underway (441/2230 places narrated, methodology
 > established) before this plan was written. It documents the current approach and the concrete
 > remaining work, per the PRD's Phase 2 entry, rather than re-deriving a methodology already proven
