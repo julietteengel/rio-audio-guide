@@ -248,6 +248,61 @@ func TestReviewScript_RejectsNonAdmin(t *testing.T) {
 	}
 }
 
+func TestRetryAudio_Admin(t *testing.T) {
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript("place-1", domain.LanguageFR, text, "source")
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	_ = audioFile.MarkGenerating()
+	_ = audioFile.MarkFailed("elevenlabs: transient 500")
+
+	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
+	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
+	publisher := &fakePublisher{}
+	tokens := fakeTokenIssuer{}
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), publisher, fakeAudioStorage{}, newFakeCache(), tokens)
+
+	token, _ := tokens.Issue("julie", domain.RoleAdmin)
+	req := httptest.NewRequest(http.MethodPost, "/audio-files/"+audioFile.ID()+"/retry", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusAccepted {
+		t.Fatalf("got status %d, want 202: %s", rec.Code, rec.Body.String())
+	}
+	if publisher.published != 1 {
+		t.Fatalf("got %d published jobs, want 1", publisher.published)
+	}
+	if audioFile.Status() != domain.AudioFileStatusQueued {
+		t.Fatalf("got status %v, want queued", audioFile.Status())
+	}
+}
+
+func TestRetryAudio_RejectsNonAdmin(t *testing.T) {
+	audioFile, _ := domain.NewAudioFile("script-1", "voice-1")
+	_ = audioFile.MarkGenerating()
+	_ = audioFile.MarkFailed("elevenlabs: transient 500")
+
+	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
+	publisher := &fakePublisher{}
+	tokens := fakeTokenIssuer{}
+	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}}, audioFileRepo,
+		newFakeUserRepo(), publisher, fakeAudioStorage{}, newFakeCache(), tokens)
+
+	token, _ := tokens.Issue("someone-else", domain.RoleUser)
+	req := httptest.NewRequest(http.MethodPost, "/audio-files/"+audioFile.ID()+"/retry", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusForbidden {
+		t.Fatalf("got status %d, want 403: %s", rec.Code, rec.Body.String())
+	}
+	if publisher.published != 0 {
+		t.Fatalf("got %d published jobs, want 0", publisher.published)
+	}
+}
+
 func TestReviewScript_RequiresAuth(t *testing.T) {
 	text, _ := domain.NewScriptText("Texte")
 	script := domain.NewScript("place-1", domain.LanguageFR, text, "source")

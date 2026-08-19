@@ -56,7 +56,9 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	auth := requireAuth(s.tokens)
 	// ReviewAndRequestAudio triggers a real, billed ElevenLabs call -- gated
 	// to RoleAdmin, not just any authenticated account (see requireRole).
-	s.echo.POST("/scripts/:id/review", s.reviewScript, auth, requireRole(domain.RoleAdmin))
+	adminOnly := requireRole(domain.RoleAdmin)
+	s.echo.POST("/scripts/:id/review", s.reviewScript, auth, adminOnly)
+	s.echo.POST("/audio-files/:id/retry", s.retryAudio, auth, adminOnly)
 
 	s.echo.POST("/register", s.registerUser)
 	s.echo.POST("/login", s.login)
