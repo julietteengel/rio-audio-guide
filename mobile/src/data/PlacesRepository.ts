@@ -1,4 +1,4 @@
-import type { Place, NarrationStatus } from "./types";
+import type { Place, NarrationStatus, AudioAvailability } from "./types";
 import { MOCK_PLACES } from "./types";
 import { API_BASE_URL } from "../config";
 import type { Locale } from "../i18n/dictionary";
@@ -9,6 +9,7 @@ export interface PlacesRepository {
   getById(id: string): Promise<Place | undefined>;
   search(query: string): Promise<Place[]>;
   downloadedCount(): Promise<number>;
+  getAudioUrl(placeId: string, language: Locale): Promise<AudioAvailability>;
 }
 
 /**
@@ -33,6 +34,12 @@ export class MockPlacesRepository implements PlacesRepository {
 
   async downloadedCount(): Promise<number> {
     return MOCK_PLACES.length;
+  }
+
+  // No real backend behind the mock repository, so no real audio to point
+  // to -- honest "unavailable" rather than pretending.
+  async getAudioUrl(): Promise<AudioAvailability> {
+    return { state: "unavailable" };
   }
 }
 
@@ -148,6 +155,22 @@ export class HttpPlacesRepository implements PlacesRepository {
   async downloadedCount(): Promise<number> {
     const summary = await getOfflineDownloadSummary();
     return summary?.placeCount ?? 0;
+  }
+
+  // 200 {url}: ready, real presigned S3 URL. 202 {status}: queued/generating/
+  // "script not yet published" -- all mean the same thing to the UI, not
+  // playable yet. 404: no audio was ever requested for this place/language.
+  async getAudioUrl(placeId: string, language: Locale): Promise<AudioAvailability> {
+    const { status, body } = await fetchJson<{ url?: string }>(
+      `/places/${encodeURIComponent(placeId)}/audio?language=${language}`,
+    );
+    if (status === 200 && body?.url) {
+      return { state: "ready", url: body.url };
+    }
+    if (status === 202) {
+      return { state: "pending" };
+    }
+    return { state: "unavailable" };
   }
 }
 

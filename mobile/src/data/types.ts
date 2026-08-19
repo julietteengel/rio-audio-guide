@@ -5,6 +5,16 @@
 //   `body` is empty and no narration will appear until content is authored.
 export type NarrationStatus = "ready" | "pending" | "unavailable";
 
+// Same 3 states as NarrationStatus, but for GET /places/:id/audio, which is
+// a genuinely separate endpoint/lifecycle from the text narration above —
+// a script can be published (narration ready) while its audio is still
+// generating, or the other way is never true (audio always needs a
+// published script first). "ready" carries the real presigned S3 URL.
+export type AudioAvailability =
+  | { state: "ready"; url: string }
+  | { state: "pending" }
+  | { state: "unavailable" };
+
 export type Place = {
   id: string;
   name: string;

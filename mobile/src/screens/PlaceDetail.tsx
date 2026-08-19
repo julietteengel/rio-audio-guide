@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, ScrollView, Image, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import Svg, { Polyline, Path } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import type { Locale } from "../i18n/dictionary";
 import { useLocale } from "../i18n/LocaleContext";
 import { placesRepository } from "../data/PlacesRepository";
-import type { Place } from "../data/types";
+import type { Place, AudioAvailability } from "../data/types";
 import { colors, fonts, radii } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<AppStackParamList, "PlaceDetail">;
@@ -19,20 +20,53 @@ const LANG_LABEL: Record<Locale, string> = { pt: "PT", en: "EN", fr: "FR", es: "
 const WAVE_HEIGHTS_PLAYED = [8, 16, 24, 14, 22];
 const WAVE_HEIGHTS_REST = [10, 18, 26, 12, 20, 9, 16];
 
+// currentTime/duration come from expo-audio's AudioStatus in seconds
+// (fractional while loading) -- "0:00" rather than "0:NaN" before a source
+// has loaded.
+function formatTime(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2, "0");
+  return `${m}:${s}`;
+}
+
 export function PlaceDetailScreen({ route, navigation }: Props) {
   const { t } = useLocale();
   const [place, setPlace] = useState<Place | null>(null);
   const [playerLocale, setPlayerLocale] = useState<Locale>("pt");
+  const [audio, setAudio] = useState<AudioAvailability>({ state: "unavailable" });
 
   useEffect(() => {
     placesRepository.getById(route.params.placeId).then((p) => setPlace(p ?? null));
   }, [route.params.placeId]);
 
+  // Re-fetches whenever the player's own language selection changes -- this
+  // is deliberately independent from useLocale()'s app-wide locale, which
+  // only drives the readable narration text below (see getById in
+  // PlacesRepository.ts). A place can have audio ready in one language and
+  // not another, so this has to be its own fetch, not reuse the text one.
+  useEffect(() => {
+    if (!place) return;
+    let cancelled = false;
+    placesRepository.getAudioUrl(place.id, playerLocale).then((result) => {
+      if (!cancelled) setAudio(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [place?.id, playerLocale]);
+
+  // Hooks must run unconditionally on every render -- source is null until
+  // audio.state is "ready", which useAudioPlayer accepts (no source loaded
+  // yet, not an error).
+  const player = useAudioPlayer(audio.state === "ready" ? audio.url : null);
+  const status = useAudioPlayerStatus(player);
+
   if (!place) return null;
 
-  const hasDuration = typeof place.audioDurationSeconds === "number";
-  const minutes = hasDuration ? Math.floor(place.audioDurationSeconds! / 60) : 0;
-  const seconds = hasDuration ? String(place.audioDurationSeconds! % 60).padStart(2, "0") : "--";
+  const canPlay = audio.state === "ready";
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 40 }}>
@@ -79,11 +113,21 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
 
       <View style={styles.player}>
         <View style={styles.playerTop}>
-          <View style={styles.playBtn}>
-            <Svg width={14} height={14} viewBox="0 0 24 24" fill={colors.cream}>
-              <Path d="M6 4l14 8-14 8V4z" />
-            </Svg>
-          </View>
+          <Pressable
+            style={[styles.playBtn, !canPlay && styles.playBtnDisabled]}
+            disabled={!canPlay}
+            onPress={() => (status.playing ? player.pause() : player.play())}
+          >
+            {status.playing ? (
+              <Svg width={14} height={14} viewBox="0 0 24 24" fill={colors.cream}>
+                <Path d="M6 4h4v16H6zM14 4h4v16h-4z" />
+              </Svg>
+            ) : (
+              <Svg width={14} height={14} viewBox="0 0 24 24" fill={colors.cream}>
+                <Path d="M6 4l14 8-14 8V4z" />
+              </Svg>
+            )}
+          </Pressable>
           <View style={styles.wave}>
             {WAVE_HEIGHTS_PLAYED.map((h, i) => (
               <View key={`p${i}`} style={[styles.bar, styles.barPlayed, { height: h }]} />
@@ -94,9 +138,13 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
           </View>
         </View>
         <View style={styles.timeRow}>
-          <Text style={styles.timeText}>0:42</Text>
+          <Text style={styles.timeText}>{formatTime(status.currentTime)}</Text>
           <Text style={styles.timeText}>
-            {minutes}:{seconds}
+            {canPlay
+              ? formatTime(status.duration)
+              : audio.state === "pending"
+                ? t.placeDetail.narrationPending
+                : t.placeDetail.narrationUnavailable}
           </Text>
         </View>
       </View>
@@ -187,6 +235,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  playBtnDisabled: { backgroundColor: colors.sand },
   wave: { flex: 1, flexDirection: "row", alignItems: "center", gap: 3, height: 28 },
   bar: { width: 3, borderRadius: 2, backgroundColor: colors.sand },
   barPlayed: { backgroundColor: colors.terracotta },
