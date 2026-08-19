@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	"rioaudioguide/backend/internal/domain"
 	"rioaudioguide/backend/internal/ports"
 )
 
@@ -53,7 +54,9 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	s.echo.GET("/cities/:city/manifest", s.getCityManifest)
 
 	auth := requireAuth(s.tokens)
-	s.echo.POST("/scripts/:id/review", s.reviewScript, auth)
+	// ReviewAndRequestAudio triggers a real, billed ElevenLabs call -- gated
+	// to RoleAdmin, not just any authenticated account (see requireRole).
+	s.echo.POST("/scripts/:id/review", s.reviewScript, auth, requireRole(domain.RoleAdmin))
 
 	s.echo.POST("/register", s.registerUser)
 	s.echo.POST("/login", s.login)

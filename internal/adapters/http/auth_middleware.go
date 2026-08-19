@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 
+	"rioaudioguide/backend/internal/domain"
 	"rioaudioguide/backend/internal/ports"
 )
 
@@ -46,4 +47,25 @@ func requireAuth(tokens ports.TokenIssuer) echo.MiddlewareFunc {
 func contextUserID(c echo.Context) string {
 	id, _ := c.Get(contextUserIDKey).(string)
 	return id
+}
+
+func contextRole(c echo.Context) domain.Role {
+	role, _ := c.Get(contextRoleKey).(domain.Role)
+	return role
+}
+
+// requireRole must run after requireAuth (reads what requireAuth already put
+// on the context, doesn't verify the token itself) and rejects any caller
+// whose role doesn't match -- e.g. ReviewAndRequestAudio triggers a real,
+// billed ElevenLabs call, so it's restricted to RoleAdmin, not every
+// authenticated user.
+func requireRole(role domain.Role) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if contextRole(c) != role {
+				return c.JSON(http.StatusForbidden, echo.Map{"error": "insufficient permissions"})
+			}
+			return next(c)
+		}
+	}
 }

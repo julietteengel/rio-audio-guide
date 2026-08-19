@@ -188,7 +188,7 @@ func TestReviewScript(t *testing.T) {
 	tokens := fakeTokenIssuer{}
 	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), publisher, fakeAudioStorage{}, newFakeCache(), tokens)
 
-	token, _ := tokens.Issue("julie", domain.RoleUser)
+	token, _ := tokens.Issue("julie", domain.RoleAdmin)
 	body := strings.NewReader(`{"voice_id":"voice-1"}`)
 	req := httptest.NewRequest(http.MethodPost, "/scripts/"+script.ID()+"/review", body)
 	req.Header.Set("Content-Type", "application/json")
@@ -206,6 +206,36 @@ func TestReviewScript(t *testing.T) {
 	reviewed, _ := scriptRepo.FindByID(context.Background(), script.ID())
 	if reviewed.ReviewerID() != "julie" {
 		t.Fatalf("got reviewerID %q, want %q (from the authenticated token, not a client-supplied field)", reviewed.ReviewerID(), "julie")
+	}
+}
+
+// TestReviewScript_RejectsNonAdmin proves the restriction is real: a
+// correctly authenticated RoleUser account -- not a missing/invalid token,
+// covered separately by TestReviewScript_RequiresAuth -- still can't trigger
+// a real, billed ElevenLabs call.
+func TestReviewScript_RejectsNonAdmin(t *testing.T) {
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript("place-1", domain.LanguageFR, text, "source")
+
+	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
+	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}
+	publisher := &fakePublisher{}
+	tokens := fakeTokenIssuer{}
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), publisher, fakeAudioStorage{}, newFakeCache(), tokens)
+
+	token, _ := tokens.Issue("someone-else", domain.RoleUser)
+	body := strings.NewReader(`{"voice_id":"voice-1"}`)
+	req := httptest.NewRequest(http.MethodPost, "/scripts/"+script.ID()+"/review", body)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusForbidden {
+		t.Fatalf("got status %d, want 403: %s", rec.Code, rec.Body.String())
+	}
+	if publisher.published != 0 {
+		t.Fatalf("got %d published jobs, want 0 -- a non-admin must never trigger a real ElevenLabs job", publisher.published)
 	}
 }
 
