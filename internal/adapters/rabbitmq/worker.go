@@ -116,7 +116,14 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	// Le fichier audio part sur S3 via le port AudioStorage, jamais dans
 	// RabbitMQ — la queue ne transporte que de petits messages de contrôle
 	// (voir ttsJobMessage côté publisher).
-	storageURL, err := w.storage.Upload(ctx, job.AudioFileID+".mp3", audioBytes, "audio/mpeg")
+	//
+	// uploadWithRetry réessaie l'upload lui-même, en gardant audioBytes déjà
+	// en mémoire -- sans ça, un Nack(requeue=true) ici referait tout le
+	// message depuis le début, y compris le rappel ElevenLabs payant, pour
+	// ne retenter au fond qu'un upload S3 gratuit. On ne tombe sur le Nack
+	// (donc une régénération complète) qu'après avoir épuisé ces tentatives
+	// locales, pas dès le premier hoquet réseau transitoire.
+	storageURL, err := uploadWithRetry(ctx, w.storage, job.AudioFileID+".mp3", audioBytes)
 	if err != nil {
 		var permErr *ports.PermanentError
 		if errors.As(err, &permErr) {
@@ -127,7 +134,7 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 			_ = msg.Ack(false)
 			return
 		}
-		log.Printf("tts worker: upload failed for %s: %v", job.AudioFileID, err)
+		log.Printf("tts worker: upload failed after local retries for %s: %v", job.AudioFileID, err)
 		time.Sleep(requeueDelay)
 		_ = msg.Nack(false, true)
 		return
@@ -145,4 +152,41 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	// Tout a réussi : on accuse réception, RabbitMQ peut supprimer le
 	// message de la queue pour de bon.
 	_ = msg.Ack(false)
+}
+
+// uploadWithRetryAttempts borne les tentatives locales -- un nombre fixe,
+// pas de recours à un contexte avec deadline propre : on veut juste éviter
+// qu'un hoquet réseau transitoire déclenche un Nack(requeue=true), qui lui
+// referait tout le message depuis le début (donc un nouvel appel ElevenLabs
+// payant) pour ne retenter, au fond, qu'un upload S3 gratuit qui n'a rien à
+// voir avec la génération audio elle-même.
+const uploadWithRetryAttempts = 3
+
+// uploadWithRetry réessaie l'upload S3 seul, en gardant audioBytes déjà en
+// mémoire -- jamais de rappel à ElevenLabs pour ces tentatives locales. On
+// ne laisse remonter l'erreur vers handle() (donc vers le Nack qui referait
+// tout) qu'après avoir épuisé ces tentatives, ou immédiatement si l'erreur
+// est permanente (identifiants invalides, bucket absent) : réessayer une
+// erreur permanente ne changerait rien, ni ici ni côté RabbitMQ.
+func uploadWithRetry(ctx context.Context, storage ports.AudioStorage, key string, audioBytes []byte) (string, error) {
+	var lastErr error
+	for attempt := 1; attempt <= uploadWithRetryAttempts; attempt++ {
+		storageURL, err := storage.Upload(ctx, key, audioBytes, "audio/mpeg")
+		if err == nil {
+			return storageURL, nil
+		}
+
+		var permErr *ports.PermanentError
+		if errors.As(err, &permErr) {
+			return "", err
+		}
+
+		lastErr = err
+		if attempt < uploadWithRetryAttempts {
+			log.Printf("tts worker: upload attempt %d/%d failed for %s, retrying: %v",
+				attempt, uploadWithRetryAttempts, key, err)
+			time.Sleep(time.Duration(attempt) * 500 * time.Millisecond) // 500ms, puis 1s
+		}
+	}
+	return "", lastErr
 }
