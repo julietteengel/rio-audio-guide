@@ -319,6 +319,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   filterRow: {
+    // ScrollView defaults to flexGrow:1 on react-native-web (unlike native,
+    // where a horizontal ScrollView sizes to its content's height by
+    // default) -- without this, it stretched to fill the space meant for
+    // the map/list below, and the chips stretched with it into giant
+    // vertical pills.
+    flexGrow: 0,
+    flexShrink: 0,
     backgroundColor: colors.white,
     borderBottomWidth: 1,
     borderBottomColor: colors.line,
