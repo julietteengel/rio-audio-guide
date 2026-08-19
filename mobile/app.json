@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Memória Carioca",
+    "slug": "memoria-carioca",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.memoriacarioca.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Memória Carioca uses your location to show which places are nearby on the map."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#C1592E",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#C1592E"
+        }
+      ],
+      "expo-sqlite",
+      "expo-localization",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Memória Carioca uses your location to show which places are nearby on the map."
+        }
+      ],
+      "expo-secure-store",
+      "expo-audio"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "32aec4ab-d794-4380-b6ba-de1370e9ba09"
+      }
+    }
+  }
+}
