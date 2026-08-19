@@ -80,8 +80,8 @@ func TestScript_MarkReviewedThenPublish(t *testing.T) {
 	if err := s.MarkReviewed("julie"); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if s.Status() != ScriptStatusReviewed || s.Reviewer() != "julie" {
-		t.Fatalf("review did not apply: status=%v reviewer=%v", s.Status(), s.Reviewer())
+	if s.Status() != ScriptStatusReviewed || s.ReviewerID() != "julie" {
+		t.Fatalf("review did not apply: status=%v reviewerID=%v", s.Status(), s.ReviewerID())
 	}
 
 	if err := s.MarkReviewed("julie"); !errors.Is(err, ErrScriptNotDraft) {

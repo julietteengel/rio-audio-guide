@@ -62,7 +62,7 @@ type Script struct {
 	text        ScriptText
 	sourceText  string
 	status      ScriptStatus
-	reviewer    string
+	reviewerID  string
 	reviewedAt  time.Time
 	publishedAt time.Time
 }
@@ -82,7 +82,7 @@ func NewScript(placeID string, language Language, text ScriptText, sourceText st
 
 // ReconstructScript rebâtit un Script depuis des données déjà valides
 // (une ligne Postgres) — préserve l'ID et le statut donnés, ne revalide rien.
-func ReconstructScript(id, placeID string, language Language, text ScriptText, sourceText string, status ScriptStatus, reviewer string, reviewedAt, publishedAt time.Time) *Script {
+func ReconstructScript(id, placeID string, language Language, text ScriptText, sourceText string, status ScriptStatus, reviewerID string, reviewedAt, publishedAt time.Time) *Script {
 	return &Script{
 		id:          id,
 		placeID:     placeID,
@@ -90,18 +90,22 @@ func ReconstructScript(id, placeID string, language Language, text ScriptText, s
 		text:        text,
 		sourceText:  sourceText,
 		status:      status,
-		reviewer:    reviewer,
+		reviewerID:  reviewerID,
 		reviewedAt:  reviewedAt,
 		publishedAt: publishedAt,
 	}
 }
 
-func (s *Script) MarkReviewed(reviewer string) error {
+// MarkReviewed prend l'ID d'un User (pas un nom en texte libre comme avant)
+// -- qui a réellement reviewé un script doit être une vraie référence
+// traçable vers un compte, pas une chaîne qu'on pourrait mal orthographier
+// ou laisser vide sans erreur.
+func (s *Script) MarkReviewed(reviewerID string) error {
 	if s.status != ScriptStatusDraft {
 		return ErrScriptNotDraft
 	}
 	s.status = ScriptStatusReviewed
-	s.reviewer = reviewer
+	s.reviewerID = reviewerID
 	s.reviewedAt = time.Now()
 	return nil
 }
@@ -123,6 +127,6 @@ func (s *Script) Language() Language     { return s.language }
 func (s *Script) Text() ScriptText       { return s.text }
 func (s *Script) SourceText() string     { return s.sourceText }
 func (s *Script) Status() ScriptStatus   { return s.status }
-func (s *Script) Reviewer() string       { return s.reviewer }
+func (s *Script) ReviewerID() string     { return s.reviewerID }
 func (s *Script) ReviewedAt() time.Time  { return s.reviewedAt }
 func (s *Script) PublishedAt() time.Time { return s.publishedAt }
