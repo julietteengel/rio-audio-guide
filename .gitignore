@@ -7,6 +7,7 @@ pipeline/curation/*.log
 __pycache__/
 *.pyc
 .DS_Store
+tmp/
 .env
 .env.local
 .env.*.local

@@ -1,0 +1,34 @@
+api:
+  image:
+    repository: rio-api
+    tag: local
+  replicas: 2
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilization: 70
+
+worker:
+  image:
+    repository: rio-worker
+    tag: local
+  minReplicas: 0
+  maxReplicas: 10
+  rabbitmq:
+    queueName: tts_jobs
+    queueLength: "5" # jobs en attente par réplique avant de scaler
+
+s3:
+  bucket: rio-audio-guide
+  region: us-east-1
+
+redis:
+  # "hôte:port", pas une URL — c'est ce que goredis.Options.Addr attend
+  # (cf. REDIS_ADDR dans cmd/api/main.go).
+  addr: demo-redis-master:6379
+
+secrets:
+  name: rio-backend-secrets # créé hors chart, jamais commité :
+  # kubectl create secret generic rio-backend-secrets \
+  #   --from-literal=database-url=... \
+  #   --from-literal=rabbitmq-url=... \
+  #   --from-literal=elevenlabs-api-key=...

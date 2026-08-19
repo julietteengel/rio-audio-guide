@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: rio-api
+spec:
+  hosts: ["*"]
+  gateways: [rio-api-gateway]
+  http:
+    - route:
+        - destination: { host: rio-api, subset: stable }
+          weight: 90
+        - destination: { host: rio-api, subset: canary }
+          weight: 10 # à monter progressivement (10 → 50 → 100) une fois le canary validé

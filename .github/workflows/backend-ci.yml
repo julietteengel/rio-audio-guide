@@ -1,0 +1,111 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [backend]
+  pull_request:
+    branches: [backend]
+
+jobs:
+  # Étage 1 — en parallèle, aucun "needs" entre eux
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          check-latest: true
+          cache: true
+      - name: Vet (vérifications basiques intégrées à Go)
+        run: go vet ./...
+      - name: golangci-lint (équivalent Go d'ESLint — bugs probables, style, code mort)
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.12
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          check-latest: true
+          cache: true
+      - name: Unit tests
+        run: go test ./...
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          check-latest: true
+          cache: true
+      - name: Install govulncheck
+        run: go install golang.org/x/vuln/cmd/govulncheck@latest
+      - name: Scan for known vulnerabilities
+        run: govulncheck ./...
+
+  # Étage 2 — dépend des trois précédents
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test, security]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          check-latest: true
+          cache: true
+      - name: Build
+        run: go build ./...
+
+  # Étage 3 — dépend du build, tests d'intégration contre de vrais services
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports: ["5672:5672"]
+      # Redis : requis par internal/adapters/redis/cache_test.go (tag integration,
+      # se connecte à localhost:6379 sans skip guard). Sans ce service, l'étape
+      # ci-dessous échoue systématiquement.
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          check-latest: true
+          cache: true
+      - name: Apply schema
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -f internal/adapters/postgres/schema.sql
+      # Tourne aussi les tests sans tag (go test -tags=integration inclut tout) :
+      # le test S3 d'erreur permanente (InvalidAccessKeyId) fait un vrai appel
+      # réseau à AWS sans bucket configuré, et le test Redis d'erreur de
+      # connexion ouvre une socket vers une adresse morte — les deux passent
+      # sans infrastructure dédiée. Le test S3 Upload, lui, skip proprement
+      # tant que S3_TEST_BUCKET n'est pas défini en CI.
+      - name: Integration tests (Postgres + RabbitMQ + Redis; S3 upload skips — no S3_TEST_BUCKET in CI yet)
+        env:
+          TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+        run: go test -tags=integration ./...

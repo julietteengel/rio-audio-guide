@@ -1,0 +1,16 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Release.Name }}-worker
+spec:
+  scaleTargetRef: { name: {{ .Release.Name }}-worker }
+  minReplicaCount: {{ .Values.worker.minReplicas }}
+  maxReplicaCount: {{ .Values.worker.maxReplicas }}
+  triggers:
+    - type: rabbitmq
+      metadata:
+        queueName: {{ .Values.worker.rabbitmq.queueName }}
+        mode: QueueLength
+        value: "{{ .Values.worker.rabbitmq.queueLength }}"
+      authenticationRef:
+        name: {{ .Release.Name }}-rabbitmq-auth

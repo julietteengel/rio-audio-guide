@@ -1,0 +1,11 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: rio-api
+spec:
+  host: rio-api
+  subsets:
+    - name: stable
+      labels: { version: stable }
+    - name: canary
+      labels: { version: canary }
