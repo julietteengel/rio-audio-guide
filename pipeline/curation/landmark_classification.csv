@@ -1,0 +1,1375 @@
+id,name,lat,lon,verdict,reason
+overture:(Village Palmeiras):-22.92328:-43.60556,(Village Palmeiras),-22.923282623291016,-43.60556411743164,REJECT,residential condo branding
+overture:200 (Cresa):-22.92274:-43.18384,200 (Cresa),-22.922740936279297,-43.183841705322266,REJECT,real-estate agency code/listing
+overture:360 On The Park:-22.98718:-43.35572,360 On The Park,-22.987184524536133,-43.35572052001953,REJECT,condo branding name
+overture:786 Prudente:-22.98519:-43.20414,786 Prudente,-22.985191345214844,-43.20414352416992,REJECT,street address number
+overture:A Griff Do Bolo:-22.84878:-43.46575,A Griff Do Bolo,-22.848777770996094,-43.46574783325195,REJECT,bakery business
+overture:ASM Martins soluções LTDA:-22.94080:-43.56273,ASM Martins soluções LTDA,-22.94080352783203,-43.5627326965332,REJECT,business (LTDA company)
+overture:Acquabella:-23.01069:-43.33006,Acquabella,-23.010690689086918,-43.33005905151367,REJECT,condo/building branding
+overture:Acueducto Carioca:-22.91260:-43.17985,Acueducto Carioca,-22.91259765625,-43.17985153198242,KEEP,historic Carioca Aqueduct
+overture:Adorable Tijuca:-22.93953:-43.24994,Adorable Tijuca,-22.939529418945312,-43.24993515014648,REJECT,condo branding name
+overture:Alameda colibris:-22.81650:-43.35398,Alameda colibris,-22.816503524780277,-43.353981018066406,REJECT,street name only
+overture:Alaska:-22.98220:-43.23752,Alaska,-22.98219871520996,-43.23752212524414,REJECT,"building/venue branding, single word"
+overture:Albany:-22.96449:-43.17756,Albany,-22.96449279785156,-43.17756271362305,REJECT,"building branding, single word"
+overture:Alcóolicos Anônimos:-22.92463:-43.24347,Alcóolicos Anônimos,-22.92462730407715,-43.24347305297852,REJECT,"AA support group, not a site"
+overture:Alfa Barra I:-23.00978:-43.36476,Alfa Barra I,-23.009784698486328,-43.36476135253906,REJECT,condo branding
+overture:Alfa Barra Resort & Services:-23.00969:-43.36879,Alfa Barra Resort & Services,-23.009693145751957,-43.36878967285156,UNCERTAIN,"unmatched in classification pass, defaulted prudently"
+overture:Alfabarra II:-23.00983:-43.36737,Alfabarra II,-23.00982666015625,-43.367374420166016,REJECT,condo branding
+overture:All Jardim Oceânico:-23.00599:-43.31240,All Jardim Oceânico,-23.0059871673584,-43.31239700317383,REJECT,condo branding
+overture:Almirante Calheiros Da Graca:-22.89830:-43.28424,Almirante Calheiros Da Graca,-22.89829635620117,-43.28423690795898,REJECT,street name only
+overture:Almirante Guinlem:-22.98589:-43.21849,Almirante Guinlem,-22.98589324951172,-43.21848678588867,REJECT,street name only
+overture:Alphaville:-22.99169:-43.39533,Alphaville,-22.99169158935547,-43.39532852172852,REJECT,real-estate development brand
+overture:Alphaville Barra da Tijuca:-23.01191:-43.30858,Alphaville Barra da Tijuca,-23.01190757751465,-43.30857849121094,REJECT,real-estate development brand
+"overture:Alto Do Corcovado, Rio De Janeiro - RJ:-22.95302:-43.21061","Alto Do Corcovado, Rio De Janeiro - RJ",-22.953022003173828,-43.21060562133789,REJECT,bare address ending in RJ
+overture:Alto Grajau:-22.91962:-43.26421,Alto Grajau,-22.919618606567383,-43.26421356201172,REJECT,bare subdistrict/area name
+overture:Alvorada da Barra:-23.00313:-43.43569,Alvorada da Barra,-23.00312614440918,-43.435691833496094,REJECT,condo branding
+overture:Amarelinho:-22.82423:-43.33832,Amarelinho,-22.82423210144043,-43.33831787109375,UNCERTAIN,"possibly the historic Bar Amarelinho, unclear location match"
+overture:Amcrag Guillobel:-22.90521:-43.54246,Amcrag Guillobel,-22.90521049499512,-43.54246139526367,REJECT,business/nonsensical name
+overture:America Club Condominium:-22.87661:-43.26614,America Club Condominium,-22.876605987548828,-43.26613998413086,REJECT,condo branding
+overture:American Village:-23.00573:-43.48116,American Village,-23.00572967529297,-43.48115539550781,REJECT,condo branding
+overture:Amigos do Ocean Drive -:-23.01009:-43.36896,Amigos do Ocean Drive -,-23.010087966918945,-43.36895751953125,REJECT,social/resident group
+overture:Amo Cristo Redentor - I Love Christ The Redeemer:-22.96161:-43.27309,Amo Cristo Redentor - I Love Christ The Redeemer,-22.961605072021484,-43.273094177246094,REJECT,"fan page label, not a site"
+overture:Amznwarehouses US:-22.93770:-43.33493,Amznwarehouses US,-22.93769645690918,-43.33492660522461,REJECT,warehouse business
+overture:Amália/Baleares (Urubuzinho):-22.87576:-43.31109,Amália/Baleares (Urubuzinho),-22.875762939453125,-43.31108856201172,REJECT,building nickname
+overture:Ananab Co-Living:-22.93523:-43.19366,Ananab Co-Living,-22.93522834777832,-43.19366455078125,REJECT,co-living business
+overture:Anil Jacarepaguá:-22.95775:-43.33608,Anil Jacarepaguá,-22.957748413085938,-43.336082458496094,REJECT,bare neighborhood name
+overture:Antiga Casa do Sitio do Picapau Amarelo:-23.04592:-43.55410,Antiga Casa do Sitio do Picapau Amarelo,-23.045921325683597,-43.55409622192383,KEEP,themed historic/cultural house site
+overture:Antonio Salema:-22.92295:-43.24063,Antonio Salema,-22.92294692993164,-43.24062728881836,REJECT,street name only
+overture:Ap de Bangu:-22.86931:-43.46148,Ap de Bangu,-22.86931037902832,-43.46147537231445,REJECT,personal apartment nickname
+overture:Ap-Cdd:-22.95113:-43.35538,Ap-Cdd,-22.951133728027344,-43.355377197265625,REJECT,nonsensical apartment label
+overture:Ape Nay e Lipe:-22.81038:-43.32754,Ape Nay e Lipe,-22.810379028320312,-43.32754135131836,REJECT,personal apartment nickname
+overture:Aperana:-22.98797:-43.22933,Aperana,-22.98797035217285,-43.22933197021485,REJECT,unclear business/building name
+overture:Apogeu Barra:-22.97899:-43.41896,Apogeu Barra,-22.97899055480957,-43.4189567565918,REJECT,condo branding
+overture:Apolo:-22.94166:-43.17631,Apolo,-22.9416618347168,-43.17631149291992,REJECT,unclear single-word building name
+overture:Apê:-22.98370:-43.20715,Apê,-22.98369789123535,-43.2071533203125,REJECT,"generic ""apartment"""
+overture:Apê do Ribery:-22.89782:-43.26364,Apê do Ribery,-22.8978214263916,-43.26363754272461,REJECT,personal apartment nickname
+overture:AquaMarina:-22.76058:-43.45336,AquaMarina,-22.760581970214844,-43.4533576965332,REJECT,condo branding
+overture:Aqueduct Taquara:-22.93625:-43.39985,Aqueduct Taquara,-22.93624687194824,-43.39985275268555,UNCERTAIN,"possible aqueduct feature, unverified"
+overture:Aqueduto da Carioca:-22.91260:-43.17985,Aqueduto da Carioca,-22.91259765625,-43.17985153198242,KEEP,historic Carioca Aqueduct
+overture:Arcos da Lapa:-22.91285:-43.17978,Arcos da Lapa,-22.9128532409668,-43.179779052734375,KEEP,iconic Lapa Arches landmark
+overture:Areia Branca / São Benedito:-22.93768:-43.68308,Areia Branca / São Benedito,-22.93767547607422,-43.683082580566406,REJECT,bare locality/neighborhood name
+overture:Arena Camaragibe:-22.92631:-43.23405,Arena Camaragibe,-22.926307678222656,-43.23405075073242,REJECT,generic sports arena
+overture:Argentão:-22.97880:-43.22690,Argentão,-22.978803634643555,-43.226898193359375,REJECT,unclear single word
+overture:Ari-Leão:-22.85112:-43.24670,Ari-Leão,-22.851118087768555,-43.2467041015625,REJECT,street name only
+overture:Armazem da Utopia:-22.89419:-43.19883,Armazem da Utopia,-22.894193649291992,-43.19882583618164,UNCERTAIN,possible cultural event venue
+overture:Arnaldo Eugênio:-22.90994:-43.53205,Arnaldo Eugênio,-22.909942626953125,-43.53205490112305,REJECT,street/person name
+"overture:Arroio Fundo (vattendrag i Brasilien, Rio de Janeiro):-22.97760:-43.34803","Arroio Fundo (vattendrag i Brasilien, Rio de Janeiro)",-22.97760009765625,-43.34803009033203,REJECT,Swedish Wikidata label artifact
+overture:Arroio Tindiba:-22.93262:-43.36539,Arroio Tindiba,-22.9326229095459,-43.36539077758789,UNCERTAIN,"named stream, minor feature"
+overture:Arvrão:-22.96528:-43.27637,Arvrão,-22.965280532836918,-43.27637100219727,REJECT,garbled/unclear text
+overture:Associação de moradores Village Pavuna:-22.82144:-43.37910,Associação de moradores Village Pavuna,-22.821443557739254,-43.37910079956055,REJECT,residents association
+overture:Associação dos moradores : Alto Bela Vista:-22.92980:-43.38776,Associação dos moradores : Alto Bela Vista,-22.929800033569336,-43.38775634765625,REJECT,residents association
+overture:Asé Carmelita:-22.87307:-43.57642,Asé Carmelita,-22.87306785583496,-43.576419830322266,UNCERTAIN,possible Candomblé terreiro/religious site
+overture:Atmosfera Condominium Park:-22.91465:-43.22023,Atmosfera Condominium Park,-22.914648056030277,-43.22023010253906,REJECT,condo branding
+overture:Ausente arrumando a casa face aberto:-22.86169:-43.45425,Ausente arrumando a casa face aberto,-22.86168670654297,-43.45425415039063,REJECT,nonsensical text
+"overture:Av Nossa Senhora De Copacabana, 99:-22.96463:-43.17523","Av Nossa Senhora De Copacabana, 99",-22.96463394165039,-43.17523193359375,REJECT,street address
+overture:Av.Pastor Martin Luther King Jr n3.275 - Engenho da Rainha:-22.86831:-43.29691,Av.Pastor Martin Luther King Jr n3.275 - Engenho da Rainha,-22.86830711364746,-43.296905517578125,REJECT,street address
+overture:Avant Garde:-22.93639:-43.33483,Avant Garde,-22.936391830444336,-43.3348274230957,REJECT,condo/building branding
+overture:Avenida Atlantica:-22.96855:-43.17998,Avenida Atlantica,-22.96855354309082,-43.17997741699219,REJECT,street name only
+overture:Avenida Brasil - Passarela 12:-22.83907:-43.29248,Avenida Brasil - Passarela 12,-22.839073181152344,-43.29248046875,REJECT,street/address
+overture:Avenida Lineu Paula Machado 1006:-22.96630:-43.21845,Avenida Lineu Paula Machado 1006,-22.96629524230957,-43.218448638916016,REJECT,street address
+overture:Avenida Lúcio Costa:-23.00847:-43.32721,Avenida Lúcio Costa,-23.008474349975582,-43.32720947265625,REJECT,street name only
+overture:Avenida Maracanã:-22.92708:-43.23843,Avenida Maracanã,-22.927078247070312,-43.238426208496094,REJECT,street name only
+overture:Avenida Mergulhao:-22.88220:-43.54956,Avenida Mergulhao,-22.882204055786133,-43.549560546875,REJECT,street name only
+overture:Avenida Sete de Setembro:-22.90346:-43.10078,Avenida Sete de Setembro,-22.903461456298828,-43.10078048706055,REJECT,street name only
+overture:Avenida das Américas:-23.00217:-43.42286,Avenida das Américas,-23.002174377441406,-43.4228630065918,REJECT,street name only
+overture:Avenida epitacio pessoa 2180:-22.97870:-43.19918,Avenida epitacio pessoa 2180,-22.97869873046875,-43.19917678833008,REJECT,street address
+overture:Avenida paranapuã:-22.79558:-43.18064,Avenida paranapuã,-22.79557609558105,-43.180641174316406,REJECT,street name only
+overture:Avignon e Nimes:-22.89768:-43.29738,Avignon e Nimes,-22.897680282592773,-43.29737854003906,REJECT,condo building branding
+overture:Azul Da Cor Do Mar:-23.01952:-43.46740,Azul Da Cor Do Mar,-23.01952171325684,-43.46739959716797,REJECT,business/restaurant name
+overture:Azul do Mar:-22.88798:-43.36230,Azul do Mar,-22.88798141479492,-43.362300872802734,REJECT,business branding
+overture:BXD CRUEL:-22.78489:-43.37901,BXD CRUEL,-22.784887313842773,-43.379005432128906,REJECT,"graffiti crew tag, nonsensical"
+overture:Bairro Carioca:-22.89210:-43.24865,Bairro Carioca,-22.8920955657959,-43.248653411865234,REJECT,bare neighborhood name
+overture:Bairro Carioca Triagem:-22.89464:-43.24667,Bairro Carioca Triagem,-22.89463806152344,-43.24666976928711,REJECT,bare neighborhood name
+overture:Bairro Da Luz:-22.75885:-43.46981,Bairro Da Luz,-22.75885391235352,-43.46981048583984,REJECT,bare neighborhood name
+overture:Bairro Higienópolis - RJ:-22.87757:-43.25908,Bairro Higienópolis - RJ,-22.87757110595703,-43.25907897949219,REJECT,bare neighborhood + RJ suffix
+overture:Bairro Lins:-22.90967:-43.27128,Bairro Lins,-22.909671783447266,-43.27128219604492,REJECT,bare neighborhood name
+overture:Bairro das Laranjeiras - RJ:-22.93112:-43.17852,Bairro das Laranjeiras - RJ,-22.931121826171875,-43.17851638793945,REJECT,bare neighborhood + RJ suffix
+overture:Bairro de Inhaúma:-22.87746:-43.28556,Bairro de Inhaúma,-22.87745857238769,-43.28556442260742,REJECT,bare neighborhood name
+overture:Bairro de Jacarépaguá:-22.93120:-43.35784,Bairro de Jacarépaguá,-22.931198120117188,-43.35783767700195,REJECT,bare neighborhood name
+overture:Bairro de Realengo:-22.88084:-43.43750,Bairro de Realengo,-22.880836486816406,-43.4375,REJECT,bare neighborhood name
+overture:Bairro de cascadura:-22.87867:-43.32253,Bairro de cascadura,-22.8786678314209,-43.32252883911133,REJECT,bare neighborhood name
+overture:Baixada Fluminense:-22.75946:-43.44260,Baixada Fluminense,-22.75945854187012,-43.44259643554688,REJECT,generic large region name
+overture:Balança Mas Não Cai:-22.90707:-43.19412,Balança Mas Não Cai,-22.907072067260746,-43.19411849975586,REJECT,bar/botequim business
+overture:Bancários Barao 207:-22.90362:-43.34808,Bancários Barao 207,-22.90361595153809,-43.34808349609375,REJECT,address-like entry
+overture:Bancários de Cavalcanti:-22.87385:-43.31065,Bancários de Cavalcanti,-22.87384986877441,-43.31065368652344,REJECT,street/neighborhood name
+overture:Barata:-22.89474:-43.44096,Barata,-22.894737243652344,-43.44096374511719,REJECT,bare single common word
+overture:Barra Acrópole:-22.97144:-43.39190,Barra Acrópole,-22.9714412689209,-43.391902923583984,REJECT,condo branding
+overture:Barra Bali Apple:-23.00908:-43.43660,Barra Bali Apple,-23.00907516479492,-43.43660354614258,REJECT,condo branding
+overture:Barra Da Tijuca Itanhangá:-22.97669:-43.32863,Barra Da Tijuca Itanhangá,-22.976694107055664,-43.32863235473633,REJECT,neighborhood combo name
+overture:Barra Da Tijuca Posto Três:-22.94265:-43.33932,Barra Da Tijuca Posto Três,-22.942649841308597,-43.339317321777344,REJECT,gas station reference
+overture:Barra Sol:-23.00517:-43.32592,Barra Sol,-23.005172729492188,-43.32592391967773,REJECT,condo branding
+overture:Barra Verde:-22.96745:-43.39194,Barra Verde,-22.96745109558105,-43.391937255859375,REJECT,condo branding
+overture:Barra Village House e Life:-23.00166:-43.43705,Barra Village House e Life,-23.001657485961918,-43.43705368041992,REJECT,condo branding
+overture:Barra Village Lakes:-23.00760:-43.46260,Barra Village Lakes,-23.007598876953125,-43.46260070800781,REJECT,condo branding
+overture:Barreira Do Vasco Complexo Da Pedreira:-22.82219:-43.35489,Barreira Do Vasco Complexo Da Pedreira,-22.82218742370605,-43.35489273071289,REJECT,favela/complex administrative name
+overture:Bartcaverna:-22.90310:-43.24878,Bartcaverna,-22.90309715270996,-43.248783111572266,REJECT,bar business
+overture:Base do Tk:-22.80474:-43.40622,Base do Tk,-22.80474281311035,-43.40622329711914,REJECT,informal/unclear location
+overture:Bazar 4 de Dezembro:-22.88527:-43.36278,Bazar 4 de Dezembro,-22.885272979736328,-43.3627815246582,REJECT,shop business
+overture:Beach condo Plus:-22.96439:-43.39782,Beach condo Plus,-22.96438980102539,-43.39782333374024,REJECT,condo branding
+overture:Beco Do Constâncio:-22.95170:-43.68178,Beco Do Constâncio,-22.951696395874023,-43.68178176879883,REJECT,alley/street name only
+overture:Beco da Pantera:-22.91522:-43.17690,Beco da Pantera,-22.91522026062012,-43.176902770996094,REJECT,alley/street name only
+overture:Beco da bomba:-22.79555:-43.38026,Beco da bomba,-22.79555320739746,-43.38025665283203,REJECT,alley/street name only
+overture:Beco do Juca Futebol Resenha:-22.84690:-43.35260,Beco do Juca Futebol Resenha,-22.846900939941406,-43.35260009765625,REJECT,informal social group
+overture:Bela Vida Campo Grande:-22.89895:-43.57498,Bela Vida Campo Grande,-22.898948669433597,-43.574981689453125,REJECT,condo branding
+overture:Bela Vista Nova Iguaçu:-22.75945:-43.48945,Bela Vista Nova Iguaçu,-22.75944709777832,-43.48945236206055,REJECT,condo/development branding
+overture:Bella Carolina:-22.90575:-43.28622,Bella Carolina,-22.90575408935547,-43.286224365234375,REJECT,condo/building branding
+overture:Belle Vie:-22.93595:-43.33205,Belle Vie,-22.93595314025879,-43.3320541381836,REJECT,condo branding
+overture:Belle Ville Botafogo:-22.95828:-43.19428,Belle Ville Botafogo,-22.95827865600586,-43.194278717041016,REJECT,condo branding
+overture:Bem vindo Fumacê:-22.86737:-43.42314,Bem vindo Fumacê,-22.86736869812012,-43.42314147949219,REJECT,nonsensical greeting text
+overture:Bento Lisboa Catete:-22.92626:-43.17944,Bento Lisboa Catete,-22.92626190185547,-43.179443359375,REJECT,street name only
+overture:Bento Ribeiro:-22.87188:-43.35723,Bento Ribeiro,-22.87188148498535,-43.35722732543945,REJECT,bare neighborhood name
+overture:Big Brother Brasil:-22.95667:-43.40889,Big Brother Brasil,-22.956666946411133,-43.40888977050781,REJECT,"TV show reference, not a site"
+overture:Blend Life and Business:-22.93299:-43.35287,Blend Life and Business,-22.932992935180664,-43.35286712646485,REJECT,business
+overture:Bloco 1:-22.87475:-43.27363,Bloco 1,-22.87474822998047,-43.27362823486328,REJECT,generic building block label
+overture:Bloco 23:-22.85067:-43.37960,Bloco 23,-22.85067367553711,-43.37960052490234,REJECT,generic building block label
+overture:Bloco Cordão do Prata Preta:-22.88067:-43.23019,Bloco Cordão do Prata Preta,-22.88067054748535,-43.23018646240234,REJECT,"carnival street group, not a site"
+overture:Bloco Perereca do Grajaú:-22.92197:-43.26283,Bloco Perereca do Grajaú,-22.921968460083008,-43.26282501220703,REJECT,"carnival street group, not a site"
+overture:Bloco Seu Kuka:-22.92044:-43.25975,Bloco Seu Kuka,-22.92044258117676,-43.25975036621094,REJECT,"carnival street group, not a site"
+overture:Bloco Vira-lata:-22.99867:-43.25945,Bloco Vira-lata,-22.99867248535156,-43.25944900512695,REJECT,"carnival street group, not a site"
+overture:Blue Bali:-23.01000:-43.44012,Blue Bali,-23.0100040435791,-43.44012069702149,REJECT,condo branding
+overture:Blue Bay:-22.88568:-43.12318,Blue Bay,-22.88567543029785,-43.12317657470703,REJECT,condo branding
+overture:Bolt House:-22.94817:-43.18263,Bolt House,-22.94816780090332,-43.1826286315918,REJECT,co-living building branding
+overture:Bon Vivaggi:-22.94314:-43.33670,Bon Vivaggi,-22.943140029907227,-43.33669662475586,REJECT,condo branding
+overture:Bora Bora Hills Town:-22.93223:-43.33403,Bora Bora Hills Town,-22.932228088378903,-43.33403015136719,REJECT,condo branding
+overture:Bora Bora Tijuca:-22.92711:-43.24022,Bora Bora Tijuca,-22.927114486694336,-43.2402229309082,REJECT,condo branding
+overture:Bosque Dos Esquilos:-22.96207:-43.33475,Bosque Dos Esquilos,-22.962066650390625,-43.334747314453125,UNCERTAIN,"possible park/grove, unverified"
+overture:Bosque da Boiúna:-22.91417:-43.39582,Bosque da Boiúna,-22.914167404174805,-43.39582061767578,UNCERTAIN,"possible park/grove, unverified"
+overture:Bosque dos Bandeirantes:-23.00510:-43.50887,Bosque dos Bandeirantes,-23.005096435546875,-43.50886535644531,UNCERTAIN,"possible park/grove, unverified"
+overture:Bosque dos Buritis:-22.93735:-43.24649,Bosque dos Buritis,-22.937353134155277,-43.24648666381836,UNCERTAIN,"possible park/grove, unverified"
+overture:Botequim da Cidade do Samba:-22.89492:-43.19672,Botequim da Cidade do Samba,-22.894920349121094,-43.19671630859375,REJECT,bar/business
+overture:Bougainville Blanc and Rouge:-22.90629:-43.10111,Bougainville Blanc and Rouge,-22.90629005432129,-43.101112365722656,REJECT,condo branding
+overture:Boulevard Carioca:-22.90825:-43.58162,Boulevard Carioca,-22.90825080871582,-43.58162307739258,REJECT,shopping/street branding
+overture:Brisa Leblon Mozak:-22.98693:-43.22971,Brisa Leblon Mozak,-22.986927032470703,-43.22970581054688,REJECT,condo branding
+overture:Brito Corretagem:-23.01021:-43.44859,Brito Corretagem,-23.01020622253418,-43.44859313964844,REJECT,real-estate brokerage business
+overture:Bronze drika:-22.80947:-43.32471,Bronze drika,-22.809473037719727,-43.32471084594727,REJECT,tanning salon business
+overture:Brow:-22.93566:-43.17707,Brow,-22.93565559387207,-43.17707443237305,REJECT,"bare single word, salon business"
+overture:Buenos Aires Corporate:-22.90200:-43.17673,Buenos Aires Corporate,-22.902000427246094,-43.17672729492188,REJECT,office building branding
+overture:Buraco do Lume:-22.90612:-43.17620,Buraco do Lume,-22.906118392944336,-43.17620468139648,KEEP,known waterfall/cave site near Alto da Boa Vista
+overture:C.P.D.L:-22.90008:-43.28996,C.P.D.L,-22.900081634521484,-43.28995895385742,REJECT,unclear acronym
+overture:CDD Vila Norma:-22.78295:-43.40521,CDD Vila Norma,-22.7829532623291,-43.40520858764648,REJECT,condo branding
+overture:CMS Píndaro de Carvalho Rodrigues:-22.97968:-43.22952,CMS Píndaro de Carvalho Rodrigues,-22.979677200317383,-43.229522705078125,REJECT,municipal school
+overture:CP Shope:-22.90650:-43.19415,CP Shope,-22.906497955322266,-43.19415283203125,REJECT,shop/business
+overture:Cabuçu:-22.78982:-43.42101,Cabuçu,-22.78982353210449,-43.42101287841797,REJECT,bare place name
+overture:Cachambi:-22.89279:-43.26698,Cachambi,-22.89278793334961,-43.26698303222656,REJECT,bare neighborhood name
+"overture:Cachoeira Anil,rj:-22.88140:-43.43755","Cachoeira Anil,rj",-22.881404876708984,-43.43754959106445,KEEP,named waterfall (Cachoeira do Anil)
+overture:Cachoeira Da Mazomba:-22.84525:-43.76049,Cachoeira Da Mazomba,-22.84524917602539,-43.7604866027832,KEEP,named waterfall
+overture:Cachoeira Indiana Jones:-23.01663:-43.46807,Cachoeira Indiana Jones,-23.01663017272949,-43.46807098388672,UNCERTAIN,"locally nicknamed waterfall, name plausible but informal"
+"overture:Cachoeira Véu de Noiva, Vila de Maringa, Itatiaia, RJ:-22.92786:-43.35540","Cachoeira Véu de Noiva, Vila de Maringa, Itatiaia, RJ",-22.92786026000977,-43.35539627075195,KEEP,named waterfall (Véu de Noiva)
+overture:Cachoeira das Fadas-Minas Gerais:-22.95680:-43.17728,Cachoeira das Fadas-Minas Gerais,-22.956796646118164,-43.177276611328125,UNCERTAIN,named waterfall but location label mismatched
+overture:Cacuia:-22.82195:-43.18390,Cacuia,-22.821945190429688,-43.183895111083984,REJECT,bare neighborhood name
+overture:Calle Due:-22.90563:-43.10557,Calle Due,-22.90562629699707,-43.105567932128906,REJECT,condo/building branding
+overture:Calle Uno:-22.90534:-43.10523,Calle Uno,-22.90534210205078,-43.105228424072266,REJECT,condo/building branding
+overture:Calçadão Itaguaí:-22.87145:-43.77791,Calçadão Itaguaí,-22.8714542388916,-43.77791213989258,REJECT,generic boardwalk/street feature
+overture:Caminho dos Pescadores:-22.96348:-43.16468,Caminho dos Pescadores,-22.963476181030277,-43.164676666259766,UNCERTAIN,possible named path/trail
+overture:Caminhos da Barra:-22.95617:-43.34953,Caminhos da Barra,-22.95616912841797,-43.34952926635742,REJECT,shopping/mall branding
+overture:Caminhos do Rio:-22.78439:-43.41300,Caminhos do Rio,-22.784385681152344,-43.41299819946289,REJECT,generic path name
+overture:Campo 7 Praça Seca:-22.88963:-43.34403,Campo 7 Praça Seca,-22.88962745666504,-43.34402847290039,REJECT,sports field
+overture:Campo de Sao Joao:-23.04862:-43.55834,Campo de Sao Joao,-23.04861640930176,-43.5583381652832,UNCERTAIN,unclear whether field or historic site
+overture:Campão Irajá:-22.82538:-43.32785,Campão Irajá,-22.82538414001465,-43.32784652709961,REJECT,sports field
+overture:Campão da Rio Grande:-22.91758:-43.40343,Campão da Rio Grande,-22.91758346557617,-43.4034309387207,REJECT,sports field
+overture:Canal Cação Vermelho:-22.90222:-43.69191,Canal Cação Vermelho,-22.902223587036133,-43.69191360473633,UNCERTAIN,"named canal, minor feature"
+overture:Canal Faria-Timbó:-22.87880:-43.25071,Canal Faria-Timbó,-22.878803253173828,-43.25071334838867,UNCERTAIN,"named canal, minor feature"
+overture:Canal Gruçai:-22.83657:-43.27370,Canal Gruçai,-22.836570739746094,-43.27370071411133,UNCERTAIN,"named canal, minor feature"
+overture:Canal Marapendi:-23.00000:-43.31667,Canal Marapendi,-23.0,-43.316673278808594,KEEP,named canal tied to Marapendi ecological reserve
+overture:Canal São Fernando:-22.92872:-43.77055,Canal São Fernando,-22.928720474243164,-43.77055358886719,REJECT,"minor drainage canal, infrastructure not landmark"
+overture:Canal da Ceasa:-22.83863:-43.33675,Canal da Ceasa,-22.83863067626953,-43.33675003051758,REJECT,"minor drainage canal near market, infrastructure"
+overture:Canal da Visconde de Albuquerque:-22.97900:-43.22766,Canal da Visconde de Albuquerque,-22.97900009155273,-43.2276611328125,REJECT,"drainage canal named after street, infrastructure"
+overture:Canal das Taxas:-23.02071:-43.49185,Canal das Taxas,-23.02071189880371,-43.49185180664063,REJECT,"minor drainage canal, infrastructure"
+overture:Canal de Santo Agostinho:-22.91079:-43.78764,Canal de Santo Agostinho,-22.91079330444336,-43.78764343261719,REJECT,"minor drainage canal, infrastructure"
+overture:Canal de Sarapuí:-22.82750:-43.45278,Canal de Sarapuí,-22.827503204345703,-43.452781677246094,UNCERTAIN,named after real river but likely just a drainage channel
+overture:Canal de Sernambetiba:-23.03556:-43.49334,Canal de Sernambetiba,-23.03556060791016,-43.49333572387695,REJECT,"drainage canal along avenue, infrastructure"
+overture:Canal do Bacalhau:-23.05771:-43.56327,Canal do Bacalhau,-23.057710647583008,-43.563270568847656,REJECT,"minor drainage canal, infrastructure"
+overture:Canal do Cascalho:-23.00323:-43.49403,Canal do Cascalho,-23.003232955932617,-43.49403381347656,REJECT,"minor drainage canal, infrastructure"
+overture:Canal do Guandu:-22.86667:-43.68333,Canal do Guandu,-22.866670608520508,-43.68333053588867,KEEP,"major river and Rio's main water source, notable geographic feature"
+overture:Canal do Mangue:-22.89732:-43.21064,Canal do Mangue,-22.89732360839844,-43.21064376831055,KEEP,"historic canal from early 20th-century urban reform, notable"
+overture:Cantinho de Paz!:-22.91100:-43.39818,Cantinho de Paz!,-22.91100311279297,-43.3981819152832,REJECT,personal/generic nickname
+overture:Canto do Recreio - RJ:-23.01230:-43.38496,Canto do Recreio - RJ,-23.012300491333008,-43.38496017456055,REJECT,bare address-style entry with RJ suffix
+overture:Capela de Santa Bárbara:-22.93829:-43.13165,Capela de Santa Bárbara,-22.93828582763672,-43.131649017333984,KEEP,"genuine chapel, religious historical site"
+overture:Cardeal Musa Apart:-22.91692:-43.18883,Cardeal Musa Apart,-22.91692352294922,-43.18882751464844,REJECT,apartment building branding
+overture:Carolina:-22.74930:-43.43375,Carolina,-22.749298095703125,-43.43374633789063,REJECT,"bare personal name, no site"
+overture:Casa:-22.98373:-43.20765,Casa,-22.983726501464844,-43.20764923095703,REJECT,bare generic word
+overture:Casa De Festa Em Realengo:-22.87580:-43.44498,Casa De Festa Em Realengo,-22.87580299377441,-43.44497680664063,REJECT,party venue business
+overture:Casa Golden Garden:-22.91794:-43.54963,Casa Golden Garden,-22.91793632507324,-43.54962539672852,REJECT,residential/condo branding
+overture:Casa Meu Amor:-22.89944:-43.12262,Casa Meu Amor,-22.899444580078125,-43.12261962890625,REJECT,personal home nickname
+overture:Casa Parc des Palmier:-23.00355:-43.43987,Casa Parc des Palmier,-23.00354766845703,-43.43986892700195,REJECT,residential branding
+overture:Casa Própria Laiane Zidório:-22.90431:-43.56576,Casa Própria Laiane Zidório,-22.904312133789062,-43.56575775146485,REJECT,personal real-estate listing name
+overture:Casa Rio:-22.88026:-43.44236,Casa Rio,-22.880260467529297,-43.44235610961914,REJECT,generic business/home name
+overture:Casa da Camila:-22.97545:-43.18835,Casa da Camila,-22.975446701049805,-43.18834686279297,REJECT,personal home nickname
+overture:Casa da Colina:-22.92055:-43.18211,Casa da Colina,-22.92055320739746,-43.182106018066406,REJECT,personal/generic home nickname
+overture:Casa da Dani:-22.99583:-43.23892,Casa da Dani,-22.995826721191406,-43.23892211914063,REJECT,personal home nickname
+overture:Casa da Montanha:-22.76343:-43.47007,Casa da Montanha,-22.763429641723636,-43.47006988525391,REJECT,personal home nickname
+overture:Casa da Neusa- São Pedro da Aldeia:-22.81917:-43.26958,Casa da Neusa- São Pedro da Aldeia,-22.819171905517575,-43.26957702636719,REJECT,personal home nickname
+overture:Casa da Palma:-22.94445:-43.20432,Casa da Palma,-22.94445037841797,-43.20431518554688,REJECT,personal/generic home nickname
+overture:Casa da Praia:-23.01438:-43.30580,Casa da Praia,-23.014375686645508,-43.30580139160156,REJECT,personal home nickname (beach house)
+overture:Casa da Sofia:-22.88404:-43.28834,Casa da Sofia,-22.884042739868164,-43.2883415222168,REJECT,personal home nickname
+overture:Casa da Tia Paulinha:-22.93050:-43.34124,Casa da Tia Paulinha,-22.930503845214844,-43.34123611450195,REJECT,personal home nickname
+overture:Casa da Vovó Alzira:-22.92903:-43.56045,Casa da Vovó Alzira,-22.929033279418945,-43.56045150756836,REJECT,personal home nickname (rubric example)
+overture:Casa da sereia:-22.86896:-43.45393,Casa da sereia,-22.868959426879883,-43.45392990112305,REJECT,personal/generic home nickname
+overture:Casa da tia:-22.78449:-43.42786,Casa da tia,-22.78448867797852,-43.4278564453125,REJECT,personal home nickname (rubric example)
+overture:Casa da tia juju:-22.96855:-43.18642,Casa da tia juju,-22.96854782104492,-43.18642425537109,REJECT,personal home nickname
+overture:Casa do Claudio Cyrillo:-22.97930:-43.21933,Casa do Claudio Cyrillo,-22.97929573059082,-43.219329833984375,REJECT,personal name house
+overture:Casa do Jorge miguel:-22.89543:-43.71507,Casa do Jorge miguel,-22.89543342590332,-43.71506881713867,REJECT,personal name house
+overture:Casa do Juanzin:-22.81632:-43.37756,Casa do Juanzin,-22.816320419311523,-43.37755584716797,REJECT,personal name house
+overture:Casa do Mozão:-22.82856:-43.40987,Casa do Mozão,-22.828563690185547,-43.40987396240234,REJECT,personal home nickname (rubric example)
+overture:Casa do Oleiro:-22.76213:-43.42940,Casa do Oleiro,-22.762134552001957,-43.42940139770508,UNCERTAIN,"possible historic rural pottery-house site, unclear"
+overture:Casa do Rio:-22.82789:-43.32288,Casa do Rio,-22.82788848876953,-43.322879791259766,REJECT,generic home/business name
+overture:Casa do Xandro:-22.97261:-43.59063,Casa do Xandro,-22.97261047363281,-43.59062576293945,REJECT,personal name house
+overture:Casa do meu tio:-22.84640:-43.33947,Casa do meu tio,-22.84640312194824,-43.339473724365234,REJECT,personal home nickname
+overture:Casa dos pais:-23.00134:-43.34159,Casa dos pais,-23.0013427734375,-43.341590881347656,REJECT,personal home nickname
+overture:Casa mãe:-22.91386:-43.27209,Casa mãe,-22.91386032104492,-43.272090911865234,REJECT,personal home nickname
+overture:Casa silvestre:-22.86907:-43.54745,Casa silvestre,-22.86907386779785,-43.54745101928711,REJECT,generic/personal home nickname
+overture:Casaredo:-22.92909:-43.37737,Casaredo,-22.92909049987793,-43.37737274169922,REJECT,"unclear single word, likely personal"
+overture:Casas Bahia:-22.97798:-43.33824,Casas Bahia,-22.97798156738281,-43.33823776245117,REJECT,"national furniture retail chain, business"
+overture:Cass:-22.90005:-43.10279,Cass,-22.900054931640625,-43.10279083251953,REJECT,bare fragment word
+overture:Castel Sant'Angelo:-22.95371:-43.18839,Castel Sant'Angelo,-22.95370864868164,-43.18838882446289,REJECT,aspirational foreign condo/building name
+overture:Castelo Do Rei:-22.98975:-43.24994,Castelo Do Rei,-22.9897518157959,-43.24993896484375,REJECT,likely themed party venue business
+overture:Castelo da Família Real de Portunha:-22.96612:-43.18797,Castelo da Família Real de Portunha,-22.966121673583984,-43.187965393066406,REJECT,whimsical/joke personal name
+overture:Catete Palace:-22.92588:-43.17620,Catete Palace,-22.925878524780277,-43.17620086669922,KEEP,famous historical palace (Palácio do Catete)
+overture:Caxias:-23.00982:-43.35794,Caxias,-23.00982093811035,-43.35793685913086,REJECT,"bare place/city name, administrative"
+overture:Ccju:-22.94747:-43.33687,Ccju,-22.947471618652344,-43.33686828613281,REJECT,"unclear acronym, likely business"
+overture:Cdm Vivendas da Baroneza:-22.78431:-43.42743,Cdm Vivendas da Baroneza,-22.784311294555664,-43.427433013916016,REJECT,residential development branding
+overture:Cena Carioca:-22.91087:-43.17612,Cena Carioca,-22.910865783691406,-43.176116943359375,REJECT,business/venue-style name
+overture:Central Park Riviera 1:-22.76640:-43.27959,Central Park Riviera 1,-22.766403198242188,-43.27959442138672,REJECT,residential development branding (rubric example)
+overture:Centro Empresarial Leonardo da Vinci:-22.92082:-43.21820,Centro Empresarial Leonardo da Vinci,-22.920822143554688,-43.21820068359375,REJECT,business/office center
+overture:Centro de Tradições Nordestinas Luiz Gonzaga:-22.89746:-43.22038,Centro de Tradições Nordestinas Luiz Gonzaga,-22.897462844848636,-43.22037506103516,KEEP,genuine cultural institution
+overture:Cenário Laranjeiras:-22.93171:-43.18660,Cenário Laranjeiras,-22.93170738220215,-43.18659973144531,REJECT,likely studio/business name
+overture:Chalé do Alto:-22.96402:-43.27631,Chalé do Alto,-22.96402359008789,-43.27631378173828,UNCERTAIN,"possible historic chalet/cottage, unclear"
+overture:Chalé do Sal:-22.93050:-43.18996,Chalé do Sal,-22.930503845214844,-43.1899642944336,UNCERTAIN,"possible historic chalet, unclear"
+overture:Charme de Copa:-22.96341:-43.17476,Charme de Copa,-22.96340560913086,-43.17475891113281,REJECT,business (salon/shop) name
+overture:Chateau de Cheverny:-22.96524:-43.19186,Chateau de Cheverny,-22.965242385864254,-43.19186401367188,REJECT,aspirational foreign condo/building name
+overture:Chatuba Penha RJ:-22.84588:-43.29274,Chatuba Penha RJ,-22.84588432312012,-43.2927360534668,REJECT,neighborhood name with RJ address suffix
+overture:Choice:-23.02197:-43.49063,Choice,-23.021974563598636,-43.49062728881836,REJECT,"bare generic word, likely business"
+overture:Chácara Froes:-22.91351:-43.10960,Chácara Froes,-22.91351318359375,-43.10960006713867,UNCERTAIN,"possible historic estate, unclear"
+overture:Chácara da Freguesia:-22.94434:-43.33445,Chácara da Freguesia,-22.944339752197266,-43.33444595336914,UNCERTAIN,"possible historic estate, unclear"
+overture:Chácara do Abaeté:-22.90250:-43.11543,Chácara do Abaeté,-22.902502059936523,-43.11543273925781,UNCERTAIN,"possible historic estate, unclear"
+overture:Chácara do Itaguaí:-22.89673:-43.10253,Chácara do Itaguaí,-22.896732330322266,-43.10253143310547,UNCERTAIN,"possible historic estate, unclear"
+overture:Cidade Alta:-22.81957:-43.29438,Cidade Alta,-22.81957054138184,-43.29438400268555,REJECT,generic neighborhood name
+overture:Cidade Jardim:-22.98859:-43.36515,Cidade Jardim,-22.98859024047852,-43.36514663696289,REJECT,residential development branding
+overture:Cidade Jardim - Barra:-23.01427:-43.52639,Cidade Jardim - Barra,-23.014270782470703,-43.52638626098633,REJECT,residential development branding
+overture:Cidade Jardim Barra da Tijuca:-22.96624:-43.38500,Cidade Jardim Barra da Tijuca,-22.966243743896484,-43.3849983215332,REJECT,residential development branding
+overture:Cidade Universitária da UFRJ:-22.85306:-43.22583,Cidade Universitária da UFRJ,-22.85305595397949,-43.225833892822266,KEEP,notable university campus site
+overture:Cimento Lins:-22.77457:-43.41014,Cimento Lins,-22.77457427978516,-43.4101448059082,REJECT,business (cement company)
+overture:Claris Casa & Clube:-23.01392:-43.44058,Claris Casa & Clube,-23.013916015625,-43.44058227539063,UNCERTAIN,"unmatched in classification pass, defaulted prudently"
+overture:Claudia:-22.97206:-43.19001,Claudia,-22.972055435180664,-43.19000625610352,REJECT,bare personal name
+overture:Climao:-22.96570:-43.21923,Climao,-22.965700149536133,-43.21923065185547,REJECT,"unclear word, likely business"
+overture:Clube Militar:-22.95633:-43.16476,Clube Militar,-22.95632553100586,-43.16476058959961,KEEP,notable historic social/military club
+overture:Clube Naval:-22.90818:-43.17667,Clube Naval,-22.908180236816406,-43.17667388916016,KEEP,notable historic naval club
+overture:Clube dos marambaias:-23.05920:-43.56100,Clube dos marambaias,-23.059200286865234,-43.56100463867188,UNCERTAIN,"generic local club, unclear significance"
+overture:Coabe:-22.85675:-43.25425,Coabe,-22.85675048828125,-43.25425338745117,REJECT,"unclear acronym, likely administrative"
+overture:Cocobongo:-22.87164:-43.34322,Cocobongo,-22.871644973754883,-43.34321975708008,REJECT,business (bar/club) sounding name
+overture:Cocotá - Ilha Do Governador:-22.80269:-43.18229,Cocotá - Ilha Do Governador,-22.80268859863281,-43.18228530883789,KEEP,distinct named locale/beach area on Ilha do Governador
+overture:Cohab De Bonsucesso:-22.85644:-43.25363,Cohab De Bonsucesso,-22.8564395904541,-43.25362777709961,REJECT,public housing complex (rubric example)
+overture:Cohab Jacarezinho:-22.88614:-43.25307,Cohab Jacarezinho,-22.886138916015625,-43.253074645996094,REJECT,public housing complex
+overture:Colinas Do Itanhangá:-22.97984:-43.32510,Colinas Do Itanhangá,-22.97984313964844,-43.325103759765625,REJECT,residential development branding
+overture:Colinas de Campo Grande:-22.88904:-43.52929,Colinas de Campo Grande,-22.889039993286133,-43.52928924560547,REJECT,residential development branding
+overture:Colinas do Retiro:-22.86567:-43.47866,Colinas do Retiro,-22.865671157836918,-43.47866439819336,REJECT,residential development branding
+overture:Colonia de Férias RJ:-22.95808:-43.35148,Colonia de Férias RJ,-22.95808219909668,-43.35148239135742,REJECT,generic vacation facility with RJ suffix
+overture:Colors:-22.94096:-43.33461,Colors,-22.94095993041992,-43.33461380004883,REJECT,"bare generic word, likely business"
+overture:Colégio Estadual Barão de Tefé:-22.76438:-43.68590,Colégio Estadual Barão de Tefé,-22.764375686645508,-43.68589782714844,REJECT,"functioning public school, not a landmark site"
+overture:Comari - Campo Grande - Rj:-22.91659:-43.55433,Comari - Campo Grande - Rj,-22.91658973693848,-43.5543327331543,REJECT,business name with RJ address suffix
+overture:Comdomínio Colinas Do Magarça:-22.94177:-43.58716,Comdomínio Colinas Do Magarça,-22.9417724609375,-43.587162017822266,REJECT,condo development
+overture:Comendador Siqueira:-22.92815:-43.34779,Comendador Siqueira,-22.928150177001957,-43.34779357910156,REJECT,"street/person name, not a distinct site"
+overture:Companhia Siderúrgica do Atlântico:-22.89893:-43.73333,Companhia Siderúrgica do Atlântico,-22.898929595947266,-43.73333358764648,REJECT,"steel company, business"
+overture:Completo Piedade:-22.89056:-43.31161,Completo Piedade,-22.89055824279785,-43.31160736083984,REJECT,likely gym/fitness business
+overture:Complexo  ZP:-22.85061:-43.28405,Complexo  ZP,-22.85061454772949,-43.28404998779297,REJECT,unclear favela/administrative cluster name
+overture:Complexo Da Barreira.:-22.90882:-43.58689,Complexo Da Barreira.,-22.908824920654297,-43.58688735961914,REJECT,favela/administrative cluster name
+overture:Complexo Das Casinha:-22.79608:-43.42146,Complexo Das Casinha,-22.79607582092285,-43.42145919799805,REJECT,favela/administrative cluster name
+overture:Complexo Do LINS:-22.91255:-43.27568,Complexo Do LINS,-22.91255187988281,-43.27568054199219,REJECT,favela/administrative cluster name
+overture:Complexo da João Teles:-22.78860:-43.17934,Complexo da João Teles,-22.78860282897949,-43.17933654785156,REJECT,favela/administrative cluster name
+overture:Complexo da Penha:-22.84652:-43.28972,Complexo da Penha,-22.846515655517575,-43.28971862792969,REJECT,"favela area name, not a specific landmark building"
+overture:Complexo da R.D:-22.80497:-43.40591,Complexo da R.D,-22.804969787597656,-43.40591049194336,REJECT,"unclear abbreviation, administrative"
+"overture:Complexo do Alemão, Rio de Janeiro:-22.86056:-43.27361","Complexo do Alemão, Rio de Janeiro",-22.86055564880371,-43.27361297607422,REJECT,"favela area name with city suffix, not a specific building"
+overture:Complexo do chapadao:-22.81896:-43.37537,Complexo do chapadao,-22.818960189819336,-43.3753662109375,REJECT,favela/administrative cluster name
+overture:Comunidade do Jacarezinho-RJ:-22.94476:-43.34285,Comunidade do Jacarezinho-RJ,-22.94476318359375,-43.34285354614258,REJECT,community name with RJ suffix
+overture:Comunidade saibreira:-22.88351:-43.48014,Comunidade saibreira,-22.883514404296875,-43.48014450073242,REJECT,generic community name
+overture:Conceito California:-22.76114:-43.42575,Conceito California,-22.761140823364254,-43.42575073242188,REJECT,aspirational condo/business branding
+overture:Conceição 179:-22.89978:-43.18456,Conceição 179,-22.8997802734375,-43.1845588684082,REJECT,"street name plus number, address-like"
+overture:Concetto Nero:-23.00900:-43.47333,Concetto Nero,-23.009002685546875,-43.473331451416016,REJECT,aspirational foreign condo branding
+overture:Cond Bosque da Freguesia:-22.95310:-43.34723,Cond Bosque da Freguesia,-22.95310401916504,-43.34722518920898,REJECT,condo development
+overture:Cond Clube Vida Boa I e II:-22.94295:-43.58324,Cond Clube Vida Boa I e II,-22.94295310974121,-43.5832405090332,REJECT,condo development
+overture:Cond Grand Village:-22.97069:-43.38974,Cond Grand Village,-22.97069358825684,-43.38974380493164,REJECT,condo development
+overture:Cond Solar do grajaú:-22.91942:-43.25675,Cond Solar do grajaú,-22.919422149658203,-43.25674819946289,REJECT,condo development
+overture:Cond vila Heloisa 1220:-22.95621:-43.34684,Cond vila Heloisa 1220,-22.956205368041992,-43.34683609008789,REJECT,condo development
+overture:Cond. Crystal Lake:-23.01311:-43.43436,Cond. Crystal Lake,-23.01310920715332,-43.434356689453125,REJECT,condo development
+overture:Cond. Gávea Garden:-22.97764:-43.22989,Cond. Gávea Garden,-22.977638244628903,-43.22989273071289,REJECT,condo development
+overture:Cond. Laura Garcia:-22.92419:-43.24971,Cond. Laura Garcia,-22.924190521240234,-43.24970626831055,REJECT,condo development
+overture:Cond. Pq. Encantado:-22.89594:-43.30810,Cond. Pq. Encantado,-22.895938873291016,-43.308101654052734,REJECT,condo development
+overture:Cond. Prainha da Ilha:-22.82385:-43.16786,Cond. Prainha da Ilha,-22.8238468170166,-43.16786193847656,REJECT,condo development
+overture:Cond. Solaris da Torre:-22.92293:-43.25262,Cond. Solaris da Torre,-22.92292594909668,-43.25261688232422,REJECT,condo development
+overture:Cond. Sulacap Green:-22.89173:-43.39825,Cond. Sulacap Green,-22.891733169555664,-43.39824676513672,REJECT,condo development
+overture:Cond. Varandas do Méier:-22.89849:-43.28897,Cond. Varandas do Méier,-22.89848518371582,-43.28897476196289,REJECT,condo development
+overture:Cond. Village Bouganvilles:-22.90548:-43.56614,Cond. Village Bouganvilles,-22.90548324584961,-43.566139221191406,REJECT,condo development
+overture:Cond. Village do Tingui:-22.88376:-43.56650,Cond. Village do Tingui,-22.883764266967773,-43.56650161743164,REJECT,condo development
+overture:Cond. vale dos bem te vis:-22.95287:-43.34288,Cond. vale dos bem te vis,-22.952869415283203,-43.3428840637207,REJECT,condo development
+overture:Cond.Vale Das Palmeiras:-22.86421:-43.55933,Cond.Vale Das Palmeiras,-22.86421012878418,-43.55933380126953,REJECT,condo development
+overture:Condado Luz do Sol II:-22.92546:-43.37565,Condado Luz do Sol II,-22.92546272277832,-43.37564849853516,REJECT,condo development
+overture:Condado de Palmares:-22.91723:-43.22088,Condado de Palmares,-22.917234420776367,-43.22087860107422,REJECT,condo development (aspirational name)
+overture:Conde das Palmeiras:-22.90158:-43.25104,Conde das Palmeiras,-22.90158462524414,-43.25103759765625,REJECT,condo development
+overture:Conde de Cascais:-22.98731:-43.22670,Conde de Cascais,-22.987314224243164,-43.2266960144043,REJECT,aspirational condo branding
+overture:Condo All Blue:-22.84932:-43.31925,Condo All Blue,-22.849315643310547,-43.31924819946289,REJECT,condo development
+overture:Condo Aluizio de Azevedo:-22.93344:-43.18710,Condo Aluizio de Azevedo,-22.93343544006348,-43.187103271484375,REJECT,condo development
+overture:Condo Bella Vitta Jacarepagua:-22.94180:-43.36747,Condo Bella Vitta Jacarepagua,-22.941804885864254,-43.36747360229492,REJECT,condo development
+overture:Condo Belle Ville:-22.89277:-43.39638,Condo Belle Ville,-22.89277458190918,-43.39637756347656,REJECT,condo development (rubric example)
+overture:Condo Blue One:-23.00243:-43.42516,Condo Blue One,-23.00243377685547,-43.42515563964844,REJECT,condo development
+overture:Condo Cove Park:-22.88462:-43.11957,Condo Cove Park,-22.88462448120117,-43.119571685791016,REJECT,condo development
+overture:Condo Darcy Vargas:-22.85164:-43.25013,Condo Darcy Vargas,-22.851638793945312,-43.2501335144043,REJECT,condo development
+overture:Condo Eldorado Green:-22.93094:-43.34769,Condo Eldorado Green,-22.93093681335449,-43.347694396972656,REJECT,condo development
+overture:Condo Gardens London:-22.92819:-43.33831,Condo Gardens London,-22.92818832397461,-43.33831405639648,REJECT,condo development
+overture:Condo Grove Mirataia:-22.93626:-43.36266,Condo Grove Mirataia,-22.936260223388672,-43.36266326904297,REJECT,condo development
+overture:Condo Horacio Camargo:-22.92470:-43.52794,Condo Horacio Camargo,-22.924701690673828,-43.52793502807617,REJECT,condo development
+overture:Condo Itaúna Gold:-23.01053:-43.42089,Condo Itaúna Gold,-23.01053237915039,-43.42089080810547,REJECT,condo development (rubric example)
+overture:Condo Longbeach and Casablanca:-23.00338:-43.35140,Condo Longbeach and Casablanca,-23.00337600708008,-43.35140228271485,REJECT,condo development
+overture:Condo Park Royal:-22.88286:-43.63025,Condo Park Royal,-22.88286399841309,-43.6302490234375,REJECT,condo development
+overture:Condo Peninsula Way:-22.98712:-43.35757,Condo Peninsula Way,-22.98711585998535,-43.35757064819336,REJECT,condo development
+overture:Condo Piacenza Life:-22.87519:-43.53435,Condo Piacenza Life,-22.875185012817383,-43.53435134887695,REJECT,condo development
+overture:Condo Retreat of the Roses:-22.81869:-43.30455,Condo Retreat of the Roses,-22.81869125366211,-43.3045539855957,REJECT,condo development
+overture:Condo Royal Green:-22.98989:-43.35419,Condo Royal Green,-22.989885330200195,-43.35418701171875,REJECT,condo development
+overture:Condo Saint Lucia:-23.00508:-43.33229,Condo Saint Lucia,-23.00507926940918,-43.33229446411133,REJECT,condo development
+overture:Condo San Francesco:-22.76241:-43.39694,Condo San Francesco,-22.76240921020508,-43.39694213867188,REJECT,condo development
+overture:Condo San Remo:-22.88221:-43.54957,Condo San Remo,-22.882211685180664,-43.54956817626953,REJECT,condo development
+overture:Condo Sol Marapendi:-23.00698:-43.32505,Condo Sol Marapendi,-23.006980895996094,-43.32505035400391,REJECT,condo development
+overture:Condo Soul Garden Icaraí:-22.90087:-43.10207,Condo Soul Garden Icaraí,-22.90086936950684,-43.10206985473633,REJECT,condo development
+overture:Condo Van Erven:-22.91753:-43.19784,Condo Van Erven,-22.917526245117188,-43.19783782958984,REJECT,condo development
+overture:Condo Villa Angela:-22.76423:-43.48989,Condo Villa Angela,-22.76423454284668,-43.48989486694336,REJECT,condo development
+overture:Condo Villa Borghese:-22.88241:-43.55096,Condo Villa Borghese,-22.88241195678711,-43.55095672607422,REJECT,condo development
+overture:Condo Villa Carioca:-22.92663:-43.24679,Condo Villa Carioca,-22.9266300201416,-43.24678802490234,REJECT,condo development
+overture:Condo Villa Espanã:-22.97136:-43.39042,Condo Villa Espanã,-22.971364974975582,-43.390419006347656,REJECT,condo development
+overture:Condo Villaggio Dei Fiori:-22.89528:-43.10019,Condo Villaggio Dei Fiori,-22.89528465270996,-43.10018539428711,REJECT,condo development
+overture:Condo Villas Castle:-22.92848:-43.35939,Condo Villas Castle,-22.92848396301269,-43.35939407348633,REJECT,condo development
+overture:Condo Villas Of Almond:-22.91696:-43.61544,Condo Villas Of Almond,-22.91695976257324,-43.61544036865234,REJECT,condo development
+overture:Condomi'nio Caminhos do Rio 1:-22.78449:-43.40919,Condomi'nio Caminhos do Rio 1,-22.784486770629883,-43.40919494628906,REJECT,condo development
+overture:Condomi'nio Ilha de Cozumel:-23.00846:-43.32904,Condomi'nio Ilha de Cozumel,-23.008455276489254,-43.32904052734375,REJECT,condo development
+overture:Condomi'nio Oswaldo Lussac:-22.93957:-43.36279,Condomi'nio Oswaldo Lussac,-22.9395694732666,-43.36278533935547,REJECT,condo development
+overture:Condomi'nio Quinta do Morgado:-22.97644:-43.50007,Condomi'nio Quinta do Morgado,-22.976438522338867,-43.50006866455078,REJECT,condo development
+overture:Condomi'nio Recanto das Andorinhas:-22.84321:-43.36221,Condomi'nio Recanto das Andorinhas,-22.843210220336918,-43.362213134765625,REJECT,condo development
+overture:Condomi'nio San Martin:-22.92382:-43.36064,Condomi'nio San Martin,-22.92382049560547,-43.36064147949219,REJECT,condo development
+overture:Condomi'nio Sesquicentenario:-22.82299:-43.30891,Condomi'nio Sesquicentenario,-22.82299041748047,-43.30890655517578,REJECT,residential condominium
+overture:Condomi'nio Village dos Oitis:-22.99142:-43.48050,Condomi'nio Village dos Oitis,-22.99142265319824,-43.48050308227539,REJECT,residential condominium
+overture:Condomi'nio Vivendas das Cotovias:-22.88468:-43.62766,Condomi'nio Vivendas das Cotovias,-22.88468360900879,-43.62765884399414,REJECT,residential condominium
+overture:Condomi'nio Vivendas das Oliveiras:-22.91161:-43.58199,Condomi'nio Vivendas das Oliveiras,-22.91160774230957,-43.58198547363281,REJECT,residential condominium
+overture:Condomi'nio do Edifi'cio Inconfide ncia:-22.90082:-43.12528,Condomi'nio do Edifi'cio Inconfide ncia,-22.900821685791016,-43.125282287597656,REJECT,residential condominium building
+overture:Condomi'nio do Edifi'cio Michelangelo:-22.90631:-43.11307,Condomi'nio do Edifi'cio Michelangelo,-22.90631103515625,-43.113067626953125,REJECT,residential condominium building
+overture:Condomini:-22.92605:-43.55169,Condomini,-22.926050186157227,-43.55168533325195,REJECT,generic garbled condo name
+overture:Condominium Art Life:-23.01734:-43.49263,Condominium Art Life,-23.01734161376953,-43.49263000488281,REJECT,condo branding
+overture:Condominium Fazenda Passaredo:-22.92172:-43.41338,Condominium Fazenda Passaredo,-22.92171859741211,-43.41337585449219,REJECT,condo branding
+overture:Condominium GREEN LIVING:-22.75077:-43.69167,Condominium GREEN LIVING,-22.75077247619629,-43.69166946411133,REJECT,condo branding
+overture:Condominium Garden of Acacias:-22.93531:-43.55738,Condominium Garden of Acacias,-22.935312271118164,-43.557376861572266,REJECT,condo branding
+overture:Condominium Garden of Ipe:-22.86373:-43.26916,Condominium Garden of Ipe,-22.86372947692871,-43.269161224365234,REJECT,condo branding
+overture:Condominium Park Renovare:-22.87901:-43.55041,Condominium Park Renovare,-22.879005432128903,-43.550411224365234,REJECT,condo branding
+overture:Condominium Park Silvestre:-22.87139:-43.54833,Condominium Park Silvestre,-22.87138938903809,-43.54833221435547,REJECT,condo branding
+overture:Condominium Quinta da Lagoa:-22.97757:-43.19823,Condominium Quinta da Lagoa,-22.97757339477539,-43.1982307434082,REJECT,condo branding
+overture:Condominium Via Bella:-22.98779:-43.35729,Condominium Via Bella,-22.987791061401367,-43.3572883605957,REJECT,condo branding
+overture:Condominium Via Corcovado:-22.88404:-43.31456,Condominium Via Corcovado,-22.884037017822266,-43.31455993652344,REJECT,condo branding
+overture:Condominium Village of Ipês:-22.83326:-43.71311,Condominium Village of Ipês,-22.833261489868164,-43.71310806274414,REJECT,condo branding
+overture:Condominium Villagio Del Mare:-23.02753:-43.47614,Condominium Villagio Del Mare,-23.02753448486328,-43.47614288330078,REJECT,condo branding
+overture:Condominium park of Hortências:-22.91396:-43.54824,Condominium park of Hortências,-22.91396141052246,-43.54823684692383,REJECT,condo branding
+overture:Condomino delos:-22.90752:-43.69513,Condomino delos,-22.90752410888672,-43.69513320922852,REJECT,condo branding
+overture:Condomíno La Plage:-23.03106:-43.48023,Condomíno La Plage,-23.031055450439453,-43.48023223876953,REJECT,condo branding
+overture:Conflorvegan:-22.91920:-43.25758,Conflorvegan,-22.9192008972168,-43.25758361816406,REJECT,business name
+overture:Conjunto 61:-22.89444:-43.71582,Conjunto 61,-22.894437789916992,-43.715816497802734,REJECT,housing complex
+overture:Conjunto Boa Esperança:-22.81331:-43.59085,Conjunto Boa Esperança,-22.813308715820312,-43.59084701538086,REJECT,housing complex
+overture:Conjunto Cesarão - Santa Cruz:-22.93544:-43.66528,Conjunto Cesarão - Santa Cruz,-22.93544006347656,-43.66527557373047,REJECT,housing complex
+overture:Conjunto Cesarão Sitio:-22.93355:-43.65120,Conjunto Cesarão Sitio,-22.933549880981445,-43.65120315551758,REJECT,housing complex
+overture:Conjunto Coronel Vieira:-22.84889:-43.31990,Conjunto Coronel Vieira,-22.8488883972168,-43.31989669799805,REJECT,housing complex
+overture:Conjunto César maia:-22.98977:-43.43174,Conjunto César maia,-22.98977279663086,-43.43174362182617,REJECT,housing complex
+overture:Conjunto Da Pmerj Olaria Rj:-22.85065:-43.27509,Conjunto Da Pmerj Olaria Rj,-22.85065078735352,-43.27508544921875,REJECT,public housing complex
+overture:Conjunto Do Desipe - Bangu:-22.84587:-43.48559,Conjunto Do Desipe - Bangu,-22.845867156982425,-43.48559188842773,REJECT,housing complex
+overture:Conjunto Dom Bosco:-22.80375:-43.58640,Conjunto Dom Bosco,-22.80375289916992,-43.586402893066406,REJECT,housing complex
+overture:Conjunto Dos Ferroviários Dr. Roberto Silveira:-22.78733:-43.31690,Conjunto Dos Ferroviários Dr. Roberto Silveira,-22.787330627441406,-43.31689834594727,REJECT,housing complex
+overture:Conjunto Guandu 2:-22.90461:-43.70819,Conjunto Guandu 2,-22.90460777282715,-43.70819091796875,REJECT,housing complex
+overture:Conjunto Habitacional Prefeito Sá lessa:-22.82518:-43.35615,Conjunto Habitacional Prefeito Sá lessa,-22.825178146362305,-43.35614776611328,REJECT,public housing complex
+overture:Conjunto Habitacional Presidente Getúlio Vargas:-22.84952:-43.38079,Conjunto Habitacional Presidente Getúlio Vargas,-22.849519729614254,-43.38079071044922,REJECT,public housing complex
+overture:Conjunto Habitacional São Sebastião:-22.94440:-43.34204,Conjunto Habitacional São Sebastião,-22.94440078735352,-43.34203720092773,REJECT,public housing complex
+overture:Conjunto Liberdade:-22.90132:-43.70949,Conjunto Liberdade,-22.901315689086918,-43.70948791503906,REJECT,housing complex
+overture:Conjunto Ubaldo de Oliveira:-22.86313:-43.47188,Conjunto Ubaldo de Oliveira,-22.863134384155277,-43.47187805175781,REJECT,housing complex
+overture:Conjunto da Joaquim Ribeiro:-22.87773:-43.28617,Conjunto da Joaquim Ribeiro,-22.877729415893555,-43.28617477416992,REJECT,housing complex
+overture:Conjunto da Marinha:-22.81360:-43.37735,Conjunto da Marinha,-22.8136043548584,-43.37734603881836,REJECT,housing complex
+overture:Conjunto dos Ferroviários:-22.88633:-43.29327,Conjunto dos Ferroviários,-22.886329650878903,-43.293270111083984,REJECT,housing complex
+overture:Conjunto dos Mouras:-22.93706:-43.63309,Conjunto dos Mouras,-22.937055587768555,-43.633087158203125,REJECT,housing complex
+overture:Conjunto nova sepetiba:-22.95987:-43.68554,Conjunto nova sepetiba,-22.959871292114254,-43.685543060302734,REJECT,housing complex
+overture:Connect Icarai:-22.90758:-43.10274,Connect Icarai,-22.907581329345703,-43.10273742675781,REJECT,business/coworking branding
+overture:Connect Life Work Trade:-22.91822:-43.37913,Connect Life Work Trade,-22.9182243347168,-43.379127502441406,REJECT,business branding
+overture:Conquista Campo Grande:-22.87262:-43.52630,Conquista Campo Grande,-22.87262344360352,-43.52630233764648,REJECT,real-estate development branding
+overture:Conquista Jardim Guadalupe:-22.84443:-43.37486,Conquista Jardim Guadalupe,-22.84442901611328,-43.37486267089844,REJECT,real-estate development branding
+overture:Conquista Mendanha:-22.86825:-43.55198,Conquista Mendanha,-22.86824607849121,-43.55197525024414,REJECT,real-estate development branding
+overture:Consultor Imobiliário Jorge Rondão:-22.86742:-43.55332,Consultor Imobiliário Jorge Rondão,-22.867420196533203,-43.553321838378906,REJECT,real-estate agent business
+overture:Contemporâneo Design Resort:-22.94751:-43.56160,Contemporâneo Design Resort,-22.947513580322266,-43.56160354614258,REJECT,resort/business branding
+overture:Copa do Rei:-22.85650:-43.35308,Copa do Rei,-22.85650062561035,-43.35307693481445,UNCERTAIN,unclear business or place name
+overture:Copacabana Bela Vista:-22.96395:-43.17255,Copacabana Bela Vista,-22.96395301818848,-43.172550201416016,REJECT,residential building branding
+overture:Coqueirinho:-22.77786:-43.32941,Coqueirinho,-22.77786445617676,-43.32940673828125,UNCERTAIN,possibly bare locality name
+overture:Coqueirão:-22.98709:-43.20627,Coqueirão,-22.987085342407227,-43.20627212524414,UNCERTAIN,possibly bare locality name
+overture:Coreto de Sepetiba Rj:-22.97089:-43.70963,Coreto de Sepetiba Rj,-22.97089385986328,-43.70962905883789,KEEP,historic bandstand structure
+overture:Corporate Tijuca:-22.92161:-43.23470,Corporate Tijuca,-22.921607971191406,-43.23469543457031,REJECT,office building branding
+overture:Cosmos City:-22.91693:-43.61456,Cosmos City,-22.916927337646484,-43.614559173583984,REJECT,real-estate development branding
+overture:Costa Blanca:-23.00634:-43.32664,Costa Blanca,-23.00633811950684,-43.326637268066406,REJECT,condo/real-estate branding
+overture:Costa Del Sol:-23.01028:-43.33267,Costa Del Sol,-23.01028251647949,-43.33267211914063,REJECT,condo/real-estate branding
+overture:Costa do Atlântico:-22.98664:-43.19786,Costa do Atlântico,-22.98663711547852,-43.19785690307617,REJECT,condo/real-estate branding
+overture:Costão do Grumari:-23.05495:-43.53920,Costão do Grumari,-23.054950714111328,-43.53920364379883,KEEP,named coastal geographic feature
+overture:Covanca:-22.91579:-43.34472,Covanca,-22.915786743164062,-43.3447151184082,UNCERTAIN,possibly bare locality name
+overture:Cozinha da Nutri Daiana Queiroz:-22.87103:-43.76700,Cozinha da Nutri Daiana Queiroz,-22.871034622192383,-43.766998291015625,REJECT,nutritionist business
+overture:Cremtei:-22.82406:-43.32884,Cremtei,-22.82406044006348,-43.32884216308594,REJECT,business/service acronym
+overture:Cruzada de são Sebastião:-22.98184:-43.21619,Cruzada de são Sebastião,-22.981840133666992,-43.216190338134766,KEEP,notable historic housing/urbanization landmark
+overture:Cruzeiro do Sul (Mesquita):-22.77855:-43.42863,Cruzeiro do Sul (Mesquita),-22.778553009033203,-43.42862701416016,UNCERTAIN,possibly cross monument or locality name
+overture:Cukrová homole (hora):-22.94861:-43.15722,Cukrová homole (hora),-22.9486141204834,-43.157222747802734,REJECT,foreign-language Wikidata label artifact
+overture:Cupim City .:-22.75340:-43.46259,Cupim City .,-22.753400802612305,-43.462589263916016,REJECT,garbled business name
+overture:Cury Nova Iguaçu:-22.76107:-43.41965,Cury Nova Iguaçu,-22.761070251464844,-43.41964721679688,REJECT,real-estate developer branding
+overture:Cury Ramos:-22.86150:-43.25511,Cury Ramos,-22.861495971679688,-43.25511169433594,REJECT,real-estate developer branding
+overture:D&A Areia de Quartzo:-22.91368:-43.54753,D&A Areia de Quartzo,-22.913684844970703,-43.54753112792969,UNCERTAIN,"unmatched in classification pass, defaulted prudently"
+overture:DNA HOMER:-22.90721:-43.56602,DNA HOMER,-22.90721321105957,-43.56602096557617,REJECT,business branding
+overture:Da Prata:-22.76113:-43.41917,Da Prata,-22.761125564575195,-43.419166564941406,UNCERTAIN,"fragment, unclear referent"
+overture:Deck Aterro Flamengo:-22.93574:-43.17002,Deck Aterro Flamengo,-22.935739517211918,-43.17002487182617,KEEP,public deck landmark in Parque do Flamengo
+overture:Del Bosco:-22.94149:-43.33828,Del Bosco,-22.941490173339844,-43.33827590942383,REJECT,condo/real-estate branding
+overture:Dez Rocha Miranda:-22.85136:-43.34531,Dez Rocha Miranda,-22.851364135742188,-43.345314025878906,REJECT,real-estate development branding
+overture:Dez Zona Norte:-22.82970:-43.32247,Dez Zona Norte,-22.82969856262207,-43.32246780395508,REJECT,real-estate development branding
+overture:Disegno Casas Boutique:-23.00988:-43.42601,Disegno Casas Boutique,-23.009878158569336,-43.42600631713867,REJECT,real-estate business branding
+overture:Drop Vertical - Escola de Surf e Kitesurf:-23.00917:-43.34249,Drop Vertical - Escola de Surf e Kitesurf,-23.009166717529297,-43.34249496459961,REJECT,surf school business
+overture:Duque de Epson:-22.97351:-43.18654,Duque de Epson,-22.973512649536133,-43.18653869628906,REJECT,nonsensical/garbled text
+overture:Dúvidas sobre sexo:-23.01152:-43.44580,Dúvidas sobre sexo,-23.011520385742188,-43.44580078125,REJECT,nonsensical garbled text
+overture:EXATO  Estrada do Rio Grande Taquara:-22.91903:-43.39349,EXATO  Estrada do Rio Grande Taquara,-22.91903305053711,-43.39349365234375,REJECT,business plus street address
+overture:East Side Méier:-22.89644:-43.28291,East Side Méier,-22.89643859863281,-43.28291320800781,REJECT,real-estate development branding
+overture:Ed Argelia:-22.96858:-43.18250,Ed Argelia,-22.968582153320312,-43.182498931884766,REJECT,residential apartment building
+overture:Ed Faestal:-22.87135:-43.77781,Ed Faestal,-22.87135124206543,-43.77780532836914,REJECT,residential apartment building
+overture:Ed Fidalgo/ Ed Las Palmas:-22.76130:-43.45139,Ed Fidalgo/ Ed Las Palmas,-22.76130104064941,-43.45138549804688,REJECT,residential apartment building
+overture:Ed Maria Quiteria:-22.97291:-43.19235,Ed Maria Quiteria,-22.97290802001953,-43.19234848022461,REJECT,residential apartment building
+overture:Ed Space VII and VIII:-22.90424:-43.11837,Ed Space VII and VIII,-22.904239654541016,-43.11837387084961,REJECT,residential apartment building
+overture:Ed Torre Charles Degaulle:-23.00225:-43.32795,Ed Torre Charles Degaulle,-23.00225257873535,-43.32795333862305,REJECT,residential apartment building
+overture:Ed Verbenas:-22.87817:-43.36736,Ed Verbenas,-22.8781681060791,-43.36735534667969,REJECT,residential apartment building
+overture:Ed. Alita:-22.89543:-43.35402,Ed. Alita,-22.89542579650879,-43.35401916503906,REJECT,residential apartment building
+overture:Ed. Allegro:-22.81143:-43.19606,Ed. Allegro,-22.811431884765625,-43.19606018066406,REJECT,residential apartment building
+overture:Ed. Canopus:-22.97952:-43.22046,Ed. Canopus,-22.979516983032227,-43.220462799072266,REJECT,residential apartment building
+overture:Ed. Chinguar:-22.75730:-43.45961,Ed. Chinguar,-22.757295608520508,-43.4596061706543,REJECT,residential apartment building
+overture:Ed. Conquest:-22.75919:-43.45875,Ed. Conquest,-22.75919342041016,-43.45874786376953,REJECT,residential apartment building
+overture:Ed. Elias F. Pariz:-22.78907:-43.30747,Ed. Elias F. Pariz,-22.789066314697266,-43.30747222900391,REJECT,residential apartment building
+overture:Ed. Gandhi:-22.95526:-43.17511,Ed. Gandhi,-22.95525550842285,-43.175106048583984,REJECT,residential apartment building
+overture:Ed. Gois Monteiro 155:-22.95562:-43.17886,Ed. Gois Monteiro 155,-22.955623626708984,-43.17886352539063,REJECT,residential apartment building
+overture:Ed. Ingá Beira Mar:-22.90349:-43.12626,Ed. Ingá Beira Mar,-22.90348625183105,-43.126258850097656,REJECT,residential apartment building
+overture:Ed. Jardim das Tulipas:-22.88467:-43.36578,Ed. Jardim das Tulipas,-22.884666442871094,-43.36577987670898,REJECT,residential apartment building
+overture:Ed. Jursan:-22.90972:-43.19170,Ed. Jursan,-22.90972328186035,-43.19169616699219,REJECT,residential apartment building
+overture:Ed. Lucie Danon:-22.96907:-43.18673,Ed. Lucie Danon,-22.969070434570312,-43.18672943115234,REJECT,residential apartment building
+overture:Ed. Luiz de Camões:-22.97126:-43.18465,Ed. Luiz de Camões,-22.97125625610352,-43.18465423583984,REJECT,residential apartment building
+overture:Ed. Mar do Norte:-22.87251:-43.34244,Ed. Mar do Norte,-22.872509002685547,-43.34243774414063,REJECT,residential apartment building
+overture:Ed. Marcedo VIII:-22.87910:-43.36043,Ed. Marcedo VIII,-22.87910461425781,-43.36042785644531,REJECT,residential apartment building
+overture:Ed. Marcílio Dias:-22.88540:-43.12528,Ed. Marcílio Dias,-22.885400772094727,-43.12527847290039,REJECT,residential apartment building
+overture:Ed. Mário Scapin:-22.75831:-43.45023,Ed. Mário Scapin,-22.75830841064453,-43.450225830078125,REJECT,residential apartment building
+overture:Ed. Nicias:-22.98569:-43.19632,Ed. Nicias,-22.98568725585937,-43.196319580078125,REJECT,residential apartment building
+overture:Ed. Parreiras:-22.98388:-43.19539,Ed. Parreiras,-22.98388290405273,-43.19538879394531,REJECT,residential apartment building
+overture:Ed. Pasteur Palace:-22.95268:-43.17715,Ed. Pasteur Palace,-22.952682495117188,-43.17715072631836,REJECT,residential apartment building
+overture:Ed. Pena Safira:-22.96736:-43.19102,Ed. Pena Safira,-22.967361450195312,-43.19102096557617,REJECT,residential apartment building
+overture:Ed. Pina:-22.97090:-43.18960,Ed. Pina,-22.97090148925781,-43.18960189819336,REJECT,residential apartment building
+overture:Ed. Porto Brisa V:-22.87908:-43.37101,Ed. Porto Brisa V,-22.879079818725582,-43.37100982666016,REJECT,residential apartment building
+overture:Ed. Porto Seguro:-22.95192:-43.18628,Ed. Porto Seguro,-22.95191764831543,-43.186283111572266,REJECT,residential apartment building
+overture:Ed. Reserva Marapendi:-23.01236:-43.44323,Ed. Reserva Marapendi,-23.012359619140625,-43.44323348999024,REJECT,residential apartment building
+overture:Ed. San Diego:-22.96876:-43.18608,Ed. San Diego,-22.9687614440918,-43.18607711791992,REJECT,residential apartment building
+overture:Ed. Solar Do Marques:-22.89253:-43.11347,Ed. Solar Do Marques,-22.89253044128418,-43.113468170166016,REJECT,residential apartment building
+overture:Ed. Solar do Valqueire:-22.87828:-43.36953,Ed. Solar do Valqueire,-22.878278732299805,-43.36952590942383,REJECT,residential apartment building
+overture:Ed. Sta Mônica:-22.87444:-43.27264,Ed. Sta Mônica,-22.874435424804688,-43.27263641357422,REJECT,residential apartment building
+overture:Ed. Taquara:-22.96964:-43.18754,Ed. Taquara,-22.96964454650879,-43.187538146972656,REJECT,residential apartment building
+overture:Ed. Tirante:-22.89329:-43.11963,Ed. Tirante,-22.893291473388672,-43.119625091552734,REJECT,residential apartment building
+overture:Ed. Varandas do Recreio:-23.01108:-43.44865,Ed. Varandas do Recreio,-23.01108169555664,-43.44865417480469,REJECT,residential apartment building
+overture:Ed. Vila Normanda:-22.97112:-43.18440,Ed. Vila Normanda,-22.971120834350582,-43.18439865112305,REJECT,residential apartment building
+overture:Ed.Del Valle:-22.90982:-43.19343,Ed.Del Valle,-22.90981674194336,-43.19343185424805,REJECT,residential apartment building
+overture:Edf. Chopin:-22.96770:-43.17952,Edf. Chopin,-22.967702865600582,-43.17952346801758,REJECT,residential apartment building
+overture:Edf. Marrocos:-22.96850:-43.18267,Edf. Marrocos,-22.96849822998047,-43.18267440795898,REJECT,residential apartment building
+overture:Edf. Vendome:-22.96911:-43.20498,Edf. Vendome,-22.96910858154297,-43.20497512817383,REJECT,residential apartment building
+overture:Edficio Curupaiti:-22.89957:-43.29123,Edficio Curupaiti,-22.899566650390625,-43.29122924804688,REJECT,residential apartment building
+overture:Elevato Bonsucesso:-22.86728:-43.27173,Elevato Bonsucesso,-22.86727523803711,-43.271732330322266,UNCERTAIN,"possibly overpass or building, unclear"
+overture:Em Bangu:-22.87271:-43.48127,Em Bangu,-22.87270736694336,-43.48126983642578,REJECT,nonsensical generic fragment
+overture:Empreendimento Del Monte Club and Houses:-22.92801:-43.33632,Empreendimento Del Monte Club and Houses,-22.92800521850586,-43.3363151550293,REJECT,real-estate development
+overture:Empreendimento Rossi Libertá Resort:-22.99968:-43.41684,Empreendimento Rossi Libertá Resort,-22.999683380126957,-43.41684341430664,REJECT,real-estate development
+overture:Engenho Da Rainha:-22.87232:-43.29607,Engenho Da Rainha,-22.8723201751709,-43.29606628417969,UNCERTAIN,historic sugar mill site or bare neighborhood name
+overture:Enjoy:-23.01076:-43.47143,Enjoy,-23.01075553894043,-43.47143173217773,REJECT,bare generic word/business
+overture:Equipe Leandro Galvão:-23.03112:-43.47206,Equipe Leandro Galvão,-23.03112030029297,-43.4720573425293,REJECT,real-estate agent team business
+overture:Escada de Acesso ao Morro da Conceicao:-22.89747:-43.18117,Escada de Acesso ao Morro da Conceicao,-22.897470474243164,-43.18117141723633,KEEP,named historic stairway landmark
+overture:Escadaria da Marechal Mascarenhas de Morais:-22.96413:-43.18336,Escadaria da Marechal Mascarenhas de Morais,-22.964126586914062,-43.1833610534668,KEEP,named public stairway landmark
+overture:Espacio Laguna:-22.98442:-43.38487,Espacio Laguna,-22.98441696166992,-43.38486862182617,REJECT,real-estate development branding
+overture:Espaço Gourmet da Família Gato:-22.77786:-43.35073,Espaço Gourmet da Família Gato,-22.77786064147949,-43.350730895996094,REJECT,personal/business name
+overture:Espaço São Clemente:-22.94971:-43.18829,Espaço São Clemente,-22.94971466064453,-43.18829345703125,KEEP,"cultural/event space, plausible landmark"
+overture:Especialista Imobiliário:-22.80225:-43.35767,Especialista Imobiliário,-22.8022518157959,-43.35767364501953,REJECT,real-estate agent business
+overture:Espigao do Méier:-22.90310:-43.28281,Espigao do Méier,-22.90310478210449,-43.28281021118164,KEEP,notable tall building landmark nickname
+overture:Esqueleto Hotel Panorama:-22.85466:-43.39014,Esqueleto Hotel Panorama,-22.854660034179688,-43.39013671875,KEEP,"notable structure/ruin, plausible landmark"
+overture:Esquina com Raul Pompeia:-22.98209:-43.19227,Esquina com Raul Pompeia,-22.982086181640625,-43.19226837158203,REJECT,"street-corner reference, no distinct site"
+overture:Essence Condominium:-22.97617:-43.37387,Essence Condominium,-22.976167678833008,-43.373870849609375,REJECT,condo branding
+overture:Estação Flamengo:-22.93409:-43.17604,Estação Flamengo,-22.9340934753418,-43.17604064941406,UNCERTAIN,unclear if real station/site
+overture:Estação Jardim de Alah:-22.99250:-43.25499,Estação Jardim de Alah,-22.99250030517578,-43.2549934387207,UNCERTAIN,unclear if real station/site
+overture:Estação Teleférica:-22.86741:-43.25516,Estação Teleférica,-22.867412567138672,-43.255157470703125,KEEP,"cable car station, notable public landmark"
+overture:Estação Zona Norte Londres:-22.81190:-43.36744,Estação Zona Norte Londres,-22.81190490722656,-43.367435455322266,REJECT,real-estate development branding
+overture:Estr. Do Morgado - Vargem Grande:-22.99248:-43.50927,Estr. Do Morgado - Vargem Grande,-22.992481231689453,-43.509273529052734,REJECT,street/address only
+overture:Estrada Santa Maria:-22.88056:-43.58055,Estrada Santa Maria,-22.880563735961918,-43.5805549621582,REJECT,street name only
+"overture:Estrada do Tijuaçu, Alto da Boa Vista:-22.97128:-43.28493","Estrada do Tijuaçu, Alto da Boa Vista",-22.971281051635746,-43.28492736816406,REJECT,street/address only
+overture:Estrada do capenha 1130:-22.93289:-43.34952,Estrada do capenha 1130,-22.93289375305176,-43.34952163696289,REJECT,street address with number
+overture:Estrada do colégio 77:-22.83863:-43.33469,Estrada do colégio 77,-22.8386344909668,-43.334693908691406,REJECT,street address with number
+overture:Estrada do rio grande:-22.92309:-43.37437,Estrada do rio grande,-22.923093795776367,-43.37437057495117,REJECT,street name only
+overture:Estrelas Full Condominium:-22.96902:-43.39185,Estrelas Full Condominium,-22.96902084350586,-43.391849517822266,REJECT,condo branding
+overture:Euzébio Flamengo:-22.93734:-43.17529,Euzébio Flamengo,-22.937339782714844,-43.175289154052734,UNCERTAIN,"possibly bar/business, unclear"
+overture:Evidence Península:-22.99100:-43.35051,Evidence Península,-22.991003036499023,-43.35050582885742,REJECT,real-estate development branding
+overture:Ex-Combatentes:-22.88534:-43.25185,Ex-Combatentes,-22.88534164428711,-43.25185012817383,UNCERTAIN,possibly veterans monument or housing complex
+overture:Exclusive Noronha:-22.89403:-43.09972,Exclusive Noronha,-22.894025802612305,-43.0997200012207,REJECT,condo/real-estate branding
+overture:Explana Barra Bali:-23.00932:-43.43726,Explana Barra Bali,-23.009323120117188,-43.43726348876953,REJECT,real-estate development branding
+overture:Fabux's House:-22.91601:-43.22738,Fabux's House,-22.91600608825684,-43.22737884521485,REJECT,personal home nickname
+overture:Facile:-22.93683:-43.37168,Facile,-22.93682861328125,-43.371681213378906,REJECT,bare generic business name
+overture:Favela da Barão:-22.89976:-43.35134,Favela da Barão,-22.899763107299805,-43.351341247558594,UNCERTAIN,possibly a named informal settlement
+overture:Favelão:-22.97990:-43.21918,Favelão,-22.979900360107425,-43.219181060791016,REJECT,generic non-proper term
+overture:Fazenda Atlântica:-22.89548:-43.57759,Fazenda Atlântica,-22.895477294921875,-43.57758712768555,UNCERTAIN,possibly historic farm or condo branding
+overture:Fazenda Imperial de Santa Cruz:-22.91000:-43.68531,Fazenda Imperial de Santa Cruz,-22.91000366210937,-43.685306549072266,KEEP,historic imperial fazenda site
+overture:Filomena nunes:-22.84080:-43.26330,Filomena nunes,-22.840803146362305,-43.26329803466797,REJECT,personal name artifact
+overture:First Humaitá:-22.95315:-43.19634,First Humaitá,-22.953147888183597,-43.19634246826172,REJECT,real-estate development branding
+overture:Five Lagoa:-22.96561:-43.20211,Five Lagoa,-22.96561050415039,-43.20211410522461,REJECT,real-estate development branding
+overture:Floratta di Carmem:-22.90513:-43.10519,Floratta di Carmem,-22.905128479003903,-43.10518646240234,REJECT,condo/business branding
+overture:Flyinguru:-22.99047:-43.25215,Flyinguru,-22.99047088623047,-43.25215148925781,REJECT,business (paragliding/flight tour company)
+overture:Focus Tijuca:-22.91657:-43.22101,Focus Tijuca,-22.91657066345215,-43.22100830078125,REJECT,condo/development branding
+overture:Font Vieille:-22.98942:-43.35288,Font Vieille,-22.989416122436523,-43.35288238525391,REJECT,condo with French aspirational name
+overture:Fonte Wallace:-22.96992:-43.22438,Fonte Wallace,-22.969919204711918,-43.22438049316406,KEEP,real historic Wallace fountain in Tijuca Forest
+overture:Fort Copacabana:-22.98618:-43.18653,Fort Copacabana,-22.986177444458008,-43.1865348815918,KEEP,"Forte de Copacabana, genuine historic fort"
+"overture:Fortaleza De Sao João, Urca:-22.83379:-43.31466","Fortaleza De Sao João, Urca",-22.83379173278809,-43.31465911865234,KEEP,genuine historic fort in Urca
+overture:Forte de Boa Viagem:-22.90933:-43.13053,Forte de Boa Viagem,-22.909330368041992,-43.13053131103516,KEEP,genuine historic fort in Niterói
+overture:Foz do iguassu:-22.97759:-43.18835,Foz do iguassu,-22.97758674621582,-43.18835067749024,REJECT,"central Rio coords, clearly a business misnamed after Iguazu Falls"
+overture:Fra Angelico:-22.90217:-43.11372,Fra Angelico,-22.902172088623047,-43.11371612548828,REJECT,likely a street name
+overture:Francico Otaviano:-22.98661:-43.18995,Francico Otaviano,-22.98661422729492,-43.18994522094727,REJECT,street name
+overture:Freedom - Barra da Tijuca:-22.96791:-43.39371,Freedom - Barra da Tijuca,-22.967905044555664,-43.39371490478516,REJECT,condo branding
+overture:Freedom freguesia:-22.93663:-43.32677,Freedom freguesia,-22.93663024902344,-43.32676696777344,REJECT,condo branding
+overture:Freguesia Tower:-22.94416:-43.33577,Freguesia Tower,-22.94415664672852,-43.33576583862305,REJECT,condo tower branding
+"overture:Frei Luiz Alevato, 356:-22.93551:-43.36801","Frei Luiz Alevato, 356",-22.93550682067871,-43.368011474609375,REJECT,street address with number
+overture:Frequesia:-22.93432:-43.33594,Frequesia,-22.934324264526367,-43.3359375,REJECT,bare (misspelled) neighborhood name
+overture:Front Park:-22.93595:-43.57049,Front Park,-22.93595123291016,-43.57048797607422,REJECT,condo branding
+overture:FrontLake Barra:-22.97269:-43.38174,FrontLake Barra,-22.97269058227539,-43.38174057006836,REJECT,condo branding
+overture:Furnas da Tijuca:-22.97455:-43.28665,Furnas da Tijuca,-22.974552154541016,-43.28664779663086,KEEP,real natural rock formation/cave feature in Tijuca Forest
+"overture:Furquim Mendes, Noroeste City:-22.80587:-43.31545","Furquim Mendes, Noroeste City",-22.80587387084961,-43.3154525756836,REJECT,street plus development name
+overture:G.S.A - Guerreiros da Selva Airsoft:-22.94821:-43.25867,G.S.A - Guerreiros da Selva Airsoft,-22.948213577270508,-43.258670806884766,REJECT,airsoft business
+overture:GOD of WAR:-22.86799:-43.36494,GOD of WAR,-22.86799049377441,-43.36494064331055,REJECT,nonsensical/business name reference
+overture:GRAN Reserva Metropolitano:-22.95062:-43.38103,GRAN Reserva Metropolitano,-22.95062065124512,-43.38103485107422,REJECT,condo branding
+overture:Gabinete Real:-22.90527:-43.17251,Gabinete Real,-22.9052734375,-43.17251205444336,UNCERTAIN,"possibly refers to famous Real Gabinete Português de Leitura, coords slightly off"
+overture:Galeria San James:-22.96511:-43.18020,Galeria San James,-22.96510505676269,-43.1801986694336,REJECT,"shopping gallery, business"
+overture:Galeão:-22.81166:-43.22783,Galeão,-22.81166076660156,-43.22782516479492,UNCERTAIN,"historic area name but primarily known as airport, no clear building"
+overture:Garden Park:-22.92684:-43.25743,Garden Park,-22.926841735839844,-43.25742721557617,REJECT,condo branding
+overture:Garden Party:-22.90849:-43.37861,Garden Party,-22.908491134643555,-43.37860870361328,REJECT,business/event venue
+overture:Gardênia Azul:-22.94447:-43.36118,Gardênia Azul,-22.94447326660156,-43.36118316650391,REJECT,bare neighborhood name
+overture:Garganta do Grumari:-23.04844:-43.54990,Garganta do Grumari,-23.04844093322754,-43.549896240234375,KEEP,real natural gorge/valley feature near Grumari
+overture:Gauguin:-22.98996:-43.35099,Gauguin,-22.989959716796875,-43.35099029541016,REJECT,likely street name (artist name)
+overture:Gellegöç Tarihi Mekan:-22.92456:-43.23196,Gellegöç Tarihi Mekan,-22.924562454223636,-43.23196029663086,REJECT,Turkish Wikidata label artifact
+overture:General José de San Martín:-22.97543:-43.19789,General José de San Martín,-22.97542953491211,-43.19789123535156,UNCERTAIN,could be street or monument/statue honoring San Martín
+overture:Giardini Di Milano:-23.01114:-43.47327,Giardini Di Milano,-23.011137008666992,-43.47327423095703,REJECT,condo with Italian aspirational name
+overture:Glaucia:-22.75711:-43.35485,Glaucia,-22.757110595703125,-43.35485076904297,REJECT,bare personal name
+overture:Global Park:-22.96376:-43.40176,Global Park,-22.963756561279297,-43.40176010131836,REJECT,condo branding
+overture:Gokano:-22.91425:-43.42099,Gokano,-22.91425323486328,-43.42098617553711,REJECT,likely business name
+overture:Golden Garden:-22.94831:-43.18967,Golden Garden,-22.94830703735352,-43.18966674804688,REJECT,condo branding
+overture:Gragoatá Bay:-22.90107:-43.13302,Gragoatá Bay,-22.901065826416016,-43.13302230834961,KEEP,real bay/beach area in Niterói
+overture:Grand Araguaia:-22.93451:-43.33512,Grand Araguaia,-22.93450736999512,-43.33512115478516,REJECT,condo branding
+overture:Grand Life Icaraí:-22.89676:-43.11200,Grand Life Icaraí,-22.896759033203125,-43.112003326416016,REJECT,condo branding
+overture:Grand Reserva - Campo Grande:-22.88345:-43.60942,Grand Reserva - Campo Grande,-22.883453369140625,-43.60942077636719,REJECT,condo branding
+overture:Grand Village Freguesia:-22.94483:-43.33506,Grand Village Freguesia,-22.94483184814453,-43.33506393432617,REJECT,condo branding (matches example)
+overture:Grande Miquelon:-22.85801:-43.48740,Grande Miquelon,-22.85801315307617,-43.487396240234375,REJECT,foreign-sounding condo name
+overture:Gravata:-22.86729:-43.37304,Gravata,-22.86728858947754,-43.373043060302734,REJECT,bare common word
+overture:Green Life - Niterói - GF Consultoria:-22.88470:-43.11802,Green Life - Niterói - GF Consultoria,-22.88470268249512,-43.11801528930664,REJECT,real-estate consultancy business
+overture:Green Ocean:-22.98488:-43.21848,Green Ocean,-22.98487663269043,-43.218482971191406,REJECT,condo branding
+overture:Green Tijuca:-22.92601:-43.24156,Green Tijuca,-22.926013946533203,-43.24156188964844,REJECT,condo branding
+overture:Gruta Karl Glasl:-22.96879:-43.22527,Gruta Karl Glasl,-22.968788146972656,-43.22527313232422,KEEP,real named grotto in Tijuca Forest
+overture:HO 200:-22.96454:-43.19302,HO 200,-22.964540481567383,-43.19302368164063,REJECT,nonsensical code/address
+overture:Hadock Lobo esquina com Matoso:-22.91561:-43.20840,Hadock Lobo esquina com Matoso,-22.91561317443848,-43.20839691162109,REJECT,street corner description
+overture:Helô Mozak:-22.98236:-43.20657,Helô Mozak,-22.982357025146484,-43.206573486328125,REJECT,personal name
+overture:Henri Matisse:-23.01851:-43.46314,Henri Matisse,-23.01850891113281,-43.46314239501953,REJECT,likely street name (artist name)
+overture:Hilton Fly Rio:-22.99916:-43.26192,Hilton Fly Rio,-22.999156951904297,-43.26191711425781,REJECT,business (hotel/flight service)
+overture:Hipermercado Extra Vila da Penha:-22.88418:-43.28102,Hipermercado Extra Vila da Penha,-22.884180068969727,-43.28102111816406,REJECT,supermarket business
+overture:Home Rio:-22.98293:-43.21679,Home Rio,-22.982933044433597,-43.21678924560547,REJECT,business (likely real estate)
+overture:Home Sweet Home:-22.93146:-43.63520,Home Sweet Home,-22.931459426879883,-43.635196685791016,REJECT,generic personal home nickname
+overture:Hub Co-Living:-22.91266:-43.17767,Hub Co-Living,-22.91266250610352,-43.17766571044922,REJECT,co-living business
+overture:Humaitá Garden Lagoinha:-22.81717:-43.61234,Humaitá Garden Lagoinha,-22.81716537475586,-43.612342834472656,REJECT,condo branding
+overture:Hydra Clube de Morar:-22.91562:-43.22289,Hydra Clube de Morar,-22.91561889648437,-43.22289276123047,REJECT,"condo branding (""clube de morar"")"
+overture:IAPC de Irajá:-22.82360:-43.33290,IAPC de Irajá,-22.823604583740234,-43.33290481567383,REJECT,public housing institute complex
+overture:IAPI de Del Castilho:-22.87614:-43.27034,IAPI de Del Castilho,-22.87613677978516,-43.27033996582031,REJECT,public housing institute complex
+overture:INPS:-22.78862:-43.18530,INPS,-22.78862190246582,-43.18529510498047,REJECT,government institute acronym
+overture:Ibrahim Sued Statue:-22.96881:-43.18029,Ibrahim Sued Statue,-22.968812942504883,-43.1802864074707,KEEP,real monument/statue in Ipanema
+overture:Icarai' Golden Style:-22.90644:-43.10331,Icarai' Golden Style,-22.90644073486328,-43.10330581665039,REJECT,condo branding
+overture:Icaraí Privillege:-22.90791:-43.10331,Icaraí Privillege,-22.90791130065918,-43.103309631347656,REJECT,condo branding
+overture:Ideal Village Condominium Rossi Guandu Sape:-22.87751:-43.56142,Ideal Village Condominium Rossi Guandu Sape,-22.87750816345215,-43.56141662597656,REJECT,explicitly named condominium
+overture:Igarapava 53:-22.98689:-43.23111,Igarapava 53,-22.986888885498047,-43.23111343383789,REJECT,street address with number
+overture:Ilha Da Trindade:-22.86453:-43.30235,Ilha Da Trindade,-22.86453437805176,-43.302345275878906,UNCERTAIN,inland coords don't match famous island; unclear local feature
+"overture:Ilha Das Flores - São Gonçalo, RJ:-22.85003:-43.10205","Ilha Das Flores - São Gonçalo, RJ",-22.85003089904785,-43.102046966552734,KEEP,real historic island in Guanabara Bay
+overture:Ilha Pura:-22.98293:-43.41184,Ilha Pura,-22.982933044433597,-43.411842346191406,REJECT,Olympic Village residential development branding
+overture:Ilha Pura Barra da Tijuca:-22.98310:-43.40995,Ilha Pura Barra da Tijuca,-22.98309898376465,-43.409950256347656,REJECT,Olympic Village residential development branding
+overture:Ilha Terceira:-22.76102:-43.45680,Ilha Terceira,-22.761016845703125,-43.4567985534668,REJECT,foreign-sounding condo/development name (Azores island)
+"overture:Ilha das Palmas (ö i Brasilien, Rio de Janeiro, lat -23,06, long -43,51):-23.06284:-43.51153","Ilha das Palmas (ö i Brasilien, Rio de Janeiro, lat -23,06, long -43,51)",-23.062843322753903,-43.511531829833984,REJECT,Swedish Wikidata label artifact
+overture:Iluminato Botafogo:-22.94650:-43.18903,Iluminato Botafogo,-22.946502685546875,-43.18903350830078,REJECT,condo branding
+overture:In Rio Das Pedras Jacarepaguá-RJ:-22.97387:-43.33502,In Rio Das Pedras Jacarepaguá-RJ,-22.97387313842773,-43.33502197265625,REJECT,address/neighborhood descriptor
+overture:Ingá Offices:-22.90306:-43.12400,Ingá Offices,-22.903057098388672,-43.12400436401367,REJECT,office building business
+overture:Inhauma Prev:-22.86481:-43.30141,Inhauma Prev,-22.86480712890625,-43.301414489746094,REJECT,insurance/pension business
+overture:Inovar Predial:-22.89334:-43.12107,Inovar Predial,-22.89334297180176,-43.12107467651367,REJECT,property management business
+overture:Instituto vida real:-22.85596:-43.24673,Instituto vida real,-22.85596466064453,-43.246726989746094,REJECT,institute/business name
+overture:Interlagos Quality:-22.99723:-43.41932,Interlagos Quality,-22.997228622436523,-43.4193229675293,REJECT,condo branding
+overture:Ipanema Copa Posto 6:-22.98404:-43.19390,Ipanema Copa Posto 6,-22.98403549194336,-43.19390106201172,UNCERTAIN,iconic beach lifeguard post but borderline commercial kiosk
+overture:Ipanema Tower:-22.98507:-43.20623,Ipanema Tower,-22.985071182250977,-43.20623397827149,REJECT,condo branding
+overture:Ipiranga:-22.80612:-43.56368,Ipiranga,-22.806116104125977,-43.56367874145508,REJECT,generic/bare place-echo name
+overture:Iraja 1158:-22.83207:-43.32780,Iraja 1158,-22.832069396972656,-43.32780456542969,REJECT,street address with number
+overture:Irmandade do Corte:-22.78434:-43.37456,Irmandade do Corte,-22.78434181213379,-43.37456130981445,UNCERTAIN,"possible religious/social brotherhood institution, unclear"
+overture:Island Personal Office:-23.00270:-43.33815,Island Personal Office,-23.002700805664062,-43.33815383911133,REJECT,office business
+overture:Itabirito (Urubu):-22.88047:-43.30432,Itabirito (Urubu),-22.88047218322754,-43.304317474365234,UNCERTAIN,possibly refers to a named hill (Morro do Urubu)
+overture:Itanhaga:-22.98646:-43.30999,Itanhaga,-22.986461639404297,-43.30999374389648,KEEP,"likely refers to Morro do Itanhangá, notable Rio mountain"
+overture:Itaperu:-22.92243:-43.19656,Itaperu,-22.922426223754883,-43.19655990600586,UNCERTAIN,"bare name, unclear if real site"
+overture:Jacare na Praça da Concórdia:-22.88461:-43.25657,Jacare na Praça da Concórdia,-22.884605407714844,-43.25656509399414,KEEP,known local curiosity (caimans in Praça da Concórdia pond)
+"overture:Jacarezinho, Largo dos Tubas, RJ:-22.88460:-43.25634","Jacarezinho, Largo dos Tubas, RJ",-22.88459587097168,-43.256343841552734,REJECT,address/neighborhood descriptor
+overture:Jagoroaba:-22.87895:-43.37103,Jagoroaba,-22.878950119018555,-43.37102508544922,REJECT,garbled/nonsensical word
+overture:Jamaica City:-22.90862:-43.29959,Jamaica City,-22.908618927001957,-43.299591064453125,REJECT,condo branding
+overture:Jambalaya Resort Beach:-22.83170:-43.35023,Jambalaya Resort Beach,-22.831697463989254,-43.3502311706543,REJECT,resort business
+overture:Jardim América - RJ:-22.81300:-43.32284,Jardim América - RJ,-22.813003540039062,-43.32284164428711,REJECT,bare neighborhood name with RJ suffix
+overture:Jardim Garrido:-22.98656:-43.63271,Jardim Garrido,-22.986560821533203,-43.63270950317383,REJECT,neighborhood/development name
+overture:Jardim Icaraí:-22.90350:-43.10184,Jardim Icaraí,-22.90350341796875,-43.10184097290039,REJECT,bare neighborhood name
+overture:Jardim Meriti:-22.77754:-43.37281,Jardim Meriti,-22.77754020690918,-43.37281036376953,REJECT,bare neighborhood name
+overture:Jardim Paris:-22.91352:-43.10090,Jardim Paris,-22.913516998291016,-43.10089874267578,REJECT,condo with foreign aspirational name
+overture:Jardim Sao Joao:-22.89155:-43.12144,Jardim Sao Joao,-22.891550064086918,-43.12144088745117,REJECT,neighborhood/development name
+overture:Jardim bangu:-22.84579:-43.46563,Jardim bangu,-22.84579086303711,-43.46562576293945,REJECT,bare neighborhood name
+overture:Jardim carioca:-22.80219:-43.19761,Jardim carioca,-22.80219078063965,-43.19761276245117,REJECT,bare neighborhood name
+overture:Jardim de Alah:-22.98355:-43.21624,Jardim de Alah,-22.98354721069336,-43.21623611450195,KEEP,"real named park (Jardim de Alá canal park, Ipanema/Leblon)"
+overture:Jardim do Alto Estilo e Serviços:-23.02221:-43.48677,Jardim do Alto Estilo e Serviços,-23.02220726013184,-43.48677444458008,REJECT,services business
+overture:Jardim do Itanhanga:-22.99436:-43.30129,Jardim do Itanhanga,-22.99436378479004,-43.30128860473633,REJECT,generic neighborhood name
+overture:Jardim do Méier:-22.90014:-43.27857,Jardim do Méier,-22.90013694763184,-43.27857208251953,REJECT,bare neighborhood name
+overture:Jardim dos Lírios I:-22.95060:-43.64236,Jardim dos Lírios I,-22.950603485107425,-43.64236068725586,REJECT,numbered development/condo name
+overture:Jardins de Maria:-23.00434:-43.44324,Jardins de Maria,-23.004337310791016,-43.4432373046875,REJECT,condo/development branding
+overture:Jequitiba 1:-22.97375:-43.23091,Jequitiba 1,-22.973745346069336,-43.23091125488281,REJECT,street/building number
+overture:Jhessy Unhas:-22.80072:-43.39761,Jhessy Unhas,-22.80072021484375,-43.397605895996094,REJECT,nail salon business
+overture:Jn Marcenaria/ moves planejados:-22.91131:-43.27783,Jn Marcenaria/ moves planejados,-22.91131401062012,-43.27783203125,REJECT,carpentry business
+overture:Jorginhos Rooftop:-22.79469:-43.29240,Jorginhos Rooftop,-22.7946891784668,-43.29239654541016,REJECT,rooftop bar/restaurant business
+overture:José Vicente:-22.91956:-43.25730,José Vicente,-22.91955947875977,-43.25729751586914,REJECT,"personal name, likely street"
+overture:Julho de castilho lote 1:-22.78424:-43.39558,Julho de castilho lote 1,-22.784238815307617,-43.39558029174805,REJECT,address/lot
+overture:Junqueira freire:-22.89496:-43.28695,Junqueira freire,-22.89495658874512,-43.28694915771485,REJECT,street name
+overture:Jóia do Campo:-22.91367:-43.54754,Jóia do Campo,-22.91366577148437,-43.54754257202149,REJECT,development/business branding
+overture:Ki Delícia:-22.83664:-43.41048,Ki Delícia,-22.83664321899414,-43.41048431396485,REJECT,food business
+overture:L'unité Araguaia:-22.93446:-43.33447,L'unité Araguaia,-22.93446350097656,-43.33447265625,REJECT,condo with French aspirational name
+overture:L_O_V_E:-22.91398:-43.27253,L_O_V_E,-22.91398429870605,-43.27253341674805,REJECT,nonsensical text
+overture:La Plagne:-22.98682:-43.22544,La Plagne,-22.986818313598636,-43.22544097900391,REJECT,condo with French ski-resort aspirational name
+overture:Lac Premier:-23.00531:-43.37182,Lac Premier,-23.005313873291016,-43.37181854248047,REJECT,condo with French aspirational name
+overture:Ladeira Dos Tabajaras:-22.96518:-43.18890,Ladeira Dos Tabajaras,-22.96517944335937,-43.18889999389648,UNCERTAIN,"notable sloped street/staircase art site, possibly a real landmark"
+overture:Ladeira do Castro:-22.91880:-43.18596,Ladeira do Castro,-22.918798446655277,-43.18596267700195,REJECT,"street-type entry, no distinct site"
+overture:Lagoa Bella:-22.97755:-43.19729,Lagoa Bella,-22.97754669189453,-43.1972885131836,REJECT,condo with Italian aspirational name
+overture:Laguna di Mare:-22.98325:-43.38233,Laguna di Mare,-22.983253479003903,-43.38232803344727,REJECT,condo with Italian aspirational name
+overture:Laje dos Balbinot:-22.93861:-43.33563,Laje dos Balbinot,-22.938608169555664,-43.33562850952149,UNCERTAIN,"possibly a named rooftop viewpoint, unclear"
+overture:Lajão:-22.93304:-43.33454,Lajão,-22.93304443359375,-43.33453750610352,REJECT,"vague generic term, no distinct name"
+overture:Lake Buena Vista condo:-23.00736:-43.32239,Lake Buena Vista condo,-23.007362365722656,-43.3223876953125,REJECT,explicitly named condo
+overture:Lanna Kingdom:-22.97242:-43.20816,Lanna Kingdom,-22.972421646118164,-43.20816421508789,REJECT,restaurant business (Thai-themed)
+overture:Lapa de Irajá:-22.81827:-43.33324,Lapa de Irajá,-22.818267822265625,-43.33324432373047,UNCERTAIN,"possible local cave/area name, unclear"
+overture:Lar Cida:-23.02273:-43.48835,Lar Cida,-23.02273368835449,-43.48834609985352,REJECT,personal home nickname
+overture:Lar de David Farias:-22.76134:-43.45889,Lar de David Farias,-22.761335372924805,-43.45888900756836,REJECT,personal home nickname
+overture:Largo Alexandre Herculano:-22.90582:-43.18209,Largo Alexandre Herculano,-22.90581512451172,-43.18209457397461,UNCERTAIN,"named plaza, unclear historic significance"
+overture:Largo Da Capela 601:-22.91644:-43.41497,Largo Da Capela 601,-22.916439056396484,-43.41497039794922,REJECT,"numbered address, not a plaza"
+overture:Largo Do Remi:-22.92876:-43.39281,Largo Do Remi,-22.92876434326172,-43.3928108215332,UNCERTAIN,"named plaza, unclear historic significance"
+overture:Largo Grimmauld n12:-22.82692:-43.33213,Largo Grimmauld n12,-22.82691764831543,-43.33213424682617,REJECT,"Harry Potter reference, joke/fictional name"
+overture:Largo de Itararé:-22.85652:-43.26671,Largo de Itararé,-22.85651588439941,-43.26670837402344,UNCERTAIN,"named plaza, unclear historic significance"
+overture:Largo do Machado Station:-22.93090:-43.17831,Largo do Machado Station,-22.93090057373047,-43.17830657958984,KEEP,well-known historic square/metro station in Rio
+overture:Largo dos Palácios:-22.95124:-43.19397,Largo dos Palácios,-22.95124244689941,-43.193965911865234,UNCERTAIN,"named plaza possibly near a palace, unclear"
+overture:Lazuli Niterói:-22.90762:-43.12971,Lazuli Niterói,-22.907617568969727,-43.12971496582031,REJECT,condo branding
+overture:Le Grand Miguel Couto:-22.90065:-43.10344,Le Grand Miguel Couto,-22.90064811706543,-43.10343933105469,REJECT,condo with French aspirational name
+overture:Leblon InFoco:-22.98561:-43.21802,Leblon InFoco,-22.985605239868164,-43.218021392822266,REJECT,business (media/photography)
+overture:Leme:-22.96347:-43.17352,Leme,-22.96346664428711,-43.17352294921875,REJECT,bare neighborhood name
+overture:Lenda:-22.90191:-43.12604,Lenda,-22.90190696716309,-43.12604141235352,REJECT,generic single word
+overture:Leopoldina Minas Gerais:-22.88116:-43.47554,Leopoldina Minas Gerais,-22.881160736083984,-43.47553634643555,REJECT,generic/unclear name
+overture:Lesboland:-22.93107:-43.23859,Lesboland,-22.93107032775879,-43.23859024047852,REJECT,nonsensical/joke business name
+overture:Life Resort Club Campo Grande:-22.92544:-43.55204,Life Resort Club Campo Grande,-22.92543601989746,-43.55203628540039,REJECT,resort/condo branding
+overture:Like Barra da Tijuca:-22.96327:-43.39149,Like Barra da Tijuca,-22.963266372680664,-43.39149475097656,REJECT,condo branding
+overture:Living Wish Norte:-22.88770:-43.28107,Living Wish Norte,-22.887704849243164,-43.28106689453125,REJECT,condo branding
+overture:Lobie Vilares:-22.96494:-43.19118,Lobie Vilares,-22.96494483947754,-43.19118118286133,REJECT,likely building/lobby name
+overture:Loompalândia:-22.85296:-43.39091,Loompalândia,-22.85296058654785,-43.390907287597656,REJECT,fantastical business/venue name
+overture:Lopes House:-22.93281:-43.35268,Lopes House,-22.932809829711918,-43.352684020996094,REJECT,real-estate brand business
+overture:Lote 7:-22.81714:-43.37663,Lote 7,-22.817140579223636,-43.37662506103516,REJECT,lot number address
+overture:Loteamento Belford Roxo:-22.75527:-43.39981,Loteamento Belford Roxo,-22.755273818969727,-43.399810791015625,REJECT,housing subdivision development
+overture:Loteamento Monte Líbano:-22.87921:-43.59513,Loteamento Monte Líbano,-22.879207611083984,-43.59512710571289,REJECT,housing subdivision development
+overture:Luar do Pontal:-23.02325:-43.51294,Luar do Pontal,-23.023250579833984,-43.512939453125,REJECT,likely business/development name
+overture:Luau do Recreio:-23.02250:-43.49001,Luau do Recreio,-23.022499084472656,-43.49000549316406,REJECT,event venue business
+overture:Luggo Mauá:-22.89873:-43.18116,Luggo Mauá,-22.898725509643555,-43.1811637878418,REJECT,rental apartment brand
+overture:Lumina Rio:-22.89524:-43.18774,Lumina Rio,-22.895238876342773,-43.18774032592773,REJECT,condo branding
+overture:Luperce Miranda Vista Alegre:-22.82672:-43.32290,Luperce Miranda Vista Alegre,-22.826719284057617,-43.32290267944336,REJECT,street name plus neighborhood
+overture:MRV Riviera Tropical:-22.88466:-43.62514,MRV Riviera Tropical,-22.88465881347656,-43.62513732910156,REJECT,condo (MRV developer brand)
+overture:Maayan - Barra Da Tijuca:-22.96699:-43.38653,Maayan - Barra Da Tijuca,-22.966991424560547,-43.38652801513672,REJECT,likely business name
+overture:Madureira rj:-22.87849:-43.33908,Madureira rj,-22.87848663330078,-43.33908081054688,REJECT,bare neighborhood name
+overture:Maggiore Residenziale - Sacisa:-22.89429:-43.27417,Maggiore Residenziale - Sacisa,-22.894285202026367,-43.274169921875,REJECT,"condo explicitly ""Residenziale"""
+overture:Mais + Recanto da Taquara - ROSSI:-22.91913:-43.36464,Mais + Recanto da Taquara - ROSSI,-22.919132232666016,-43.3646354675293,REJECT,condo (Rossi developer brand)
+overture:Maison Merlot:-22.93153:-43.36216,Maison Merlot,-22.93152618408203,-43.36215591430664,REJECT,condo with French aspirational name
+overture:Maison Paradis:-23.02509:-43.48920,Maison Paradis,-23.025087356567383,-43.48919677734375,REJECT,condo with French aspirational name
+overture:Maison Saint Marcelin:-22.95956:-43.20195,Maison Saint Marcelin,-22.95956420898437,-43.20194625854492,REJECT,condo with French aspirational name
+overture:Maison du Soleil:-22.90478:-43.28212,Maison du Soleil,-22.90477561950684,-43.28212356567383,REJECT,condo with French aspirational name
+overture:Majestic Cyrela:-22.96508:-43.38644,Majestic Cyrela,-22.96508407592773,-43.38643646240234,REJECT,condo (Cyrela developer brand)
+overture:Majesty:-22.93172:-43.33347,Majesty,-22.931724548339844,-43.333473205566406,REJECT,generic condo branding
+overture:Maluco 22:-22.98865:-43.24904,Maluco 22,-22.98865127563477,-43.24904251098633,REJECT,nonsensical bar-type name
+overture:Mandarim Península Barra:-22.99051:-43.35168,Mandarim Península Barra,-22.99051094055176,-43.35167694091797,REJECT,condo/residential development marketing name
+overture:Mangueira (cidade do Rio de Janeiro):-22.90389:-43.23695,Mangueira (cidade do Rio de Janeiro),-22.903892517089844,-43.23694610595703,REJECT,bare neighborhood name wikidata artifact
+overture:Mangueiral:-22.88504:-43.42033,Mangueiral,-22.88504219055176,-43.42033004760742,REJECT,residential complex name
+overture:Manoel Leitao:-22.91894:-43.21540,Manoel Leitao,-22.918943405151367,-43.21539688110352,UNCERTAIN,unclear if street or distinct site
+overture:Mansão Bitcoin:-23.03401:-43.48861,Mansão Bitcoin,-23.03400993347168,-43.48860549926758,REJECT,joke/nickname house name
+overture:Mansão Boa Vista:-22.96005:-43.27124,Mansão Boa Vista,-22.960054397583008,-43.27123641967773,UNCERTAIN,"possible historic estate, unverified"
+overture:Mansão Marins:-22.81730:-43.31696,Mansão Marins,-22.81729507446289,-43.31695938110352,REJECT,surname-based private house nickname
+overture:Mansão Ross:-22.97429:-43.33310,Mansão Ross,-22.974294662475582,-43.333099365234375,REJECT,surname-based private house nickname
+overture:Mansão de Pedra Guedes:-22.83639:-43.31983,Mansão de Pedra Guedes,-22.836389541625977,-43.31982803344727,UNCERTAIN,"possible historic stone mansion, unverified"
+overture:Mansão dos Cordeiros:-22.85305:-43.46699,Mansão dos Cordeiros,-22.853050231933597,-43.46698760986328,REJECT,surname-based private house nickname
+overture:Mansão dos Dantas:-22.91940:-43.35192,Mansão dos Dantas,-22.919395446777344,-43.35192108154297,REJECT,surname-based private house nickname
+overture:Mansão dos Fernandes:-22.81064:-43.31493,Mansão dos Fernandes,-22.810644149780277,-43.31493377685547,REJECT,surname-based private house nickname
+overture:Mansão dos Kaulino's:-22.81204:-43.20627,Mansão dos Kaulino's,-22.81204032897949,-43.20626831054688,REJECT,surname-based private house nickname
+overture:Mansões da Prata:-22.91487:-43.51844,Mansões da Prata,-22.914871215820312,-43.518436431884766,REJECT,residential condo marketing name
+overture:Mar de Ibiza:-22.90161:-43.10190,Mar de Ibiza,-22.901613235473636,-43.10190200805664,REJECT,aspirational condo marketing name
+overture:Maramar:-23.03278:-43.49314,Maramar,-23.03277969360352,-43.49314498901367,REJECT,condo development portmanteau name
+overture:Maraville  Rio Grande:-22.91859:-43.38926,Maraville  Rio Grande,-22.91859436035156,-43.38925552368164,REJECT,condo marketing name
+overture:Marcão Comunidade Novo Rio:-22.96186:-43.34776,Marcão Comunidade Novo Rio,-22.961856842041016,-43.34775924682617,REJECT,informal community nickname
+overture:Mare Pontal Oceanico:-23.02125:-43.50576,Mare Pontal Oceanico,-23.02125358581543,-43.50575637817383,REJECT,condo marketing name
+overture:Maria:-22.86835:-43.79301,Maria,-22.86834716796875,-43.79301071166992,REJECT,bare personal name
+overture:Marquês de valença:-22.92118:-43.22574,Marquês de valença,-22.92117500305176,-43.22573852539063,UNCERTAIN,"possible historic street/place, unverified"
+overture:Martins Pena_ Vila São Luiz:-22.77820:-43.29087,Martins Pena_ Vila São Luiz,-22.7782039642334,-43.29086685180664,REJECT,street/village address fragment
+overture:Matinho:-22.89017:-43.34782,Matinho,-22.89016532897949,-43.34782409667969,REJECT,bare generic word
+overture:Matizes Icarai Niteroi:-22.90472:-43.11168,Matizes Icarai Niteroi,-22.904720306396484,-43.1116828918457,REJECT,condo marketing name
+overture:Mazzetti:-22.86252:-43.30518,Mazzetti,-22.862520217895508,-43.30517578125,UNCERTAIN,"bare surname, unclear referent"
+overture:Mc Nego do Borel:-23.06712:-43.56572,Mc Nego do Borel,-23.067123413085938,-43.56571578979492,REJECT,personal/artist nickname
+overture:Mendanha:-22.85416:-43.53953,Mendanha,-22.854156494140625,-43.53953170776367,KEEP,likely refers to Serra do Mendanha natural landmark
+overture:Meringuava 1396:-22.91545:-43.38790,Meringuava 1396,-22.91545295715332,-43.38790130615234,REJECT,address-numbered condo entry
+overture:Mesa do Imperado:-22.96851:-43.25685,Mesa do Imperado,-22.968505859375,-43.25685119628906,KEEP,likely Mesa do Imperador historic viewpoint
+overture:Mesquita:-22.79243:-43.42739,Mesquita,-22.792428970336918,-43.42738723754883,REJECT,bare municipality name
+overture:Mesquita rj:-22.79668:-43.44059,Mesquita rj,-22.79667854309082,-43.44058609008789,REJECT,bare municipality name with state suffix
+overture:Meu lar:-22.91109:-43.10627,Meu lar,-22.91109085083008,-43.10627365112305,REJECT,generic personal home label
+overture:Minha:-22.86238:-43.78281,Minha,-22.86237907409668,-43.782806396484375,UNCERTAIN,"unmatched in classification pass, defaulted prudently"
+overture:Minha Casa Minha Vida:-22.90293:-43.56105,Minha Casa Minha Vida,-22.90293312072754,-43.5610466003418,REJECT,government housing program name
+overture:Minha Praia Cond. Clube:-22.96761:-43.39702,Minha Praia Cond. Clube,-22.96761131286621,-43.39702224731445,REJECT,condo club name
+overture:Minha cass:-22.88406:-43.43050,Minha cass,-22.884056091308597,-43.43049621582031,REJECT,personal home nickname/typo
+overture:Mirante 4:-22.98822:-43.23178,Mirante 4,-22.988224029541016,-43.231781005859375,REJECT,generic unnamed numbered viewpoint
+overture:Mirante Do Ttk:-22.92429:-43.18169,Mirante Do Ttk,-22.924293518066406,-43.18169021606445,UNCERTAIN,"unclear abbreviation, possible viewpoint"
+overture:Mirante JW Marriott:-22.97226:-43.18560,Mirante JW Marriott,-22.972257614135746,-43.18560028076172,REJECT,hotel-branded viewpoint
+overture:Mirante Jackson de Figueiredo:-23.00865:-43.28787,Mirante Jackson de Figueiredo,-23.00864791870117,-43.287872314453125,KEEP,known named mirante in Parque da Cidade
+overture:Mirante Livingstone Rezende:-22.81879:-43.20559,Mirante Livingstone Rezende,-22.81879234313965,-43.2055892944336,KEEP,specifically named mirante
+overture:Mirante Sétimo Céu:-22.98915:-43.22905,Mirante Sétimo Céu,-22.989154815673828,-43.22904968261719,KEEP,known named mirante
+overture:Mirante da Imprensa:-22.96904:-43.22513,Mirante da Imprensa,-22.969038009643555,-43.225128173828125,KEEP,specifically named mirante
+overture:Mirante da Praia da Joatinga:-23.01493:-43.28840,Mirante da Praia da Joatinga,-23.014928817749023,-43.28839874267578,KEEP,specifically named viewpoint
+overture:Mirante da bt:-22.83556:-43.28728,Mirante da bt,-22.83555793762207,-43.28727722167969,UNCERTAIN,"unclear abbreviation ""bt"""
+overture:Mirante de Boa Viagem:-22.90583:-43.12501,Mirante de Boa Viagem,-22.905834197998047,-43.1250114440918,KEEP,known viewpoint in Niterói
+overture:Mirante do Caete:-22.98485:-43.27874,Mirante do Caete,-22.984851837158203,-43.27873611450195,KEEP,specifically named mirante
+overture:Mirante do Excelsior:-22.94243:-43.27275,Mirante do Excelsior,-22.942432403564453,-43.27275085449219,KEEP,specifically named mirante
+overture:Mirante do Leblon:-22.98967:-43.22740,Mirante do Leblon,-22.989673614501957,-43.22739791870117,KEEP,well-known named viewpoint
+overture:Mirante do Leme:-22.96257:-43.16579,Mirante do Leme,-22.962566375732425,-43.165794372558594,KEEP,well-known named viewpoint
+overture:Mirante do Morro da Cruz:-22.76779:-43.11370,Mirante do Morro da Cruz,-22.767791748046875,-43.11370086669922,KEEP,well-known viewpoint in Niterói
+overture:Mirante do Pavão:-22.97929:-43.19313,Mirante do Pavão,-22.979291915893555,-43.1931266784668,KEEP,specifically named mirante
+overture:Mirante do Pontal:-23.03419:-43.49143,Mirante do Pontal,-23.0341911315918,-43.491432189941406,KEEP,specifically named mirante
+overture:Mirante do Rato Molhado:-22.92379:-43.18671,Mirante do Rato Molhado,-22.92378807067871,-43.18670654296875,KEEP,specifically named trail viewpoint
+overture:Mirante do Rio Grande:-22.92023:-43.39856,Mirante do Rio Grande,-22.92023086547852,-43.398563385009766,KEEP,specifically named mirante
+overture:Mirante do Roncador:-23.03787:-43.49949,Mirante do Roncador,-23.03787422180176,-43.499488830566406,KEEP,specifically named mirante
+overture:Moinho Fluminense:-22.89627:-43.19144,Moinho Fluminense,-22.896270751953125,-43.191436767578125,KEEP,historic grain mill landmark
+overture:Monte Horebe em Mesquita RJ:-22.84855:-43.32082,Monte Horebe em Mesquita RJ,-22.84854888916016,-43.3208236694336,UNCERTAIN,possible church site name
+overture:Monumental Okara:-22.88693:-43.11248,Monumental Okara,-22.886926651000977,-43.11248397827149,REJECT,condo/residential marketing name
+overture:Mood Lapa:-22.91409:-43.18892,Mood Lapa,-22.91408920288086,-43.18891906738281,REJECT,business/venue name
+overture:Morada Delas:-22.97532:-43.32681,Morada Delas,-22.975324630737305,-43.326805114746094,REJECT,residential development name
+overture:Morada do Sol - Bloco D:-22.95650:-43.17863,Morada do Sol - Bloco D,-22.95650100708008,-43.17863464355469,REJECT,residential building block
+overture:Morada dos Colibris - JPA:-22.92698:-43.38815,Morada dos Colibris - JPA,-22.926977157592773,-43.388145446777344,REJECT,residential complex name
+overture:Moradas Do Itanhangá Condominium:-22.97564:-43.32765,Moradas Do Itanhangá Condominium,-22.97563934326172,-43.3276481628418,REJECT,explicitly a condominium
+overture:Moradas Santa Clara:-22.75131:-43.42268,Moradas Santa Clara,-22.75130844116211,-43.42268371582031,REJECT,residential complex name
+overture:Moradas do Itanhangá:-22.97699:-43.32949,Moradas do Itanhangá,-22.97698974609375,-43.32949447631836,REJECT,residential complex name
+"overture:Morro Boa Vista (berg i Brasilien, Rio de Janeiro, Rio de Janeiro):-22.96413:-43.26356","Morro Boa Vista (berg i Brasilien, Rio de Janeiro, Rio de Janeiro)",-22.964130401611328,-43.2635612487793,REJECT,foreign-language wikidata label artifact
+overture:Morro Do Embaixador:-22.77518:-43.33804,Morro Do Embaixador,-22.775184631347656,-43.338035583496094,KEEP,named hill
+overture:Morro Do Familia:-22.90691:-43.30569,Morro Do Familia,-22.906911849975582,-43.30569076538086,KEEP,named hill
+overture:Morro Do Joá - Rio De Janeiro:-22.96138:-43.20719,Morro Do Joá - Rio De Janeiro,-22.96138000488281,-43.20719146728516,KEEP,well-known named hill
+overture:Morro Pau da Bandeira:-22.91416:-43.25778,Morro Pau da Bandeira,-22.914161682128903,-43.25778198242188,KEEP,named hill
+overture:Morro Santo Amaro:-22.92361:-43.18056,Morro Santo Amaro,-22.92361068725586,-43.18056488037109,KEEP,named hill
+"overture:Morro da Bica (kulle i Brasilien, lat -22,81, long -43,19):-22.81439:-43.19375","Morro da Bica (kulle i Brasilien, lat -22,81, long -43,19)",-22.814388275146484,-43.19375228881836,REJECT,foreign-language wikidata label artifact
+overture:Morro da Boa Vista São Lourenço Niterói:-22.88695:-43.11089,Morro da Boa Vista São Lourenço Niterói,-22.886947631835938,-43.11088943481445,KEEP,named hill
+overture:Morro da Cachoeirinha:-22.91972:-43.27778,Morro da Cachoeirinha,-22.919723510742188,-43.27777862548828,KEEP,named hill
+overture:Morro da Caixa D'Água (berg):-22.90260:-43.39376,Morro da Caixa D'Água (berg),-22.902603149414062,-43.39375686645508,REJECT,foreign-language wikidata label artifact
+"overture:Morro da Conceição (kulle i Brasilien, lat -22,82, long -43,35):-22.81581:-43.35355","Morro da Conceição (kulle i Brasilien, lat -22,82, long -43,35)",-22.815813064575195,-43.353546142578125,REJECT,foreign-language wikidata label artifact
+overture:Morro da Eno:-22.82360:-43.31138,Morro da Eno,-22.823598861694336,-43.31137847900391,KEEP,named hill
+"overture:Morro da Formiga (kulle i Brasilien, Rio de Janeiro, Rio de Janeiro, lat -22,86, long -43,52):-22.85685:-43.52489","Morro da Formiga (kulle i Brasilien, Rio de Janeiro, Rio de Janeiro, lat -22,86, long -43,52)",-22.856853485107425,-43.52488708496094,REJECT,foreign-language wikidata label artifact
+overture:Morro da Mangueira:-22.90389:-43.23695,Morro da Mangueira,-22.903892517089844,-43.23694610595703,KEEP,well-known named hill
+overture:Morro da Quinta do Caju:-22.87437:-43.21205,Morro da Quinta do Caju,-22.874366760253903,-43.2120475769043,KEEP,named hill
+"overture:Morro da Tapera (kulle i Brasilien, Rio de Janeiro):-22.81223:-43.17902","Morro da Tapera (kulle i Brasilien, Rio de Janeiro)",-22.812232971191406,-43.17902374267578,REJECT,foreign-language wikidata label artifact
+"overture:Morro das Araras (kulle i Brasilien, Rio de Janeiro):-22.78684:-43.17730","Morro das Araras (kulle i Brasilien, Rio de Janeiro)",-22.786840438842773,-43.17730331420898,REJECT,foreign-language wikidata label artifact
+overture:Morro de São Lourenço:-22.88747:-43.11008,Morro de São Lourenço,-22.887466430664062,-43.11008071899414,KEEP,named hill
+overture:Morro do Inglês:-22.94223:-43.20334,Morro do Inglês,-22.942228317260746,-43.20333862304688,KEEP,named historic hill
+overture:Morro do Pica Pau:-22.98366:-43.31216,Morro do Pica Pau,-22.98366355895996,-43.31216049194336,KEEP,named hill
+overture:Morro do Pico:-22.93130:-43.12339,Morro do Pico,-22.931299209594727,-43.12339019775391,KEEP,named hill
+overture:Morro do Pontal de Sernambetiba:-23.03417:-43.47010,Morro do Pontal de Sernambetiba,-23.03417015075684,-43.470096588134766,KEEP,named hill
+overture:Morro do Vintém:-22.89834:-43.26640,Morro do Vintém,-22.898338317871094,-43.266395568847656,KEEP,well-known named hill/trail
+overture:Morro dos Caboclos:-22.95167:-43.51751,Morro dos Caboclos,-22.951669692993164,-43.51750946044922,KEEP,named hill
+"overture:Morro dos Macacos (kulle i Brasilien, Rio de Janeiro, Rio de Janeiro, lat -22,89, long -43,43):-22.89316:-43.42504","Morro dos Macacos (kulle i Brasilien, Rio de Janeiro, Rio de Janeiro, lat -22,89, long -43,43)",-22.893163681030277,-43.42504119873047,REJECT,foreign-language wikidata label artifact
+overture:Moto Táxi Village:-22.81504:-43.38102,Moto Táxi Village,-22.81503677368164,-43.38102340698242,REJECT,business (moto taxi service)
+overture:Mudrá Full Living:-22.99906:-43.40622,Mudrá Full Living,-22.999061584472656,-43.40622329711914,REJECT,residential/wellness marketing name
+overture:Murals in the Lapa district:-22.91511:-43.17903,Murals in the Lapa district,-22.915111541748047,-43.17902755737305,UNCERTAIN,generic area description not a named site
+overture:Murdock House:-22.89293:-43.56692,Murdock House,-22.89292907714844,-43.5669174194336,UNCERTAIN,unclear if historic house
+overture:Murinho da Urca:-22.93523:-43.17519,Murinho da Urca,-22.93523406982422,-43.17519378662109,KEEP,well-known Urca seawall promenade
+overture:Musal:-22.88112:-43.38741,Musal,-22.881122589111328,-43.38741302490234,REJECT,bare unclear word
+overture:Muzema:-22.99012:-43.32046,Muzema,-22.990123748779297,-43.32046127319336,REJECT,bare neighborhood/favela name
+overture:Márcio Alto Aratanha:-22.91245:-43.56863,Márcio Alto Aratanha,-22.91245460510254,-43.56863021850586,UNCERTAIN,unclear personal+place combination
+overture:Mário Carpenter:-22.88460:-43.29246,Mário Carpenter,-22.884601593017575,-43.29246139526367,REJECT,"personal name, no landmark indicator"
+overture:Mérito Jacarepaguá:-22.95799:-43.34238,Mérito Jacarepaguá,-22.957992553710938,-43.342376708984375,REJECT,condo/residential brand name
+overture:NOVO CCHCS:-22.83728:-43.32843,NOVO CCHCS,-22.8372802734375,-43.328426361083984,UNCERTAIN,unclear institutional acronym
+overture:Nascimento Silva:-22.98180:-43.20896,Nascimento Silva,-22.98179817199707,-43.20895767211914,REJECT,likely street name
+overture:Nau da Barra:-22.99765:-43.37819,Nau da Barra,-22.99764633178711,-43.37818908691406,KEEP,distinctive ship-shaped landmark building
+overture:Nau dos Descobrimentos:-22.90502:-43.16987,Nau dos Descobrimentos,-22.905017852783203,-43.16987228393555,KEEP,known monument at Praça Mauá
+overture:Ninho dos Accioly:-22.93819:-43.34105,Ninho dos Accioly,-22.938188552856445,-43.34104537963867,REJECT,personal family home nickname
+overture:Niterói Working Center:-22.89399:-43.11955,Niterói Working Center,-22.89398956298828,-43.11954879760742,REJECT,business coworking space
+overture:No Morro da Caixa d' Água:-22.91389:-43.35693,No Morro da Caixa d' Água,-22.913894653320312,-43.35692596435547,REJECT,"informal locational phrase, not a proper name"
+overture:No Quintal do Gica:-22.82630:-43.39866,No Quintal do Gica,-22.8262996673584,-43.39866256713867,REJECT,personal home nickname
+overture:Nobrega UM:-22.90129:-43.10555,Nobrega UM,-22.901287078857425,-43.10554885864258,REJECT,condo building name
+overture:Norte Dreams:-22.89076:-43.26960,Norte Dreams,-22.890756607055664,-43.26959991455078,REJECT,aspirational condo marketing name
+overture:Norte Premium:-22.88908:-43.28715,Norte Premium,-22.88907814025879,-43.28715133666992,REJECT,condo marketing name
+overture:Nova CCPL:-22.89126:-43.24746,Nova CCPL,-22.891263961791992,-43.24745941162109,UNCERTAIN,unclear institutional acronym
+overture:Novo Horizonte:-22.95630:-43.33354,Novo Horizonte,-22.956300735473636,-43.33353805541992,REJECT,generic community name
+overture:O`Sullivan House:-22.87353:-43.41301,O`Sullivan House,-22.87352752685547,-43.41301345825195,UNCERTAIN,unclear if historic house
+overture:Obelisco da Avenida Rio Branco:-22.91271:-43.17479,Obelisco da Avenida Rio Branco,-22.9127140045166,-43.1747932434082,KEEP,real monument obelisk
+overture:Ocean Breeze:-23.01752:-43.48178,Ocean Breeze,-23.017518997192383,-43.48177719116211,REJECT,condo marketing name
+overture:Ocean Star:-23.01006:-43.35205,Ocean Star,-23.010059356689453,-43.35205459594727,REJECT,condo marketing name
+overture:Oceana Golf - Absolute Design:-23.00058:-43.40428,Oceana Golf - Absolute Design,-23.000577926635746,-43.40427780151367,REJECT,condo development marketing name
+overture:Oceana Golf Barra da Tijuca:-23.00125:-43.40755,Oceana Golf Barra da Tijuca,-23.00124931335449,-43.40754699707031,REJECT,condo development marketing name
+overture:Oceana Waterfront:-23.02651:-43.46272,Oceana Waterfront,-23.026506423950195,-43.46271896362305,REJECT,condo marketing name
+overture:Oceanside Recreio - Emccamp:-23.01872:-43.48559,Oceanside Recreio - Emccamp,-23.01871681213379,-43.48559188842773,REJECT,condo development by named builder
+overture:On Botafogo Voluntarios da Patria Cyrela:-22.95150:-43.18542,On Botafogo Voluntarios da Patria Cyrela,-22.95149803161621,-43.18541717529297,REJECT,condo development by named builder
+overture:On The Sea Arpoador:-22.98727:-43.19058,On The Sea Arpoador,-22.98727035522461,-43.19058227539063,REJECT,condo marketing name
+overture:Only by Living:-22.88636:-43.28004,Only by Living,-22.88636016845703,-43.28003692626953,REJECT,marketing slogan
+overture:Opera di Milano Residenza:-22.90298:-43.10452,Opera di Milano Residenza,-22.902982711791992,-43.1045150756836,REJECT,aspirational condo marketing name
+overture:Orange Village Condo:-22.87266:-43.53069,Orange Village Condo,-22.872657775878903,-43.53068542480469,REJECT,explicitly a condo
+overture:Oreo Clapp:-22.88041:-43.30785,Oreo Clapp,-22.880409240722656,-43.30785369873047,REJECT,likely business name
+overture:Oriente-se:-22.90866:-43.23434,Oriente-se,-22.908655166625977,-43.23434066772461,REJECT,"generic phrase, not a site"
+overture:Osvaldo Cruz (bairro do Rio de Janeiro):-22.87056:-43.35001,Osvaldo Cruz (bairro do Rio de Janeiro),-22.870555877685547,-43.350006103515625,REJECT,bare neighborhood name wikidata artifact
+overture:PEDRA De Guaratba:-22.99120:-43.62716,PEDRA De Guaratba,-22.99120330810547,-43.62716293334961,KEEP,named rock/natural feature
+overture:PNR1 ESAO:-22.86172:-43.39312,PNR1 ESAO,-22.861722946166992,-43.39311981201172,UNCERTAIN,"likely military school acronym, unclear"
+overture:Padre miguel:-22.86308:-43.45351,Padre miguel,-22.86308479309082,-43.45351409912109,REJECT,bare neighborhood name
+overture:Painel Etnias:-22.89513:-43.18488,Painel Etnias,-22.895132064819336,-43.18487930297852,KEEP,"famous Kobra ""Etnias"" mural landmark"
+overture:Palace II:-23.00616:-43.32227,Palace II,-23.00615882873535,-43.322265625,REJECT,generic condo tower name
+overture:Palacete Laguna:-22.91157:-43.22294,Palacete Laguna,-22.91157341003418,-43.222938537597656,REJECT,condo development name
+overture:Palacete Princesa Isabel:-22.92320:-43.69316,Palacete Princesa Isabel,-22.92320442199707,-43.69315719604492,KEEP,plausible historic palacete
+overture:Palacio de Buckingham:-22.98465:-43.20006,Palacio de Buckingham,-22.98465347290039,-43.2000617980957,REJECT,joke/nickname house name
+overture:Palacio de Edimburgo:-22.93369:-43.20023,Palacio de Edimburgo,-22.93369483947754,-43.200225830078125,REJECT,joke/nickname house name
+overture:Palazzo Botafogo:-22.95681:-43.18441,Palazzo Botafogo,-22.956811904907227,-43.18441009521485,REJECT,aspirational condo marketing name
+overture:Palazzo Di Shangri La:-22.95410:-43.18138,Palazzo Di Shangri La,-22.954099655151367,-43.18137741088867,REJECT,aspirational condo marketing name
+overture:Palhaçada Real:-23.02402:-43.49128,Palhaçada Real,-23.024023056030277,-43.49127578735352,REJECT,nonsensical/joke name
+"overture:Palmas, Ilha Grande:-22.97177:-43.19020","Palmas, Ilha Grande",-22.971773147583008,-43.1901969909668,UNCERTAIN,"possible beach name, unverified"
+overture:Palmeira Imperial:-22.96955:-43.22469,Palmeira Imperial,-22.96954917907715,-43.22468566894531,KEEP,likely famous imperial palm tree landmark
+overture:Palmeiras da Penha:-22.83789:-43.27642,Palmeiras da Penha,-22.83788681030273,-43.27642440795898,UNCERTAIN,"generic descriptive name, unclear referent"
+overture:Palácio Arariboia:-22.89449:-43.12125,Palácio Arariboia,-22.89448547363281,-43.12125396728516,KEEP,"historic palace, Niterói city hall"
+overture:Palácio De La Potrinyh - Malvinas:-22.86029:-43.48187,Palácio De La Potrinyh - Malvinas,-22.860286712646484,-43.48186874389648,REJECT,garbled nonsensical name
+overture:Palácio Vigia:-22.90127:-43.17642,Palácio Vigia,-22.90126609802246,-43.17641830444336,UNCERTAIN,unclear if genuine site
+overture:Pan De Azucar:-22.95456:-43.16706,Pan De Azucar,-22.95456314086914,-43.16706085205078,UNCERTAIN,possibly mislabeled Sugarloaf reference or business
+overture:Paradigma:-22.89704:-43.12176,Paradigma,-22.89703941345215,-43.12176132202149,REJECT,"bare generic word, likely business"
+overture:Parcão Tijuca:-22.93152:-43.24376,Parcão Tijuca,-22.93152236938477,-43.24375534057617,KEEP,known park in Tijuca
+overture:Park Rossette:-22.91395:-43.60574,Park Rossette,-22.913951873779297,-43.605735778808594,REJECT,condo marketing name
+overture:Park View Barra Bonita:-23.02324:-43.48694,Park View Barra Bonita,-23.023237228393555,-43.486942291259766,REJECT,condo marketing name
+overture:Park condominium Onix:-22.90708:-43.67154,Park condominium Onix,-22.907081604003903,-43.67153549194336,REJECT,explicitly a condominium
+overture:Park condominium Reality:-22.88015:-43.55083,Park condominium Reality,-22.880151748657227,-43.55083084106445,REJECT,explicitly a condominium
+overture:Parque Anchieta:-22.83030:-43.41767,Parque Anchieta,-22.83029556274414,-43.41767120361328,KEEP,real historic park
+overture:Parque Bondinho:-22.95553:-43.16701,Parque Bondinho,-22.955530166625977,-43.16700744628906,UNCERTAIN,possible reference to Sugarloaf cable car park
+overture:Parque Coqueiros:-22.97472:-43.49840,Parque Coqueiros,-22.97472381591797,-43.4984016418457,KEEP,named park
+overture:Parque Natural Municipal do Gericinó:-22.81271:-43.41616,Parque Natural Municipal do Gericinó,-22.812705993652344,-43.41615676879883,KEEP,real municipal natural park
+overture:Parque Roma:-22.91414:-43.55687,Parque Roma,-22.914140701293945,-43.5568733215332,KEEP,named park
+overture:Parque São Pedro:-22.86471:-43.46309,Parque São Pedro,-22.86471366882324,-43.46309280395508,KEEP,named park
+overture:Parque das Ruínas:-22.91780:-43.18232,Parque das Ruínas,-22.917797088623047,-43.182315826416016,KEEP,famous park in Santa Teresa
+overture:Parque dos Sonhos:-22.76287:-43.48895,Parque dos Sonhos,-22.76287078857422,-43.48894500732422,UNCERTAIN,could be legit park or marketing name
+overture:Passarela Do 314:-22.99766:-43.23947,Passarela Do 314,-22.997663497924805,-43.23947143554688,UNCERTAIN,unclear community walkway reference
+overture:Passarela GAGa:-22.96792:-43.17902,Passarela GAGa,-22.967920303344727,-43.17901992797852,UNCERTAIN,"unclear name, possible venue"
+overture:Patrimovel Jardins do Valqueire:-22.88227:-43.35810,Patrimovel Jardins do Valqueire,-22.882265090942383,-43.358097076416016,REJECT,real estate agency listing
+overture:Patrimovel Scena Laguna:-22.98374:-43.38143,Patrimovel Scena Laguna,-22.98373794555664,-43.38142776489258,REJECT,real estate agency listing
+overture:Pau Grande:-22.83569:-43.28513,Pau Grande,-22.835691452026367,-43.28512573242188,UNCERTAIN,bare place name with some historic significance
+overture:Pau-brasil:-22.96973:-43.22517,Pau-brasil,-22.9697265625,-43.22516632080078,REJECT,generic tree species name
+overture:Paulo Prado 63:-22.87878:-43.35378,Paulo Prado 63,-22.87877655029297,-43.353782653808594,REJECT,street address with number
+overture:Paço Real:-22.90393:-43.22131,Paço Real,-22.903932571411133,-43.22130584716797,UNCERTAIN,"possible historic palace reference, unverified"
+overture:Paço de São Cristóvão:-22.90572:-43.22689,Paço de São Cristóvão,-22.905723571777344,-43.22689437866211,KEEP,historic imperial palace
+overture:Peach Bali:-23.00909:-43.43728,Peach Bali,-23.009090423583984,-43.43728256225586,REJECT,foreign-sounding condo/development branding name
+overture:Pedra Aguda:-22.98463:-43.27684,Pedra Aguda,-22.9846305847168,-43.27684020996094,KEEP,named rock outcrop natural landmark
+overture:Pedra Negra:-22.95888:-43.41417,Pedra Negra,-22.958881378173828,-43.41416549682617,KEEP,named rock outcrop natural landmark
+overture:Pedra da Babilônia:-22.91917:-43.22806,Pedra da Babilônia,-22.919166564941406,-43.228057861328125,KEEP,well-known named rock/hill landmark near Urca
+overture:Pedra da Macumba:-23.03202:-43.48052,Pedra da Macumba,-23.032020568847656,-43.48051834106445,KEEP,named rock formation natural landmark
+overture:Pedra da Onça:-22.78923:-43.16149,Pedra da Onça,-22.78923225402832,-43.16149139404297,KEEP,named rock formation natural landmark
+overture:Pedra da Proa:-22.96410:-43.25652,Pedra da Proa,-22.964099884033203,-43.25651931762695,KEEP,named rock formation natural landmark
+overture:Pedra da Tartaruga:-23.07331:-43.55126,Pedra da Tartaruga,-23.07331275939941,-43.5512580871582,KEEP,named rock formation natural landmark
+overture:Pedra de Itapuca:-22.90514:-43.12016,Pedra de Itapuca,-22.90513801574707,-43.120155334472656,KEEP,well-known named rock in Niterói
+overture:Pedra de Itapuã:-23.03223:-43.48084,Pedra de Itapuã,-23.032230377197266,-43.48084259033203,KEEP,named rock formation natural landmark
+overture:Pedra de São Francisco:-22.94250:-43.31861,Pedra de São Francisco,-22.942502975463867,-43.3186149597168,KEEP,named rock formation natural landmark
+overture:Pedra do Índio:-22.90503:-43.11832,Pedra do Índio,-22.905027389526367,-43.11832427978516,KEEP,named rock formation natural landmark
+overture:Pena Turquesa:-22.95144:-43.19173,Pena Turquesa,-22.95144271850586,-43.19172668457031,UNCERTAIN,unclear whether real named site or business
+overture:Penhasco 2 irmãos:-22.98867:-43.23173,Penhasco 2 irmãos,-22.98866844177246,-43.231727600097656,KEEP,named cliff feature near Dois Irmãos
+overture:Peninsula:-22.98884:-43.35320,Peninsula,-22.988842010498047,-43.35319900512695,REJECT,"generic bare name, likely development"
+overture:Península - Barra Da Tijuca:-22.87167:-43.24187,Península - Barra Da Tijuca,-22.87166976928711,-43.24186706542969,REJECT,generic development/neighborhood marketing name
+overture:Península Condominium Bernini:-22.99309:-43.35109,Península Condominium Bernini,-22.99308967590332,-43.35109329223633,REJECT,explicit condominium branding
+overture:Península Office:-22.98707:-43.35853,Península Office,-22.9870662689209,-43.3585319519043,REJECT,office building/business
+overture:Península Style:-22.99067:-43.35089,Península Style,-22.99066734313965,-43.35089111328125,REJECT,residential development branding
+overture:Pereira pinto:-22.86435:-43.29929,Pereira pinto,-22.86435317993164,-43.29928588867188,UNCERTAIN,could be street/person name or minor site
+overture:Perrottão:-22.90023:-43.56181,Perrottão,-22.900230407714844,-43.56180953979492,UNCERTAIN,possible named rock/hill but unverified
+overture:Personnalise:-22.97065:-43.39457,Personnalise,-22.970653533935547,-43.394569396972656,REJECT,business/service name
+overture:Personnalité Luxury Apartments:-22.93410:-43.33406,Personnalité Luxury Apartments,-22.934101104736328,-43.33406448364258,REJECT,luxury apartment real-estate branding
+overture:Piazza Del Sole:-22.96453:-43.21932,Piazza Del Sole,-22.96452522277832,-43.21931838989258,REJECT,condo/development marketing name
+overture:Pier da barra:-23.01310:-43.29637,Pier da barra,-23.01309967041016,-43.29637145996094,UNCERTAIN,"generic pier, unclear if distinct landmark"
+overture:Pilares:-22.88417:-43.29173,Pilares,-22.884166717529297,-43.291725158691406,REJECT,bare neighborhood name
+overture:Planalto - Anchieta Rj:-22.82506:-43.40020,Planalto - Anchieta Rj,-22.825063705444336,-43.400203704833984,REJECT,address/administrative style entry
+overture:Planet Icarai:-22.90229:-43.10897,Planet Icarai,-22.90229034423828,-43.10896682739258,REJECT,business/store name
+overture:Point do Encontro:-22.91429:-43.29857,Point do Encontro,-22.914287567138672,-43.2985725402832,REJECT,generic bar/meeting-spot business name
+overture:Polo Novo Rio Antigo:-22.90826:-43.18393,Polo Novo Rio Antigo,-22.90826416015625,-43.18393325805664,UNCERTAIN,unclear if cultural district or generic label
+overture:Pombal - Niterói:-22.87412:-43.10709,Pombal - Niterói,-22.874120712280277,-43.10708999633789,UNCERTAIN,"possible named dovecote structure, unverified"
+overture:Pombal Da Prata:-22.76303:-43.41161,Pombal Da Prata,-22.76302719116211,-43.41161346435547,UNCERTAIN,"possible named dovecote structure, unverified"
+overture:Pombal De Marechal Hermes:-22.86439:-43.36879,Pombal De Marechal Hermes,-22.864389419555664,-43.36879348754883,UNCERTAIN,"possible named dovecote structure, unverified"
+overture:Pombal De Santa Eugênia:-22.75081:-43.45712,Pombal De Santa Eugênia,-22.750810623168945,-43.45711517333984,UNCERTAIN,"possible named dovecote structure, unverified"
+overture:Pombal Vila Isabel:-22.91016:-43.24479,Pombal Vila Isabel,-22.910160064697266,-43.24478530883789,UNCERTAIN,"possible named dovecote structure, unverified"
+overture:Pombal do ibc:-22.75030:-43.44413,Pombal do ibc,-22.750301361083984,-43.444129943847656,UNCERTAIN,"possible named dovecote structure, unverified"
+overture:Ponta Zé Mundongo:-22.95000:-43.11668,Ponta Zé Mundongo,-22.950000762939453,-43.116676330566406,KEEP,named headland natural feature
+overture:Ponta da Joatinga:-23.01648:-43.29596,Ponta da Joatinga,-23.016475677490234,-43.29595947265625,KEEP,well-known named headland
+overture:Ponta da Mãe Maria:-22.81667:-43.26667,Ponta da Mãe Maria,-22.816673278808597,-43.26667022705078,KEEP,named headland natural feature
+overture:Ponta da Restinga (udde i Brasilien):-22.80000:-43.23333,Ponta da Restinga (udde i Brasilien),-22.80000305175781,-43.23333358764648,REJECT,Swedish Wikidata label artifact
+overture:Ponta de Irajá:-22.81667:-43.28334,Ponta de Irajá,-22.816673278808597,-43.2833366394043,KEEP,named headland natural feature
+overture:Ponta de Santa Cruz:-22.93779:-43.13525,Ponta de Santa Cruz,-22.93779182434082,-43.13524627685547,KEEP,named headland natural feature
+overture:Ponta de Tubiacanga:-22.78439:-43.22998,Ponta de Tubiacanga,-22.784393310546875,-43.22998046875,KEEP,named headland natural feature
+overture:Ponta do Catalão:-22.84859:-43.22184,Ponta do Catalão,-22.84859085083008,-43.22183609008789,KEEP,well-known named headland near Ilha do Governador
+overture:Ponta do Tiro:-22.81107:-43.17662,Ponta do Tiro,-22.81106948852539,-43.17662048339844,KEEP,named headland natural feature
+overture:Portao Historico da Fortaleza de Sao Joao:-22.94354:-43.15702,Portao Historico da Fortaleza de Sao Joao,-22.943544387817383,-43.157020568847656,KEEP,historic gate of Fortaleza de São João
+overture:Porto Carioca:-22.90052:-43.20774,Porto Carioca,-22.90052032470703,-43.20773696899414,REJECT,sounds like business/hospitality branding
+overture:Porto Maravilha:-22.89715:-43.20277,Porto Maravilha,-22.897151947021484,-43.2027702331543,KEEP,well-known urban renewal landmark district
+overture:Porto Olímpico:-22.85656:-43.38353,Porto Olímpico,-22.856557846069336,-43.3835334777832,KEEP,notable Olympic-related site
+overture:Porto dos Cabritos numero 1000:-23.00229:-43.32521,Porto dos Cabritos numero 1000,-23.00229263305664,-43.3252067565918,REJECT,address-style entry with number
+overture:Portoalegre:-22.95723:-43.18456,Portoalegre,-22.957225799560547,-43.18456268310547,REJECT,likely development/business name
+overture:Portofino:-23.00388:-43.34155,Portofino,-23.003881454467773,-43.34154891967773,REJECT,foreign-themed development/business name
+overture:Posto 1:-23.01424:-43.29899,Posto 1,-23.014244079589844,-43.29899215698242,REJECT,generic administrative lifeguard-post marker
+"overture:Posto 13, Prata, Nova Iguaçu:-22.76030:-43.41536","Posto 13, Prata, Nova Iguaçu",-22.760303497314453,-43.41536331176758,REJECT,address-style entry with commas
+overture:Posto 4 Copacabana:-22.97345:-43.18987,Posto 4 Copacabana,-22.973451614379883,-43.18986892700195,REJECT,generic administrative lifeguard-post marker
+overture:Poça do Ville Prime:-22.92104:-43.24787,Poça do Ville Prime,-22.921043395996094,-43.24786758422852,REJECT,condo/development branding
+"overture:Praca Da Bandeira, Vila São Luiz, Duque De Caxias Rj:-22.77317:-43.29743","Praca Da Bandeira, Vila São Luiz, Duque De Caxias Rj",-22.77317237854004,-43.29743194580078,REJECT,address-style entry ending in Rj
+overture:Praca Espanha:-22.98361:-43.21342,Praca Espanha,-22.98360824584961,-43.21342468261719,KEEP,named public square landmark
+overture:Praca Luiz La Saigne:-22.92127:-43.23530,Praca Luiz La Saigne,-22.92126846313477,-43.23530197143555,UNCERTAIN,"local named square, unverified significance"
+overture:Praia Park Sol:-22.98651:-43.46850,Praia Park Sol,-22.98650932312012,-43.46849822998047,REJECT,condo/development branding
+overture:Praia da Macumba:-23.03227:-43.48467,Praia da Macumba,-23.03227424621582,-43.48467254638672,KEEP,well-known named beach
+overture:Praia do Recreio:-23.01556:-43.41251,Praia do Recreio,-23.015560150146484,-43.412506103515625,KEEP,well-known named beach
+overture:Praça Antônio Amado:-22.84611:-43.36438,Praça Antônio Amado,-22.84611320495605,-43.364383697509766,UNCERTAIN,"local named square, unverified significance"
+overture:Praça Barra Bonita - Recreio:-22.88624:-43.37001,Praça Barra Bonita - Recreio,-22.886240005493164,-43.3700065612793,UNCERTAIN,"local named square, unverified significance"
+overture:Praça Chale:-22.96655:-43.41473,Praça Chale,-22.966550827026367,-43.41473007202149,UNCERTAIN,possibly historic chalé-associated plaza
+overture:Praça Compositor Ismael Silva:-22.91309:-43.20256,Praça Compositor Ismael Silva,-22.913087844848636,-43.20256423950195,KEEP,square honoring notable samba composer
+"overture:Praça Da Apoteose, Vila São Luiz:-22.77729:-43.29299","Praça Da Apoteose, Vila São Luiz",-22.77728843688965,-43.2929916381836,KEEP,Praça da Apoteose is the Sambadrome's famous landmark plaza
+overture:Praça Da Rodo:-22.89695:-43.36942,Praça Da Rodo,-22.89694595336914,-43.36941909790039,UNCERTAIN,unclear local square name
+overture:Praça Doutor Roberto Em Morro da Mibeira Catumbi:-22.91800:-43.20005,Praça Doutor Roberto Em Morro da Mibeira Catumbi,-22.91800117492676,-43.20005035400391,UNCERTAIN,"small local square, unverified significance"
+overture:Praça Jardim Vista Alegre:-22.83109:-43.31381,Praça Jardim Vista Alegre,-22.831085205078125,-43.313812255859375,UNCERTAIN,"possibly tied to housing development, unclear"
+overture:Praça Marechal Âncora:-23.00314:-43.39334,Praça Marechal Âncora,-23.003143310546875,-43.393341064453125,KEEP,well-known square in central Rio
+overture:Praça Olavo Bilac:-22.90348:-43.17994,Praça Olavo Bilac,-22.90347671508789,-43.179935455322266,KEEP,square honoring famous Brazilian poet
+"overture:Praça Parada Modelo, Guapimirim:-22.90866:-43.16962","Praça Parada Modelo, Guapimirim",-22.908660888671875,-43.16961669921875,UNCERTAIN,"address-like entry, unclear significance"
+overture:Praça Quincas Borba:-22.89028:-43.38562,Praça Quincas Borba,-22.890283584594727,-43.3856201171875,KEEP,square honoring notable literary figure
+overture:Praça Sans Penã Tijuca:-22.90474:-43.30188,Praça Sans Penã Tijuca,-22.90474319458008,-43.301876068115234,UNCERTAIN,"local named square, unverified significance"
+overture:Praça São Salvador:-22.93660:-43.17743,Praça São Salvador,-22.936595916748047,-43.177433013916016,KEEP,well-known cultural square in Laranjeiras
+overture:Praça da Boa Vista Santa Cruz:-22.92183:-43.69109,Praça da Boa Vista Santa Cruz,-22.921825408935547,-43.69108963012695,UNCERTAIN,"generic local square, unverified significance"
+overture:Praça da Telemar:-22.78289:-43.42777,Praça da Telemar,-22.782894134521484,-43.42776870727539,REJECT,"named after telecom corporation, likely administrative"
+overture:Praça da Vila Sāo Luiz:-22.77440:-43.29626,Praça da Vila Sāo Luiz,-22.77440452575684,-43.2962646484375,UNCERTAIN,"generic local square, unverified significance"
+overture:Praça do Bnh:-22.91215:-43.54157,Praça do Bnh,-22.91215133666992,-43.54156875610352,REJECT,"named after housing-bank institution, administrative"
+overture:Praça do Brizolinha:-22.94445:-43.38548,Praça do Brizolinha,-22.94445037841797,-43.38547897338867,UNCERTAIN,"informal name tied to public school, unclear"
+overture:Praça do Country:-22.82648:-43.28630,Praça do Country,-22.82648277282715,-43.28629684448242,UNCERTAIN,unclear if named after country club or generic
+overture:Praça do Coutry - Brás de Pina:-22.82366:-43.28691,Praça do Coutry - Brás de Pina,-22.82366180419922,-43.28691101074219,UNCERTAIN,unclear if named after country club or generic
+overture:Praça do Eucalipto:-22.82845:-43.28601,Praça do Eucalipto,-22.828453063964844,-43.28600692749024,UNCERTAIN,"generic local square, unverified significance"
+overture:Praça do Skate - 77:-22.88940:-43.44448,Praça do Skate - 77,-22.88940048217773,-43.444480895996094,REJECT,"modern skate park, not historical/cultural"
+overture:Praça do Skate Rocinha:-22.99022:-43.25194,Praça do Skate Rocinha,-22.990222930908203,-43.2519416809082,REJECT,"modern skate park, not historical/cultural"
+overture:Praça dos Expedicionários:-22.90522:-43.17142,Praça dos Expedicionários,-22.905221939086918,-43.171424865722656,KEEP,commemorative square honoring WWII veterans
+overture:Praça seca:-22.89507:-43.35019,Praça seca,-22.89506721496582,-43.350189208984375,REJECT,bare neighborhood name (Praça Seca bairro)
+overture:Prima Classe:-22.93889:-43.33704,Prima Classe,-22.93889045715332,-43.337039947509766,REJECT,business/service name
+overture:Proj Vilaisabel:-22.91488:-43.24615,Proj Vilaisabel,-22.91488075256348,-43.24615097045898,REJECT,looks like a development project name
+overture:Projeto Semeando:-22.81739:-43.34730,Projeto Semeando,-22.81739044189453,-43.3473014831543,REJECT,"sounds like a social/NGO project, not landmark"
+overture:Prologis Dutra RJ I:-22.79902:-43.34903,Prologis Dutra RJ I,-22.79901695251465,-43.34902572631836,REJECT,corporate logistics warehouse facility
+overture:Promenade Rio Stay:-22.97514:-43.41453,Promenade Rio Stay,-22.975135803222656,-43.414527893066406,REJECT,hospitality/rental business name
+overture:Prédio:-22.91675:-43.22910,Prédio,-22.9167537689209,-43.229103088378906,REJECT,"bare generic word ""building"""
+overture:Prédio Brisa do Mar:-23.03009:-43.47255,Prédio Brisa do Mar,-23.030088424682617,-43.47254943847656,REJECT,generic residential building name
+overture:Prédio Michelozzo:-23.00356:-43.38289,Prédio Michelozzo,-23.00355529785156,-43.38289260864258,REJECT,generic residential building name
+overture:Prédio hermes:-23.02534:-43.46514,Prédio hermes,-23.02533721923828,-43.46513748168945,REJECT,generic residential building name
+overture:Prédio onde morou Renato Russo:-22.98179:-43.20839,Prédio onde morou Renato Russo,-22.98179244995117,-43.20838928222656,KEEP,former residence of notable Brazilian musician
+overture:Puerto Madero:-23.02273:-43.48797,Puerto Madero,-23.022727966308597,-43.48797225952149,REJECT,foreign-themed development branding
+overture:Pulse Offices:-22.96486:-43.21788,Pulse Offices,-22.96486091613769,-43.21787643432617,REJECT,office building/business
+overture:Píer da Pedra de Guaratiba:-23.00189:-43.64221,Píer da Pedra de Guaratiba,-23.001893997192383,-43.6422119140625,KEEP,named pier landmark tied to natural feature
+overture:Qg Malhão:-22.85457:-43.24456,Qg Malhão,-22.854568481445312,-43.24456024169922,REJECT,informal HQ/gym business name
+overture:Quality Green:-22.97074:-43.36765,Quality Green,-22.97073745727539,-43.36764526367188,REJECT,business/service name
+overture:Quartier Carioca:-22.92841:-43.17964,Quartier Carioca,-22.92841339111328,-43.17964172363281,REJECT,condo/development marketing name
+overture:Quattro Pinheiro Guimaraes Botafogo:-22.95829:-43.19345,Quattro Pinheiro Guimaraes Botafogo,-22.958290100097656,-43.19344711303711,REJECT,condo/development branding
+overture:Quebra-Coco:-22.81357:-43.20931,Quebra-Coco,-22.81356811523437,-43.20930862426758,UNCERTAIN,unclear if real named site or locality
+overture:Querovoar.net:-22.96719:-43.18189,Querovoar.net,-22.96718978881836,-43.18189239501953,REJECT,website/business domain
+overture:Quintal do Normando:-22.89397:-43.27470,Quintal do Normando,-22.89396858215332,-43.274696350097656,REJECT,sounds like bar/restaurant business name
+overture:Quintal do Well:-22.84386:-43.32460,Quintal do Well,-22.84386444091797,-43.3245964050293,REJECT,sounds like bar/restaurant business name
+overture:Quintas de Icaraí:-22.90729:-43.10344,Quintas de Icaraí,-22.90728759765625,-43.10344314575195,REJECT,residential development branding
+overture:Quintas do Pontal Recreio dos Bandeirantes:-23.02579:-43.50465,Quintas do Pontal Recreio dos Bandeirantes,-23.025787353515625,-43.50464630126953,REJECT,residential development branding
+overture:Quintas do Rio:-22.98481:-43.50184,Quintas do Rio,-22.98480987548828,-43.5018424987793,REJECT,residential development branding
+overture:RG33:-22.95186:-43.19383,RG33,-22.95185852050781,-43.19382858276367,REJECT,nonsensical alphanumeric code
+"overture:RIO Cidade Maravilhosa"":-22.88356:-43.27487","RIO Cidade Maravilhosa""",-22.883560180664062,-43.27487182617188,REJECT,generic slogan phrase with stray quote artifact
+overture:RS Personal Trainer:-22.83644:-43.40272,RS Personal Trainer,-22.8364372253418,-43.4027214050293,REJECT,personal trainer business
+overture:RUA UÇÁ:-22.81703:-43.20164,RUA UÇÁ,-22.817033767700195,-43.20164489746094,REJECT,bare street name
+overture:Rancho PAIOL:-22.97899:-43.68959,Rancho PAIOL,-22.978988647460938,-43.68959426879883,UNCERTAIN,unclear if venue/farm or business
+overture:Raro Palacete Art Déco:-22.94629:-43.18512,Raro Palacete Art Déco,-22.9462947845459,-43.18512344360352,KEEP,notable Art Deco era mansion/palacete
+overture:Ravana:-22.92309:-43.25006,Ravana,-22.92309188842773,-43.25006484985352,REJECT,"bare single word, likely business name"
+overture:Recanto Do Grajaú:-22.91954:-43.26915,Recanto Do Grajaú,-22.919538497924805,-43.2691535949707,REJECT,residential development branding
+overture:Recanto Do Pontal - Tenda:-22.93318:-43.35260,Recanto Do Pontal - Tenda,-22.93317985534668,-43.35260009765625,REJECT,real-estate developer (Tenda) branded development
+overture:Recanto do Pontal:-23.01999:-43.51258,Recanto do Pontal,-23.01998519897461,-43.51258087158203,REJECT,residential development branding
+overture:Recreio dos Anciãos:-22.94057:-43.25122,Recreio dos Anciãos,-22.940570831298828,-43.25121688842773,REJECT,likely elder-care institution/business
+overture:Recreio dos Bandeirantes posto 12:-23.02868:-43.47203,Recreio dos Bandeirantes posto 12,-23.028682708740234,-43.47203063964844,REJECT,generic lifeguard-post marker
+overture:Regina reis:-22.89357:-43.31741,Regina reis,-22.893573760986328,-43.3174057006836,REJECT,"personal name, likely business"
+overture:Região Amazônica:-22.96623:-43.21832,Região Amazônica,-22.96623420715332,-43.21831512451172,REJECT,"likely themed business name, not a real region here"
+overture:Região Oceânica de Niterói:-22.90008:-43.11773,Região Oceânica de Niterói,-22.900075912475582,-43.11773300170898,REJECT,bare administrative region name
+overture:Reino do Brasil:-22.90000:-43.23333,Reino do Brasil,-22.90000343322754,-43.23333358764648,UNCERTAIN,unclear if historic reference or business name
+overture:Relógio de Sol:-22.97040:-43.22451,Relógio de Sol,-22.970399856567383,-43.22451019287109,KEEP,named sundial landmark
+overture:Relógio do Cacuia:-22.81206:-43.19179,Relógio do Cacuia,-22.812061309814453,-43.19178771972656,KEEP,named public clock landmark
+overture:Represa do Ciganos:-22.92835:-43.29929,Represa do Ciganos,-22.9283504486084,-43.29928588867188,KEEP,named reservoir/dam natural-built feature
+overture:República Alvorada:-22.78836:-43.17714,República Alvorada,-22.78836250305176,-43.1771354675293,REJECT,likely student-republic/residential housing name
+overture:República MonasLisas:-22.74807:-43.70591,República MonasLisas,-22.748065948486328,-43.70591354370117,REJECT,residential/republic housing branding
+overture:República Morada Jardim:-22.86863:-43.21885,República Morada Jardim,-22.868629455566406,-43.21885299682617,REJECT,residential/republic housing branding
+overture:Res. Paineiras:-22.91159:-43.56349,Res. Paineiras,-22.91158676147461,-43.5634880065918,REJECT,abbreviated residencial/condo name
+overture:Reserva Carioca:-22.96974:-43.39356,Reserva Carioca,-22.96974372863769,-43.39356231689453,REJECT,condo/development branding
+overture:Reserva Do Pontal:-22.92795:-43.37345,Reserva Do Pontal,-22.92795181274414,-43.37345123291016,REJECT,condo/development branding
+overture:Reserva Marapendi:-23.02057:-43.46424,Reserva Marapendi,-23.02057266235352,-43.46424102783203,KEEP,named ecological reserve in Barra da Tijuca
+overture:Reserva Mirataia:-22.93734:-43.36237,Reserva Mirataia,-22.93734359741211,-43.36237335205078,UNCERTAIN,could be development or genuine reserve
+overture:Reserva Natura Camorim:-22.96956:-43.41856,Reserva Natura Camorim,-22.96956443786621,-43.41856384277344,KEEP,tied to real protected area (Camorim)
+overture:Reserva da Freguesia:-22.93151:-43.33298,Reserva da Freguesia,-22.93151092529297,-43.332984924316406,REJECT,condo/development branding
+overture:Reserva do Duque:-22.75744:-43.31123,Reserva do Duque,-22.757444381713867,-43.31122970581055,REJECT,condo/development branding
+overture:Reserva dos Pássaros:-22.94254:-43.33286,Reserva dos Pássaros,-22.942535400390625,-43.33285903930664,UNCERTAIN,could be small nature reserve or development
+overture:Reservatorio do Morro do Ingles:-22.94438:-43.20243,Reservatorio do Morro do Ingles,-22.944381713867188,-43.20243453979492,KEEP,named reservoir landmark on a named hill
+overture:Restinga de Maricá:-22.91272:-43.20646,Restinga de Maricá,-22.9127197265625,-43.20646286010742,KEEP,named natural sandbar/restinga feature
+overture:Retiro da Serra:-22.81732:-43.30550,Retiro da Serra,-22.817323684692383,-43.30549621582031,UNCERTAIN,possibly a named lookout/retreat site
+overture:Rio 40:-22.93972:-43.17827,Rio 40,-22.939722061157227,-43.17827224731445,REJECT,unclear/nonsensical short label
+overture:Rio Andaraí:-22.92802:-43.25354,Rio Andaraí,-22.92802047729492,-43.253536224365234,KEEP,"named river, notable in Tijuca area"
+overture:Rio Apart:-22.97692:-43.19141,Rio Apart,-22.97692108154297,-43.19141387939453,REJECT,apartment rental business
+overture:Rio Apartments:-22.96502:-43.17554,Rio Apartments,-22.965023040771484,-43.175540924072266,REJECT,apartment rental business
+overture:Rio Bota-Soho:-22.95331:-43.18987,Rio Bota-Soho,-22.95330810546875,-43.18987274169922,REJECT,condo/development branding
+overture:Rio By Yoo:-22.93871:-43.17123,Rio By Yoo,-22.93870735168457,-43.17122650146485,REJECT,luxury condo brand (Yoo)
+overture:Rio Cabuçu Mirim:-22.91534:-43.55038,Rio Cabuçu Mirim,-22.915340423583984,-43.55038070678711,KEEP,named river in Tijuca forest area
+overture:Rio Cantagalo:-22.93671:-43.64215,Rio Cantagalo,-22.936710357666016,-43.64215087890625,KEEP,named river
+overture:Rio De Janeiro Tijuca:-22.91298:-43.21750,Rio De Janeiro Tijuca,-22.912982940673828,-43.21750259399414,REJECT,"generic city+neighborhood combo, likely business"
+overture:Rio Energy:-22.89819:-43.20492,Rio Energy,-22.89818954467773,-43.20492172241211,REJECT,energy company business
+"overture:Rio Engenho Novo (vattendrag i Brasilien, lat -22,94, long -43,38):-22.93504:-43.38311","Rio Engenho Novo (vattendrag i Brasilien, lat -22,94, long -43,38)",-22.935043334960938,-43.38311004638672,REJECT,Swedish Wikidata label artifact
+overture:Rio Fortaleza:-22.92473:-43.30262,Rio Fortaleza,-22.92473030090332,-43.3026237487793,KEEP,named river
+"overture:Rio Ipiranga (vattendrag i Brasilien, Rio de Janeiro):-22.80210:-43.62389","Rio Ipiranga (vattendrag i Brasilien, Rio de Janeiro)",-22.80210304260254,-43.62389373779297,REJECT,Swedish Wikidata label artifact
+overture:Rio Itapuca:-23.03664:-43.55788,Rio Itapuca,-23.036640167236328,-43.55787658691406,KEEP,named river
+"overture:Rio Jordão (vattendrag i Brasilien, Rio de Janeiro):-22.91590:-43.37357","Rio Jordão (vattendrag i Brasilien, Rio de Janeiro)",-22.915903091430664,-43.373573303222656,REJECT,Swedish Wikidata label artifact
+overture:Rio Lucas:-22.81032:-43.29016,Rio Lucas,-22.810321807861328,-43.2901611328125,KEEP,"named river, consistent with surrounding river entries"
+overture:Rio Méier (vattendrag i Brasilien):-22.88134:-43.28672,Rio Méier (vattendrag i Brasilien),-22.88134002685547,-43.28671646118164,REJECT,Swedish Wikidata label artifact
+overture:Rio Nunes:-22.84915:-43.27156,Rio Nunes,-22.84915351867676,-43.27156066894531,KEEP,named river
+overture:Rio Oceane:-22.86724:-43.56141,Rio Oceane,-22.86723518371582,-43.5614128112793,UNCERTAIN,unclear if named river or condo branding
+"overture:Rio Pequeno (vattendrag i Brasilien, Rio de Janeiro):-22.91567:-43.40953","Rio Pequeno (vattendrag i Brasilien, Rio de Janeiro)",-22.91567039489746,-43.40953063964844,REJECT,Swedish Wikidata label artifact
+"overture:Rio Perdido (vattendrag i Brasilien, Rio de Janeiro):-22.92896:-43.26623","Rio Perdido (vattendrag i Brasilien, Rio de Janeiro)",-22.9289608001709,-43.266231536865234,REJECT,Swedish Wikidata label artifact
+overture:Rio Sanatório:-22.85353:-43.35234,Rio Sanatório,-22.853530883789062,-43.35234069824219,UNCERTAIN,unclear river/sanatorium reference
+overture:Rio São Gonçalo (vattendrag):-22.96934:-43.42478,Rio São Gonçalo (vattendrag),-22.969343185424805,-43.424781799316406,REJECT,Swedish Wikidata label artifact
+overture:Rio São João de Meriti:-22.80155:-43.27391,Rio São João de Meriti,-22.801551818847656,-43.27390670776367,KEEP,major named river in Baixada Fluminense
+"overture:Rio Taquara (vattendrag i Brasilien, Rio de Janeiro):-22.98059:-43.30785","Rio Taquara (vattendrag i Brasilien, Rio de Janeiro)",-22.9805908203125,-43.30785369873047,REJECT,Swedish Wikidata label artifact
+"overture:Rio Tingui (vattendrag i Brasilien, Rio de Janeiro):-22.84888:-43.37176","Rio Tingui (vattendrag i Brasilien, Rio de Janeiro)",-22.848880767822266,-43.37176132202149,REJECT,Swedish Wikidata label artifact
+overture:Rio da Toca:-22.97475:-43.49572,Rio da Toca,-22.974750518798828,-43.495723724365234,UNCERTAIN,"named river, minor natural feature of unclear significance"
+"overture:Rio das Pedras (vattendrag i Brasilien, Rio de Janeiro, lat -22,98, long -43,33):-22.97666:-43.33438","Rio das Pedras (vattendrag i Brasilien, Rio de Janeiro, lat -22,98, long -43,33)",-22.97666358947754,-43.334381103515625,REJECT,Swedish Wikidata label artifact
+overture:Rio de Janeiro:-22.90519:-43.29094,Rio de Janeiro,-22.90518951416016,-43.29093933105469,REJECT,bare city name
+overture:Rio do Açude:-22.96966:-43.28371,Rio do Açude,-22.96966361999512,-43.28371047973633,UNCERTAIN,"named river, minor natural feature of unclear significance"
+overture:Rio do Portinho:-23.04287:-43.57654,Rio do Portinho,-23.04287338256836,-43.576541900634766,UNCERTAIN,"named river, minor natural feature of unclear significance"
+overture:Rio do ”A”:-22.88375:-43.59433,Rio do ”A”,-22.883750915527344,-43.59432601928711,REJECT,"nonsensical name, single letter in quotes"
+"overture:Rio dos Cachorros (vattendrag i Brasilien, Rio de Janeiro, lat -22,80, long -43,33):-22.80244:-43.32672","Rio dos Cachorros (vattendrag i Brasilien, Rio de Janeiro, lat -22,80, long -43,33)",-22.802440643310547,-43.32672119140625,REJECT,Swedish Wikidata label artifact
+"overture:Rio Água Fria (vattendrag i Brasilien, Rio de Janeiro):-22.95207:-43.48862","Rio Água Fria (vattendrag i Brasilien, Rio de Janeiro)",-22.95207023620605,-43.48862075805664,REJECT,Swedish Wikidata label artifact
+overture:Riomar VII:-23.00014:-43.40434,Riomar VII,-23.00013732910156,-43.404335021972656,REJECT,"residential development, roman-numeral series naming"
+overture:Ritz:-22.90694:-43.10086,Ritz,-22.906944274902344,-43.10086441040039,REJECT,generic building/business name
+overture:Riviera Carioca:-22.89863:-43.31461,Riviera Carioca,-22.89862632751465,-43.31461334228516,REJECT,residential development branding
+overture:Riviera Dei Fiori:-23.00570:-43.33984,Riviera Dei Fiori,-23.005695343017575,-43.33983612060547,REJECT,"residential development, foreign-sounding marketing name"
+overture:Riviera Del Sol:-23.01344:-43.49278,Riviera Del Sol,-23.0134391784668,-43.49278259277344,REJECT,"residential development, foreign-sounding marketing name"
+overture:Rivieras De Florenca:-22.94401:-43.33382,Rivieras De Florenca,-22.944011688232425,-43.33381652832031,REJECT,"residential development, foreign-sounding marketing name"
+overture:Rocha Miranda:-22.85048:-43.34483,Rocha Miranda,-22.85047721862793,-43.34483337402344,REJECT,bare neighborhood name
+overture:Rodo City:-22.92561:-43.66972,Rodo City,-22.925613403320312,-43.669715881347656,REJECT,business/mall-style name
+overture:Rodoviária novo rio:-22.89869:-43.20827,Rodoviária novo rio,-22.8986930847168,-43.208274841308594,UNCERTAIN,"major bus terminal, infrastructure not clearly historical/cultural"
+overture:Rooftop 603:-22.89416:-43.28115,Rooftop 603,-22.89415740966797,-43.28115463256836,REJECT,business (rooftop venue)
+overture:Rooftop Vieira Souto:-22.98604:-43.20877,Rooftop Vieira Souto,-22.986040115356445,-43.20876693725586,REJECT,business (rooftop bar/restaurant)
+overture:Roselien II:-22.90085:-43.29079,Roselien II,-22.90084648132324,-43.29079055786133,REJECT,"residential development, numbered series"
+overture:Rossi Ideal Vila Guaratiba:-22.99670:-43.62832,Rossi Ideal Vila Guaratiba,-22.9967041015625,-43.62831878662109,REJECT,real-estate developer branding
+overture:Rosário Fusco:-22.83445:-43.28806,Rosário Fusco,-22.83444595336914,-43.28805923461914,UNCERTAIN,"person's name, possibly a street/plaza namesake"
+overture:Royal Blue:-23.00195:-43.42323,Royal Blue,-23.0019474029541,-43.42323303222656,REJECT,residential development branding
+overture:Rua Aguiar:-22.92373:-43.22102,Rua Aguiar,-22.923728942871094,-43.22101974487305,REJECT,bare street name
+overture:Rua Alfredo Bastos:-22.88662:-43.42749,Rua Alfredo Bastos,-22.886621475219727,-43.42748641967773,REJECT,bare street name
+overture:Rua Alvaro Albuquerque:-22.83086:-43.40085,Rua Alvaro Albuquerque,-22.83085823059082,-43.40084838867188,REJECT,bare street name
+overture:Rua Barão 51:-22.89968:-43.35116,Rua Barão 51,-22.89968490600586,-43.35115814208984,REJECT,street address
+overture:Rua Barão de Macaúbas:-22.94946:-43.19272,Rua Barão de Macaúbas,-22.949464797973636,-43.192718505859375,REJECT,bare street name
+overture:Rua Beira rio:-22.82015:-43.41029,Rua Beira rio,-22.820148468017575,-43.41028594970703,REJECT,bare street name
+overture:Rua Bento Lisboa 36:-22.92609:-43.17957,Rua Bento Lisboa 36,-22.92608642578125,-43.1795654296875,REJECT,street address
+"overture:Rua Candido Mendes, 240, Gloria:-22.91972:-43.18032","Rua Candido Mendes, 240, Gloria",-22.91971969604492,-43.18032455444336,REJECT,street address
+overture:Rua Cisplatina Irajá.:-22.84579:-43.32525,Rua Cisplatina Irajá.,-22.84579467773437,-43.32524871826172,REJECT,bare street name
+overture:Rua Domingos Ferreira:-22.97427:-43.18800,Rua Domingos Ferreira,-22.97426986694336,-43.18800354003906,REJECT,bare street name
+overture:Rua Dulce:-22.91848:-43.22640,Rua Dulce,-22.91847801208496,-43.22639846801758,REJECT,bare street name
+overture:Rua Farme de amoedo:-22.98450:-43.19767,Rua Farme de amoedo,-22.9844970703125,-43.19766616821289,REJECT,bare street name
+overture:Rua Figueiredo Pímentel:-22.88362:-43.30713,Rua Figueiredo Pímentel,-22.883617401123047,-43.30712890625,REJECT,bare street name
+overture:Rua Francisco Mota 174:-22.90657:-43.54376,Rua Francisco Mota 174,-22.906574249267575,-43.54376220703125,REJECT,street address
+overture:Rua Groairas:-22.91461:-43.26729,Rua Groairas,-22.91460609436035,-43.26729202270508,REJECT,bare street name
+overture:Rua Gustavo Sampaio:-22.98247:-43.19226,Rua Gustavo Sampaio,-22.982471466064453,-43.1922607421875,REJECT,bare street name
+overture:Rua Igarapé Jardim Olavo Bilac Duque De Caxias:-22.77935:-43.32688,Rua Igarapé Jardim Olavo Bilac Duque De Caxias,-22.779346466064453,-43.32687759399414,REJECT,garbled street name
+overture:Rua Irineu Marinho:-22.90946:-43.19392,Rua Irineu Marinho,-22.90946388244629,-43.19391632080078,REJECT,bare street name
+overture:Rua Japurá:-22.90043:-43.34895,Rua Japurá,-22.900426864624023,-43.34894943237305,REJECT,bare street name
+overture:Rua João Adil de Oliveira:-22.82359:-43.32682,Rua João Adil de Oliveira,-22.823591232299805,-43.32682418823242,REJECT,bare street name
+overture:Rua João Pereira:-22.87522:-43.33296,Rua João Pereira,-22.875221252441406,-43.33295822143555,REJECT,bare street name
+overture:Rua Lancastre:-22.89165:-43.33515,Rua Lancastre,-22.891645431518555,-43.33515167236328,REJECT,bare street name
+overture:Rua Leocádio Figueiredo:-22.84498:-43.36820,Rua Leocádio Figueiredo,-22.844980239868164,-43.368202209472656,REJECT,bare street name
+"overture:Rua Mangueiral N11, Campo Grande/ Rj.:-22.91959:-43.55484","Rua Mangueiral N11, Campo Grande/ Rj.",-22.919586181640625,-43.55484008789063,REJECT,street address
+overture:Rua Maria Antonia:-22.90797:-43.27157,Rua Maria Antonia,-22.907968521118164,-43.27156829833984,REJECT,bare street name
+overture:Rua Mercúrio:-22.82167:-43.34056,Rua Mercúrio,-22.821666717529297,-43.34055709838867,REJECT,bare street name
+overture:Rua Nazário:-22.90454:-43.24645,Rua Nazário,-22.904541015625,-43.24645233154297,REJECT,bare street name
+overture:Rua Newton Fontoura Reis:-23.02641:-43.46598,Rua Newton Fontoura Reis,-23.026412963867188,-43.46598052978516,REJECT,bare street name
+overture:Rua Nova Canaã Morro:-22.86119:-43.24301,Rua Nova Canaã Morro,-22.86119079589844,-43.24300765991211,REJECT,bare street name
+overture:Rua Oliveira:-22.90329:-43.28111,Rua Oliveira,-22.903291702270508,-43.28110504150391,REJECT,bare street name
+overture:Rua Pajuçara- Ilha do Governador:-22.82715:-43.40547,Rua Pajuçara- Ilha do Governador,-22.827150344848636,-43.40547180175781,REJECT,bare street name
+overture:Rua Pedro Guedes são cristovao:-22.91127:-43.21955,Rua Pedro Guedes são cristovao,-22.911266326904297,-43.21955108642578,REJECT,bare street name
+overture:Rua Professor Nehemias Gueiros:-23.01838:-43.45341,Rua Professor Nehemias Gueiros,-23.01837539672852,-43.45341110229492,REJECT,bare street name
+overture:Rua Quatro (Cj Guandu Velho):-22.90140:-43.70309,Rua Quatro (Cj Guandu Velho),-22.901397705078125,-43.70309066772461,REJECT,street in public housing complex
+overture:Rua Sandra Freitas:-22.82576:-43.38765,Rua Sandra Freitas,-22.825763702392575,-43.38764953613281,REJECT,bare street name
+overture:Rua São Sebastião:-22.85751:-43.26933,Rua São Sebastião,-22.85750961303711,-43.26932907104492,REJECT,bare street name
+overture:Rua arquiteto:-23.02580:-43.48510,Rua arquiteto,-23.025802612304688,-43.48510360717773,REJECT,bare street name
+overture:Rua cabo herculano:-22.83313:-43.30785,Rua cabo herculano,-22.8331298828125,-43.30785369873047,REJECT,bare street name
+overture:Rua castelo branco:-22.82358:-43.28077,Rua castelo branco,-22.823575973510746,-43.2807731628418,REJECT,bare street name
+overture:Rua citeria Irajá rj:-22.82857:-43.32434,Rua citeria Irajá rj,-22.828569412231445,-43.3243408203125,REJECT,bare street name
+overture:Rua da matriz:-22.86008:-43.27571,Rua da matriz,-22.86008071899414,-43.27571105957031,REJECT,bare street name
+overture:Rua das Amendoeira:-22.92018:-43.61562,Rua das Amendoeira,-22.9201774597168,-43.61562347412109,REJECT,bare street name
+overture:Rua mar grande:-22.81641:-43.29086,Rua mar grande,-22.81640625,-43.29085540771485,REJECT,bare street name
+overture:Rua timboacu:-22.93603:-43.32036,Rua timboacu,-22.93602752685547,-43.32036209106445,REJECT,bare street name
+overture:Rua três corações:-22.89018:-43.41999,Rua três corações,-22.890180587768555,-43.41998672485352,REJECT,bare street name
+overture:Rua ubirata:-22.87435:-43.26259,Rua ubirata,-22.874347686767575,-43.26259231567383,REJECT,bare street name
+overture:Rua Álvares de Azevedo 245:-22.90077:-43.11030,Rua Álvares de Azevedo 245,-22.900766372680664,-43.11029815673828,REJECT,street address
+overture:Rua Érico Coelho:-22.79776:-43.18459,Rua Érico Coelho,-22.797758102416992,-43.18458938598633,REJECT,bare street name
+overture:Ruas do Rio:-22.88785:-43.29910,Ruas do Rio,-22.887849807739254,-43.29909896850586,REJECT,"generic ""streets of Rio"" label"
+overture:Saint Germain:-23.00346:-43.32758,Saint Germain,-23.00345993041992,-43.327579498291016,REJECT,"residential development, foreign-sounding marketing name (explicit example)"
+overture:Saint Martin:-22.98529:-43.35954,Saint Martin,-22.985294342041016,-43.35954284667969,REJECT,"residential development, foreign-sounding marketing name"
+overture:Sala da Justiça:-22.90335:-43.35011,Sala da Justiça,-22.90335464477539,-43.3501091003418,REJECT,generic administrative/courtroom label
+overture:Sambódromo:-22.96419:-43.17361,Sambódromo,-22.964191436767575,-43.173606872558594,KEEP,major Carnival parade grounds landmark
+overture:San Remo - Rio2:-22.97176:-43.38466,San Remo - Rio2,-22.971759796142575,-43.38466262817383,REJECT,residential development branding
+overture:Sanduba De RUA:-22.92096:-43.25045,Sanduba De RUA,-22.92096328735352,-43.25044631958008,REJECT,business (street food)
+overture:Santa Monica Classic Houses:-22.99754:-43.39471,Santa Monica Classic Houses,-22.997535705566406,-43.39471054077149,REJECT,residential development branding
+overture:Santa Tereza Rj:-22.92681:-43.19363,Santa Tereza Rj,-22.92681121826172,-43.193634033203125,REJECT,bare neighborhood name
+overture:Santo Antônio da Prata:-22.76011:-43.40805,Santo Antônio da Prata,-22.76011276245117,-43.40804672241211,UNCERTAIN,"possibly a locality/chapel name, unclear"
+overture:Santo Cristo_ M.P:-22.90491:-43.20236,Santo Cristo_ M.P,-22.90491485595703,-43.20236206054688,REJECT,garbled/personal-tag variant of neighborhood name
+overture:Santorini:-23.00731:-43.31939,Santorini,-23.00731468200684,-43.31939315795898,REJECT,generic themed building/condo name
+overture:Santos Apóstolos:-22.90354:-43.11599,Santos Apóstolos,-22.90354347229004,-43.11598587036133,UNCERTAIN,"possibly a church name, unconfirmed"
+overture:Sapo de Camará:-22.88437:-43.48724,Sapo de Camará,-22.884366989135746,-43.48723983764648,UNCERTAIN,possibly a local natural landmark nickname
+overture:Sapucaia:-22.90455:-43.19891,Sapucaia,-22.90454864501953,-43.19891357421875,UNCERTAIN,"ambiguous, could be place/street reference"
+overture:Saraiva:-22.96602:-43.19153,Saraiva,-22.96602249145508,-43.1915283203125,REJECT,likely business (bookstore chain surname)
+overture:Sea Coast Apartments:-23.00721:-43.44127,Sea Coast Apartments,-23.007213592529297,-43.44126892089844,REJECT,residential development branding
+overture:Selaron Steps:-22.91553:-43.17966,Selaron Steps,-22.9155330657959,-43.17965698242188,KEEP,iconic Selarón Steps landmark
+overture:Selarón Apartments:-22.91645:-43.17938,Selarón Apartments,-22.91644859313965,-43.17938232421875,REJECT,residential development themed after landmark
+overture:Selfie:-22.96456:-43.19302,Selfie,-22.964555740356445,-43.19301986694336,REJECT,"generic single word, likely business"
+overture:Selva de Pedra:-22.98031:-43.21968,Selva de Pedra,-22.980314254760746,-43.21967697143555,UNCERTAIN,"famous but residential condominium complex, borderline landmark status"
+overture:Selvinha Bangu:-22.86323:-43.45798,Selvinha Bangu,-22.86322593688965,-43.45797729492188,UNCERTAIN,"unclear meaning, possibly local nickname"
+overture:Send Cooliving:-22.90951:-43.17781,Send Cooliving,-22.90950965881348,-43.17780685424805,REJECT,co-living business
+overture:Serra Grande-Santa Cruz Rj:-22.94054:-43.68299,Serra Grande-Santa Cruz Rj,-22.94053649902344,-43.68299102783203,UNCERTAIN,"named mountain range, unclear significance"
+"overture:Serra da Carioca (bergskedja i Brasilien, Rio de Janeiro, lat -22,95, long -43,22):-22.94833:-43.22158","Serra da Carioca (bergskedja i Brasilien, Rio de Janeiro, lat -22,95, long -43,22)",-22.948331832885746,-43.22157669067383,REJECT,Swedish Wikidata label artifact
+overture:Serra do Grumari:-23.03345:-43.53566,Serra do Grumari,-23.0334529876709,-43.5356559753418,KEEP,"named hill/mountain, notable geographic feature"
+overture:Serra do Macaco (berg):-22.96134:-43.42627,Serra do Macaco (berg),-22.96134185791016,-43.42627334594727,REJECT,foreign-language Wikidata descriptor artifact
+overture:Serra do Marapicu:-22.83246:-43.57906,Serra do Marapicu,-22.832460403442383,-43.579063415527344,KEEP,"named mountain, notable geographic feature"
+"overture:Serra do Quilombo (bergskedja i Brasilien, Rio de Janeiro, lat -22,95, long -43,45):-22.94633:-43.44986","Serra do Quilombo (bergskedja i Brasilien, Rio de Janeiro, lat -22,95, long -43,45)",-22.946332931518555,-43.44986343383789,REJECT,Swedish Wikidata label artifact
+overture:Serra do Vulcão / Serra Volcano:-22.85594:-43.45192,Serra do Vulcão / Serra Volcano,-22.855937957763672,-43.45192337036133,KEEP,"named mountain, notable geographic feature"
+overture:Set Tom Jobim:-22.85189:-43.47499,Set Tom Jobim,-22.85188865661621,-43.47499084472656,UNCERTAIN,"unclear reference, possibly business or venue"
+overture:Setor dos aliados:-22.87211:-43.36197,Setor dos aliados,-22.872108459472656,-43.36196517944336,UNCERTAIN,"obscure sector/area name, unclear significance"
+overture:Siena Residenziale:-22.89539:-43.27305,Siena Residenziale,-22.89538955688477,-43.273048400878906,REJECT,"residential development, Italian-sounding marketing name"
+overture:Silver Bali:-23.00919:-43.43610,Silver Bali,-23.00919342041016,-43.43610382080078,REJECT,"residential development, foreign-sounding marketing name"
+overture:Singular Meier:-22.90823:-43.28358,Singular Meier,-22.908226013183597,-43.28357696533203,REJECT,residential development branding
+overture:Sitio Humayta:-22.90149:-43.53087,Sitio Humayta,-22.901487350463867,-43.5308723449707,REJECT,generic named property/farm
+overture:Skylux by Tegra:-22.89968:-43.17909,Skylux by Tegra,-22.899677276611328,-43.17909240722656,REJECT,"residential development, ""by X"" developer branding"
+overture:Smmoficial:-22.91802:-43.37907,Smmoficial,-22.91802024841309,-43.37907409667969,REJECT,business (social media marketing)
+overture:Solar Belmonte:-22.95303:-43.18372,Solar Belmonte,-22.95302963256836,-43.1837158203125,UNCERTAIN,could be historic manor house or condo branding
+overture:Solar Camabatela:-22.92457:-43.37065,Solar Camabatela,-22.924570083618164,-43.37064743041992,REJECT,condo branding using exotic foreign place name
+overture:Solar Clovis Bevilaqua:-22.92904:-43.23617,Solar Clovis Bevilaqua,-22.92904090881348,-43.23617172241211,UNCERTAIN,"could be historic building named after jurist, or public building"
+overture:Solar Da Gabela:-22.91044:-43.58244,Solar Da Gabela,-22.91044235229492,-43.58243560791016,REJECT,condo branding using exotic foreign place name
+overture:Solar Das Hortênsias:-22.96125:-43.21339,Solar Das Hortênsias,-22.961254119873047,-43.21339416503906,REJECT,"residential development, floral marketing name"
+overture:Solar Príncipe João:-22.98317:-43.20773,Solar Príncipe João,-22.9831657409668,-43.20773315429688,UNCERTAIN,"historic-sounding name, could be condo or genuine site"
+overture:Solar da Vila:-22.91721:-43.24416,Solar da Vila,-22.917207717895508,-43.2441635131836,UNCERTAIN,"generic ""manor"" name, could be condo"
+overture:Solar das Acácias:-22.89912:-43.10768,Solar das Acácias,-22.89912414550781,-43.10768127441406,REJECT,"residential development, floral marketing name"
+overture:Solar de Aveiro:-22.89962:-43.11545,Solar de Aveiro,-22.89961624145508,-43.11545181274414,REJECT,condo branding using foreign (Portuguese) city name
+overture:Solar do Grajau':-22.91786:-43.26098,Solar do Grajau',-22.91786003112793,-43.26098251342773,UNCERTAIN,could be historic building or condo in Grajaú
+overture:Solar dos Ingleses condo:-22.87982:-43.26125,Solar dos Ingleses condo,-22.87981605529785,-43.26124954223633,REJECT,explicitly labeled condo
+overture:Somep:-22.84791:-43.26127,Somep,-22.8479061126709,-43.26127243041992,REJECT,"unclear acronym, likely business"
+overture:Sonho Da Casa Própria:-22.87888:-43.27175,Sonho Da Casa Própria,-22.878883361816406,-43.271751403808594,REJECT,real-estate marketing slogan
+overture:Soul Península by Canopus:-22.98995:-43.34910,Soul Península by Canopus,-22.989952087402344,-43.34910202026367,REJECT,"residential development, ""by X"" developer branding"
+overture:Soul Rio - Bairro de Fátima:-22.91658:-43.18810,Soul Rio - Bairro de Fátima,-22.916576385498047,-43.18810272216797,REJECT,residential development branding
+overture:Souto Bistrot Tropical:-22.98641:-43.19922,Souto Bistrot Tropical,-22.986408233642575,-43.19922256469727,REJECT,business (restaurant/bistro)
+overture:Spazio Mário Guimarães:-22.75795:-43.46009,Spazio Mário Guimarães,-22.757946014404297,-43.4600944519043,REJECT,"residential development, ""Spazio"" branding pattern"
+overture:Spazio Reale:-22.93657:-43.35918,Spazio Reale,-22.936573028564453,-43.35918045043945,REJECT,residential development branding
+overture:Spazio Recoleta:-22.83963:-43.31741,Spazio Recoleta,-22.83962631225586,-43.317413330078125,REJECT,"residential development, foreign place name branding"
+overture:Spazio Recriart:-22.93157:-43.35348,Spazio Recriart,-22.931570053100582,-43.353477478027344,REJECT,residential development branding
+overture:Spazio Regence:-22.92727:-43.36511,Spazio Regence,-22.927265167236328,-43.36510848999024,REJECT,residential development branding
+overture:Spazio Reserva Imperial:-22.92452:-43.38975,Spazio Reserva Imperial,-22.92452049255371,-43.38975143432617,REJECT,residential development branding
+overture:Spazio Riverside:-22.88892:-43.30439,Spazio Riverside,-22.8889217376709,-43.304386138916016,REJECT,residential development branding
+overture:Spazio Rotterdam:-22.91773:-43.37182,Spazio Rotterdam,-22.9177303314209,-43.37182235717773,REJECT,"residential development, foreign place name branding"
+overture:Splendore Araguaia:-22.93595:-43.33879,Splendore Araguaia,-22.935949325561523,-43.33879470825195,REJECT,residential development branding
+overture:Stand Jardins Nova Iguaçu:-22.75841:-43.45808,Stand Jardins Nova Iguaçu,-22.758405685424805,-43.45808029174805,REJECT,real-estate sales office
+overture:Stand Novolar Penha:-22.83852:-43.27519,Stand Novolar Penha,-22.83851623535156,-43.27519226074219,REJECT,real-estate sales office
+overture:Stand de Vendas:-23.01407:-43.46740,Stand de Vendas,-23.014070510864254,-43.467403411865234,REJECT,real-estate sales office (literal name)
+overture:Stardust:-22.94676:-43.33684,Stardust,-22.946760177612305,-43.33684158325195,REJECT,generic building/condo name
+overture:Start Tijuca:-22.92568:-43.22602,Start Tijuca,-22.925683975219727,-43.226016998291016,REJECT,business (gym/coworking)
+overture:Studio Privativo:-22.95296:-43.38087,Studio Privativo,-22.952960968017575,-43.38086700439453,REJECT,private apartment listing
+overture:Studios 111:-22.91924:-43.22383,Studios 111,-22.91924095153809,-43.22382736206055,REJECT,apartment building
+overture:Studios Nogueira Lopes:-22.91810:-43.18408,Studios Nogueira Lopes,-22.9180965423584,-43.18408203125,REJECT,apartment building
+"overture:Sugar Loaf, Rio de Janeiro:-22.93300:-43.18311","Sugar Loaf, Rio de Janeiro",-22.93299674987793,-43.18310928344727,KEEP,"Sugarloaf Mountain, iconic major landmark"
+overture:Summer Coast:-23.00342:-43.32877,Summer Coast,-23.003419876098636,-43.32876586914063,REJECT,residential development branding
+overture:SunDeck:-23.00120:-43.39119,SunDeck,-23.001203536987305,-43.39118576049805,REJECT,generic building/condo name
+overture:SunPlaza:-23.00112:-43.39001,SunPlaza,-23.001123428344727,-43.39000701904297,REJECT,generic building/mall name
+overture:Sunflower:-23.01755:-43.48231,Sunflower,-23.017547607421875,-43.4823112487793,REJECT,generic building/condo name
+overture:Sunrise House Garden:-23.01535:-43.48157,Sunrise House Garden,-23.015352249145508,-43.4815673828125,REJECT,residential development branding
+overture:Sunset Icaraí LANÇAMENTO:-22.91196:-43.10723,Sunset Icaraí LANÇAMENTO,-22.911958694458008,-43.107234954833984,REJECT,"real-estate launch marketing (explicit ""LANÇAMENTO"")"
+overture:Sunshine Drive Resort:-23.01026:-43.37023,Sunshine Drive Resort,-23.0102596282959,-43.37023162841797,REJECT,residential/resort development branding
+overture:Sítio São Luiz:-22.88929:-43.51638,Sítio São Luiz,-22.88928604125977,-43.516380310058594,REJECT,generic named property/farm
+overture:Sítio da Chaminé - Itaguaí:-22.89091:-43.32101,Sítio da Chaminé - Itaguaí,-22.890913009643555,-43.32100677490234,REJECT,generic named property/farm
+overture:Tancredo Martins Costa:-22.91287:-43.30024,Tancredo Martins Costa,-22.912872314453125,-43.30023956298828,UNCERTAIN,"person's name, possible street/plaza namesake"
+overture:Taquara - Jacarepaguá:-22.92155:-43.37099,Taquara - Jacarepaguá,-22.921550750732425,-43.37098693847656,REJECT,bare neighborhood name pairing
+overture:Tatelise's House:-22.96856:-43.18586,Tatelise's House,-22.968564987182617,-43.18586349487305,REJECT,personal home nickname
+overture:Tellos 2:-22.89142:-43.27828,Tellos 2,-22.89141845703125,-43.27827835083008,REJECT,"residential development, numbered series"
+overture:Terraço Panorâmico:-22.91414:-43.16709,Terraço Panorâmico,-22.914140701293945,-43.167091369628906,UNCERTAIN,possibly a scenic viewpoint or just a building rooftop
+overture:The Flower:-22.90720:-43.10249,The Flower,-22.907201766967773,-43.10248947143555,REJECT,generic building/business name
+overture:The Place Icarai:-22.90849:-43.10312,The Place Icarai,-22.90848731994629,-43.10312271118164,REJECT,residential development branding
+overture:The Wonderful World of Pink Jana:-22.96731:-43.38612,The Wonderful World of Pink Jana,-22.967309951782227,-43.3861198425293,REJECT,personal/nonsensical name
+overture:Tijolinho:-22.92196:-43.25212,Tijolinho,-22.921955108642575,-43.25212097167969,UNCERTAIN,unclear informal place nickname
+overture:Tijuca Office Center:-22.92486:-43.22536,Tijuca Office Center,-22.92485809326172,-43.22536087036133,REJECT,business/office building
+overture:Tom Delfim Moreira Leblon:-22.98656:-43.22141,Tom Delfim Moreira Leblon,-22.986560821533203,-43.22140502929688,REJECT,likely business/kiosk on named avenue
+overture:Top Duplex:-23.02307:-43.48910,Top Duplex,-23.023069381713867,-43.48909759521485,REJECT,apartment listing
+overture:Torre Da Vivo Vila Isabel:-22.91250:-43.23972,Torre Da Vivo Vila Isabel,-22.91250228881836,-43.239723205566406,REJECT,telecom infrastructure (Vivo cell tower)
+overture:Torre Niemeyer:-23.00208:-43.32827,Torre Niemeyer,-23.00208282470703,-43.328269958496094,UNCERTAIN,could reference architect Niemeyer or be condo branding
+overture:Tour de Nantes:-22.98519:-43.20576,Tour de Nantes,-22.98518943786621,-43.20576477050781,REJECT,condo branding using foreign (French) city name
+overture:Trakinas House:-22.87396:-43.34266,Trakinas House,-22.873958587646484,-43.342655181884766,REJECT,personal/brand-name nickname
+overture:Travessa Antônio Pedro 12:-22.90913:-43.10983,Travessa Antônio Pedro 12,-22.90912628173828,-43.10982894897461,REJECT,street address
+overture:Travessa Bernardo:-22.90202:-43.30797,Travessa Bernardo,-22.90201759338379,-43.30796813964844,REJECT,bare street name
+overture:Travessa Caldeira:-22.87063:-43.10278,Travessa Caldeira,-22.87063217163086,-43.102783203125,REJECT,bare street name
+overture:Travessa Cordeiro N 55:-22.88585:-43.29580,Travessa Cordeiro N 55,-22.885854721069336,-43.29579544067383,REJECT,street address
+overture:Travessa Cunha Galvão 1137:-22.93664:-43.34937,Travessa Cunha Galvão 1137,-22.9366397857666,-43.349365234375,REJECT,bare street address (Travessa)
+overture:Travessa Nossa Senhora de Fátima:-22.93746:-43.38710,Travessa Nossa Senhora de Fátima,-22.93745803833008,-43.38710403442383,REJECT,bare street address (Travessa)
+overture:Travessa Pastor Francisco Soren:-22.83467:-43.29758,Travessa Pastor Francisco Soren,-22.834667205810547,-43.29758071899414,REJECT,bare street address (Travessa)
+overture:Travessa seis:-22.86535:-43.23815,Travessa seis,-22.865346908569336,-43.2381477355957,REJECT,bare street address (Travessa)
+overture:Trendy E-Home:-22.93229:-43.24739,Trendy E-Home,-22.93229103088379,-43.24739074707031,REJECT,"real-estate/business branding (""Trendy E-Home"")"
+overture:Tribunal Regional do Trabalho da 1a Regiao Niteroi:-22.89371:-43.12130,Tribunal Regional do Trabalho da 1a Regiao Niteroi,-22.893707275390625,-43.12129592895508,REJECT,government/court office
+overture:Trilha Morro da Babilônia -RJ:-22.94415:-43.38671,Trilha Morro da Babilônia -RJ,-22.944150924682617,-43.38671112060547,KEEP,"named trail on Morro da Babilônia, notable hill"
+overture:Trilha da Pedra da Gavea:-23.00149:-43.30536,Trilha da Pedra da Gavea,-23.001487731933597,-43.30535888671875,KEEP,named trail to Pedra da Gávea landmark
+overture:Triplex Leme:-22.96164:-43.16941,Triplex Leme,-22.96164321899414,-43.16940689086914,REJECT,"real-estate development (""Triplex"")"
+overture:Twenty Botafogo:-22.95173:-43.19423,Twenty Botafogo,-22.95172882080078,-43.19422912597656,REJECT,real-estate/condo branding
+overture:Type Tijuca:-22.91222:-43.21792,Type Tijuca,-22.91221618652344,-43.21792221069336,REJECT,real-estate/condo branding
+overture:Union Square RJ:-22.97289:-43.39154,Union Square RJ,-22.9728946685791,-43.39153671264648,REJECT,"real-estate/condo branding (matches ""Union Square"" pattern)"
+overture:Unique Offices:-22.92356:-43.36924,Unique Offices,-22.923561096191406,-43.369239807128906,REJECT,business (office space)
+overture:Unique Tijuca:-22.92726:-43.23699,Unique Tijuca,-22.927255630493164,-43.23698806762695,REJECT,real-estate/condo branding
+overture:Up Barra:-22.95680:-43.34788,Up Barra,-22.9567985534668,-43.347877502441406,REJECT,real-estate/condo branding
+overture:Up Barra Mais:-22.96720:-43.64199,Up Barra Mais,-22.967199325561523,-43.64199447631836,REJECT,real-estate/condo branding
+overture:Up Life:-23.02213:-43.48738,Up Life,-23.02213287353516,-43.48737716674805,REJECT,real-estate/condo branding
+overture:Up Norte:-22.88764:-43.28740,Up Norte,-22.887636184692383,-43.28739547729492,REJECT,real-estate/condo branding
+overture:Up Nova Iguaçu:-22.75655:-43.44827,Up Nova Iguaçu,-22.75654983520508,-43.4482650756836,REJECT,real-estate/condo branding
+overture:Upa de magalhas bastos:-22.88100:-43.45863,Upa de magalhas bastos,-22.88100242614746,-43.45863342285156,REJECT,"public health facility (UPA), administrative"
+overture:VILA da light:-22.90185:-43.34839,VILA da light,-22.90185165405273,-43.348392486572266,REJECT,"residential vila, not a landmark"
+overture:VIVAZ Bandeirantes:-22.98877:-43.44082,VIVAZ Bandeirantes,-22.988773345947266,-43.44082260131836,REJECT,condo brand (Vivaz)
+overture:Vale Dourado:-22.94407:-43.33069,Vale Dourado,-22.94407081604004,-43.330692291259766,REJECT,residential complex naming pattern
+overture:Vale das Orquídeas:-22.88170:-43.37354,Vale das Orquídeas,-22.881696701049805,-43.37353897094727,REJECT,residential complex naming pattern
+overture:Vale do Stucky:-22.83008:-43.39949,Vale do Stucky,-22.830080032348636,-43.39949035644531,REJECT,residential complex naming pattern
+overture:Vale dos Bentivis:-22.95235:-43.34263,Vale dos Bentivis,-22.952348709106445,-43.34262847900391,REJECT,residential complex naming pattern
+overture:Varanda das Rosas:-23.00212:-43.34849,Varanda das Rosas,-23.00212287902832,-43.34848785400391,REJECT,residential complex naming pattern (Varanda)
+overture:Varanda dos Abreus:-23.01110:-43.31307,Varanda dos Abreus,-23.011096954345703,-43.31307220458984,REJECT,residential complex naming pattern
+overture:Varandas de Barra Bonita:-23.02083:-43.48692,Varandas de Barra Bonita,-23.020828247070312,-43.48691940307617,REJECT,residential complex naming pattern
+overture:Varandas de Botafogo:-22.95733:-43.19317,Varandas de Botafogo,-22.957334518432617,-43.19316864013672,REJECT,residential complex naming pattern
+"overture:Vasco da Gama, Rio de Janeiro:-22.89194:-43.22695","Vasco da Gama, Rio de Janeiro",-22.891944885253903,-43.22694778442383,REJECT,bare neighborhood-style entry with address suffix
+overture:Venda velha:-22.78828:-43.35119,Venda velha,-22.788278579711918,-43.351192474365234,REJECT,"generic business (""old store"")"
+overture:Ventanas Nature:-22.99888:-43.41745,Ventanas Nature,-22.998884201049805,-43.41744613647461,REJECT,real-estate/condo branding
+overture:Ventura:-22.89208:-43.28113,Ventura,-22.8920841217041,-43.2811279296875,REJECT,standalone real-estate brand name
+overture:Verdes Encantos:-22.74869:-43.51750,Verdes Encantos,-22.748685836791992,-43.51749801635742,REJECT,residential complex branding
+overture:Verona Casablanca:-22.90173:-43.68262,Verona Casablanca,-22.901731491088867,-43.68262481689453,REJECT,foreign-sounding condo branding
+overture:Via Parque Offices:-22.98364:-43.36110,Via Parque Offices,-22.98363876342773,-43.3610954284668,REJECT,business (offices)
+overture:Via Premiere:-22.98053:-43.42266,Via Premiere,-22.980527877807617,-43.422664642333984,REJECT,real-estate/condo branding
+overture:Viaduto Paulo De Frontin:-22.91563:-43.21008,Viaduto Paulo De Frontin,-22.91563034057617,-43.2100830078125,KEEP,specific named historic viaduct
+overture:Viaduto de Todos os Santos:-22.89716:-43.28592,Viaduto de Todos os Santos,-22.897159576416016,-43.28591537475586,KEEP,specific named historic viaduct
+overture:Victoria Park:-22.93734:-43.33269,Victoria Park,-22.93734359741211,-43.33268737792969,REJECT,"condo branding, explicit rubric example"
+overture:Vila 838:-22.94374:-43.33284,Vila 838,-22.943737030029297,-43.33283615112305,REJECT,numbered residential vila
+overture:Vila Acorizal:-22.86873:-43.27951,Vila Acorizal,-22.868728637695312,-43.27950668334961,REJECT,residential vila
+"overture:Vila Aliança, Bangu, Rio de Janeiro - RJ:-22.87272:-43.47225","Vila Aliança, Bangu, Rio de Janeiro - RJ",-22.87272453308105,-43.47225189208984,REJECT,bare address with RJ suffix
+overture:Vila Aurélio - Manoel Machado:-22.85801:-43.33119,Vila Aurélio - Manoel Machado,-22.858009338378903,-43.33119201660156,REJECT,residential vila
+overture:Vila Avance:-23.01659:-43.47797,Vila Avance,-23.01658821105957,-43.47797393798828,REJECT,residential vila
+overture:Vila Azul:-22.90255:-43.18009,Vila Azul,-22.90254592895508,-43.18008804321289,REJECT,residential vila
+overture:Vila Balbina:-22.98520:-43.62468,Vila Balbina,-22.985200881958008,-43.62468338012695,REJECT,residential vila
+overture:Vila Branca Campo Grande:-22.92095:-43.54560,Vila Branca Campo Grande,-22.92095375061035,-43.545597076416016,REJECT,residential vila
+overture:Vila Carioca:-22.91535:-43.24289,Vila Carioca,-22.91535186767578,-43.24289321899414,REJECT,bare neighborhood-style vila name
+overture:Vila Conquista:-22.83799:-43.34876,Vila Conquista,-22.83799362182617,-43.34876251220703,REJECT,residential vila
+overture:Vila De Vaz Lobo:-22.84922:-43.30333,Vila De Vaz Lobo,-22.849220275878903,-43.3033332824707,REJECT,residential vila
+overture:Vila Del Mar:-22.97087:-43.39526,Vila Del Mar,-22.970870971679688,-43.39525985717773,REJECT,residential vila
+"overture:Vila Dona Julia, Anchieta:-22.82562:-43.40612","Vila Dona Julia, Anchieta",-22.82562255859375,-43.4061164855957,REJECT,residential vila with address suffix
+overture:Vila Dos Mineiros:-22.87588:-43.77155,Vila Dos Mineiros,-22.87588119506836,-43.77155303955078,REJECT,residential vila
+overture:Vila Esplendida RJ:-22.84896:-43.31473,Vila Esplendida RJ,-22.848955154418945,-43.314727783203125,REJECT,residential vila
+overture:Vila Guarapari:-22.81363:-43.37967,Vila Guarapari,-22.813627243041992,-43.379669189453125,REJECT,residential vila
+overture:Vila Isabel Ed.barao Da Vila:-22.91692:-43.25771,Vila Isabel Ed.barao Da Vila,-22.916921615600582,-43.25770568847656,REJECT,residential building (Ed. = Edifício)
+overture:Vila Julieta Engenho Novo:-22.90667:-43.27207,Vila Julieta Engenho Novo,-22.90667152404785,-43.27206802368164,REJECT,residential vila
+overture:Vila Matina:-22.91661:-43.40373,Vila Matina,-22.916614532470703,-43.40372848510742,REJECT,residential vila
+overture:Vila Militar Copacabana - VMC - Exército - Army:-22.96251:-43.17918,Vila Militar Copacabana - VMC - Exército - Army,-22.962512969970703,-43.17918014526367,REJECT,"military installation, administrative"
+overture:Vila Militar Dos Afonsos:-22.88626:-43.38008,Vila Militar Dos Afonsos,-22.88625717163086,-43.38007736206055,UNCERTAIN,"military zone, possibly near Aerospace Museum (Campo dos Afonsos)"
+overture:Vila Militar de Gericinó:-22.87064:-43.41909,Vila Militar de Gericinó,-22.870643615722656,-43.41908645629883,REJECT,"military installation, administrative"
+overture:Vila Modelo:-22.88207:-43.41156,Vila Modelo,-22.88207054138184,-43.411563873291016,REJECT,residential vila
+overture:Vila Nini:-22.91759:-43.22490,Vila Nini,-22.91759490966797,-43.22490310668945,REJECT,residential vila
+overture:Vila Pan-Americana:-22.97304:-43.35803,Vila Pan-Americana,-22.97303581237793,-43.3580322265625,UNCERTAIN,notable Pan American Games housing complex
+overture:Vila Porta do Céu:-22.86683:-43.46247,Vila Porta do Céu,-22.866830825805664,-43.46247482299805,REJECT,residential vila
+overture:Vila Portuária:-22.90081:-43.20053,Vila Portuária,-22.90081214904785,-43.20053482055664,REJECT,generic port-area term
+overture:Vila Ritz:-22.91233:-43.28579,Vila Ritz,-22.912328720092773,-43.28579330444336,REJECT,residential vila
+overture:Vila Rosado:-22.92849:-43.38124,Vila Rosado,-22.92848777770996,-43.38124084472656,REJECT,residential vila
+overture:Vila Solange:-22.87017:-43.34539,Vila Solange,-22.870174407958984,-43.34539031982422,REJECT,residential vila
+overture:Vila Souza Cabral:-22.90348:-43.21384,Vila Souza Cabral,-22.90347671508789,-43.21384048461914,REJECT,residential vila
+overture:Vila São Jorge:-22.91287:-43.23909,Vila São Jorge,-22.91286849975586,-43.23908996582031,REJECT,residential vila
+overture:Vila Trade Office:-22.91839:-43.25074,Vila Trade Office,-22.918392181396484,-43.2507438659668,REJECT,business (trade office)
+overture:Vila Valqueire:-22.88963:-43.35717,Vila Valqueire,-22.889633178710938,-43.35717391967773,REJECT,bare neighborhood name
+overture:Vila cosmos:-22.85360:-43.30361,Vila cosmos,-22.85360336303711,-43.30360794067383,REJECT,bare neighborhood name (Vila Kosmos)
+overture:Vila das Fontes RJ:-22.85069:-43.31545,Vila das Fontes RJ,-22.85069465637207,-43.31544876098633,REJECT,residential vila
+overture:Vila de Cascais:-22.90563:-43.09922,Vila de Cascais,-22.90563201904297,-43.09922409057617,REJECT,foreign-branded residential vila
+overture:Vila do Arco-íris:-22.93772:-43.38665,Vila do Arco-íris,-22.93772315979004,-43.38665390014648,REJECT,residential vila
+overture:Vila do Chaves:-22.74685:-43.69511,Vila do Chaves,-22.74684715270996,-43.69511032104492,REJECT,residential vila
+overture:Vila do Pan:-22.97112:-43.35834,Vila do Pan,-22.97111701965332,-43.358341217041016,UNCERTAIN,possible alt-name for Pan American Games complex
+overture:Vila do Sossego:-22.95019:-43.26120,Vila do Sossego,-22.95018577575684,-43.26119613647461,REJECT,residential vila
+overture:Vila dos Comerciários:-22.85518:-43.25751,Vila dos Comerciários,-22.855175018310547,-43.25750732421875,REJECT,residential vila
+overture:Vila dos Parreiras:-22.92402:-43.24676,Vila dos Parreiras,-22.92401885986328,-43.24676132202149,REJECT,residential vila
+overture:Vila jesus:-22.93642:-43.19271,Vila jesus,-22.936418533325195,-43.19270706176758,REJECT,residential vila
+overture:Vila medina:-22.90063:-43.21675,Vila medina,-22.9006290435791,-43.21675109863281,REJECT,residential vila
+overture:Vila são Luís:-22.77664:-43.29050,Vila são Luís,-22.77663993835449,-43.290504455566406,REJECT,residential vila
+overture:Vilagio Carioca:-22.84910:-43.31797,Vilagio Carioca,-22.849103927612305,-43.317970275878906,REJECT,residential complex branding
+overture:Villa Di Genova:-23.00673:-43.32631,Villa Di Genova,-23.00672721862793,-43.3263053894043,REJECT,foreign-branded condo
+overture:Villa Grajaú:-22.91956:-43.25587,Villa Grajaú,-22.91955947875977,-43.25587463378906,REJECT,residential villa
+overture:Villa Humaitá:-22.95361:-43.19855,Villa Humaitá,-22.9536075592041,-43.19855117797852,REJECT,residential villa
+overture:Villa Jardim Itanhangá:-22.99729:-43.31346,Villa Jardim Itanhangá,-22.99728775024414,-43.31345748901367,REJECT,residential villa
+overture:Villa Luna:-22.97041:-43.39406,Villa Luna,-22.970407485961918,-43.39406204223633,REJECT,residential villa
+overture:Villa Sole:-22.97076:-43.39176,Villa Sole,-22.97075843811035,-43.39176177978516,REJECT,residential villa
+overture:Villa Splendore:-22.89600:-43.28123,Villa Splendore,-22.89600372314453,-43.281227111816406,REJECT,residential villa
+overture:Villa Venturosa:-22.92133:-43.17584,Villa Venturosa,-22.92133331298828,-43.17584228515625,REJECT,residential villa
+overture:Villa Visconti:-22.95748:-43.19383,Villa Visconti,-22.95747756958008,-43.19382858276367,REJECT,residential villa
+overture:Villa messina:-22.97009:-43.39384,Villa messina,-22.970094680786133,-43.39384078979492,REJECT,residential villa
+overture:Village Atlanta:-22.90571:-43.69640,Village Atlanta,-22.90570640563965,-43.69640350341797,REJECT,condo branding
+overture:Village Boechat I:-22.87894:-43.36643,Village Boechat I,-22.878936767578125,-43.36642837524414,REJECT,condo branding
+overture:Village Botanique:-22.93181:-43.32760,Village Botanique,-22.93181037902832,-43.327598571777344,REJECT,condo branding
+overture:Village Caribe I:-22.90107:-43.35316,Village Caribe I,-22.901065826416016,-43.35316467285156,REJECT,condo branding
+overture:Village Del Riposo:-22.92781:-43.38387,Village Del Riposo,-22.927806854248047,-43.38386917114258,REJECT,condo branding
+overture:Village Firenze:-22.93606:-43.34565,Village Firenze,-22.93605613708496,-43.34564971923828,REJECT,condo branding
+overture:Village Florença:-22.94021:-43.33207,Village Florença,-22.940210342407227,-43.332069396972656,REJECT,condo branding
+overture:Village Freguesia Ilha do Governador:-22.78889:-43.17424,Village Freguesia Ilha do Governador,-22.78888893127441,-43.17424392700195,REJECT,explicit rubric example (Village Freguesia)
+overture:Village Livorno:-22.93318:-43.33447,Village Livorno,-22.933181762695312,-43.33446502685547,REJECT,condo branding
+overture:Village Park Itanhangá:-22.98495:-43.32963,Village Park Itanhangá,-22.98494911193848,-43.329627990722656,REJECT,condo branding
+overture:Village Sao Conrado:-22.99536:-43.25636,Village Sao Conrado,-22.9953556060791,-43.2563591003418,REJECT,condo branding
+overture:Village São Bento:-22.90256:-43.10371,Village São Bento,-22.902557373046875,-43.10371398925781,REJECT,condo branding
+overture:Village Vip Jacarepaguá:-22.96641:-43.40888,Village Vip Jacarepaguá,-22.96640968322754,-43.40888214111328,REJECT,condo branding
+overture:Village de Ibiza:-22.90234:-43.35227,Village de Ibiza,-22.90233993530273,-43.352272033691406,REJECT,condo branding
+overture:Village do Maciço:-22.98157:-43.46297,Village do Maciço,-22.981565475463867,-43.46297073364258,REJECT,condo branding
+overture:Village do capenha:-22.93362:-43.35005,Village do capenha,-22.933618545532227,-43.35005187988281,REJECT,condo branding
+overture:Village du Parc:-22.90222:-43.10984,Village du Parc,-22.902217864990234,-43.109840393066406,REJECT,condo branding
+overture:Villagio Arboretto:-22.92335:-43.55127,Villagio Arboretto,-22.9233512878418,-43.551265716552734,REJECT,condo branding
+overture:Villagio Silvestre Condo Club:-22.86750:-43.54498,Villagio Silvestre Condo Club,-22.86750221252441,-43.54497909545898,REJECT,"explicit ""Condo Club"" branding"
+overture:Villagio do Campo I:-22.88621:-43.59780,Villagio do Campo I,-22.886205673217773,-43.59779739379883,REJECT,condo branding
+overture:Villas of Patativas:-22.88362:-43.62683,Villas of Patativas,-22.883621215820312,-43.626834869384766,REJECT,condo branding
+overture:Ville Roma:-22.93026:-43.38517,Ville Roma,-22.930259704589844,-43.38517379760742,REJECT,condo branding
+overture:Vinlanda:-22.94279:-43.18159,Vinlanda,-22.94278717041016,-43.18159484863281,UNCERTAIN,"ambiguous single word, unclear referent"
+overture:Visao do Morro:-22.77412:-43.43545,Visao do Morro,-22.774118423461918,-43.43545150756836,UNCERTAIN,"possible informal viewpoint name, could be business"
+overture:Vista Ipanema:-22.98573:-43.19954,Vista Ipanema,-22.985734939575195,-43.19953918457031,REJECT,"apartment-building naming pattern (""Vista X"")"
+overture:Visto do Museu do Artes Comtemporary:-22.90372:-43.11696,Visto do Museu do Artes Comtemporary,-22.903715133666992,-43.11695861816406,KEEP,apparent viewpoint referencing MAC Niterói museum
+overture:Vitale Flow:-22.83388:-43.32715,Vitale Flow,-22.833879470825195,-43.3271484375,REJECT,condo branding
+overture:Vitale On 2 quartos Rua Piaui. Perto do Norte Shopping:-22.89080:-43.63633,Vitale On 2 quartos Rua Piaui. Perto do Norte Shopping,-22.89080047607422,-43.63633346557617,REJECT,real-estate listing text
+overture:Vitta Green:-22.94041:-43.55691,Vitta Green,-22.940412521362305,-43.556907653808594,REJECT,explicit rubric example (Vitta Green)
+overture:Viure - Ilha Pura:-22.98501:-43.41507,Viure - Ilha Pura,-22.985010147094727,-43.41506576538086,REJECT,real-estate development (Ilha Pura)
+overture:Viva Mais Engenho Novo:-22.89792:-43.26383,Viva Mais Engenho Novo,-22.897924423217773,-43.26383209228516,REJECT,real-estate/wellness branding
+overture:Viva Vida Zona Norte:-22.81182:-43.35501,Viva Vida Zona Norte,-22.81182289123535,-43.35501480102539,REJECT,real-estate/wellness branding
+overture:Viva Vida Zona Oeste:-22.94066:-43.66294,Viva Vida Zona Oeste,-22.940658569335938,-43.66294097900391,REJECT,real-estate/wellness branding
+overture:Vivaz Andaraí:-22.92799:-43.25192,Vivaz Andaraí,-22.92798614501953,-43.25192260742188,REJECT,condo branding
+overture:Vivaz Prime Zona Norte:-22.89080:-43.29284,Vivaz Prime Zona Norte,-22.89080238342285,-43.29284286499024,REJECT,condo branding
+overture:Vivaz Ramos:-22.85353:-43.25689,Vivaz Ramos,-22.853534698486328,-43.25688552856445,REJECT,condo branding
+overture:Vivaz São Cristóvão:-22.89007:-43.22602,Vivaz São Cristóvão,-22.89007377624512,-43.22602081298828,REJECT,condo branding
+overture:Vivenda das Coleirinhas:-22.88348:-43.62845,Vivenda das Coleirinhas,-22.88348197937012,-43.628448486328125,REJECT,residential complex branding
+overture:Vivendas 3200:-23.01061:-43.32736,Vivendas 3200,-23.01061248779297,-43.32735824584961,REJECT,numbered residential complex
+overture:Vivendas Cassia Furtado:-22.78039:-43.40635,Vivendas Cassia Furtado,-22.7803897857666,-43.40635299682617,REJECT,residential complex branding
+overture:Vivendas Da Serra. Freguesia:-22.93374:-43.32940,Vivendas Da Serra. Freguesia,-22.93373680114746,-43.32939529418945,REJECT,residential complex branding
+overture:Vivendas Do Bosque:-22.99772:-43.37958,Vivendas Do Bosque,-22.997722625732425,-43.37957763671875,REJECT,residential complex branding
+overture:Vivendas Do Paraíso:-22.92037:-43.69986,Vivendas Do Paraíso,-22.92037010192871,-43.69985580444336,REJECT,residential complex branding
+overture:Vivendas Luís Felipe:-22.81912:-43.42636,Vivendas Luís Felipe,-22.81912040710449,-43.426361083984375,REJECT,residential complex branding
+overture:Vivendas da Colina:-22.77441:-43.43179,Vivendas da Colina,-22.77440643310547,-43.431785583496094,REJECT,residential complex branding
+overture:Vivendas da Freguesia:-22.94281:-43.33365,Vivendas da Freguesia,-22.942806243896484,-43.33364868164063,REJECT,residential complex branding
+overture:Vivendas de Sagres:-22.94140:-43.57578,Vivendas de Sagres,-22.941404342651367,-43.575775146484375,REJECT,residential complex branding
+overture:Vivendas do Imperador:-22.81231:-43.42480,Vivendas do Imperador,-22.81230735778809,-43.42479705810547,REJECT,residential complex branding
+overture:Viver Bem RJ:-22.89687:-43.20303,Viver Bem RJ,-22.896873474121094,-43.203033447265625,REJECT,real-estate/wellness branding
+overture:Viver Mais Campo Grande:-22.89561:-43.54953,Viver Mais Campo Grande,-22.895612716674805,-43.54952621459961,REJECT,real-estate/wellness branding
+overture:Volp 40:-22.95061:-43.18331,Volp 40,-22.950613021850582,-43.18330764770508,REJECT,cryptic condo code
+overture:WCA Elétrica:-22.81135:-43.36472,WCA Elétrica,-22.81134605407715,-43.36471557617188,REJECT,business (electrical services)
+overture:Wave by Yoo:-23.01197:-43.31873,Wave by Yoo,-23.0119686126709,-43.3187255859375,REJECT,explicit rubric example (Wave by Yoo)
+overture:WayCondo:-22.90398:-43.17523,WayCondo,-22.903976440429688,-43.17522811889648,REJECT,"explicit ""Condo"" branding"
+overture:Weekend:-23.00920:-43.34246,Weekend,-23.00919914245605,-43.34246444702149,REJECT,"generic single word, no landmark meaning"
+overture:Wimbledon Park:-23.00150:-43.34663,Wimbledon Park,-23.001502990722656,-43.34663391113281,REJECT,foreign-named condo branding
+overture:Xmgpfshop02:-22.91168:-43.56015,Xmgpfshop02,-22.91167640686035,-43.56014633178711,REJECT,gibberish shop code
+overture:Zoifer:-22.99751:-43.34825,Zoifer,-22.99751281738281,-43.34824752807617,REJECT,explicit rubric example (Zoifer)
+overture:avenida santa cruz:-22.88283:-43.48829,avenida santa cruz,-22.88282966613769,-43.48828506469727,REJECT,bare avenue name
+overture:complexo do orelha:-22.90834:-43.28859,complexo do orelha,-22.90833854675293,-43.28858947753906,UNCERTAIN,ambiguous informal complex/community name
+overture:condominium of acacias:-22.85035:-43.48206,condominium of acacias,-22.850345611572266,-43.482059478759766,REJECT,"explicit ""condominium"" naming"
+overture:conjunto maravilha:-22.92319:-43.54715,conjunto maravilha,-22.923192977905277,-43.54715347290039,REJECT,"housing complex (""Conjunto""), matches reject pattern"
+overture:jardim palmares:-22.88631:-43.63909,jardim palmares,-22.886308670043945,-43.63908767700195,REJECT,residential/garden housing complex name
+overture:largo do Pelourinho Salvador Bahia:-22.78225:-43.31718,largo do Pelourinho Salvador Bahia,-22.78224754333496,-43.31718444824219,REJECT,"references landmark in a different city (Salvador, Bahia), data mismatch"
+overture:nova holanda:-22.85535:-43.24160,nova holanda,-22.8553466796875,-43.24159622192383,REJECT,bare favela/neighborhood name
+overture:paz de gandhi:-22.76870:-43.42830,paz de gandhi,-22.76870346069336,-43.42829895019531,UNCERTAIN,"possible small park/monument, unclear"
+overture:rua anchieta:-22.96257:-43.17033,rua anchieta,-22.962570190429688,-43.17033004760742,REJECT,bare street name
+overture:rua hanibal porto:-22.82286:-43.32452,rua hanibal porto,-22.82286071777344,-43.32451629638672,REJECT,bare street name
+overture:rua maués:-22.83698:-43.31528,rua maués,-22.83698272705078,-43.315277099609375,REJECT,bare street name
+overture:Álvares de Azevedo:-22.90441:-43.10935,Álvares de Azevedo,-22.9044132232666,-43.10934829711914,UNCERTAIN,"possibly named for poet, unclear if street or landmark"
+overture:Área 5:-22.86693:-43.27944,Área 5,-22.86693382263184,-43.27943801879883,REJECT,explicit rubric example (Área 5)
+overture:Éden:-22.79090:-43.39051,Éden,-22.790903091430664,-43.390506744384766,UNCERTAIN,"single ambiguous word, unclear referent"
