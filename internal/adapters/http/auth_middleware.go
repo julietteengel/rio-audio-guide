@@ -6,7 +6,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"rioaudioguide/backend/internal/domain"
 	"rioaudioguide/backend/internal/ports"
 )
 
@@ -47,9 +46,4 @@ func requireAuth(tokens ports.TokenIssuer) echo.MiddlewareFunc {
 func contextUserID(c echo.Context) string {
 	id, _ := c.Get(contextUserIDKey).(string)
 	return id
-}
-
-func contextRole(c echo.Context) domain.Role {
-	role, _ := c.Get(contextRoleKey).(domain.Role)
-	return role
 }
