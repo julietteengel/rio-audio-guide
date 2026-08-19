@@ -1,0 +1,5 @@
+# These .py files are ~98% embedded FR/EN/ES/PT narration text (254 places),
+# not code -- without this, GitHub's language stats (Linguist) count every
+# byte of that text as "Python," swamping the real language breakdown
+# (Go backend, TypeScript frontend, the actual Python pipeline code).
+pipeline/curation/narrations_data_part*.py linguist-generated=true
