@@ -21,13 +21,23 @@ func TestScriptRepository_SaveAndFindByID(t *testing.T) {
 		t.Fatalf("save place fixture: %v", err)
 	}
 
+	// reviewer_id référence users(id) (schema.sql) -- il faut un vrai compte
+	// pour que MarkReviewed("...") passe la contrainte de clé étrangère,
+	// pas juste une chaîne arbitraire.
+	email, _ := domain.NewEmail("julie+" + place.ID() + "@example.com")
+	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
+	reviewer := domain.NewUser(email, passwordHash, domain.RoleUser)
+	if err := NewUserRepository(pool).Save(ctx, reviewer); err != nil {
+		t.Fatalf("save reviewer fixture: %v", err)
+	}
+
 	scriptRepo := NewScriptRepository(pool)
 	text, err := domain.NewScriptText("Voici l'escadaria...")
 	if err != nil {
 		t.Fatalf("unexpected error building fixture: %v", err)
 	}
 	script := domain.NewScript(place.ID(), domain.LanguageFR, text, "source text")
-	if err := script.MarkReviewed("julie"); err != nil {
+	if err := script.MarkReviewed(reviewer.ID()); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -39,8 +49,8 @@ func TestScriptRepository_SaveAndFindByID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("find by id: %v", err)
 	}
-	if found.Status() != domain.ScriptStatusReviewed || found.Reviewer() != "julie" {
-		t.Fatalf("got status=%v reviewer=%v, want reviewed by julie", found.Status(), found.Reviewer())
+	if found.Status() != domain.ScriptStatusReviewed || found.ReviewerID() != reviewer.ID() {
+		t.Fatalf("got status=%v reviewerID=%v, want reviewed by %v", found.Status(), found.ReviewerID(), reviewer.ID())
 	}
 	if found.ReviewedAt().IsZero() {
 		t.Fatal("expected ReviewedAt to be set after round-trip")

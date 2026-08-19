@@ -11,32 +11,44 @@ import (
 	"rioaudioguide/backend/internal/ports"
 )
 
-// Server regroupe l'instance Echo et les six ports dont l'API a besoin (les adaptateurs ne doivent jamais se connaître entre eux, seulement connaître les ports.)
+// Server regroupe l'instance Echo et les ports dont l'API a besoin (les adaptateurs ne doivent jamais se connaître entre eux, seulement connaître les ports.)
 type Server struct {
 	echo          *echo.Echo
 	placeRepo     ports.PlaceRepository
 	scriptRepo    ports.ScriptRepository
 	audioFileRepo ports.AudioFileRepository
+	userRepo      ports.UserRepository
 	publisher     ports.AudioJobPublisher
 	storage       ports.AudioStorage
 	cache         ports.Cache
+	tokens        ports.TokenIssuer
 }
 
-func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage, cache ports.Cache) *Server {
+func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, userRepo ports.UserRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage, cache ports.Cache, tokens ports.TokenIssuer) *Server {
 	s := &Server{
 		echo:          echo.New(),
 		placeRepo:     placeRepo,
 		scriptRepo:    scriptRepo,
 		audioFileRepo: audioFileRepo,
+		userRepo:      userRepo,
 		publisher:     publisher,
 		storage:       storage,
 		cache:         cache,
+		tokens:        tokens,
 	}
 	s.echo.GET("/places", s.listPlaces)
 	s.echo.GET("/places/:id", s.getPlaceDetail)
 	s.echo.GET("/places/:id/audio", s.getPlaceAudio)
 	s.echo.GET("/cities/:city/manifest", s.getCityManifest)
-	s.echo.POST("/scripts/:id/review", s.reviewScript)
+
+	auth := requireAuth(s.tokens)
+	s.echo.POST("/scripts/:id/review", s.reviewScript, auth)
+
+	s.echo.POST("/register", s.registerUser)
+	s.echo.POST("/login", s.login)
+	s.echo.POST("/logout", s.logout, auth)
+	s.echo.PATCH("/me", s.updateMe, auth)
+	s.echo.DELETE("/me", s.deleteMe, auth)
 	return s
 }
 

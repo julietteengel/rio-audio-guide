@@ -55,7 +55,7 @@ func newReadyManifestFixture(t *testing.T) manifestFixture {
 
 func TestGetCityManifest_IncludesFullyReadyPlace(t *testing.T) {
 	fx := newReadyManifestFixture(t)
-	server := NewServer(fx.placeRepo, fx.scriptRepo, fx.audioRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache())
+	server := NewServer(fx.placeRepo, fx.scriptRepo, fx.audioRepo, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
 
 	req := httptest.NewRequest(http.MethodGet, "/cities/rio/manifest?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -81,8 +81,8 @@ func TestGetCityManifest_OmitsPlaceWithUnpublishedScript(t *testing.T) {
 
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
-	server := NewServer(placeRepo, scriptRepo, &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}},
-		&fakePublisher{}, fakeAudioStorage{}, newFakeCache())
+	server := NewServer(placeRepo, scriptRepo, &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(),
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
 
 	req := httptest.NewRequest(http.MethodGet, "/cities/rio/manifest?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -106,7 +106,7 @@ func TestGetCityManifest_OmitsPlaceWithNoScriptForLanguage(t *testing.T) {
 
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache())
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
 
 	req := httptest.NewRequest(http.MethodGet, "/cities/rio/manifest?language=es", nil)
 	rec := httptest.NewRecorder()
@@ -122,7 +122,7 @@ func TestGetCityManifest_OmitsPlaceWithNoScriptForLanguage(t *testing.T) {
 
 func TestGetCityManifest_UnknownCityIs404(t *testing.T) {
 	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache())
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
 
 	req := httptest.NewRequest(http.MethodGet, "/cities/sao-paulo/manifest?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -135,7 +135,7 @@ func TestGetCityManifest_UnknownCityIs404(t *testing.T) {
 
 func TestGetCityManifest_RequiresLanguageParam(t *testing.T) {
 	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache())
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
 
 	req := httptest.NewRequest(http.MethodGet, "/cities/rio/manifest", nil)
 	rec := httptest.NewRecorder()
@@ -149,7 +149,7 @@ func TestGetCityManifest_RequiresLanguageParam(t *testing.T) {
 func TestGetCityManifest_CachesOnSecondCall(t *testing.T) {
 	fx := newReadyManifestFixture(t)
 	cache := newFakeCache()
-	server := NewServer(fx.placeRepo, fx.scriptRepo, fx.audioRepo, &fakePublisher{}, fakeAudioStorage{}, cache)
+	server := NewServer(fx.placeRepo, fx.scriptRepo, fx.audioRepo, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, cache, fakeTokenIssuer{})
 
 	for i := range 2 {
 		req := httptest.NewRequest(http.MethodGet, "/cities/rio/manifest?language=fr", nil)

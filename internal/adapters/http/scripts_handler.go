@@ -9,10 +9,13 @@ import (
 )
 
 type reviewScriptRequest struct {
-	Reviewer string `json:"reviewer"`
-	VoiceID  string `json:"voice_id"`
+	VoiceID string `json:"voice_id"`
 }
 
+// reviewScript est derrière requireAuth (voir server.go) -- le reviewer
+// n'est plus un nom en texte libre fourni par le client (n'importe qui
+// pouvait prétendre être n'importe qui), c'est l'ID du compte réellement
+// authentifié par le token, lu via contextUserID.
 func (s *Server) reviewScript(c echo.Context) error {
 	scriptID := c.Param("id")
 
@@ -20,11 +23,11 @@ func (s *Server) reviewScript(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
 	}
-	if req.Reviewer == "" || req.VoiceID == "" {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": "reviewer and voice_id are required"})
+	if req.VoiceID == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "voice_id is required"})
 	}
 
-	err := application.ReviewAndRequestAudio(c.Request().Context(), s.scriptRepo, s.audioFileRepo, s.publisher, scriptID, req.Reviewer, req.VoiceID)
+	err := application.ReviewAndRequestAudio(c.Request().Context(), s.scriptRepo, s.audioFileRepo, s.publisher, scriptID, contextUserID(c), req.VoiceID)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": err.Error()})
 	}

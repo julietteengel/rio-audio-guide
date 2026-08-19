@@ -18,28 +18,37 @@ func NewScriptRepository(db DBTX) *ScriptRepository {
 }
 
 const upsertScriptSQL = `
-	INSERT INTO scripts (id, place_id, language, text, source_text, status, reviewer, reviewed_at, published_at)
+	INSERT INTO scripts (id, place_id, language, text, source_text, status, reviewer_id, reviewed_at, published_at)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	ON CONFLICT (id) DO UPDATE SET
 		text = EXCLUDED.text,
 		status = EXCLUDED.status,
-		reviewer = EXCLUDED.reviewer,
+		reviewer_id = EXCLUDED.reviewer_id,
 		reviewed_at = EXCLUDED.reviewed_at,
 		published_at = EXCLUDED.published_at,
 		updated_at = now()
 `
 
 func scriptSaveArgs(script *domain.Script) []any {
-	var reviewedAt, publishedAt any
+	var reviewedAt, publishedAt, reviewerID any
 	if !script.ReviewedAt().IsZero() {
 		reviewedAt = script.ReviewedAt()
 	}
 	if !script.PublishedAt().IsZero() {
 		publishedAt = script.PublishedAt()
 	}
+	// reviewer_id a une contrainte REFERENCES users(id) (schema.sql) : une
+	// chaîne vide n'est PAS NULL pour Postgres, donc un script encore Draft
+	// (jamais reviewé, ReviewerID() == "") ferait échouer la contrainte de
+	// clé étrangère si on l'insérait telle quelle -- "" ne correspond à
+	// aucun users.id. nil, lui, est un vrai NULL SQL, que la contrainte
+	// laisse toujours passer.
+	if script.ReviewerID() != "" {
+		reviewerID = script.ReviewerID()
+	}
 	return []any{
 		script.ID(), script.PlaceID(), script.Language().String(), script.Text().String(), script.SourceText(),
-		string(script.Status()), script.Reviewer(), reviewedAt, publishedAt,
+		string(script.Status()), reviewerID, reviewedAt, publishedAt,
 	}
 }
 
@@ -87,14 +96,14 @@ func (r *ScriptRepository) FindExistingLanguages(ctx context.Context, placeIDs [
 func (r *ScriptRepository) FindByID(ctx context.Context, id string) (*domain.Script, error) {
 	row := r.db.QueryRow(ctx, `
 		SELECT id, place_id, language, text, COALESCE(source_text, ''), status,
-		       COALESCE(reviewer, ''), reviewed_at, published_at
+		       COALESCE(reviewer_id, ''), reviewed_at, published_at
 		FROM scripts WHERE id = $1
 	`, id)
 
-	var scriptID, placeID, languageRaw, textRaw, sourceText, status, reviewer string
+	var scriptID, placeID, languageRaw, textRaw, sourceText, status, reviewerID string
 	var reviewedAt, publishedAt *time.Time
 	if err := row.Scan(&scriptID, &placeID, &languageRaw, &textRaw, &sourceText, &status,
-		&reviewer, &reviewedAt, &publishedAt); err != nil {
+		&reviewerID, &reviewedAt, &publishedAt); err != nil {
 		return nil, err
 	}
 
@@ -116,20 +125,20 @@ func (r *ScriptRepository) FindByID(ctx context.Context, id string) (*domain.Scr
 	}
 
 	return domain.ReconstructScript(scriptID, placeID, language, text, sourceText, domain.ScriptStatus(status),
-		reviewer, reviewedAtVal, publishedAtVal), nil
+		reviewerID, reviewedAtVal, publishedAtVal), nil
 }
 
 func (r *ScriptRepository) FindByPlaceIDAndLanguage(ctx context.Context, placeID, language string) (*domain.Script, error) {
 	row := r.db.QueryRow(ctx, `
 		SELECT id, place_id, language, text, COALESCE(source_text, ''), status,
-		       COALESCE(reviewer, ''), reviewed_at, published_at
+		       COALESCE(reviewer_id, ''), reviewed_at, published_at
 		FROM scripts WHERE place_id = $1 AND language = $2
 	`, placeID, language)
 
-	var scriptID, placeIDCol, languageRaw, textRaw, sourceText, status, reviewer string
+	var scriptID, placeIDCol, languageRaw, textRaw, sourceText, status, reviewerID string
 	var reviewedAt, publishedAt *time.Time
 	if err := row.Scan(&scriptID, &placeIDCol, &languageRaw, &textRaw, &sourceText, &status,
-		&reviewer, &reviewedAt, &publishedAt); err != nil {
+		&reviewerID, &reviewedAt, &publishedAt); err != nil {
 		return nil, err
 	}
 
@@ -151,5 +160,5 @@ func (r *ScriptRepository) FindByPlaceIDAndLanguage(ctx context.Context, placeID
 	}
 
 	return domain.ReconstructScript(scriptID, placeIDCol, language2, text, sourceText, domain.ScriptStatus(status),
-		reviewer, reviewedAtVal, publishedAtVal), nil
+		reviewerID, reviewedAtVal, publishedAtVal), nil
 }

@@ -1,5 +1,15 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 
+CREATE TABLE users (
+    id            TEXT PRIMARY KEY,
+    email         TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role          TEXT NOT NULL DEFAULT 'user',
+    status        TEXT NOT NULL DEFAULT 'active',
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE places (
     id              TEXT PRIMARY KEY,
     name            TEXT NOT NULL,
@@ -22,7 +32,7 @@ CREATE TABLE scripts (
     text         TEXT NOT NULL,
     source_text  TEXT,
     status       TEXT NOT NULL DEFAULT 'draft',
-    reviewer     TEXT,
+    reviewer_id  TEXT REFERENCES users(id),
     reviewed_at  TIMESTAMPTZ,
     published_at TIMESTAMPTZ,
     created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),

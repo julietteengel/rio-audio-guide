@@ -179,9 +179,14 @@ go test ./...                                                    # no infra need
 go vet ./...
 golangci-lint run ./...
 
-TEST_DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
+TEST_DATABASE_URL="postgres://postgres:postgres@localhost:5434/postgres" \
   go test -tags=integration ./...                                 # + real Postgres/RabbitMQ/Redis/S3
 ```
+
+`TEST_DATABASE_URL` points at a *separate* Postgres (port 5434, the `postgres-test` service in
+`docker-compose.yml`), not the port-5433 one holding real dev data. Integration tests write real
+fixture rows (`"Test Place"`, `"julie"` as a reviewer, etc.) — pointing them at the dev database
+silently pollutes it with that content over repeated runs.
 
 Everything needing a live Postgres/RabbitMQ/Redis is gated behind the `integration` build tag, so
 `go test ./...` needs no infrastructure to be running. Two untagged tests do touch the network, but

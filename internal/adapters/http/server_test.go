@@ -78,6 +78,51 @@ func (f *fakeAudioFileRepo) FindByScriptID(_ context.Context, scriptID string) (
 	return nil, pgx.ErrNoRows
 }
 
+type fakeUserRepo struct{ users map[string]*domain.User }
+
+func newFakeUserRepo() *fakeUserRepo { return &fakeUserRepo{users: map[string]*domain.User{}} }
+
+func (f *fakeUserRepo) Save(_ context.Context, u *domain.User) error {
+	f.users[u.ID()] = u
+	return nil
+}
+func (f *fakeUserRepo) FindByID(_ context.Context, id string) (*domain.User, error) {
+	u, ok := f.users[id]
+	if !ok {
+		return nil, pgx.ErrNoRows
+	}
+	return u, nil
+}
+func (f *fakeUserRepo) FindByEmail(_ context.Context, email string) (*domain.User, error) {
+	for _, u := range f.users {
+		if u.Email().String() == email {
+			return u, nil
+		}
+	}
+	return nil, pgx.ErrNoRows
+}
+
+// fakeTokenIssuer skips real signing entirely -- "userID:role" is opaque
+// enough for tests, which only need Issue/Verify to round-trip consistently,
+// never real cryptographic guarantees.
+type fakeTokenIssuer struct{}
+
+func (fakeTokenIssuer) Issue(userID string, role domain.Role) (string, error) {
+	return userID + ":" + role.String(), nil
+}
+
+func (fakeTokenIssuer) Verify(token string) (string, domain.Role, error) {
+	userID, roleRaw, ok := strings.Cut(token, ":")
+	if !ok {
+		return "", "", errors.New("invalid fake token")
+	}
+	role, err := domain.NewRole(roleRaw)
+	if err != nil {
+		return "", "", err
+	}
+	return userID, role, nil
+}
+
 type fakePublisher struct{ published int }
 
 func (f *fakePublisher) PublishTTSJob(_ context.Context, _, _, _, _, _ string) error {
@@ -119,7 +164,7 @@ func TestListPlaces(t *testing.T) {
 
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache())
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places", nil)
 	rec := httptest.NewRecorder()
@@ -140,11 +185,14 @@ func TestReviewScript(t *testing.T) {
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}
 	publisher := &fakePublisher{}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, publisher, fakeAudioStorage{}, newFakeCache())
+	tokens := fakeTokenIssuer{}
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), publisher, fakeAudioStorage{}, newFakeCache(), tokens)
 
-	body := strings.NewReader(`{"reviewer":"julie","voice_id":"voice-1"}`)
+	token, _ := tokens.Issue("julie", domain.RoleUser)
+	body := strings.NewReader(`{"voice_id":"voice-1"}`)
 	req := httptest.NewRequest(http.MethodPost, "/scripts/"+script.ID()+"/review", body)
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
 	rec := httptest.NewRecorder()
 	server.echo.ServeHTTP(rec, req)
 
@@ -153,6 +201,32 @@ func TestReviewScript(t *testing.T) {
 	}
 	if publisher.published != 1 {
 		t.Fatalf("got %d published jobs, want 1", publisher.published)
+	}
+
+	reviewed, _ := scriptRepo.FindByID(context.Background(), script.ID())
+	if reviewed.ReviewerID() != "julie" {
+		t.Fatalf("got reviewerID %q, want %q (from the authenticated token, not a client-supplied field)", reviewed.ReviewerID(), "julie")
+	}
+}
+
+func TestReviewScript_RequiresAuth(t *testing.T) {
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript("place-1", domain.LanguageFR, text, "source")
+
+	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
+	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
+
+	body := strings.NewReader(`{"voice_id":"voice-1"}`)
+	req := httptest.NewRequest(http.MethodPost, "/scripts/"+script.ID()+"/review", body)
+	req.Header.Set("Content-Type", "application/json")
+	// Pas d'en-tête Authorization -- doit être rejeté avant même d'atteindre
+	// le handler.
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusUnauthorized {
+		t.Fatalf("got status %d, want 401 (missing Authorization header)", rec.Code)
 	}
 }
 
@@ -164,7 +238,7 @@ func TestListPlaces_CachesOnSecondCall(t *testing.T) {
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	cache := newFakeCache()
 	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, cache)
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, cache, fakeTokenIssuer{})
 
 	for i := 0; i < 2; i++ {
 		req := httptest.NewRequest(http.MethodGet, "/places", nil)
@@ -187,7 +261,7 @@ func TestListPlaces_FailsOpenWhenCacheErrors(t *testing.T) {
 
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, &fakePublisher{}, fakeAudioStorage{}, erroringCache{})
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, erroringCache{}, fakeTokenIssuer{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places", nil)
 	rec := httptest.NewRecorder()

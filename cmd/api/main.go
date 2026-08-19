@@ -13,6 +13,7 @@ import (
 	goredis "github.com/redis/go-redis/v9"
 
 	httpadapter "rioaudioguide/backend/internal/adapters/http"
+	"rioaudioguide/backend/internal/adapters/jwt"
 	"rioaudioguide/backend/internal/adapters/postgres"
 	"rioaudioguide/backend/internal/adapters/rabbitmq"
 	"rioaudioguide/backend/internal/adapters/redis"
@@ -58,6 +59,17 @@ func main() {
 	placeRepo := postgres.NewPlaceRepository(pool)
 	scriptRepo := postgres.NewScriptRepository(pool)
 	audioFileRepo := postgres.NewAudioFileRepository(pool)
+	userRepo := postgres.NewUserRepository(pool)
+
+	// Le fallback ci-dessous n'est là que pour le confort du dev local (même
+	// esprit que DATABASE_URL/RABBITMQ_URL) -- mais contrairement à ceux-là,
+	// un secret JWT prévisible permettrait de forger des tokens valides pour
+	// n'importe quel compte. JWT_SECRET doit être positionné explicitement dès
+	// que ce service tourne ailleurs qu'en local (staging, prod).
+	tokens, err := jwt.NewIssuer(envOr("JWT_SECRET", "dev-only-insecure-secret-change-me"))
+	if err != nil {
+		log.Fatalf("set up token issuer: %v", err)
+	}
 
 	publisher, err := rabbitmq.NewAudioJobPublisher(channel)
 	if err != nil {
@@ -94,7 +106,7 @@ func main() {
 	})
 	cache := redis.NewCache(redisClient)
 
-	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, publisher, storage, cache)
+	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, userRepo, publisher, storage, cache, tokens)
 	log.Println("api ready, listening on :8080")
 	if err := server.Start(":8080"); err != nil {
 		log.Fatalf("http server: %v", err)
