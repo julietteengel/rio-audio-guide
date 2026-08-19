@@ -33,9 +33,13 @@ function formatTime(seconds: number): string {
 }
 
 export function PlaceDetailScreen({ route, navigation }: Props) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [place, setPlace] = useState<Place | null>(null);
-  const [playerLocale, setPlayerLocale] = useState<Locale>("pt");
+  // Defaults to the app's own reading locale, not a fixed language -- it was
+  // hardcoded to "pt" before, which silently broke for anyone reading in a
+  // different language (and happened to be exactly the one language that
+  // failed to generate for Cristo Redentor, making it look broken).
+  const [playerLocale, setPlayerLocale] = useState<Locale>(locale);
   const [audio, setAudio] = useState<AudioAvailability>({ state: "unavailable" });
 
   useEffect(() => {
@@ -67,6 +71,10 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   if (!place) return null;
 
   const canPlay = audio.state === "ready";
+  // Falls back to the raw backend value for any category not yet in the
+  // dictionary, rather than showing nothing.
+  const categoryLabel =
+    (t.categories as Record<string, string>)[place.category] ?? place.category;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 40 }}>
@@ -91,7 +99,7 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
         </SafeAreaView>
         <View style={styles.heroText}>
           <Text style={styles.eyebrow}>
-            {place.neighborhood ? `${place.category} · ${place.neighborhood}` : place.category}
+            {place.neighborhood ? `${categoryLabel} · ${place.neighborhood}` : categoryLabel}
           </Text>
           <Text style={styles.title}>{place.name}</Text>
         </View>
@@ -191,7 +199,16 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.cream },
-  hero: { height: 320, backgroundColor: colors.sand, justifyContent: "space-between" },
+  hero: {
+    height: 320,
+    backgroundColor: colors.sand,
+    justifyContent: "space-between",
+    // Without this, react-native-web's absolutely-positioned cover Image
+    // (and its gradient overlay) can render taller than this fixed-height
+    // container and bleed into the content below on web -- native clips
+    // this automatically, web doesn't.
+    overflow: "hidden",
+  },
   back: {
     marginLeft: 18,
     marginTop: 8,

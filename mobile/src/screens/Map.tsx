@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, Pressable, StyleSheet, Platform, ScrollView } from "react-native";
+import { View, Text, Pressable, TextInput, StyleSheet, Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 import Svg, { Circle, Line, Path } from "react-native-svg";
@@ -43,6 +43,17 @@ export function MapScreen({ navigation }: Props) {
   const [offlineCount, setOfflineCount] = useState(0);
   const [userLocation, setUserLocation] = useState<LatLon | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [query, setQuery] = useState("");
+
+  // Local filter over the already-loaded list, not a network call per
+  // keystroke -- listNearby() already fetched every place once above, and
+  // placesRepository.search() hitting the backend on every character typed
+  // would be both slower and unnecessary for a list this size.
+  const visiblePlaces = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return places;
+    return places.filter((p) => p.name.toLowerCase().includes(q));
+  }, [places, query]);
 
   useEffect(() => {
     placesRepository.listNearby().then(setPlaces);
@@ -121,7 +132,7 @@ export function MapScreen({ navigation }: Props) {
         {Platform.OS === "web" ? (
           <ScrollView style={StyleSheet.absoluteFill} contentContainerStyle={styles.webListContent}>
             <Text style={styles.webListNotice}>{t.map.webMapUnavailable}</Text>
-            {places.map((p) => (
+            {visiblePlaces.map((p) => (
               <Pressable
                 key={p.id}
                 style={styles.webListRow}
@@ -130,7 +141,9 @@ export function MapScreen({ navigation }: Props) {
                 <View style={styles.pin} />
                 <View style={styles.nearbyText}>
                   <Text style={styles.nearbyTitle}>{p.name}</Text>
-                  <Text style={styles.nearbySub}>{p.category}</Text>
+                  <Text style={styles.nearbySub}>
+                    {(t.categories as Record<string, string>)[p.category] ?? p.category}
+                  </Text>
                 </View>
               </Pressable>
             ))}
@@ -162,7 +175,13 @@ export function MapScreen({ navigation }: Props) {
             <Circle cx={11} cy={11} r={7} stroke={colors.inkFaint} strokeWidth={2} />
             <Line x1={21} y1={21} x2={16.65} y2={16.65} stroke={colors.inkFaint} strokeWidth={2} strokeLinecap="round" />
           </Svg>
-          <Text style={styles.searchText}>{t.map.searchPlaceholder}</Text>
+          <TextInput
+            style={[styles.searchText, { color: colors.ink }]}
+            placeholder={t.map.searchPlaceholder}
+            placeholderTextColor={colors.inkFaint}
+            value={query}
+            onChangeText={setQuery}
+          />
         </View>
       </View>
 
@@ -257,7 +276,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
-  searchText: { fontFamily: fonts.body, fontSize: 14, color: colors.inkFaint },
+  searchText: { flex: 1, fontFamily: fonts.body, fontSize: 14, color: colors.inkFaint },
   webListContent: { paddingTop: 76, paddingHorizontal: 16, paddingBottom: 100, gap: 10 },
   webListNotice: {
     fontFamily: fonts.body,
