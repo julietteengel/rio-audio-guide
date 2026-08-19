@@ -7,6 +7,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
 import { placesRepository } from "../data/PlacesRepository";
+import { fetchCityManifest, RIO_CITY_SLUG } from "../data/downloadManager";
 import type { Place } from "../data/types";
 import { haversineMeters, formatDistance, type LatLon } from "../utils/geo";
 import { colors, fonts, radii } from "../theme/tokens";
@@ -38,12 +39,34 @@ const RIO_REGION = {
 };
 
 export function MapScreen({ navigation }: Props) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [places, setPlaces] = useState<Place[]>([]);
   const [offlineCount, setOfflineCount] = useState(0);
   const [userLocation, setUserLocation] = useState<LatLon | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);
   const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [audioOnly, setAudioOnly] = useState(false);
+  // IDs with real, ready, published audio in the app's current language --
+  // GET /cities/rio/manifest?language=X already computes exactly this
+  // (script published AND audio ready, one cached call), reusing it here
+  // instead of a per-place /audio call x252 or trusting a stale local flag.
+  const [audioReadyIds, setAudioReadyIds] = useState<Set<string> | null>(null);
+
+  useEffect(() => {
+    fetchCityManifest(RIO_CITY_SLUG, locale).then((ready) => {
+      setAudioReadyIds(new Set(ready.map((p) => p.id)));
+    });
+  }, [locale]);
+
+  // Every category actually present in the loaded list, not a hardcoded
+  // set -- stays correct if new categories show up without a frontend
+  // change, and never offers a filter chip with zero matching places.
+  const categories = useMemo(() => {
+    const seen = new Set<string>();
+    for (const p of places) seen.add(p.category);
+    return Array.from(seen).sort();
+  }, [places]);
 
   // Local filter over the already-loaded list, not a network call per
   // keystroke -- listNearby() already fetched every place once above, and
@@ -51,9 +74,13 @@ export function MapScreen({ navigation }: Props) {
   // would be both slower and unnecessary for a list this size.
   const visiblePlaces = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return places;
-    return places.filter((p) => p.name.toLowerCase().includes(q));
-  }, [places, query]);
+    return places.filter((p) => {
+      if (q && !p.name.toLowerCase().includes(q)) return false;
+      if (activeCategory && p.category !== activeCategory) return false;
+      if (audioOnly && !audioReadyIds?.has(p.id)) return false;
+      return true;
+    });
+  }, [places, query, activeCategory, audioOnly, audioReadyIds]);
 
   useEffect(() => {
     placesRepository.listNearby().then(setPlaces);
@@ -128,6 +155,41 @@ export function MapScreen({ navigation }: Props) {
         </View>
       </SafeAreaView>
 
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterRow}
+        contentContainerStyle={styles.filterRowContent}
+      >
+        <Pressable
+          style={[styles.chip, activeCategory === null && styles.chipActive]}
+          onPress={() => setActiveCategory(null)}
+        >
+          <Text style={[styles.chipText, activeCategory === null && styles.chipTextActive]}>
+            {t.map.allCategories}
+          </Text>
+        </Pressable>
+        {categories.map((cat) => (
+          <Pressable
+            key={cat}
+            style={[styles.chip, activeCategory === cat && styles.chipActive]}
+            onPress={() => setActiveCategory(activeCategory === cat ? null : cat)}
+          >
+            <Text style={[styles.chipText, activeCategory === cat && styles.chipTextActive]}>
+              {(t.categories as Record<string, string>)[cat] ?? cat}
+            </Text>
+          </Pressable>
+        ))}
+        <Pressable
+          style={[styles.chip, styles.chipDivider, audioOnly && styles.chipActive]}
+          onPress={() => setAudioOnly((v) => !v)}
+        >
+          <Text style={[styles.chipText, audioOnly && styles.chipTextActive]}>
+            {t.map.audioOnlyFilter}
+          </Text>
+        </Pressable>
+      </ScrollView>
+
       <View style={styles.map}>
         {Platform.OS === "web" ? (
           <ScrollView style={StyleSheet.absoluteFill} contentContainerStyle={styles.webListContent}>
@@ -150,7 +212,7 @@ export function MapScreen({ navigation }: Props) {
           </ScrollView>
         ) : (
           <MapView style={StyleSheet.absoluteFill} initialRegion={RIO_REGION}>
-            {places.map((p) => (
+            {visiblePlaces.map((p) => (
               <Marker
                 key={p.id}
                 coordinate={{ latitude: p.lat, longitude: p.lon }}
@@ -256,6 +318,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  filterRow: {
+    backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  filterRowContent: {
+    flexDirection: "row",
+    gap: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  chip: {
+    borderRadius: radii.pill,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    backgroundColor: colors.sand,
+  },
+  chipDivider: { marginLeft: 6 },
+  chipActive: { backgroundColor: colors.terracotta },
+  chipText: { fontFamily: fonts.bodyBold, fontSize: 12.5, color: colors.inkSoft },
+  chipTextActive: { color: colors.cream },
   map: { flex: 1, backgroundColor: colors.sand },
   search: {
     position: "absolute",

@@ -36,6 +36,8 @@ export const dictionary = {
     map: {
       offlineBadge: "Hors ligne · {count} lieux",
       searchPlaceholder: "Rechercher un lieu",
+      allCategories: "Tout",
+      audioOnlyFilter: "Audio disponible",
       nearbyDistance: "{distance} · à portée d'écoute",
       youAreHere: "Vous êtes ici",
       locatingYou: "Localisation en cours…",
@@ -145,6 +147,8 @@ export const dictionary = {
     map: {
       offlineBadge: "Offline · {count} places",
       searchPlaceholder: "Search a place",
+      allCategories: "All",
+      audioOnlyFilter: "Audio available",
       nearbyDistance: "{distance} · within earshot",
       youAreHere: "You are here",
       locatingYou: "Locating you…",
@@ -254,6 +258,8 @@ export const dictionary = {
     map: {
       offlineBadge: "Offline · {count} lugares",
       searchPlaceholder: "Buscar um lugar",
+      allCategories: "Tudo",
+      audioOnlyFilter: "Áudio disponível",
       nearbyDistance: "{distance} · ao alcance",
       youAreHere: "Você está aqui",
       locatingYou: "Localizando…",
@@ -363,6 +369,8 @@ export const dictionary = {
     map: {
       offlineBadge: "Sin conexión · {count} lugares",
       searchPlaceholder: "Buscar un lugar",
+      allCategories: "Todo",
+      audioOnlyFilter: "Audio disponible",
       nearbyDistance: "{distance} · al alcance",
       youAreHere: "Estás aquí",
       locatingYou: "Localizando…",
