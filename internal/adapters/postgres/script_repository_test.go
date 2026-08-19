@@ -57,6 +57,43 @@ func TestScriptRepository_SaveAndFindByID(t *testing.T) {
 	}
 }
 
+func TestScriptRepository_FindByPlaceID(t *testing.T) {
+	pool := testPool(t)
+	ctx := context.Background()
+
+	placeName, _ := domain.NewPlaceName("Confeitaria Colombo")
+	coords, _ := domain.NewCoordinates(-22.9068, -43.1765)
+	place := domain.NewPlace(placeName, "historic_site", coords, "", "overture", "correct")
+	placeRepo := NewPlaceRepository(pool)
+	if err := placeRepo.Save(ctx, place); err != nil {
+		t.Fatalf("save place fixture: %v", err)
+	}
+
+	scriptRepo := NewScriptRepository(pool)
+	for _, lang := range []domain.Language{domain.LanguageFR, domain.LanguageEN} {
+		text, _ := domain.NewScriptText("Texte")
+		script := domain.NewScript(place.ID(), lang, text, "source")
+		if err := scriptRepo.Save(ctx, script); err != nil {
+			t.Fatalf("save script fixture (%s): %v", lang, err)
+		}
+	}
+
+	found, err := scriptRepo.FindByPlaceID(ctx, place.ID())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(found) != 2 {
+		t.Fatalf("got %d scripts, want 2", len(found))
+	}
+	languages := map[string]bool{}
+	for _, s := range found {
+		languages[s.Language().String()] = true
+	}
+	if !languages["fr"] || !languages["en"] {
+		t.Fatalf("got languages %v, want fr and en", languages)
+	}
+}
+
 func TestScriptRepository_FindByPlaceIDAndLanguage(t *testing.T) {
 	pool := testPool(t)
 	ctx := context.Background()

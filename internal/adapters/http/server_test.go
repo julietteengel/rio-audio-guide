@@ -55,6 +55,15 @@ func (f *fakeScriptRepo) FindByPlaceIDAndLanguage(_ context.Context, placeID, la
 	}
 	return nil, pgx.ErrNoRows
 }
+func (f *fakeScriptRepo) FindByPlaceID(_ context.Context, placeID string) ([]*domain.Script, error) {
+	var found []*domain.Script
+	for _, s := range f.scripts {
+		if s.PlaceID() == placeID {
+			found = append(found, s)
+		}
+	}
+	return found, nil
+}
 
 type fakeAudioFileRepo struct{ files map[string]*domain.AudioFile }
 
