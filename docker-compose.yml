@@ -45,5 +45,63 @@ services:
     ports:
       - "6379:6379"
 
+  # api/worker : même image golang:1.26 + air (deploy/docker/Dockerfile.dev),
+  # seule la commande air (donc le fichier .toml passé en -c) diffère -- le
+  # code source arrive par bind mount, pas par COPY, donc une sauvegarde
+  # recompile et relance en place sans rebuild d'image.
+  api:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.dev
+    command: ["-c", "deploy/docker/air.api.toml"]
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      REDIS_ADDR: redis:6379
+      JWT_SECRET: dev-only-insecure-secret-change-me
+    volumes:
+      - .:/src
+      - api-gocache:/go/pkg/mod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.dev
+    command: ["-c", "deploy/docker/air.worker.toml"]
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      S3_BUCKET: rio-audio-guide
+      # Repris depuis le shell hôte (docker compose interpole ${VAR} tel
+      # quel). Pas de ":?" ici : ça ferait échouer `docker compose up api`
+      # aussi (compose interpole tout le fichier, pas juste le service
+      # démarré) même quand on ne touche pas au worker. Le vrai garde-fou
+      # est mustEnv() côté Go (cmd/worker/main.go) -- absent, seul le
+      # worker refuse de démarrer, pas le reste de la stack.
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+    volumes:
+      - .:/src
+      - worker-gocache:/go/pkg/mod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
 volumes:
   postgres-data:
+  api-gocache:
+  worker-gocache:

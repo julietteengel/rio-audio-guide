@@ -4,3 +4,4 @@ pipeline/places.json
 __pycache__/
 *.pyc
 .DS_Store
+tmp/

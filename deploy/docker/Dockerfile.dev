@@ -1,0 +1,21 @@
+FROM golang:1.26
+
+WORKDIR /src
+
+# air en couche d'image séparée -- reconstruite seulement si le module air
+# lui-même change, jamais à cause d'une modif de code applicatif. Le
+# toolchain de l'image (1.26) n'a pas besoin d'égaler go.mod (1.25.0) --
+# c'est go.mod qui fixe la version de langage réellement utilisée pour
+# compiler ce module, la base image dev n'est qu'un exécuteur plus récent.
+RUN go install github.com/air-verse/air@latest
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Le code réel arrive via le bind mount de docker-compose (volumes: .:/src),
+# pas cette COPY -- elle sert juste à ce que l'image soit utilisable seule
+# (ex: CI) sans dépendre du mount. air surveille les .go montés et recompile
+# à chaque sauvegarde.
+COPY . .
+
+ENTRYPOINT ["air"]

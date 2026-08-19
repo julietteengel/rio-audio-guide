@@ -81,14 +81,19 @@ Postgres as `Place`/`Script` rows, before any of the above can run against real 
 
 ## Running locally
 
-Plain Docker containers for Postgres/RabbitMQ/Redis, `cmd/api`/`cmd/worker` run as normal local Go
-processes (no Kubernetes involved at all — see "Running on `kind`" below if you specifically want
-to exercise the Helm chart or autoscaling).
+`docker compose up -d` starts everything — Postgres/RabbitMQ/Redis plus `api`/`worker` themselves,
+built from `deploy/docker/Dockerfile.dev` (a `golang:1.26` image with
+[air](https://github.com/air-verse/air) for hot reload). The repo root is bind-mounted into the
+container (`.:/src`), so saving a `.go` file rebuilds and restarts that service in place — no
+`docker compose build` round trip per change, no local Go toolchain required at all. This replaced
+running `cmd/api`/`cmd/worker` as bare `go run` processes on the host (no Kubernetes involved either
+way — see "Running on `kind`" below if you specifically want to exercise the Helm chart or
+autoscaling).
 
 ```bash
-docker run -d --name rio-postgres -p 5433:5432 -e POSTGRES_PASSWORD=postgres postgis/postgis:16-3.4
-docker run -d --name rio-rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
-docker run -d --name rio-redis -p 6379:6379 redis:7-alpine
+docker compose up -d              # postgres, postgres-test, rabbitmq, redis, api, worker
+docker compose logs -f api        # follow one service's logs
+docker compose up -d --build api  # only needed after editing Dockerfile.dev itself (not app code)
 
 psql "postgres://postgres:postgres@localhost:5433/postgres" -f internal/adapters/postgres/schema.sql
 
@@ -96,30 +101,33 @@ psql "postgres://postgres:postgres@localhost:5433/postgres" -f internal/adapters
 # See ../sourcing-pipeline/pipeline/curation/ for how those CSVs are produced.
 DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
   go run ./cmd/import -places=<path>/places_clean_vN.csv -narrations=<path>/narrations_multi_full.csv
-
-DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
-RABBITMQ_URL="amqp://guest:guest@localhost:5672/" \
-REDIS_ADDR="localhost:6379" \
-  go run ./cmd/api
-
-DATABASE_URL="postgres://postgres:postgres@localhost:5433/postgres" \
-RABBITMQ_URL="amqp://guest:guest@localhost:5672/" \
-S3_BUCKET="rio-audio-guide" \
-ELEVENLABS_API_KEY="<your key>" \
-  go run ./cmd/worker
 ```
 
-`REDIS_ADDR` is a bare `host:port`, not a URL like `DATABASE_URL`/`RABBITMQ_URL` — that's what the
-Redis client expects, and `redis://…` would fail. Skipping Redis entirely still works: the cache is
-fail-open, so the API serves every request correctly, just never from cache. It logs each failure
-rather than degrading silently.
+`api` needs nothing beyond what's already wired in `docker-compose.yml` — `DATABASE_URL`/
+`RABBITMQ_URL` point at the `postgres`/`rabbitmq` service names (Compose's internal DNS), and
+`REDIS_ADDR` is a bare `host:port` (`redis:6379`), not a URL — that's what the Redis client expects,
+and `redis://…` would fail. Skipping Redis entirely still works: the cache is fail-open, so the API
+serves every request correctly, just never from cache. It logs each failure rather than degrading
+silently.
+
+`worker` additionally needs a real `ELEVENLABS_API_KEY` (and, to actually upload finished audio, real
+AWS credentials) — it refuses to start without one (`mustEnv`, deliberately, so it never silently
+no-ops). Export these in your shell *before* `docker compose up`, Compose passes them through:
+
+```bash
+export ELEVENLABS_API_KEY="<your key>"
+export AWS_ACCESS_KEY_ID="…" AWS_SECRET_ACCESS_KEY="…" AWS_SESSION_TOKEN="…"
+docker compose up -d worker
+```
 
 Trigger generation for an imported script (get a `voice_id` from the ElevenLabs voice library, or clone
-one with `pipeline/curation/clone_voice.py`):
+one with `pipeline/curation/clone_voice.py`) — `reviewScript` sits behind `requireAuth` now, so it
+reads the reviewer from your JWT (`Authorization: Bearer …`, from `POST /login`), not a body field:
 
 ```bash
 curl -X POST localhost:8080/scripts/<script-id>/review \
-  -d '{"reviewer":"you","voice_id":"<voice_id>"}'
+  -H "Authorization: Bearer <token>" \
+  -d '{"voice_id":"<voice_id>"}'
 ```
 
 Then fetch the finished audio — note this takes a **place** ID, not a script ID, and the language
