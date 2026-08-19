@@ -6,6 +6,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
 import { LocaleProvider } from "./src/i18n/LocaleContext";
+import { AuthProvider } from "./src/auth/AuthContext";
 import { RootNavigator } from "./src/navigation/RootNavigator";
 import { colors } from "./src/theme/tokens";
 
@@ -39,9 +40,11 @@ export default function App() {
     <View style={{ flex: 1, backgroundColor: colors.cream }} onLayout={onLayoutRootView}>
       <SafeAreaProvider>
         <LocaleProvider>
-          <NavigationContainer>
-            <RootNavigator />
-          </NavigationContainer>
+          <AuthProvider>
+            <NavigationContainer>
+              <RootNavigator />
+            </NavigationContainer>
+          </AuthProvider>
         </LocaleProvider>
       </SafeAreaProvider>
       <StatusBar style="dark" />

@@ -9,4 +9,6 @@ export type AppStackParamList = {
   PlaceDetail: { placeId: string };
   Assistant: { placeId: string };
   Settings: undefined;
+  Auth: undefined;
+  EditProfile: undefined;
 };

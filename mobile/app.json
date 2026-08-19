@@ -43,7 +43,8 @@
         {
           "locationWhenInUsePermission": "Memória Carioca uses your location to show which places are nearby on the map."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "extra": {
       "eas": {

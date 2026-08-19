@@ -1,17 +1,34 @@
 import React from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Polyline } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
 import { SUPPORTED_LOCALES, Locale } from "../i18n/dictionary";
+import { useAuth } from "../auth/AuthContext";
 import { colors, fonts, radii } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<AppStackParamList, "Settings">;
 
 export function SettingsScreen({ navigation }: Props) {
   const { t, locale, setLocale } = useLocale();
+  const { user, isLoggedIn, logout, deleteAccount } = useAuth();
+
+  function confirmDeleteAccount() {
+    Alert.alert(t.settings.deleteAccountConfirmTitle, t.settings.deleteAccountConfirmMessage, [
+      { text: t.settings.deleteAccountCancel, style: "cancel" },
+      {
+        text: t.settings.deleteAccountConfirm,
+        style: "destructive",
+        onPress: () => {
+          deleteAccount().catch(() => {
+            Alert.alert(t.auth.genericError);
+          });
+        },
+      },
+    ]);
+  }
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -25,6 +42,35 @@ export function SettingsScreen({ navigation }: Props) {
       <Text style={styles.h1}>{t.settings.title}</Text>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>{t.settings.accountSection}</Text>
+          <View style={styles.group}>
+            {isLoggedIn ? (
+              <>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>{user?.email}</Text>
+                </View>
+                <Pressable style={styles.row} onPress={() => navigation.navigate("EditProfile")}>
+                  <Text style={styles.rowLabel}>{t.settings.editProfile}</Text>
+                </Pressable>
+                <Pressable style={styles.row} onPress={() => logout()}>
+                  <Text style={styles.rowLabel}>{t.settings.logout}</Text>
+                </Pressable>
+                <Pressable style={[styles.row, styles.rowLast]} onPress={confirmDeleteAccount}>
+                  <Text style={styles.rowLabelDanger}>{t.settings.deleteAccount}</Text>
+                </Pressable>
+              </>
+            ) : (
+              <Pressable
+                style={[styles.row, styles.rowLast]}
+                onPress={() => navigation.navigate("Auth")}
+              >
+                <Text style={styles.rowLabel}>{t.settings.login}</Text>
+              </Pressable>
+            )}
+          </View>
+        </View>
+
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t.settings.offlineDataSection}</Text>
           <View style={styles.group}>
@@ -134,6 +180,7 @@ const styles = StyleSheet.create({
   },
   rowLast: { borderBottomWidth: 0 },
   rowLabel: { flex: 1, fontFamily: fonts.bodySemiBold, fontSize: 15, color: colors.ink },
+  rowLabelDanger: { flex: 1, fontFamily: fonts.bodySemiBold, fontSize: 15, color: colors.terracottaDark },
   rowSub: { fontFamily: fonts.body, fontSize: 12.5, color: colors.inkSoft, marginTop: 2 },
   rowValue: { fontFamily: fonts.body, fontSize: 14, color: colors.inkSoft },
   link: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.terracotta },
