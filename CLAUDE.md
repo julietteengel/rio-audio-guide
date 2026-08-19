@@ -29,7 +29,9 @@ it's had a real human code review pass (not just an automated one). When asked t
     `2026-08-18-mobile-app-design.md` for screens/navigation/architecture; see
     `2026-08-19-mobile-real-backend-wiring-design.md` for the follow-up that wired it to the backend's
     real routes, added a real map with a web fallback, and fixed a download-language/UI-language UX
-    bug — read both, the second doesn't repeat the first).
+    bug; see `2026-08-19-mobile-account-design.md` for login/edit-profile/logout/delete-account,
+    wired to auth routes the founder built in parallel on `backend` — read all three, none repeats
+    the last).
   Both reuse the brand, copy, and visual design already validated in an earlier Claude Design
   prototype (ephemeral session scratch files, not part of this repo) — that prototype is not
   re-designed here, and is no longer needed to continue this work: the specs above and the code itself
