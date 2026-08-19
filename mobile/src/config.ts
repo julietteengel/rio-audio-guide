@@ -2,20 +2,22 @@ import Constants from "expo-constants";
 
 /**
  * Base URL of the backend API (see rio-audio-guide's `backend` branch,
- * `internal/adapters/http`), e.g. "http://192.168.0.45:8080".
+ * `internal/adapters/http`).
  *
- * A physical phone running Expo Go cannot reach "localhost" — that resolves
- * to the phone itself, not the machine running the backend — so this must be
- * the backend machine's LAN IP while both devices are on the same Wi-Fi.
- *
- * Override without editing this file, in order of precedence:
- *   1. `EXPO_PUBLIC_API_BASE_URL` env var (e.g. in a local `.env` file) —
- *      the simplest override, picked up automatically by Expo's bundler.
- *   2. `expo.extra.apiBaseUrl` in app.json.
- *   3. The hardcoded fallback below, which is only ever right on the exact
- *      machine/network this was last configured for.
+ * No real value is hardcoded here or in app.json — a LAN IP is
+ * machine/network-specific (right today, stale tomorrow) and doesn't belong
+ * committed to git either way. Set it locally instead:
+ *   1. `EXPO_PUBLIC_API_BASE_URL` in a local, gitignored `.env` file (or
+ *      exported in your shell) — picked up automatically by Expo's bundler.
+ *      Web / iOS Simulator on the same machine as the backend: "http://
+ *      localhost:8080". Physical phone over Wi-Fi: the backend machine's
+ *      LAN IP instead — "localhost" on a phone resolves to the phone
+ *      itself, not the machine running the backend.
+ *   2. `expo.extra.apiBaseUrl` in app.json, same caveat, checked second.
+ * Falls back to localhost, right for local dev on one machine (web /
+ * Simulator), never for a physical device.
  */
 export const API_BASE_URL: string =
   process.env.EXPO_PUBLIC_API_BASE_URL ??
   (Constants.expoConfig?.extra?.apiBaseUrl as string | undefined) ??
-  "http://192.168.0.45:8080";
+  "http://localhost:8080";
