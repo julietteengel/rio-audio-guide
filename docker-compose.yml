@@ -60,6 +60,15 @@ services:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
       REDIS_ADDR: redis:6379
+      S3_BUCKET: rio-audio-guide
+      # getPlaceAudio presigns real S3 URLs (PresignURL) -- needs real AWS
+      # config same as worker, missed when worker's block was added since
+      # api didn't touch S3 at the time. Same source, same rule: fill in
+      # real values in .env yourself, never here.
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
       JWT_SECRET: dev-only-insecure-secret-change-me
     volumes:
       - .:/src
