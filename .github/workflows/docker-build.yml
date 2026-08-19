@@ -1,9 +1,10 @@
 name: Docker Build and Push
 
 on:
-  push:
-    branches: [backend]
-    paths: ["cmd/**", "internal/**", "deploy/docker/**"]
+  # Volontairement pas de déclenchement sur push -- tant que le cluster EKS
+  # n'existe pas et qu'on teste tout en local via docker-compose, un push sur
+  # backend ne doit pas publier une image réelle sur ECR. Déclenchement manuel
+  # uniquement, jusqu'à décision explicite de repasser en automatique.
   workflow_dispatch:
 
 env:
