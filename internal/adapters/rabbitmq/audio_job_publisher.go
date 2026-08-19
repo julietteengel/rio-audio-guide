@@ -33,6 +33,14 @@ type ttsJobMessage struct {
 	Text        string `json:"text"`
 	Language    string `json:"language"`
 	VoiceID     string `json:"voice_id"`
+	// Attempt compte les tentatives déjà faites -- absent (donc zéro) sur
+	// tout message publié ici, via l'API HTTP normale (POST /scripts/:id/
+	// review, POST /audio-files/:id/retry). Seul le worker l'incrémente,
+	// en republiant lui-même sur échec transitoire (voir worker.go,
+	// requeueWithAttempt) plutôt que via Nack(requeue=true) -- un Nack
+	// remet le MÊME message tel quel, sans moyen de faire grimper un
+	// compteur dessus.
+	Attempt int `json:"attempt"`
 }
 
 func NewAudioJobPublisher(channel *amqp.Channel) (*AudioJobPublisher, error) {

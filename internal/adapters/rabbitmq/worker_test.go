@@ -46,6 +46,18 @@ func (f *fakeScriptRepo) FindByPlaceIDAndLanguage(_ context.Context, _, _ string
 	return nil, errors.New("not implemented in fake")
 }
 
+func (f *fakeScriptRepo) FindByPlaceID(_ context.Context, placeID string) ([]*domain.Script, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	var found []*domain.Script
+	for _, s := range f.scripts {
+		if s.PlaceID() == placeID {
+			found = append(found, s)
+		}
+	}
+	return found, nil
+}
+
 type fakeAudioFileRepo struct {
 	mu    sync.Mutex
 	files map[string]*domain.AudioFile
@@ -231,6 +243,94 @@ func TestWorker_TransientTTSError_RetriesOnRedeliveryAndSucceeds(t *testing.T) {
 				}
 				return
 			}
+		}
+	}
+}
+
+// alwaysFailingTTSGenerator never recovers -- proves maxTTSAttempts is a
+// real ceiling, not just documentation: before this fix, a persistently
+// slow/unreachable TTS call retried forever (Nack(requeue=true) with no
+// counter), silently re-billing ElevenLabs on every redelivery.
+type alwaysFailingTTSGenerator struct {
+	mu    sync.Mutex
+	calls int
+}
+
+func (g *alwaysFailingTTSGenerator) Generate(_ context.Context, _, _, _ string) ([]byte, time.Duration, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.calls++
+	return nil, 0, errors.New("simulated persistent transient failure")
+}
+
+func (g *alwaysFailingTTSGenerator) callCount() int {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.calls
+}
+
+func TestWorker_TransientTTSError_GivesUpAfterMaxAttempts(t *testing.T) {
+	channel := testChannel(t)
+
+	scriptRepo := newFakeScriptRepo()
+	audioFileRepo := newFakeAudioFileRepo()
+
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript("place-1", domain.LanguageFR, text, "source")
+	_ = script.MarkReviewed("julie")
+	_ = scriptRepo.Save(context.Background(), script)
+
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	_ = audioFileRepo.Save(context.Background(), audioFile)
+
+	generator := &alwaysFailingTTSGenerator{}
+	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{}, generator)
+	if err != nil {
+		t.Fatalf("new worker: %v", err)
+	}
+
+	// maxTTSAttempts-1 = 2 requeueDelay (2s) waits between attempts, plus
+	// processing overhead -- 10s gives comfortable margin.
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	go func() { _ = worker.Run(ctx) }()
+
+	body, _ := json.Marshal(ttsJobMessage{
+		AudioFileID: audioFile.ID(),
+		ScriptID:    script.ID(),
+		Text:        "Texte",
+		Language:    "fr",
+		VoiceID:     "voice-1",
+	})
+	if err := channel.PublishWithContext(context.Background(), "", TTSJobQueue, false, false, amqp.Publishing{
+		ContentType: "application/json",
+		Body:        body,
+	}); err != nil {
+		t.Fatalf("publish test job: %v", err)
+	}
+
+	deadline := time.After(9 * time.Second)
+	tick := time.NewTicker(100 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		select {
+		case <-deadline:
+			found, _ := audioFileRepo.FindByID(context.Background(), audioFile.ID())
+			t.Fatalf("timed out waiting for the job to give up, audio file stuck in status %v (calls=%d)",
+				found.Status(), generator.callCount())
+		case <-tick.C:
+			found, err := audioFileRepo.FindByID(context.Background(), audioFile.ID())
+			if err != nil || found.Status() != domain.AudioFileStatusFailed {
+				continue
+			}
+			if found.FailureReason() == "" {
+				t.Fatal("got empty failure reason on a failed audio file")
+			}
+			if generator.callCount() != maxTTSAttempts {
+				t.Fatalf("got %d Generate calls, want exactly %d (maxTTSAttempts) -- no more, no fewer",
+					generator.callCount(), maxTTSAttempts)
+			}
+			return
 		}
 	}
 }

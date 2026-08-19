@@ -69,6 +69,15 @@ func (w *Worker) Run(ctx context.Context) error {
 // donc dormir ici ne bloque rien d'autre.
 const requeueDelay = 2 * time.Second
 
+// maxTTSAttempts borne les retries sur une erreur TTS transitoire (timeout,
+// 5xx, hoquet réseau) -- sans ce plafond, Nack(requeue=true) reconduit le
+// même message indéfiniment : chaque redelivery rappelle ElevenLabs (payant)
+// pour, potentiellement, échouer encore. Au-delà, on abandonne proprement
+// (AudioFile "failed", visible et rejouable via POST /audio-files/:id/retry)
+// plutôt que de boucler en silence. Même valeur que uploadWithRetryAttempts,
+// pas de raison technique de diverger, juste une même intuition "3 essais".
+const maxTTSAttempts = 3
+
 func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	var job ttsJobMessage
 	if err := json.Unmarshal(msg.Body, &job); err != nil {
@@ -107,9 +116,30 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 			_ = msg.Ack(false)
 			return
 		}
-		log.Printf("tts worker: TTS generation failed for %s: %v", job.AudioFileID, err)
+		log.Printf("tts worker: transient TTS error for %s (attempt %d/%d): %v",
+			job.AudioFileID, job.Attempt+1, maxTTSAttempts, err)
+
+		if job.Attempt+1 >= maxTTSAttempts {
+			log.Printf("tts worker: giving up on %s after %d attempts, marking failed", job.AudioFileID, maxTTSAttempts)
+			if failErr := application.FailAudioGeneration(ctx, w.audioFileRepo, job.AudioFileID, err.Error()); failErr != nil {
+				log.Printf("tts worker: mark failed also failed for %s: %v", job.AudioFileID, failErr)
+			}
+			_ = msg.Ack(false)
+			return
+		}
+
 		time.Sleep(requeueDelay)
-		_ = msg.Nack(false, true)
+		job.Attempt++
+		if pubErr := w.requeueWithAttempt(ctx, job); pubErr != nil {
+			// Le nouveau message (compteur incrémenté) n'est pas parti -- on
+			// retombe sur Nack(requeue=true) plutôt que de perdre le job,
+			// au prix de reperdre le compteur pour ce tour-ci (dégradé, pas
+			// silencieux : c'est loggé).
+			log.Printf("tts worker: failed to republish retry for %s, falling back to plain requeue: %v", job.AudioFileID, pubErr)
+			_ = msg.Nack(false, true)
+			return
+		}
+		_ = msg.Ack(false)
 		return
 	}
 
@@ -152,6 +182,24 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	// Tout a réussi : on accuse réception, RabbitMQ peut supprimer le
 	// message de la queue pour de bon.
 	_ = msg.Ack(false)
+}
+
+// requeueWithAttempt republie une copie du job avec Attempt incrémenté --
+// même forme de publication que AudioJobPublisher.PublishTTSJob (exchange
+// par défaut, routing key = nom de la queue, message persistant), mais
+// depuis le worker lui-même : Nack(requeue=true) redonne le MÊME message
+// tel quel, sans permettre de modifier son contenu, donc pas de moyen d'y
+// faire grimper un compteur autrement qu'en publiant un nouveau message.
+func (w *Worker) requeueWithAttempt(ctx context.Context, job ttsJobMessage) error {
+	body, err := json.Marshal(job)
+	if err != nil {
+		return err
+	}
+	return w.channel.PublishWithContext(ctx, "", TTSJobQueue, false, false, amqp.Publishing{
+		ContentType:  "application/json",
+		DeliveryMode: amqp.Persistent,
+		Body:         body,
+	})
 }
 
 // uploadWithRetryAttempts borne les tentatives locales -- un nombre fixe,

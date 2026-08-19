@@ -24,7 +24,16 @@ func NewGenerator(apiKey string) *Generator {
 	return &Generator{
 		apiKey:     apiKey,
 		baseURL:    "https://api.elevenlabs.io/v1/text-to-speech",
-		httpClient: &http.Client{Timeout: 60 * time.Second},
+		// Cette API n'est pas streamée : la réponse n'arrive qu'une fois
+		// l'audio ENTIER généré côté ElevenLabs, et ce temps croît avec la
+		// longueur du texte -- 60s tenait pour un texte court, mais une
+		// narration longue (~1300 mots, ~9 min d'audio) peut dépasser 60s de
+		// synthèse à elle seule, sans que rien ne soit cassé. Un texte trop
+		// long pour raisonnablement tenir dans 5 minutes reviendrait de toute
+		// façon buter sur le plafond d'essais de worker.go (maxTTSAttempts),
+		// donc pas de boucle infinie même si ce plafond s'avère encore trop
+		// court pour un cas extrême.
+		httpClient: &http.Client{Timeout: 5 * time.Minute},
 	}
 }
 
