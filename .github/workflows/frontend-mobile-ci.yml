@@ -1,0 +1,31 @@
+name: Frontend Mobile CI
+
+on:
+  push:
+    branches: [frontend]
+    paths: ["mobile/**"]
+  pull_request:
+    branches: [frontend]
+    paths: ["mobile/**"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: mobile/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Type-check
+        run: npx tsc --noEmit
+      - name: Unit tests (offline download logic)
+        run: npx jest
+      - name: Export bundle (proves the app actually builds)
+        run: npx expo export --platform ios

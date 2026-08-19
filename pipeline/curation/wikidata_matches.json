@@ -1,0 +1,1353 @@
+{
+  "overture:Casa França-Brasil:-22.90061:-43.17572": {
+    "qid": "Q9698083",
+    "wikidata_label": "Casa França-Brasil",
+    "lang": "pt",
+    "title": "Casa França-Brasil",
+    "dist_m": 73.7
+  },
+  "overture:Chácara do Céu:-22.91795:-43.18295": {
+    "qid": "Q10333663",
+    "wikidata_label": "Museu da Chácara do Céu",
+    "lang": "pt",
+    "title": "Museu da Chácara do Céu",
+    "dist_m": 51.4
+  },
+  "overture:Museu das Telecomunicações:-22.92996:-43.17651": {
+    "qid": "Q10333734",
+    "wikidata_label": "Museu das Telecomunicações",
+    "lang": "pt",
+    "title": "Museu das Comunicações e Humanidades",
+    "dist_m": 31.5
+  },
+  "overture:Museu de Arte do Rio:-22.89661:-43.18204": {
+    "qid": "Q10333798",
+    "wikidata_label": "Museu de Arte do Rio",
+    "lang": "pt",
+    "title": "Museu de Arte do Rio",
+    "dist_m": 6.5
+  },
+  "overture:Museu de Arte do Rio (MAR):-22.89688:-43.18177": {
+    "qid": "Q10333798",
+    "wikidata_label": "Museu de Arte do Rio",
+    "lang": "pt",
+    "title": "Museu de Arte do Rio",
+    "dist_m": 41.8
+  },
+  "overture:Museu de Imagens do Inconsciente:-22.90349:-43.30137": {
+    "qid": "Q10333843",
+    "wikidata_label": "Museu de Imagens do Inconsciente",
+    "lang": "pt",
+    "title": "Museu de Imagens do Inconsciente",
+    "dist_m": 28.6
+  },
+  "overture:Museu do Açude:-22.96483:-43.28209": {
+    "qid": "Q10333880",
+    "wikidata_label": "Museu do Açude",
+    "lang": "pt",
+    "title": "Museu do Açude",
+    "dist_m": 4.4
+  },
+  "overture:Scalinata Selarón:-22.91570:-43.17896": {
+    "qid": "Q2200939",
+    "wikidata_label": "Escadaria Selarón",
+    "lang": "pt",
+    "title": "Escadaria Selarón",
+    "dist_m": 56.9
+  },
+  "overture:Centro Cultural Banco do Brasil:-22.90096:-43.17648": {
+    "qid": "Q30939541",
+    "wikidata_label": "Centro Cultural Banco do Brasil (Rio de Janeiro)",
+    "lang": "pt",
+    "title": "Centro Cultural Banco do Brasil (Rio de Janeiro)",
+    "dist_m": 20.9
+  },
+  "overture:Centro Cultural Cartola:-22.90155:-43.24086": {
+    "qid": "Q64590714",
+    "wikidata_label": "Centro Cultural Cartola",
+    "lang": "pt",
+    "title": "Centro Cultural Cartola",
+    "dist_m": 9.8
+  },
+  "overture:Centro Cultural Correios:-22.90116:-43.17590": {
+    "qid": "Q18483673",
+    "wikidata_label": "Centro Cultural Correios Rio de Janeiro",
+    "lang": "pt",
+    "title": "Centro Cultural Correios (Rio de Janeiro)",
+    "dist_m": 11.8
+  },
+  "overture:Centro Cultural Fundição Progresso:-22.91251:-43.18025": {
+    "qid": "Q10286461",
+    "wikidata_label": "Fundição Progresso",
+    "lang": "pt",
+    "title": "Fundição Progresso",
+    "dist_m": 33.5
+  },
+  "overture:Centro Cultural José Bonifácio:-22.89622:-43.19428": {
+    "qid": "Q48867584",
+    "wikidata_label": "Centro Cultural José Bonifácio",
+    "lang": "pt",
+    "title": "Centro Cultural José Bonifácio",
+    "dist_m": 44.8
+  },
+  "overture:Centro Cultural Justiça Federal:-22.91054:-43.17531": {
+    "qid": "Q18483689",
+    "wikidata_label": "Centro Cultural Justiça Federal",
+    "lang": "pt",
+    "title": "Centro Cultural Justiça Federal",
+    "dist_m": 10.3
+  },
+  "overture:Centro Cultural Light:-22.90272:-43.18710": {
+    "qid": "Q9723311",
+    "wikidata_label": "Centro Cultural Light",
+    "lang": "pt",
+    "title": "Centro Cultural Light",
+    "dist_m": 11.8
+  },
+  "overture:Centro Cultural da Justiça Eleitoral:-22.90196:-43.17590": {
+    "qid": "Q48855711",
+    "wikidata_label": "Tribunal Regional Eleitoral do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Tribunal Regional Eleitoral do Rio de Janeiro",
+    "dist_m": 1.4
+  },
+  "overture:Centro Cultural da Policia Militar:-22.90913:-43.19479": {
+    "qid": "Q10333710",
+    "wikidata_label": "Museu da Polícia Militar do Estado do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Museu da Polícia Militar do Estado do Rio de Janeiro",
+    "dist_m": 11.2
+  },
+  "overture:Centro Luiz Gonzaga de Tradições Nordestinas:-22.89765:-43.22031": {
+    "qid": "Q9725013",
+    "wikidata_label": "Centro Luiz Gonzaga de Tradições Nordestinas",
+    "lang": "pt",
+    "title": "Centro Luiz Gonzaga de Tradições Nordestinas",
+    "dist_m": 21.6
+  },
+  "overture:Cidade das Artes:-22.99934:-43.36579": {
+    "qid": "Q2582536",
+    "wikidata_label": "Cidade das Artes Bibi Ferreira",
+    "lang": "pt",
+    "title": "Cidade das Artes Bibi Ferreira",
+    "dist_m": 43.6
+  },
+  "overture:Espaço Cultural Bndes:-22.90833:-43.18019": {
+    "qid": "Q138561968",
+    "wikidata_label": "BNDES Building",
+    "lang": "pt",
+    "title": "Edifício BNDES",
+    "dist_m": 29.3
+  },
+  "overture:Fundição Progresso:-22.91249:-43.18056": {
+    "qid": "Q10286461",
+    "wikidata_label": "Fundição Progresso",
+    "lang": "pt",
+    "title": "Fundição Progresso",
+    "dist_m": 27.8
+  },
+  "overture:Imperator - Centro Cultural João Nogueira:-22.90271:-43.28200": {
+    "qid": "Q18483685",
+    "wikidata_label": "Centro Cultural João Nogueira",
+    "lang": "pt",
+    "title": "Centro Cultural João Nogueira",
+    "dist_m": 99.4
+  },
+  "overture:Memorial Getúlio Vargas:-22.92165:-43.17352": {
+    "qid": "Q10328533",
+    "wikidata_label": "Memorial Getúlio Vargas (Rio de Janeiro)",
+    "lang": "pt",
+    "title": "Memorial Getúlio Vargas",
+    "dist_m": 33.6
+  },
+  "overture:Paço Imperial:-22.90355:-43.17431": {
+    "qid": "Q3361206",
+    "wikidata_label": "Paço Imperial",
+    "lang": "pt",
+    "title": "Paço Imperial",
+    "dist_m": 16.4
+  },
+  "overture:Samba da Pedra do Sal:-22.89789:-43.18546": {
+    "qid": "Q6543840",
+    "wikidata_label": "Pedra do Sal",
+    "lang": "pt",
+    "title": "Pedra do Sal",
+    "dist_m": 22.2
+  },
+  "wikidata:Aqueduto da Colônia Juliano Moreira:-22.93628:-43.39974": {
+    "qid": "Q18476137",
+    "wikidata_label": "Colônia Juliano Moreira",
+    "lang": "pt",
+    "title": "Colônia Juliano Moreira",
+    "dist_m": 98.5
+  },
+  "wikidata:Aterro do Flamengo:-22.92100:-43.17000": {
+    "qid": "Q5457206",
+    "wikidata_label": "Aterro do Flamengo",
+    "lang": "pt",
+    "title": "Aterro do Flamengo",
+    "dist_m": 0.0
+  },
+  "wikidata:Avenida Rio Branco:-22.90472:-43.17750": {
+    "qid": "Q4828121",
+    "wikidata_label": "Avenida Rio Branco",
+    "lang": "pt",
+    "title": "Avenida Rio Branco (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Bebedouro da Estrada Velha da Tijuca:-22.95203:-43.26208": {
+    "qid": "Q67204058",
+    "wikidata_label": "Bebedouro da Estrada Velha da Tijuca",
+    "lang": "pt",
+    "title": "Bebedouro da Estrada Velha da Tijuca",
+    "dist_m": 0.0
+  },
+  "wikidata:Biblioteca Nacional do Brasil:-22.90972:-43.17550": {
+    "qid": "Q948882",
+    "wikidata_label": "Biblioteca Nacional do Brasil",
+    "lang": "pt",
+    "title": "Biblioteca Nacional do Brasil",
+    "dist_m": 0.0
+  },
+  "wikidata:Bica da Rainha:-22.94078:-43.19701": {
+    "qid": "Q48862982",
+    "wikidata_label": "Bica da Rainha",
+    "lang": "pt",
+    "title": "Bica da Rainha",
+    "dist_m": 0.0
+  },
+  "wikidata:Capela Nossa Senhora da Cabeça Rio de Janeiro:-22.96096:-43.22087": {
+    "qid": "Q30935277",
+    "wikidata_label": "Capela Nossa Senhora da Cabeça Rio de Janeiro",
+    "lang": "pt",
+    "title": "Capela Nossa Senhora da Cabeça (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Casa da Marquesa de Santos:-22.90458:-43.21707": {
+    "qid": "Q10333920",
+    "wikidata_label": "Casa da Marquesa de Santos",
+    "lang": "pt",
+    "title": "Casa da Marquesa de Santos",
+    "dist_m": 0.0
+  },
+  "wikidata:Casa da Moeda do Brasil:-22.90649:-43.19078": {
+    "qid": "Q5047900",
+    "wikidata_label": "Casa da Moeda do Brasil",
+    "lang": "pt",
+    "title": "Casa da Moeda do Brasil",
+    "dist_m": 0.0
+  },
+  "wikidata:Casa das Canoas:-22.98590:-43.27288": {
+    "qid": "Q6816788",
+    "wikidata_label": "Casa das Canoas",
+    "lang": "pt",
+    "title": "Casa das Canoas",
+    "dist_m": 0.0
+  },
+  "wikidata:Casa de Rui Barbosa:-22.94875:-43.18705": {
+    "qid": "Q18479640",
+    "wikidata_label": "Fundação Casa de Rui Barbosa",
+    "lang": "pt",
+    "title": "Fundação Casa de Rui Barbosa",
+    "dist_m": 83.4
+  },
+  "wikidata:Casa do Bispo:-22.92607:-43.21027": {
+    "qid": "Q55608773",
+    "wikidata_label": "Casa do Bispo",
+    "lang": "pt",
+    "title": "Casa do Bispo (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Chafariz Paulo Fernandes:-22.91153:-43.19456": {
+    "qid": "Q108833935",
+    "wikidata_label": "Chafariz de Paulo Fernandes",
+    "lang": "pt",
+    "title": "Chafariz de Paulo Fernandes",
+    "dist_m": 0.0
+  },
+  "wikidata:Chafariz da Glória:-22.91843:-43.17710": {
+    "qid": "Q67203826",
+    "wikidata_label": "Chafariz da Glória",
+    "lang": "pt",
+    "title": "Chafariz da Glória",
+    "dist_m": 0.0
+  },
+  "wikidata:Chafariz das Saracuras:-22.98516:-43.19779": {
+    "qid": "Q67203719",
+    "wikidata_label": "Chafariz das Saracuras",
+    "lang": "pt",
+    "title": "Chafariz das Saracuras",
+    "dist_m": 0.0
+  },
+  "wikidata:Chafariz de Grandjean de Montigny:-22.96167:-43.27332": {
+    "qid": "Q107293524",
+    "wikidata_label": "Chafariz de Grandjean de Montigny",
+    "lang": "pt",
+    "title": "Chafariz de Grandjean de Montigny",
+    "dist_m": 76.5
+  },
+  "wikidata:Chafariz do Lagarto:-22.91203:-43.19521": {
+    "qid": "Q67204031",
+    "wikidata_label": "Chafariz do Lagarto",
+    "lang": "pt",
+    "title": "Chafariz do Lagarto",
+    "dist_m": 0.0
+  },
+  "wikidata:Coleção Geyer:-22.94099:-43.20517": {
+    "qid": "Q25419064",
+    "wikidata_label": "Coleção Geyer",
+    "lang": "pt",
+    "title": "Coleção Geyer",
+    "dist_m": 0.0
+  },
+  "wikidata:Colégio Militar do Rio de Janeiro:-22.91691:-43.22634": {
+    "qid": "Q18473983",
+    "wikidata_label": "Colégio Militar do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Colégio Militar do Rio de Janeiro",
+    "dist_m": 0.0
+  },
+  "wikidata:Colégio Pedro II:-22.90172:-43.18490": {
+    "qid": "Q1113098",
+    "wikidata_label": "Colégio Pedro II",
+    "lang": "pt",
+    "title": "Colégio Pedro II",
+    "dist_m": 0.0
+  },
+  "wikidata:Convento de Santa Teresa:-22.91553:-43.18045": {
+    "qid": "Q18482673",
+    "wikidata_label": "Convento de Santa Teresa",
+    "lang": "pt",
+    "title": "Convento de Santa Teresa (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Convento de Santo Antônio:-22.90725:-43.17914": {
+    "qid": "Q14947966",
+    "wikidata_label": "Convento de Santo Antônio",
+    "lang": "pt",
+    "title": "Convento de Santo Antônio (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Convento do Carmo:-22.90337:-43.17555": {
+    "qid": "Q4902626",
+    "wikidata_label": "Convento do Carmo",
+    "lang": "pt",
+    "title": "Convento do Carmo (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Copacabana Palace:-22.96726:-43.17874": {
+    "qid": "Q2637352",
+    "wikidata_label": "Copacabana Palace",
+    "lang": "pt",
+    "title": "Copacabana Palace",
+    "dist_m": 0.0
+  },
+  "wikidata:Cristo Redentor:-22.95192:-43.21046": {
+    "qid": "Q79961",
+    "wikidata_label": "Cristo Redentor",
+    "lang": "pt",
+    "title": "Cristo Redentor",
+    "dist_m": 0.0
+  },
+  "wikidata:Edifício ''A Noite'':-22.89730:-43.18100": {
+    "qid": "Q5338058",
+    "wikidata_label": "Edifício ''A Noite''",
+    "lang": "pt",
+    "title": "Edifício Joseph Gire",
+    "dist_m": 0.0
+  },
+  "wikidata:Edifício Docas de Santos:-22.90057:-43.17960": {
+    "qid": "Q69363749",
+    "wikidata_label": "Edifício Docas de Santos",
+    "lang": "pt",
+    "title": "Edifício Docas de Santos",
+    "dist_m": 0.0
+  },
+  "wikidata:Edifício Gustavo Capanema:-22.90920:-43.17383": {
+    "qid": "Q2598551",
+    "wikidata_label": "Edifício Gustavo Capanema",
+    "lang": "pt",
+    "title": "Edifício Gustavo Capanema",
+    "dist_m": 0.0
+  },
+  "wikidata:Escola Nacional de Belas Artes:-22.90877:-43.17571": {
+    "qid": "Q10274365",
+    "wikidata_label": "Escola Nacional de Belas Artes",
+    "lang": "pt",
+    "title": "Escola Nacional de Belas Artes",
+    "dist_m": 4.1
+  },
+  "wikidata:Estação Central do Brasil:-22.90341:-43.19144": {
+    "qid": "Q1274003",
+    "wikidata_label": "Estação Central do Brasil",
+    "lang": "pt",
+    "title": "Estação Central do Brasil",
+    "dist_m": 0.0
+  },
+  "wikidata:Estação Ferroviária Leopoldina - Barão de Mauá:-22.90771:-43.21045": {
+    "qid": "Q10275936",
+    "wikidata_label": "Estação Leopoldina",
+    "lang": "pt",
+    "title": "Estação Leopoldina",
+    "dist_m": 13.1
+  },
+  "wikidata:Estação Leopoldina:-22.90766:-43.21057": {
+    "qid": "Q10275936",
+    "wikidata_label": "Estação Leopoldina",
+    "lang": "pt",
+    "title": "Estação Leopoldina",
+    "dist_m": 0.0
+  },
+  "wikidata:Estádio Jornalista Mário Filho:-22.91222:-43.23028": {
+    "qid": "Q155174",
+    "wikidata_label": "Estádio Jornalista Mário Filho",
+    "lang": "pt",
+    "title": "Estádio Jornalista Mário Filho",
+    "dist_m": 0.0
+  },
+  "wikidata:Estátua equestre de Dom Pedro I:-22.90695:-43.18282": {
+    "qid": "Q18476242",
+    "wikidata_label": "Estátua equestre de Dom Pedro I",
+    "lang": "pt",
+    "title": "Estátua equestre de Dom Pedro I",
+    "dist_m": 0.0
+  },
+  "wikidata:Fazenda da Taquara:-22.92223:-43.38288": {
+    "qid": "Q136421907",
+    "wikidata_label": "Fazenda da Taquara",
+    "lang": "pt",
+    "title": "Fazenda da Taquara (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Fazenda do Engenho d’ Água:-22.95510:-43.35623": {
+    "qid": "Q104907313",
+    "wikidata_label": "Fazenda do Engenho d’ Água",
+    "lang": "pt",
+    "title": "Fazenda do Engenho d'Água (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Fortaleza de Nossa Senhora da Conceição (Rio de Janeiro):-22.89923:-43.18377": {
+    "qid": "Q10283627",
+    "wikidata_label": "Fortaleza de Nossa Senhora da Conceição (Rio de Janeiro)",
+    "lang": "pt",
+    "title": "Fortaleza de Nossa Senhora da Conceição (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Fortaleza de São José da Ilha das Cobras:-22.89638:-43.17114": {
+    "qid": "Q10283639",
+    "wikidata_label": "Fortaleza de São José da Ilha das Cobras",
+    "lang": "pt",
+    "title": "Fortaleza de São José da Ilha das Cobras",
+    "dist_m": 0.0
+  },
+  "wikidata:Fortaleza de São João:-22.94337:-43.15646": {
+    "qid": "Q5472516",
+    "wikidata_label": "Fortaleza de São João",
+    "lang": "pt",
+    "title": "Fortaleza de São João",
+    "dist_m": 0.0
+  },
+  "wikidata:Forte de Copacabana:-22.98583:-43.18528": {
+    "qid": "Q5470982",
+    "wikidata_label": "Forte de Copacabana",
+    "lang": "pt",
+    "title": "Forte de Copacabana",
+    "dist_m": 0.0
+  },
+  "wikidata:Forte de São Tiago:-22.90591:-43.16952": {
+    "qid": "Q10284072",
+    "wikidata_label": "Forte de São Tiago",
+    "lang": "pt",
+    "title": "Forte de São Tiago da Misericórdia",
+    "dist_m": 0.0
+  },
+  "wikidata:Fortim de Caetano Madeira:-22.89650:-43.25960": {
+    "qid": "Q10284228",
+    "wikidata_label": "Fortim de Caetano Madeira",
+    "lang": "pt",
+    "title": "Fortim de Caetano Madeira",
+    "dist_m": 0.0
+  },
+  "wikidata:Hospital Escola São Francisco de Assis:-22.90907:-43.20139": {
+    "qid": "Q10298377",
+    "wikidata_label": "Hospital Escola São Francisco de Assis",
+    "lang": "pt",
+    "title": "Instituto de Atenção à Saúde São Francisco de Assis",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja Positivista do Brasil:-22.92058:-43.17938": {
+    "qid": "Q10300201",
+    "wikidata_label": "Igreja Positivista do Brasil",
+    "lang": "pt",
+    "title": "Igreja Positivista do Brasil",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja da Ordem Terceira do Carmo:-22.90309:-43.17556": {
+    "qid": "Q10300293",
+    "wikidata_label": "Igreja da Ordem Terceira do Carmo",
+    "lang": "pt",
+    "title": "Igreja da Ordem Terceira do Carmo (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora da Ajuda (Ilha do Governador):-22.79332:-43.17052": {
+    "qid": "Q10300340",
+    "wikidata_label": "Igreja de Nossa Senhora da Ajuda (Ilha do Governador)",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora da Ajuda (Ilha do Governador)",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora da Candelária:-22.90081:-43.17789": {
+    "qid": "Q82312",
+    "wikidata_label": "Igreja de Nossa Senhora da Candelária",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora da Candelária",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora da Conceição e Boa Morte:-22.90302:-43.17875": {
+    "qid": "Q10300378",
+    "wikidata_label": "Igreja de Nossa Senhora da Conceição e Boa Morte",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora da Conceição e Boa Morte",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora da Glória do Outeiro:-22.92145:-43.17543": {
+    "qid": "Q10300392",
+    "wikidata_label": "Igreja de Nossa Senhora da Glória do Outeiro",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora da Glória do Outeiro",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora da Lapa dos Mercadores:-22.90221:-43.17520": {
+    "qid": "Q10300403",
+    "wikidata_label": "Igreja de Nossa Senhora da Lapa dos Mercadores",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora da Lapa dos Mercadores",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora da Pena:-22.94159:-43.34832": {
+    "qid": "Q104904890",
+    "wikidata_label": "Igreja de Nossa Senhora da Pena",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora da Penna",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora da Saúde:-22.89375:-43.19148": {
+    "qid": "Q104853267",
+    "wikidata_label": "Igreja de Nossa Senhora da Saúde",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora da Saúde (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora do Bonsucesso:-22.90647:-43.17059": {
+    "qid": "Q10300498",
+    "wikidata_label": "Igreja de Nossa Senhora do Bonsucesso",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora do Bonsucesso",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora do Carmo:-22.90333:-43.17556": {
+    "qid": "Q2942273",
+    "wikidata_label": "Igreja de Nossa Senhora do Carmo",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora do Carmo da Antiga Sé",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora do Carmo da Lapa do Desterro:-22.91459:-43.17771": {
+    "qid": "Q96586968",
+    "wikidata_label": "Igreja de Nossa Senhora do Carmo da Lapa do Desterro",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora do Carmo da Lapa do Desterro",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Nossa Senhora do Rosário e São Benedito (Rio de Janeiro):-22.90416:-43.18049": {
+    "qid": "Q10300555",
+    "wikidata_label": "Igreja de Nossa Senhora do Rosário e São Benedito (Rio de Janeiro)",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora do Rosário e São Benedito (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Santa Cruz dos Militares:-22.90216:-43.17568": {
+    "qid": "Q10300620",
+    "wikidata_label": "Igreja de Santa Cruz dos Militares",
+    "lang": "pt",
+    "title": "Igreja de Santa Cruz dos Militares",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de Santa Luzia:-22.90954:-43.17260": {
+    "qid": "Q10300629",
+    "wikidata_label": "Igreja de Santa Luzia",
+    "lang": "pt",
+    "title": "Igreja de Santa Luzia (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de São Francisco da Prainha:-22.89781:-43.18363": {
+    "qid": "Q48862348",
+    "wikidata_label": "Igreja de São Francisco da Prainha",
+    "lang": "pt",
+    "title": "Igreja de São Francisco da Prainha",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja de São Francisco de Paula:-22.90549:-43.18059": {
+    "qid": "Q10300739",
+    "wikidata_label": "Igreja de São Francisco de Paula",
+    "lang": "pt",
+    "title": "Igreja de São Francisco de Paula (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Igreja do Bom Jesus da Coluna:-22.85948:-43.21230": {
+    "qid": "Q10301182",
+    "wikidata_label": "Ilha do Bom Jesus da Coluna",
+    "lang": "pt",
+    "title": "Ilha do Bom Jesus da Coluna",
+    "dist_m": 61.4
+  },
+  "wikidata:Igreja do Santíssimo Sacramento da Antiga Sé:-22.90458:-43.18284": {
+    "qid": "Q10300936",
+    "wikidata_label": "Igreja do Santíssimo Sacramento da Antiga Sé",
+    "lang": "pt",
+    "title": "Igreja do Santíssimo Sacramento da Antiga Sé",
+    "dist_m": 0.0
+  },
+  "wikidata:Jardim Botânico do Rio de Janeiro:-22.96750:-43.22389": {
+    "qid": "Q45242",
+    "wikidata_label": "Jardim Botânico do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Jardim Botânico do Rio de Janeiro",
+    "dist_m": 0.0
+  },
+  "wikidata:Jardim e Morro do Valongo:-22.89856:-43.18643": {
+    "qid": "Q7912530",
+    "wikidata_label": "Observatório do Valongo",
+    "lang": "pt",
+    "title": "Observatório do Valongo",
+    "dist_m": 40.1
+  },
+  "wikidata:Ladeira da Misericórdia:-22.90620:-43.17027": {
+    "qid": "Q10315482",
+    "wikidata_label": "Ladeira da Misericórdia",
+    "lang": "pt",
+    "title": "Ladeira da Misericórdia (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Lagoa Rodrigo de Freitas:-22.97111:-43.21167": {
+    "qid": "Q429897",
+    "wikidata_label": "Lagoa Rodrigo de Freitas",
+    "lang": "pt",
+    "title": "Lagoa Rodrigo de Freitas",
+    "dist_m": 0.0
+  },
+  "wikidata:Lampadário da Lapa:-22.91434:-43.17802": {
+    "qid": "Q96586968",
+    "wikidata_label": "Igreja de Nossa Senhora do Carmo da Lapa do Desterro",
+    "lang": "pt",
+    "title": "Igreja de Nossa Senhora do Carmo da Lapa do Desterro",
+    "dist_m": 42.7
+  },
+  "wikidata:Monumento aos Mortos da Segunda Guerra Mundial:-22.91667:-43.17361": {
+    "qid": "Q2017454",
+    "wikidata_label": "Monumento aos Mortos da Segunda Guerra Mundial",
+    "lang": "pt",
+    "title": "Monumento Nacional aos Mortos da Segunda Guerra Mundial",
+    "dist_m": 0.0
+  },
+  "wikidata:Morro Dois Irmãos:-22.99080:-43.23960": {
+    "qid": "Q18476300",
+    "wikidata_label": "Morro Dois Irmãos",
+    "lang": "pt",
+    "title": "Morro Dois Irmãos (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Morro da Babilônia:-22.96000:-43.17056": {
+    "qid": "Q6914185",
+    "wikidata_label": "Morro da Babilônia",
+    "lang": "pt",
+    "title": "Morro da Babilônia",
+    "dist_m": 0.0
+  },
+  "wikidata:Morro do Corcovado:-22.95250:-43.21167": {
+    "qid": "Q506938",
+    "wikidata_label": "Morro do Corcovado",
+    "lang": "pt",
+    "title": "Corcovado",
+    "dist_m": 0.0
+  },
+  "wikidata:Mosteiro de São Bento:-22.89703:-43.17805": {
+    "qid": "Q2820360",
+    "wikidata_label": "Mosteiro de São Bento",
+    "lang": "pt",
+    "title": "Mosteiro de São Bento (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Observatório Nacional:-22.89588:-43.22498": {
+    "qid": "Q6621362",
+    "wikidata_label": "Observatório Nacional",
+    "lang": "pt",
+    "title": "Observatório Nacional",
+    "dist_m": 0.0
+  },
+  "wikidata:Palácio Guanabara:-22.93750:-43.18389": {
+    "qid": "Q3813706",
+    "wikidata_label": "Palácio Guanabara",
+    "lang": "pt",
+    "title": "Palácio Guanabara",
+    "dist_m": 0.0
+  },
+  "wikidata:Palácio Tiradentes:-22.90387:-43.17388": {
+    "qid": "Q2048490",
+    "wikidata_label": "Palácio Tiradentes",
+    "lang": "pt",
+    "title": "Palácio Tiradentes",
+    "dist_m": 0.0
+  },
+  "wikidata:Palácio da Conceição:-22.89964:-43.18270": {
+    "qid": "Q10343988",
+    "wikidata_label": "Palácio da Conceição",
+    "lang": "pt",
+    "title": "Palácio da Conceição",
+    "dist_m": 0.0
+  },
+  "wikidata:Palácio das Laranjeiras:-22.93143:-43.18356": {
+    "qid": "Q10343955",
+    "wikidata_label": "Palácio das Laranjeiras",
+    "lang": "pt",
+    "title": "Palácio das Laranjeiras",
+    "dist_m": 0.0
+  },
+  "wikidata:Palácio do Itamaraty:-22.90292:-43.18795": {
+    "qid": "Q10344051",
+    "wikidata_label": "Palácio do Itamaraty",
+    "lang": "pt",
+    "title": "Palácio do Itamaraty",
+    "dist_m": 0.0
+  },
+  "wikidata:Parque Lage:-22.96060:-43.21200": {
+    "qid": "Q7139641",
+    "wikidata_label": "Parque Lage",
+    "lang": "pt",
+    "title": "Parque Lage",
+    "dist_m": 0.0
+  },
+  "wikidata:Parque Nacional da Tijuca:-22.95944:-43.27778": {
+    "qid": "Q1974494",
+    "wikidata_label": "Parque Nacional da Tijuca",
+    "lang": "pt",
+    "title": "Parque Nacional da Tijuca",
+    "dist_m": 0.0
+  },
+  "wikidata:Passeio Público:-22.91380:-43.17599": {
+    "qid": "Q7142572",
+    "wikidata_label": "Passeio Público",
+    "lang": "pt",
+    "title": "Passeio Público (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Pavilhão Mourisco:-22.87495:-43.24543": {
+    "qid": "Q84971371",
+    "wikidata_label": "Pavilhão Mourisco",
+    "lang": "pt",
+    "title": "Pavilhão Mourisco",
+    "dist_m": 0.0
+  },
+  "wikidata:Praça XV de Novembro:-22.90300:-43.17369": {
+    "qid": "Q10353359",
+    "wikidata_label": "Praça XV de Novembro",
+    "lang": "pt",
+    "title": "Praça XV (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Quinta da Boa Vista:-22.90580:-43.22440": {
+    "qid": "Q2500590",
+    "wikidata_label": "Quinta da Boa Vista",
+    "lang": "pt",
+    "title": "Quinta da Boa Vista",
+    "dist_m": 0.0
+  },
+  "wikidata:Sambódromo da Marquês de Sapucaí:-22.91138:-43.19685": {
+    "qid": "Q281521",
+    "wikidata_label": "Sambódromo da Marquês de Sapucaí",
+    "lang": "pt",
+    "title": "Sambódromo da Marquês de Sapucaí",
+    "dist_m": 0.0
+  },
+  "wikidata:Santa Casa de Misericórdia do Rio de Janeiro:-22.90752:-43.17114": {
+    "qid": "Q10367749",
+    "wikidata_label": "Santa Casa de Misericórdia do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Santa Casa de Misericórdia do Rio de Janeiro",
+    "dist_m": 0.0
+  },
+  "wikidata:Santuário de Santa Rita de Cássia:-22.90038:-43.18066": {
+    "qid": "Q10300658",
+    "wikidata_label": "Santuário de Santa Rita de Cássia",
+    "lang": "pt",
+    "title": "Igreja de Santa Rita de Cássia (Rio de Janeiro)",
+    "dist_m": 0.0
+  },
+  "wikidata:Solar Grandjean de Montigny:-22.97902:-43.23376": {
+    "qid": "Q18485129",
+    "wikidata_label": "Solar Grandjean de Montigny",
+    "lang": "pt",
+    "title": "Solar Grandjean de Montigny",
+    "dist_m": 0.0
+  },
+  "wikidata:Universidade Federal do Rio de Janeiro:-22.86250:-43.22389": {
+    "qid": "Q586904",
+    "wikidata_label": "Universidade Federal do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Universidade Federal do Rio de Janeiro",
+    "dist_m": 0.0
+  },
+  "overture:Instituto Histórico e Geográfico Brasileiro:-22.91463:-43.17657": {
+    "qid": "Q965390",
+    "wikidata_label": "Instituto Histórico e Geográfico Brasileiro",
+    "lang": "pt",
+    "title": "Instituto Histórico e Geográfico Brasileiro",
+    "dist_m": 22.7
+  },
+  "overture:Instituto de Pesquisa e Memória Pretos Novos (IPN):-22.89598:-43.19291": {
+    "qid": "Q9719084",
+    "wikidata_label": "Cemitério dos Pretos Novos",
+    "lang": "pt",
+    "title": "Cemitério dos Pretos Novos",
+    "dist_m": 9.4
+  },
+  "overture:Military Museum Conde de Linhares:-22.90490:-43.21927": {
+    "qid": "Q10333543",
+    "wikidata_label": "Museu Militar Conde de Linhares",
+    "lang": "pt",
+    "title": "Museu Militar Conde de Linhares",
+    "dist_m": 6.1
+  },
+  "overture:Museu Histórico Nacional:-22.90583:-43.16966": {
+    "qid": "Q510993",
+    "wikidata_label": "Museu Histórico Nacional",
+    "lang": "pt",
+    "title": "Museu Histórico Nacional",
+    "dist_m": 16.3
+  },
+  "overture:Museu Histórico e Diplomático:-22.90347:-43.18834": {
+    "qid": "Q10333514",
+    "wikidata_label": "Museu Histórico e Diplomático do Itamaraty",
+    "lang": "pt",
+    "title": "Museu Histórico e Diplomático",
+    "dist_m": 72.7
+  },
+  "overture:Museu da República (Palácio do Catete):-22.92587:-43.17621": {
+    "qid": "Q56695450",
+    "wikidata_label": "Museu da República",
+    "lang": "pt",
+    "title": "Museu da República",
+    "dist_m": 67.5
+  },
+  "overture:Museu do Negro:-22.90431:-43.18052": {
+    "qid": "Q17167652",
+    "wikidata_label": "Museu do Negro",
+    "lang": "pt",
+    "title": "Museu do Negro",
+    "dist_m": 61.2
+  },
+  "overture:Museu do Trem:-22.89525:-43.29181": {
+    "qid": "Q10333946",
+    "wikidata_label": "Museu do Trem",
+    "lang": "pt",
+    "title": "Museu do Trem (Rio de Janeiro)",
+    "dist_m": 17.3
+  },
+  "overture:Museu do Índio:-22.95186:-43.19106": {
+    "qid": "Q6940631",
+    "wikidata_label": "Museu do Índio (Rio de Janeiro)",
+    "lang": "pt",
+    "title": "Museu Nacional dos Povos Indígenas",
+    "dist_m": 10.2
+  },
+  "overture:Palácio do Catete:-22.92589:-43.17620": {
+    "qid": "Q1142766",
+    "wikidata_label": "Palácio do Catete",
+    "lang": "pt",
+    "title": "Palácio do Catete",
+    "dist_m": 11.4
+  },
+  "overture:Submarino-Museu Riachuelo S-22:-22.90047:-43.17464": {
+    "qid": "Q3284128",
+    "wikidata_label": "S Riachuelo",
+    "lang": "pt",
+    "title": "S Riachuelo (S-22)",
+    "dist_m": 8.5
+  },
+  "overture:Acueducto Carioca:-22.91260:-43.17985": {
+    "qid": "Q1579892",
+    "wikidata_label": "Aqueduto da Carioca",
+    "lang": "pt",
+    "title": "Aqueduto da Carioca",
+    "dist_m": 0.4
+  },
+  "overture:Apoteose:-22.91307:-43.19578": {
+    "qid": "Q7239115",
+    "wikidata_label": "Praça da Apoteose",
+    "lang": "pt",
+    "title": "Praça da Apoteose",
+    "dist_m": 50.3
+  },
+  "overture:Aqueduto da Carioca:-22.91260:-43.17985": {
+    "qid": "Q1579892",
+    "wikidata_label": "Aqueduto da Carioca",
+    "lang": "pt",
+    "title": "Aqueduto da Carioca",
+    "dist_m": 0.4
+  },
+  "overture:Baianas da Estação Primeira de Mangueira:-22.90352:-43.24060": {
+    "qid": "Q1551579",
+    "wikidata_label": "Estação Primeira de Mangueira",
+    "lang": "pt",
+    "title": "Estação Primeira de Mangueira",
+    "dist_m": 14.8
+  },
+  "overture:Cais do Valongo:-22.89665:-43.18717": {
+    "qid": "Q20048515",
+    "wikidata_label": "Cais do Valongo",
+    "lang": "pt",
+    "title": "Cais do Valongo",
+    "dist_m": 56.2
+  },
+  "overture:Castelo Mourisco:-22.87491:-43.24537": {
+    "qid": "Q84971371",
+    "wikidata_label": "Pavilhão Mourisco",
+    "lang": "pt",
+    "title": "Pavilhão Mourisco",
+    "dist_m": 7.2
+  },
+  "overture:Centro de Tradições Nordestinas Luiz Gonzaga:-22.89746:-43.22038": {
+    "qid": "Q9725013",
+    "wikidata_label": "Centro Luiz Gonzaga de Tradições Nordestinas",
+    "lang": "pt",
+    "title": "Centro Luiz Gonzaga de Tradições Nordestinas",
+    "dist_m": 5.5
+  },
+  "overture:Cidade Universitária da UFRJ:-22.85306:-43.22583": {
+    "qid": "Q2428695",
+    "wikidata_label": "Cidade Universitária da Universidade Federal do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Cidade Universitária (Rio de Janeiro)",
+    "dist_m": 0.1
+  },
+  "overture:Clube Naval:-22.90818:-43.17667": {
+    "qid": "Q9781147",
+    "wikidata_label": "Clube Naval",
+    "lang": "pt",
+    "title": "Clube Naval (Rio de Janeiro)",
+    "dist_m": 18.7
+  },
+  "overture:Estatua Equestre de D. Pedro I:-22.90699:-43.18304": {
+    "qid": "Q18476242",
+    "wikidata_label": "Estátua equestre de Dom Pedro I",
+    "lang": "pt",
+    "title": "Estátua equestre de Dom Pedro I",
+    "dist_m": 22.9
+  },
+  "overture:Largo do Machado Station:-22.93090:-43.17831": {
+    "qid": "Q10275929",
+    "wikidata_label": "Largo do Machado",
+    "lang": "pt",
+    "title": "Estação Largo do Machado",
+    "dist_m": 0.7
+  },
+  "overture:Marechal Hermes, Rio de Janeiro:-22.86195:-43.37083": {
+    "qid": "Q1764106",
+    "wikidata_label": "Marechal Hermes",
+    "lang": "pt",
+    "title": "Marechal Hermes",
+    "dist_m": 0.4
+  },
+  "overture:Mirante do Valongo:-22.89891:-43.18705": {
+    "qid": "Q10306108",
+    "wikidata_label": "Jardim Suspenso do Valongo",
+    "lang": "pt",
+    "title": "Jardim Suspenso do Valongo",
+    "dist_m": 44.5
+  },
+  "overture:Obelisco da Avenida Rio Branco:-22.91271:-43.17479": {
+    "qid": "Q30939458",
+    "wikidata_label": "Obelisco da Avenida Rio Branco",
+    "lang": "pt",
+    "title": "Obelisco da Avenida Rio Branco (Rio de Janeiro)",
+    "dist_m": 3.2
+  },
+  "overture:Pala'cio - Parque Lage:-22.96018:-43.21217": {
+    "qid": "Q7139641",
+    "wikidata_label": "Parque Lage",
+    "lang": "pt",
+    "title": "Parque Lage",
+    "dist_m": 49.5
+  },
+  "overture:Paço de São Cristóvão:-22.90572:-43.22689": {
+    "qid": "Q2749982",
+    "wikidata_label": "Paço de São Cristóvão",
+    "lang": "pt",
+    "title": "Paço de São Cristóvão",
+    "dist_m": 81.2
+  },
+  "overture:Portao Historico da Fortaleza de Sao Joao:-22.94354:-43.15702": {
+    "qid": "Q5472516",
+    "wikidata_label": "Fortaleza de São João",
+    "lang": "pt",
+    "title": "Fortaleza de São João",
+    "dist_m": 60.7
+  },
+  "overture:Sambódromo Setor 10-11-12-13:-22.91203:-43.19681": {
+    "qid": "Q281521",
+    "wikidata_label": "Sambódromo da Marquês de Sapucaí",
+    "lang": "pt",
+    "title": "Sambódromo da Marquês de Sapucaí",
+    "dist_m": 72.5
+  },
+  "overture:Selaron Steps:-22.91553:-43.17966": {
+    "qid": "Q2200939",
+    "wikidata_label": "Escadaria Selarón",
+    "lang": "pt",
+    "title": "Escadaria Selarón",
+    "dist_m": 28.6
+  },
+  "overture:Vista Chinesa:-22.97327:-43.24947": {
+    "qid": "Q7936437",
+    "wikidata_label": "Vista Chinesa",
+    "lang": "pt",
+    "title": "Vista Chinesa",
+    "dist_m": 31.3
+  },
+  "overture:Museu de Arte Moderna do Rio de Janeiro:-22.91367:-43.17186": {
+    "qid": "Q1431995",
+    "wikidata_label": "Museu de Arte Moderna do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Museu de Arte Moderna do Rio de Janeiro",
+    "dist_m": 10.4
+  },
+  "overture:Cristo del Corcovado:-22.95139:-43.21083": {
+    "qid": "Q1132053",
+    "wikidata_label": "Trem do Corcovado",
+    "lang": "pt",
+    "title": "Trem do Corcovado",
+    "dist_m": 50.9
+  },
+  "overture:Estátua de Carlos Drummond de Andrade:-22.98435:-43.18917": {
+    "qid": "Q67205235",
+    "wikidata_label": "Estátua de Carlos Drummond de Andrade em Copacabana",
+    "lang": "pt",
+    "title": "Monumento a Carlos Drummond de Andrade",
+    "dist_m": 9.7
+  },
+  "overture:Etnias - Mural de Graffiti:-22.89434:-43.18715": {
+    "qid": "Q26234737",
+    "wikidata_label": "Mural Etnias",
+    "lang": "pt",
+    "title": "Mural Etnias",
+    "dist_m": 20.3
+  },
+  "overture:Monumento Nacional aos Mortos da Segunda Guerra Mundial:-22.91658:-43.17340": {
+    "qid": "Q2017454",
+    "wikidata_label": "Monumento aos Mortos da Segunda Guerra Mundial",
+    "lang": "pt",
+    "title": "Monumento Nacional aos Mortos da Segunda Guerra Mundial",
+    "dist_m": 23.9
+  },
+  "overture:Monumento Retirada da Laguna:-22.95494:-43.16587": {
+    "qid": "Q10332161",
+    "wikidata_label": "Monumento aos Heróis de Laguna e Dourados",
+    "lang": "pt",
+    "title": "Monumento aos Heróis de Laguna e Dourados",
+    "dist_m": 0.1
+  },
+  "overture:Monumento ao Almirante Barroso Barao do Amazonas:-22.91852:-43.17591": {
+    "qid": "Q67210520",
+    "wikidata_label": "Pedra Fundamental - Monumento ao Almirante Barroso",
+    "lang": "pt",
+    "title": "Monumento ao Almirante Barroso",
+    "dist_m": 5.3
+  },
+  "overture:Monumento ao Barão de Mauá:-22.89607:-43.18098": {
+    "qid": "Q10353330",
+    "wikidata_label": "Praça Mauá",
+    "lang": "pt",
+    "title": "Praça Mauá",
+    "dist_m": 71.1
+  },
+  "overture:Monumento ao Senador Pinheiro Machado:-22.98432:-43.20597": {
+    "qid": "Q10332154",
+    "wikidata_label": "Monumento ao Senador Pinheiro Machado",
+    "lang": "pt",
+    "title": "Monumento ao Senador Pinheiro Machado",
+    "dist_m": 14.8
+  },
+  "overture:Monumento aos Pracinhas:-22.91658:-43.17391": {
+    "qid": "Q2017454",
+    "wikidata_label": "Monumento aos Mortos da Segunda Guerra Mundial",
+    "lang": "pt",
+    "title": "Monumento Nacional aos Mortos da Segunda Guerra Mundial",
+    "dist_m": 31.9
+  },
+  "overture:Pedra da Gávea:-22.99787:-43.28473": {
+    "qid": "Q2066357",
+    "wikidata_label": "Pedra da Gávea",
+    "lang": "pt",
+    "title": "Pedra da Gávea",
+    "dist_m": 36.0
+  },
+  "overture:Arquivo histórico do Banco do Brasil:-22.90105:-43.17653": {
+    "qid": "Q30939541",
+    "wikidata_label": "Centro Cultural Banco do Brasil (Rio de Janeiro)",
+    "lang": "pt",
+    "title": "Centro Cultural Banco do Brasil (Rio de Janeiro)",
+    "dist_m": 31.3
+  },
+  "overture:Casa Brasil:-22.90061:-43.17621": {
+    "qid": "Q30939541",
+    "wikidata_label": "Centro Cultural Banco do Brasil (Rio de Janeiro)",
+    "lang": "pt",
+    "title": "Centro Cultural Banco do Brasil (Rio de Janeiro)",
+    "dist_m": 30.2
+  },
+  "overture:Casa Museu Eva Klabin:-22.97601:-43.19844": {
+    "qid": "Q5415088",
+    "wikidata_label": "Casa Museu Eva Klabin",
+    "lang": "pt",
+    "title": "Casa Museu Eva Klabin",
+    "dist_m": 56.4
+  },
+  "overture:Casa de Banho de Dom Joao VI:-22.87874:-43.21190": {
+    "qid": "Q5102665",
+    "wikidata_label": "Casa de Banho de Dom João VI",
+    "lang": "pt",
+    "title": "Casa de Banho de Dom João VI",
+    "dist_m": 17.9
+  },
+  "overture:Centro Nacional de Flocore e Cultura Popular:-22.92629:-43.17646": {
+    "qid": "Q18483978",
+    "wikidata_label": "Centro Nacional de Folclore e Cultura Popular",
+    "lang": "pt",
+    "title": "Centro Nacional de Folclore e Cultura Popular",
+    "dist_m": 28.0
+  },
+  "overture:Espaço Cultural da Marinha:-22.89494:-43.17384": {
+    "qid": "Q10274952",
+    "wikidata_label": "Espaço Cultural da Marinha",
+    "lang": "pt",
+    "title": "Espaço Cultural da Marinha",
+    "dist_m": 0.8
+  },
+  "overture:Fondation Moreira Sales:-22.98186:-43.23937": {
+    "qid": "Q6041378",
+    "wikidata_label": "Instituto Moreira Salles",
+    "lang": "pt",
+    "title": "Instituto Moreira Salles",
+    "dist_m": 15.3
+  },
+  "overture:Fundação Casa de Rui Barbosa:-22.94893:-43.18699": {
+    "qid": "Q18479640",
+    "wikidata_label": "Fundação Casa de Rui Barbosa",
+    "lang": "pt",
+    "title": "Fundação Casa de Rui Barbosa",
+    "dist_m": 63.5
+  },
+  "overture:Memorial Pretos Novos:-22.89604:-43.19298": {
+    "qid": "Q9719084",
+    "wikidata_label": "Cemitério dos Pretos Novos",
+    "lang": "pt",
+    "title": "Cemitério dos Pretos Novos",
+    "dist_m": 3.8
+  },
+  "overture:Mural Babilonia:-22.96034:-43.16975": {
+    "qid": "Q6914185",
+    "wikidata_label": "Morro da Babilônia",
+    "lang": "pt",
+    "title": "Morro da Babilônia",
+    "dist_m": 90.5
+  },
+  "overture:Museo Militar Copacabana:-22.98571:-43.18505": {
+    "qid": "Q5470982",
+    "wikidata_label": "Forte de Copacabana",
+    "lang": "pt",
+    "title": "Forte de Copacabana",
+    "dist_m": 26.4
+  },
+  "overture:Museu Botafogo:-22.95494:-43.17791": {
+    "qid": "Q80958",
+    "wikidata_label": "Botafogo de Futebol e Regatas",
+    "lang": "pt",
+    "title": "Botafogo de Futebol e Regatas",
+    "dist_m": 54.9
+  },
+  "overture:Museu Carmen Miranda:-22.94137:-43.17216": {
+    "qid": "Q10333423",
+    "wikidata_label": "Museu Carmen Miranda",
+    "lang": "pt",
+    "title": "Museu Carmen Miranda",
+    "dist_m": 27.7
+  },
+  "overture:Museu Casa de Benjamin Constant:-22.92045:-43.18827": {
+    "qid": "Q10333430",
+    "wikidata_label": "Museu Casa de Benjamin Constant",
+    "lang": "pt",
+    "title": "Museu Casa de Benjamin Constant",
+    "dist_m": 0.7
+  },
+  "overture:Museu Judaico do Rio de Janeiro:-22.90956:-43.17481": {
+    "qid": "Q10333532",
+    "wikidata_label": "Museu Judaico do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Museu Judaico do Rio de Janeiro",
+    "dist_m": 35.8
+  },
+  "overture:Museu Light da Energia:-22.90253:-43.18707": {
+    "qid": "Q9723311",
+    "wikidata_label": "Centro Cultural Light",
+    "lang": "pt",
+    "title": "Centro Cultural Light",
+    "dist_m": 14.5
+  },
+  "overture:Museu Nacional de Belas Artes:-22.90935:-43.17569": {
+    "qid": "Q10274365",
+    "wikidata_label": "Escola Nacional de Belas Artes",
+    "lang": "pt",
+    "title": "Escola Nacional de Belas Artes",
+    "dist_m": 61.7
+  },
+  "overture:Museu Naval:-22.90394:-43.17298": {
+    "qid": "Q10333597",
+    "wikidata_label": "Museu Naval",
+    "lang": "pt",
+    "title": "Museu Naval (Rio de Janeiro)",
+    "dist_m": 29.8
+  },
+  "overture:Museu Penitenciário:-22.91524:-43.19983": {
+    "qid": "Q61001994",
+    "wikidata_label": "Museu Penitenciário do Estado do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Museu Penitenciário do Estado do Rio de Janeiro",
+    "dist_m": 21.8
+  },
+  "overture:Museu Villa-Lobos:-22.95186:-43.19058": {
+    "qid": "Q56641205",
+    "wikidata_label": "Museu Villa-Lobos",
+    "lang": "pt",
+    "title": "Museu Villa-Lobos",
+    "dist_m": 17.3
+  },
+  "overture:Museu da Geodiversidade:-22.85734:-43.23232": {
+    "qid": "Q48884397",
+    "wikidata_label": "Museu da Geodiversidade",
+    "lang": "pt",
+    "title": "Museu da Geodiversidade",
+    "dist_m": 15.4
+  },
+  "overture:Museu da Ii Guerra Mundial:-22.91651:-43.17404": {
+    "qid": "Q2017454",
+    "wikidata_label": "Monumento aos Mortos da Segunda Guerra Mundial",
+    "lang": "pt",
+    "title": "Monumento Nacional aos Mortos da Segunda Guerra Mundial",
+    "dist_m": 47.3
+  },
+  "overture:Museu da Imagem e do Som:-22.91370:-43.17221": {
+    "qid": "Q10286368",
+    "wikidata_label": "Museu da Imagem e do Som do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Museu da Imagem e do Som (Rio de Janeiro)",
+    "dist_m": 0.7
+  },
+  "overture:Museu da República:-22.92590:-43.17635": {
+    "qid": "Q56695450",
+    "wikidata_label": "Museu da República",
+    "lang": "pt",
+    "title": "Museu da República",
+    "dist_m": 59.7
+  },
+  "overture:Museu de Luiz Gonzaga:-22.89750:-43.22041": {
+    "qid": "Q9725013",
+    "wikidata_label": "Centro Luiz Gonzaga de Tradições Nordestinas",
+    "lang": "pt",
+    "title": "Centro Luiz Gonzaga de Tradições Nordestinas",
+    "dist_m": 10.1
+  },
+  "overture:Museu do Planetário:-22.97830:-43.23028": {
+    "qid": "Q10350276",
+    "wikidata_label": "Planetário do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Fundação Planetário da Cidade do Rio de Janeiro",
+    "dist_m": 0.2
+  },
+  "overture:Palácio Episcopal da Conceição:-22.89953:-43.18285": {
+    "qid": "Q10343988",
+    "wikidata_label": "Palácio da Conceição",
+    "lang": "pt",
+    "title": "Palácio da Conceição",
+    "dist_m": 19.9
+  },
+  "overture:Panteão Duque de Caxias:-22.90361:-43.18917": {
+    "qid": "Q10343937",
+    "wikidata_label": "Palácio Duque de Caxias",
+    "lang": "pt",
+    "title": "Palácio Duque de Caxias",
+    "dist_m": 0.3
+  },
+  "overture:Solar de Grandjean de Montigny:-22.97902:-43.23373": {
+    "qid": "Q18485129",
+    "wikidata_label": "Solar Grandjean de Montigny",
+    "lang": "pt",
+    "title": "Solar Grandjean de Montigny",
+    "dist_m": 2.6
+  },
+  "overture:Canecão | Rio de Janeiro RJ:-22.95600:-43.17757": {
+    "qid": "Q16726246",
+    "wikidata_label": "Canecão",
+    "lang": "pt",
+    "title": "Canecão",
+    "dist_m": 38.8
+  },
+  "overture:Cidade do Samba RJ:-22.89572:-43.19756": {
+    "qid": "Q5119509",
+    "wikidata_label": "Cidade do Samba Joãozinho Trinta",
+    "lang": "pt",
+    "title": "Cidade do Samba Joãosinho Trinta",
+    "dist_m": 52.1
+  },
+  "overture:Cordão da Bola Preta:-22.91024:-43.18332": {
+    "qid": "Q10260567",
+    "wikidata_label": "Cordão do Bola Preta",
+    "lang": "pt",
+    "title": "Cordão da Bola Preta",
+    "dist_m": 3.5
+  },
+  "overture:Cristo Redentor Rio de Janeiro:-22.95205:-43.21074": {
+    "qid": "Q79961",
+    "wikidata_label": "Cristo Redentor",
+    "lang": "pt",
+    "title": "Cristo Redentor",
+    "dist_m": 32.3
+  },
+  "overture:D.R.I EAV Parque Lage:-22.96018:-43.21228": {
+    "qid": "Q7139641",
+    "wikidata_label": "Parque Lage",
+    "lang": "pt",
+    "title": "Parque Lage",
+    "dist_m": 55.0
+  },
+  "overture:Palácio Maçônico do Lavradio:-22.91051:-43.18281": {
+    "qid": "Q25439592",
+    "wikidata_label": "Solar do Marquês do Lavradio",
+    "lang": "pt",
+    "title": "Solar do Marquês do Lavradio",
+    "dist_m": 75.9
+  },
+  "overture:Teatro Justiça:-22.91043:-43.17558": {
+    "qid": "Q18483689",
+    "wikidata_label": "Centro Cultural Justiça Federal",
+    "lang": "pt",
+    "title": "Centro Cultural Justiça Federal",
+    "dist_m": 40.6
+  },
+  "overture:Theatro Municipal:-22.90836:-43.17729": {
+    "qid": "Q1968538",
+    "wikidata_label": "Theatro Municipal do Rio de Janeiro",
+    "lang": "pt",
+    "title": "Theatro Municipal do Rio de Janeiro",
+    "dist_m": 94.7
+  }
+}

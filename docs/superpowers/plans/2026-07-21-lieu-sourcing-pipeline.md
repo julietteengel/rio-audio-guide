@@ -6,7 +6,7 @@
 
 **Architecture:** Un module Python par source de données (`overture.py`, `wikidata.py`, `feiras.py`), un module de déduplication pur sans dépendance réseau (`dedup.py`), et un orchestrateur (`pipeline.py`) qui combine tout et écrit le JSON final. Chaque module de source sépare sa logique pure (testable sans réseau, avec mocks/fixtures) de son appel réseau (testé en intégration).
 
-**Tech Stack:** Python 3.11+ (éviter 3.14, incompatibilités SSL constatées avec certaines libs sur macOS), `duckdb` (requêtes Overture via S3 parquet), `requests` (Wikidata SPARQL, Nominatim, PDF), `pdfplumber` (extraction de tableau PDF), `pytest`.
+**Tech Stack:** Python 3.11+ (vérifié en pratique dans Task 1 : `requests` et `duckdb` gèrent leurs propres certificats TLS et fonctionnent bien même sur Python 3.14 ; le souci SSL rencontré plus tôt en conception était spécifique à `urllib` brut, non utilisé ici — pas de contrainte de version stricte au-delà de 3.11+), `duckdb` (requêtes Overture via S3 parquet), `requests` (Wikidata SPARQL, Nominatim, PDF), `pdfplumber` (extraction de tableau PDF), `pytest`.
 
 ## Global Constraints
 
@@ -57,8 +57,8 @@ pipeline/
 - [ ] **Step 1: Créer la structure du projet**
 
 ```bash
-mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline/sourcing
-mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline/tests
+mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline/sourcing
+mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline/tests
 ```
 
 - [ ] **Step 2: Créer `pyproject.toml`**
@@ -68,7 +68,7 @@ mkdir -p /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline/tests
 name = "rio-audio-guide-sourcing"
 version = "0.1.0"
 description = "Location sourcing pipeline for Rio Audio Guide"
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.11"
 dependencies = [
     "duckdb>=1.5.0",
     "requests>=2.32.0",
@@ -85,13 +85,13 @@ testpaths = ["tests"]
 - [ ] **Step 3: Créer un venv et installer les dépendances**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline
-python3.12 -m venv .venv
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
-Expected: installation sans erreur. Si `python3.12` n'est pas disponible, utiliser la version 3.11/3.12 la plus proche installée (`python3 --version` pour vérifier).
+Expected: installation sans erreur, quelle que soit la version 3.11+ disponible (vérifié fonctionnel avec 3.14 sur cette machine, `python3 --version` pour vérifier).
 
 - [ ] **Step 4: Écrire le test qui échoue**
 
@@ -125,7 +125,7 @@ def test_place_wikidata_qid_defaults_to_none():
 - [ ] **Step 5: Lancer le test, vérifier qu'il échoue**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline
 pytest tests/test_models.py -v
 ```
 
@@ -167,7 +167,7 @@ Expected: `3 passed`.
 - [ ] **Step 8: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/pyproject.toml pipeline/sourcing/__init__.py pipeline/sourcing/models.py pipeline/tests/test_models.py
 git commit -m "Add sourcing pipeline scaffolding and Place model"
 ```
@@ -218,7 +218,7 @@ def test_haversine_distance_approx_one_km_for_known_delta():
 def test_deduplicate_places_merges_close_same_name():
     places = [
         Place(name="Escadaria Selarón", lat=-22.91470, lon=-43.18060, category="landmark_and_historical_building", source="overture"),
-        Place(name="escadaria selaron", lat=-22.91471, lon=-43.18061, category="artwork", source="wikidata"),
+        Place(name="escadaria selaron", lat=-22.91471, lon=-43.18061, category="landmark_and_historical_building", source="wikidata"),
     ]
     result = deduplicate_places(places)
     assert len(result) == 1
@@ -238,6 +238,46 @@ def test_deduplicate_places_merges_by_shared_wikidata_qid_even_if_name_differs()
     places = [
         Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
         Place(name="National Museum of Brazil", lat=-22.9059, lon=-43.2247, category="museum", source="wikidata", wikidata_qid="Q1798512"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 1
+
+
+def test_normalize_name_strips_praca_prefix():
+    assert normalize_name("Praça XV de Novembro") == "xv de novembro"
+
+
+def test_deduplicate_places_does_not_merge_qid_match_when_far_apart():
+    places = [
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
+        Place(name="Museu Nacional (Erro)", lat=-22.8600, lon=-43.1700, category="museum", source="wikidata", wikidata_qid="Q1798512"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 2
+
+
+def test_deduplicate_places_merges_qid_match_within_qid_threshold():
+    places = [
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
+        Place(name="Museu Nacional (approx)", lat=-22.9080, lon=-43.2260, category="museum", source="wikidata", wikidata_qid="Q1798512"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 1
+
+
+def test_deduplicate_places_does_not_merge_different_categories_even_if_close_same_name():
+    places = [
+        Place(name="Igreja de Santa Rita", lat=-22.9050, lon=-43.1800, category="church_cathedral", source="overture"),
+        Place(name="Praça Santa Rita", lat=-22.90501, lon=-43.18001, category="landmark_and_historical_building", source="overture"),
+    ]
+    result = deduplicate_places(places)
+    assert len(result) == 2
+
+
+def test_deduplicate_places_merges_qid_match_even_with_different_categories():
+    places = [
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture", wikidata_qid="Q1798512"),
+        Place(name="Museu Nacional", lat=-22.9060, lon=-43.2248, category="history_museum", source="wikidata", wikidata_qid="Q1798512"),
     ]
     result = deduplicate_places(places)
     assert len(result) == 1
@@ -263,7 +303,7 @@ from sourcing.models import Place
 GENERIC_PREFIXES = [
     "museu de ", "museu do ", "museu da ",
     "igreja de ", "igreja do ", "igreja da ",
-    "praça ", "parque ",
+    "praca ", "parque ",
 ]
 
 
@@ -289,14 +329,33 @@ def haversine_distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> 
     return 2 * r * atan2(sqrt(a), sqrt(1 - a))
 
 
-def deduplicate_places(places: list[Place], max_distance_m: float = 100.0) -> list[Place]:
+def deduplicate_places(
+    places: list[Place],
+    max_distance_m: float = 100.0,
+    max_qid_distance_m: float = 5000.0,
+) -> list[Place]:
+    """max_qid_distance_m is deliberately more generous than max_distance_m: a
+    shared Wikidata QID is stronger evidence than name+proximity alone, but a
+    QID match with wildly divergent coordinates (a plausible tagging error)
+    should still not auto-merge unconditionally — that would violate the
+    "jamais de fusion automatique en cas d'ambiguïté forte" constraint."""
     kept: list[Place] = []
     for place in places:
         is_duplicate = False
         for existing in kept:
-            same_qid = place.wikidata_qid and place.wikidata_qid == existing.wikidata_qid
+            same_qid = (
+                place.wikidata_qid
+                and place.wikidata_qid == existing.wikidata_qid
+                and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_qid_distance_m
+            )
+            categories_compatible = (
+                place.category == existing.category
+                or place.category in GENERIC_SOURCE_CATEGORIES
+                or existing.category in GENERIC_SOURCE_CATEGORIES
+            )
             same_name_and_close = (
                 normalize_name(place.name) == normalize_name(existing.name)
+                and categories_compatible
                 and haversine_distance_m(place.lat, place.lon, existing.lat, existing.lon) <= max_distance_m
             )
             if same_qid or same_name_and_close:
@@ -307,18 +366,22 @@ def deduplicate_places(places: list[Place], max_distance_m: float = 100.0) -> li
     return kept
 ```
 
+Note : le chemin QID ne vérifie volontairement pas la catégorie — une identité Wikidata partagée confirmée est une preuve suffisante en elle-même, même si la catégorie diffère (ex : un même lieu catégorisé différemment selon la source).
+
+**Correctif post-revue finale (`GENERIC_SOURCE_CATEGORIES`)** : découvert lors de la revue de branche complète (Task 6) que la dédup inter-sources ne fonctionnait jamais en pratique (350 lieux réels = 221+126+3, zéro fusion) — Wikidata génère toujours `"heritage_site"` et les feiras toujours `"recurring_cultural_event"` (des catégories génériques par source, pas de vraie information de type d'entité), donc elles ne correspondaient jamais aux catégories précises d'Overture, et Overture ne porte jamais de `wikidata_qid`. Solution : traiter ces catégories génériques comme compatibles avec n'importe quelle autre catégorie pour la correspondance nom+proximité, sans affaiblir la protection anti-fusion entre deux catégories *spécifiques* différentes (le cas concret church/praça, qui reste protégé). Compromis accepté et documenté : un lieu générique (Wikidata/feiras) qui devient l'ancre `kept` peut en théorie faire fusionner deux entités Overture spécifiques différentes qui partagent son nom normalisé à moins de 100m — jugé rare en pratique, non bloquant.
+
 - [ ] **Step 4: Lancer les tests, vérifier qu'ils passent**
 
 ```bash
 pytest tests/test_dedup.py -v
 ```
 
-Expected: `7 passed`.
+Expected: `13 passed`.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/sourcing/dedup.py pipeline/tests/test_dedup.py
 git commit -m "Add name normalization and cross-source deduplication logic"
 ```
@@ -340,6 +403,8 @@ git commit -m "Add name normalization and cross-source deduplication logic"
 Créer `pipeline/tests/test_overture.py` :
 
 ```python
+import pytest
+
 from sourcing.overture import filter_by_category, query_overture_places, CATEGORY_ALLOWLIST
 
 
@@ -364,11 +429,13 @@ def test_category_allowlist_does_not_include_bars_or_restaurants():
     assert "business_advertising" not in CATEGORY_ALLOWLIST
 
 
+@pytest.mark.integration
 def test_query_overture_places_returns_known_landmark_for_selaron_bbox():
-    # Bbox serré autour de l'Escadaria Selarón (frontière Lapa/Santa Teresa).
-    # Test d'intégration réel (réseau requis) : vérifié manuellement dans la
-    # recherche de conception, cette zone renvoie de manière fiable ce lieu.
-    bbox = (-43.1815, -22.9155, -43.1795, -22.9140)
+    # Bbox serré (marge uniforme de ±0.0005°) autour des coordonnées réelles
+    # des entrées "Selarón"/"Selaron" trouvées par requête diagnostique dans
+    # le release 2026-06-17.0 (Selarón Apartments, Scalinata Selarón, Selaron
+    # Steps). Test d'intégration réel (réseau requis).
+    bbox = (-43.180157, -22.916949, -43.178459, -22.915033)
     places = query_overture_places(bbox)
     names = [p.name for p in places]
     assert any("Selarón" in name or "Selaron" in name for name in names)
@@ -442,12 +509,18 @@ def query_overture_places(
 pytest tests/test_overture.py -v
 ```
 
-Expected: `4 passed`. Le 4e test (`test_query_overture_places_returns_known_landmark_for_selaron_bbox`) nécessite un accès réseau et prend ~10-20s (requête sur le parquet public S3, comme vérifié en conception) — si le CI n'a pas d'accès réseau, marquer ce test `@pytest.mark.integration` et l'exclure du run rapide, mais le garder pour l'exécution locale.
+Expected: `4 passed`. Le 4e test (`test_query_overture_places_returns_known_landmark_for_selaron_bbox`) est marqué `@pytest.mark.integration` (nécessite un accès réseau, prend ~10-20s) — exclu du run rapide via `pytest -m "not integration"`, mais s'exécute normalement dans un run complet. Le marqueur doit être enregistré dans `pipeline/pyproject.toml` sous `[tool.pytest.ini_options]` :
+
+```toml
+markers = [
+    "integration: tests that require live network access (deselect with '-m \"not integration\"')",
+]
+```
 
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/sourcing/overture.py pipeline/tests/test_overture.py
 git commit -m "Add Overture Maps query module with tourism category allowlist"
 ```
@@ -575,7 +648,7 @@ Expected: `2 passed`.
 - [ ] **Step 5: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/sourcing/wikidata.py pipeline/tests/test_wikidata.py
 git commit -m "Add Wikidata SPARQL query for IPHAN-listed heritage sites"
 ```
@@ -666,6 +739,42 @@ def test_feiras_to_places_skips_feiras_that_fail_to_geocode():
     with patch("sourcing.feiras.requests.get", return_value=fake_response):
         places = feiras_to_places(feiras)
     assert places == []
+
+
+def test_fetch_and_parse_feiras_pdf_logs_warning_and_continues_on_malformed_page(caplog, monkeypatch):
+    import logging
+    from unittest.mock import MagicMock
+    import sourcing.feiras as feiras_module
+
+    bad_table = [["Título institucional", "", ""]]
+    good_table = [
+        ["Código", "Turno", "Descrição", "Bairro", "Dias da Semana"],
+        ["54", "Não", "RUA TEREZINA", "SANTA TERESA", "Sexta-Feira"],
+    ]
+
+    fake_page_bad = MagicMock()
+    fake_page_bad.extract_table.return_value = bad_table
+    fake_page_good = MagicMock()
+    fake_page_good.extract_table.return_value = good_table
+
+    fake_pdf = MagicMock()
+    fake_pdf.pages = [fake_page_bad, fake_page_good]
+    fake_pdf.__enter__.return_value = fake_pdf
+    fake_pdf.__exit__.return_value = False
+
+    fake_response = MagicMock()
+    fake_response.content = b"fake-pdf-bytes"
+    fake_response.raise_for_status = MagicMock()
+
+    monkeypatch.setattr(feiras_module.requests, "get", lambda *a, **kw: fake_response)
+    monkeypatch.setattr(feiras_module.pdfplumber, "open", lambda *a, **kw: fake_pdf)
+
+    with caplog.at_level(logging.WARNING):
+        result = feiras_module.fetch_and_parse_feiras_pdf()
+
+    assert len(result) == 1
+    assert result[0]["bairro"] == "SANTA TERESA"
+    assert any("Skipping page" in record.message for record in caplog.records)
 ```
 
 - [ ] **Step 2: Lancer les tests, vérifier qu'ils échouent**
@@ -680,10 +789,14 @@ Expected: `ModuleNotFoundError: No module named 'sourcing.feiras'`.
 
 ```python
 import io
+import logging
 
+import pdfplumber
 import requests
 
 from sourcing.models import Place
+
+logger = logging.getLogger(__name__)
 
 FEIRAS_PDF_URL = (
     "https://ordempublica.prefeitura.rio/wp-content/uploads/sites/30/2024/10/"
@@ -750,17 +863,21 @@ def feiras_to_places(feiras: list[dict]) -> list[Place]:
 
 def fetch_and_parse_feiras_pdf(url: str = FEIRAS_PDF_URL) -> list[dict]:
     """Wrapper d'I/O fin autour de parse_feiras_table_rows (déjà testé) : pas de
-    test dédié, à vérifier manuellement contre le vrai PDF lors de Task 6."""
-    import pdfplumber
-
+    test dédié sur l'accès réseau réel, mais une page malformée (ex: le bloc
+    titre/en-tête institutionnel de la page 1, qui n'a pas la structure de
+    colonnes attendue) est loguée en warning et sautée plutôt que de faire
+    planter toute l'extraction ou d'être avalée silencieusement."""
     response = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=60)
     response.raise_for_status()
     all_feiras: list[dict] = []
     with pdfplumber.open(io.BytesIO(response.content)) as pdf:
-        for page in pdf.pages:
+        for page_num, page in enumerate(pdf.pages, start=1):
             table = page.extract_table()
             if table:
-                all_feiras.extend(parse_feiras_table_rows(table))
+                try:
+                    all_feiras.extend(parse_feiras_table_rows(table))
+                except ValueError as exc:
+                    logger.warning("Skipping page %d in feiras PDF: %s", page_num, exc)
     return all_feiras
 ```
 
@@ -770,12 +887,14 @@ def fetch_and_parse_feiras_pdf(url: str = FEIRAS_PDF_URL) -> list[dict]:
 pytest tests/test_feiras.py -v
 ```
 
-Expected: `6 passed`.
+Expected: `8 passed`.
 
 - [ ] **Step 5: Vérification manuelle de `fetch_and_parse_feiras_pdf` contre le vrai PDF**
 
 ```bash
 python3 -c "
+import logging
+logging.basicConfig(level=logging.WARNING)
 from sourcing.feiras import fetch_and_parse_feiras_pdf
 feiras = fetch_and_parse_feiras_pdf()
 print(f'Total feiras parsées: {len(feiras)}')
@@ -784,12 +903,12 @@ print('Santa Teresa:', santa_teresa)
 "
 ```
 
-Expected: un nombre de feiras proche de 165 (total actif connu), avec au moins une entrée pour Santa Teresa (Rua Terezina, vendredi — confirmé en conception). Si le nombre est très inférieur, l'extraction de tableau du PDF a probablement raté des pages — inspecter `pdf.pages` individuellement.
+Expected (vérifié en exécution réelle) : un warning loggé pour la page 1 (bloc titre institutionnel, structure de colonnes différente), puis **149 feiras parsées** sur les pages restantes, avec l'entrée Santa Teresa (Rua Terezina, vendredi) présente. **Point de vigilance pour Task 6** : 149 est en dessous du total de 165 feiras actives annoncé par le registre — l'écart pourrait venir de lignes de continuation de tableau sur plusieurs pages mal détectées comme des en-têtes (donc silencieusement sautées avec un warning, pas une vraie perte de données non tracée), mais ça mérite une vérification manuelle ciblée (comparer la liste obtenue au PDF source) avant de considérer le pipeline de sourcing des feiras comme complet à 100%.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 git add pipeline/sourcing/feiras.py pipeline/tests/test_feiras.py
 git commit -m "Add feiras livres PDF parsing and Nominatim geocoding"
 ```
@@ -845,9 +964,20 @@ def test_run_pipeline_combines_and_writes_output(tmp_path):
 
 
 def test_run_pipeline_deduplicates_across_sources(tmp_path):
+    # Catégorie alignée sur "museum" des deux côtés (et non "heritage_site" côté
+    # Wikidata) : le chemin de fusion nom+proximité de dedup.py exige des
+    # catégories identiques par conception (durci en Task 2, commit 28547c2 —
+    # "jamais de fusion automatique en cas d'ambiguïté forte"), et le côté
+    # Overture ne porte jamais de wikidata_qid (query_overture_places n'en
+    # définit pas), donc le chemin de fusion par QID ne s'applique pas non
+    # plus ici. Une version à catégories différentes ne fusionnerait
+    # légitimement pas avec le dedup.py actuel — ce ne serait donc plus ce
+    # test-ci (vérifier que run_pipeline câble bien deduplicate_places entre
+    # sources), mais un test du comportement de dedup.py lui-même (déjà
+    # couvert en Task 2).
     overture_result = [Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="overture")]
     wikidata_result = [
-        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="heritage_site", source="wikidata", wikidata_qid="Q1798512")
+        Place(name="Museu Nacional", lat=-22.9058, lon=-43.2246, category="museum", source="wikidata", wikidata_qid="Q1798512")
     ]
 
     output_file = tmp_path / "places.json"
@@ -925,22 +1055,47 @@ Expected: tous les tests passent (le test d'intégration Overture de Task 3 incl
 
 - [ ] **Step 6: Exécution réelle du pipeline complet**
 
+**Avant de lancer** : `feiras_to_places` (Task 5) doit avoir un `time.sleep(1)` dans sa boucle après chaque appel à `geocode_address` — Nominatim (usage public) limite à 1 requête/seconde, et le pipeline complet géocode ~149 feiras en une seule exécution. Sans ce délai, l'exécution réelle ci-dessous violerait leur politique d'usage.
+
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide/pipeline
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline/pipeline
 python -m sourcing.pipeline
 ```
 
-Expected: un fichier `places.json` créé avec une liste de lieux candidats pour Santa Teresa/Lapa. Vérifier manuellement : présence de l'Escadaria Selarón, du Museu da Chácara do Céu, d'au moins une feira — et absence du Santuário do Zé Pelintra (attendu : Overture le catégorise en `business_advertising`, hors allowlist — confirme qu'il faudra l'ajouter manuellement à la liste finale, comme documenté dans le spec).
+Expected (~2-3 minutes à cause du rate-limit Nominatim) : un fichier `places.json` créé. Vérifié en exécution réelle : **350 lieux candidats** (221 Overture, 126 Wikidata, 3 feiras après géocodage). Présence confirmée : Escadaria Selarón (3 variantes de nom), Museu da Chácara do Céu, au moins une feira. Absence confirmée du Santuário do Zé Pelintra sous son nom exact (attendu : catégorisé `business_advertising` par Overture, hors allowlist) — **mais** une entrée différemment nommée "Santuário de Seu Zé Pelintra" (catégorie `topic_concert_venue`, dans l'allowlist) apparaît bien : c'est le résultat voulu de l'ajout de cette catégorie plus tôt dans la conception, à vérifier manuellement que c'est bien la même entité avant de l'inclure dans la liste finale.
+
+**Limitations connues révélées par cette exécution réelle** (voir aussi section "Résultats et limitations connues" après le Self-Review) :
+- Seulement 3 des ~149 feiras survivent au géocodage (description d'adresse trop complexe pour Nominatim) — amélioration de la stratégie de géocodage hors scope de ce plan.
+- Wikidata et les feiras ne sont pas filtrés par bbox (contrairement à Overture) — résultats à l'échelle de la ville entière, le filtrage géographique final pour Santa Teresa/Lapa reste à faire manuellement lors de la curation.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-cd /Users/julietteengel/code/julietteengel/rio-audio-guide
+cd /Users/julietteengel/code/julietteengel/rio-audio-guide/.worktrees/sourcing-pipeline
 echo "pipeline/places.json" >> .gitignore
 echo "pipeline/.venv/" >> .gitignore
 git add pipeline/sourcing/pipeline.py pipeline/tests/test_pipeline.py .gitignore
 git commit -m "Add pipeline orchestration: combine sources, dedupe, write places.json"
 ```
+
+---
+
+### Task 7: Élargir la couverture par catégorie — églises, galeries, venues, culture afro-brésilienne, fêtes
+
+Origine : question utilisateur ("il manque peut-être des catégories genre églises, lieux de culture afro-bré, fêtes ?") pendant la phase de curation des 154 lieux part4. Vérification faite par requête live sur le vrai parquet Overture (bbox Rio complet, release `2026-06-17.0`), pas de suppositions sur les noms de catégorie.
+
+**Constat** :
+- Overture a de vraies catégories pour les lieux de culte, mais à un volume très inégal : `church_cathedral` (6314), `religious_organization` (3799), `evangelical_church` (1758), `pentecostal_church` (1377), `baptist_church` (989), `catholic_church` (908), plus une longue traîne (`synagogue`, `buddhist_temple`, `mosque`, `hindu_temple`, `anglican_church`...). La quasi-totalité des trois catégories evangelical/pentecostal/baptist + `religious_organization` sont vraisemblablement des paroisses de quartier sans intérêt patrimonial/touristique — même risque de bruit que `landmark_and_historical_building` (déjà documenté dans le CLAUDE.md du repo).
+- **Aucune catégorie Overture** ne couvre la culture afro-brésilienne (terreiros, candomblé, umbanda) ni les fêtes/carnaval/écoles de samba (`music_festivals_and_organizations` n'a qu'1 résultat sur tout Rio). Ce n'est pas un problème d'allowlist — c'est un vrai trou de couverture de la source elle-même. Les quelques lieux de ce type déjà dans le corpus (Baianas da Estação Primeira de Mangueira, Cordão da Bola Preta) n'y sont que par accident, catégorisés `cultural_center`.
+- Overture a aussi des catégories galerie/venue/musée-de-niche jamais ajoutées à l'allowlist initial : `art_gallery` (321), `music_venue` (256), `theatre` (219), `venue_and_event_space` (98), `performing_arts` (53), et une dizaine de sous-types de musée à faible volume chacun (`science_museum`, `contemporary_art_museum`, `design_museum`, `childrens_museum`, `civilization_museum`, `community_museum`, `state_museum`, `sports_museum`, `cartooning_museum`, `aviation_museum`, `costume_museum`).
+
+**Décision de périmètre (utilisateur, cette session)** : pour les églises, n'ajouter que `church_cathedral` (6314 lieux) — la catégorie la plus susceptible de contenir de vraies églises historiques/touristiques (Candelária, cathédrale métropolitaine, etc.), en excluant délibérément `religious_organization`/`evangelical_church`/`pentecostal_church`/`baptist_church` (~7900 lieux combinés) jugées trop bruitées pour justifier le coût de triage. Peut être révisé après une première passe de triage réelle sur `church_cathedral` si le taux de bruit s'avère lui aussi trop élevé.
+
+- [x] **Step 1** : ajouter `art_gallery`, `music_venue`, `theatre`, `venue_and_event_space`, `performing_arts`, les sous-types de musée listés ci-dessus, et `church_cathedral` à `CATEGORY_ALLOWLIST` dans `sourcing/overture.py`, avec commentaire documentant pourquoi les autres catégories église sont explicitement exclues (pas juste oubliées). Commit `ba52276`.
+- [x] **Step 2** : vérifier que la suite de tests existante passe toujours sans modification (`pytest -m "not integration"`, 34 passed) — l'allowlist n'a pas de test qui énumère positivement son contenu complet, seulement des tests d'exclusion (`bar`, `restaurant`, `beach`...), donc aucun test cassé par l'ajout.
+- [ ] **Step 3** : relancer `python -m sourcing.pipeline` pour tirer les nouveaux lieux. Volume mesuré par requête live avant exécution : **7295 lieux nouveaux** au total sur ces catégories combinées (dont ~6314 pour `church_cathedral` seul) — à comparer aux 3858 lieux du dataset actuel post-perte de données. Vérifier que le runtime DuckDB/S3 reste raisonnable à ce volume.
+- [ ] **Step 4** : ré-exécuter tout le cycle de curation déjà utilisé pour les 773 CULTURAL initiaux sur ce nouveau lot — triage CULTURAL/NATURAL/NOISE (`scope_classification_v2.csv`-style), dédup (`dedup_cultural.py`), vérification de frontière municipale (`verify_boundary.py`), avant de passer au grounding. Attention particulière au taux de bruit réel de `church_cathedral` — si le triage montre qu'une grosse majorité est du bruit (paroisses sans importance), documenter le taux exact avant de décider si le grounding + narration valent le coût pour le reste.
+- [ ] **Step 5 (hors scope Overture)** : sourcer séparément la culture afro-brésilienne et les fêtes/carnaval — pas réparable par l'allowlist. Construire un module dédié (sur le modèle de `sourcing/wikidata.py`) avec une requête SPARQL ciblée (ex. instances de "terreiro de candomblé"/"casa de umbanda" + lieux liés au carnaval carioca dans le périmètre de Rio), ou une source manuelle curatée si Wikidata s'avère trop pauvre sur ce sujet précis.
 
 ---
 
@@ -953,6 +1108,18 @@ git commit -m "Add pipeline orchestration: combine sources, dedupe, write places
 **Cohérence des types/signatures** : `Place` (Task 1) est utilisé de façon cohérente dans tous les modules suivants (mêmes noms de champs). `deduplicate_places` (Task 2) est appelée avec la signature exacte définie. `query_overture_places`, `query_iphan_heritage_sites`, `fetch_and_parse_feiras_pdf`, `feiras_to_places` sont importés dans `pipeline.py` avec les noms exacts définis dans leurs tasks respectives, et mockés sous ces mêmes noms dans les tests de Task 6.
 
 ---
+
+## Résultats de l'exécution réelle et limitations connues
+
+Ce plan a été exécuté en entier (Tasks 1-6, subagent-driven, avec revue et corrections à chaque tâche). Résumé pour qui reprend ce travail :
+
+- **350 lieux candidats** produits pour Santa Teresa/Lapa (221 Overture, 126 Wikidata/IPHAN, 3 feiras) — c'est la liste de candidats, **pas** la sélection finale des 25 lieux (étape humaine, toujours à faire).
+- **Géocodage des feiras très partiel** (3/149 réussis) : la requête Nominatim concatène la description d'adresse complète du registre (souvent une plage de rues type "entre la rue X et la rue Y") avec le quartier — trop complexe pour un géocodeur généraliste. Une stratégie de géocodage plus fine (extraire une seule rue, ou géocoder par quartier avec vérification manuelle) serait nécessaire pour vraiment exploiter les feiras — hors scope de ce plan.
+- **Wikidata et feiras ne sont pas filtrés par bbox** (contrairement à Overture) — résultats à l'échelle de Rio entière ; le filtrage géographique final pour Santa Teresa/Lapa se fait actuellement à la main lors de la curation, pas dans le code.
+- **Rate limiting Nominatim** : `time.sleep(1)` ajouté dans `feiras_to_places` (découvert nécessaire seulement à l'exécution réelle du pipeline complet en Task 6, pas anticipé dans le plan initial) — respecte la politique d'usage de l'instance publique (max 1 req/s).
+- **Santuário do Zé Pelintra** : confirmé absent sous son nom exact (catégorisé `business_advertising`, hors allowlist), mais une entrée "Santuário de Seu Zé Pelintra" (`topic_concert_venue`, dans l'allowlist) apparaît bien — probablement la même entité sous un nom légèrement différent, à vérifier manuellement avant curation finale.
+
+**Correctifs post-revue finale de branche** (voir aussi la note dans le bloc `deduplicate_places` de Task 2) : la revue de branche complète a révélé que le chiffre de 350 lieux ci-dessus correspondait à **zéro fusion inter-source réelle** (221+126+3, addition exacte) à cause d'un défaut de conception dans le filtre de catégorie de la dédup, et que le filtrage géographique Santa Teresa/Lapa n'était appliqué qu'à Overture, pas à Wikidata/feiras (contrairement à la contrainte globale du spec). Les deux ont été corrigés (`GENERIC_SOURCE_CATEGORIES` dans `dedup.py`, filtre bbox post-agrégation dans `pipeline.py`) — une ré-exécution réelle du pipeline produirait maintenant un nombre de lieux plus bas que 350, à la fois grâce au filtre géographique et à une vraie déduplication inter-sources. Non re-exécuté après ce correctif faute de temps dans cette session (le géocodage des feiras à 1 req/s prend plusieurs minutes) — à faire avant la sélection finale des 25 lieux.
 
 ## Execution Handoff
 

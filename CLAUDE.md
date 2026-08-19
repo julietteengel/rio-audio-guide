@@ -20,6 +20,22 @@ it's had a real human code review pass (not just an automated one). When asked t
   are hand-written by the founder — Claude's role there stays explanation/review only, never editing
   those files directly. Everything from `internal/adapters/` onward (Postgres, RabbitMQ, HTTP, CI/CD)
   switched to AI-written/human-reviewed on 2026-08-15, a deliberate time-boxed call, not the default.
+- **`frontend` branch**, `.worktrees/frontend/` — user-facing apps for Memória Carioca, decomposed into
+  independent sub-projects, each with its own spec under `docs/superpowers/specs/`:
+  - `web/` — Next.js landing page (started 2026-08-18, see `2026-08-18-landing-page-design.md`).
+    Purely static (no backend calls), hosted on Vercel — deliberately decoupled from the backend's AWS
+    infrastructure.
+  - `mobile/` — React Native (Expo) app targeting the App Store, iOS first (started 2026-08-18, see
+    `2026-08-18-mobile-app-design.md` for screens/navigation/architecture; see
+    `2026-08-19-mobile-real-backend-wiring-design.md` for the follow-up that wired it to the backend's
+    real routes, added a real map with a web fallback, and fixed a download-language/UI-language UX
+    bug; see `2026-08-19-mobile-account-design.md` for login/edit-profile/logout/delete-account,
+    wired to auth routes the founder built in parallel on `backend` — read all three, none repeats
+    the last).
+  Both reuse the brand, copy, and visual design already validated in an earlier Claude Design
+  prototype (ephemeral session scratch files, not part of this repo) — that prototype is not
+  re-designed here, and is no longer needed to continue this work: the specs above and the code itself
+  are the durable source of truth going forward.
 
 ```
 docs/superpowers/specs/   dated, point-in-time decision/research documents (design doc, roadmap
