@@ -4,14 +4,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository structure — read this first
 
-As of 2026-08-19, `master` contains real application code, not just documentation: the
-`sourcing-pipeline` and `frontend` branches have been merged in (PRs #2/#3) after a human review pass.
-`backend` is the one subsystem still developed on its own branch/worktree, not merged here yet — a
-subsystem only merges into `master` once it's had a real human code review, not just an automated one.
+As of 2026-08-19, this is a monorepo: the `sourcing-pipeline`, `frontend`, and `backend` branches (each
+previously reviewed and merged independently, PRs #1-#3) are all merged into `master`, which is now the
+single integration branch. **Going forward, work happens on a short-lived branch per change** (a
+feature/fix, not a whole subsystem) **with a PR into `master`** — not direct pushes to `master`, and not
+one long-lived branch per subsystem anymore. CI (`.github/workflows/`) triggers on `master`, path-
+filtered per subsystem so an unrelated change doesn't run irrelevant checks.
 
-- **`pipeline/`** — the location-sourcing pipeline and its curation scripts (Python). Merged from
-  `sourcing-pipeline`; that branch/worktree (`.worktrees/sourcing-pipeline/`) may still be used for new,
-  not-yet-reviewed pipeline work before the next merge.
+- **`backend/`** — the Go backend (hexagonal architecture + DDD), `go.mod`/`cmd/`/`internal/` sitting
+  directly under it (the Go module root). See `docs/superpowers/specs/2026-08-12-backend-domain-model-design.md`
+  for the domain model and `docs/superpowers/plans/2026-08-12-backend-domain-model.md` for the
+  implementation plan. Originally merged flat into the repo root (no subfolder); reorganized into
+  `backend/` on 2026-08-19 to match `web/`/`mobile/`/`pipeline/`'s existing pattern — each subsystem
+  now a clean top-level folder with its own README.
+  **Authorship split (see `mission.md` for the full note)**: `internal/domain/` and `internal/ports/`
+  are hand-written by the founder — Claude's role there stays explanation/review only, never editing
+  those files directly. Everything from `internal/adapters/` onward (Postgres, RabbitMQ, HTTP, CI/CD)
+  switched to AI-written/human-reviewed on 2026-08-15, a deliberate time-boxed call, not the default.
+- **`pipeline/`** — the location-sourcing pipeline and its curation scripts (Python).
 - **`web/`** — the Next.js landing page (started 2026-08-18, see
   `docs/superpowers/specs/2026-08-18-landing-page-design.md`). Purely static (no backend calls), hosted
   on Vercel — deliberately decoupled from the backend's AWS infrastructure.
@@ -24,18 +34,7 @@ subsystem only merges into `master` once it's had a real human code review, not 
   Both `web/` and `mobile/` reuse the brand, copy, and visual design already validated in an earlier
   Claude Design prototype (ephemeral session scratch files, not part of this repo) — that prototype is
   not re-designed here, and is no longer needed to continue this work: the specs above and the code
-  itself are the durable source of truth going forward. `web/`/`mobile/` (and the now-merged
-  `sourcing-pipeline` work) may still be developed further on the `frontend` branch/worktree
-  (`.worktrees/frontend/`) before the next merge.
-- **`backend` branch**, `.worktrees/backend/` — the Go backend (hexagonal architecture + DDD). Started
-  2026-08-12 — see `docs/superpowers/specs/2026-08-12-backend-domain-model-design.md` for the domain
-  model and `docs/superpowers/plans/2026-08-12-backend-domain-model.md` for the implementation plan.
-  The Go module lives directly at the worktree root (`go.mod`, `cmd/`, `internal/`, alongside the
-  inherited `docs/`) — no extra `backend/` subfolder inside the `backend` worktree.
-  **Authorship split (see `mission.md` for the full note)**: `internal/domain/` and `internal/ports/`
-  are hand-written by the founder — Claude's role there stays explanation/review only, never editing
-  those files directly. Everything from `internal/adapters/` onward (Postgres, RabbitMQ, HTTP, CI/CD)
-  switched to AI-written/human-reviewed on 2026-08-15, a deliberate time-boxed call, not the default.
+  itself are the durable source of truth going forward.
 
 ```
 docs/superpowers/specs/   dated, point-in-time decision/research documents (design doc, roadmap
@@ -50,10 +49,6 @@ pipeline/sourcing/        the tested package: one module per data source (Overtu
 pipeline/curation/        one-off/ad-hoc scripts for content enrichment, narration generation,
                            and data cleanup — NOT a tested package, run manually, no test coverage
 ```
-
-On the `backend` branch/worktree, `go.mod`, `cmd/api`, and `internal/{domain,application,ports,
-adapters}` sit directly at the worktree root — the Go module root, playing the same role `pipeline/`
-plays here on `master`.
 
 ## Commands (run from `pipeline/`)
 

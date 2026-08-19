@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ["Docker Build and Push"]
     types: [completed]
-    branches: [backend]
+    branches: [master]
   workflow_dispatch:
 
 env:
@@ -48,7 +48,7 @@ jobs:
 
       - name: Deploy with Helm
         run: |
-          helm upgrade --install rio deploy/helm/rio-backend \
+          helm upgrade --install rio backend/deploy/helm/rio-backend \
             --set api.image.repository=${{ steps.login-ecr.outputs.registry }}/rio-api \
             --set api.image.tag=${{ github.sha }} \
             --set worker.image.repository=${{ steps.login-ecr.outputs.registry }}/rio-worker \

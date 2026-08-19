@@ -2,10 +2,10 @@ name: Frontend Mobile CI
 
 on:
   push:
-    branches: [frontend]
+    branches: [master]
     paths: ["mobile/**"]
   pull_request:
-    branches: [frontend]
+    branches: [master]
     paths: ["mobile/**"]
 
 jobs:

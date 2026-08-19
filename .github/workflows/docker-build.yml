@@ -35,8 +35,8 @@ jobs:
       - name: Build and push API image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: deploy/docker/Dockerfile.api
+          context: backend
+          file: backend/deploy/docker/Dockerfile.api
           push: true
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/rio-api:latest
@@ -50,8 +50,8 @@ jobs:
       - name: Build and push worker image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: deploy/docker/Dockerfile.worker
+          context: backend
+          file: backend/deploy/docker/Dockerfile.worker
           push: true
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/rio-worker:latest
