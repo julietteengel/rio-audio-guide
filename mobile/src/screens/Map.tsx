@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, Pressable, TextInput, StyleSheet, Platform, ScrollView } from "react-native";
+import { View, Text, Pressable, TextInput, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 import Svg, { Circle, Line, Path } from "react-native-svg";
@@ -11,20 +11,11 @@ import { fetchCityManifest, RIO_CITY_SLUG } from "../data/downloadManager";
 import type { Place } from "../data/types";
 import { haversineMeters, formatDistance, type LatLon } from "../utils/geo";
 import { colors, fonts, radii } from "../theme/tokens";
-
-// react-native-maps has no real web implementation — a static `import`
-// still gets bundled and executed by Metro's module system on every
-// platform, so it must be loaded through a runtime `require()` gated on
-// Platform.OS, not a top-level `import`, or the browser build throws at
-// load time before anything renders. Native (iOS/Android) gets the real
-// map; web gets a plain scrollable place list below (see WebPlaceList).
-let MapView: any = null;
-let Marker: any = null;
-if (Platform.OS !== "web") {
-  const Maps = require("react-native-maps");
-  MapView = Maps.default;
-  Marker = Maps.Marker;
-}
+// Metro resolves PlaceMap.web.tsx on web, PlaceMap.tsx (react-native-maps)
+// on native, automatically -- this import is platform-agnostic on purpose,
+// see PlaceMap.tsx's own comment for why a plain top-level import of
+// react-native-maps itself would break the web bundle.
+import { PlaceMap } from "../components/PlaceMap";
 
 type Props = NativeStackScreenProps<AppStackParamList, "Map">;
 
@@ -191,46 +182,13 @@ export function MapScreen({ navigation }: Props) {
       </ScrollView>
 
       <View style={styles.map}>
-        {Platform.OS === "web" ? (
-          <ScrollView style={StyleSheet.absoluteFill} contentContainerStyle={styles.webListContent}>
-            <Text style={styles.webListNotice}>{t.map.webMapUnavailable}</Text>
-            {visiblePlaces.map((p) => (
-              <Pressable
-                key={p.id}
-                style={styles.webListRow}
-                onPress={() => navigation.navigate("PlaceDetail", { placeId: p.id })}
-              >
-                <View style={styles.pin} />
-                <View style={styles.nearbyText}>
-                  <Text style={styles.nearbyTitle}>{p.name}</Text>
-                  <Text style={styles.nearbySub}>
-                    {(t.categories as Record<string, string>)[p.category] ?? p.category}
-                  </Text>
-                </View>
-              </Pressable>
-            ))}
-          </ScrollView>
-        ) : (
-          <MapView style={StyleSheet.absoluteFill} initialRegion={RIO_REGION}>
-            {visiblePlaces.map((p) => (
-              <Marker
-                key={p.id}
-                coordinate={{ latitude: p.lat, longitude: p.lon }}
-                onPress={() => navigation.navigate("PlaceDetail", { placeId: p.id })}
-                title={p.name}
-              >
-                <View style={styles.pin} />
-              </Marker>
-            ))}
-            {userLocation ? (
-              <Marker coordinate={userLocation} anchor={{ x: 0.5, y: 0.5 }} title={t.map.youAreHere}>
-                <View style={styles.me}>
-                  <View style={styles.meDot} />
-                </View>
-              </Marker>
-            ) : null}
-          </MapView>
-        )}
+        <PlaceMap
+          places={visiblePlaces}
+          region={RIO_REGION}
+          userLocation={userLocation}
+          youAreHereLabel={t.map.youAreHere}
+          onSelectPlace={(placeId) => navigation.navigate("PlaceDetail", { placeId })}
+        />
 
         <View style={styles.search}>
           <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
@@ -367,47 +325,6 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   searchText: { flex: 1, fontFamily: fonts.body, fontSize: 14, color: colors.inkFaint },
-  webListContent: { paddingTop: 76, paddingHorizontal: 16, paddingBottom: 100, gap: 10 },
-  webListNotice: {
-    fontFamily: fonts.body,
-    fontSize: 12.5,
-    color: colors.inkFaint,
-    marginBottom: 4,
-  },
-  webListRow: {
-    backgroundColor: colors.white,
-    borderRadius: radii.lg,
-    padding: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    borderWidth: 1,
-    borderColor: colors.line,
-  },
-  pin: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: colors.terracottaDark,
-    borderWidth: 2,
-    borderColor: colors.cream,
-  },
-  me: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: "rgba(193,89,46,0.22)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  meDot: {
-    width: 15,
-    height: 15,
-    borderRadius: 7.5,
-    backgroundColor: colors.terracotta,
-    borderWidth: 2.5,
-    borderColor: colors.cream,
-  },
   nearby: {
     position: "absolute",
     left: 16,
