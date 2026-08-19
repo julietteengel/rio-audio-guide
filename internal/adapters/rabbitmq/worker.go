@@ -78,6 +78,26 @@ const requeueDelay = 2 * time.Second
 // pas de raison technique de diverger, juste une même intuition "3 essais".
 const maxTTSAttempts = 3
 
+// ackOrLog/nackOrLog : Ack/Nack peuvent eux-mêmes échouer (canal déjà fermé,
+// connexion coupée) -- ignorer l'erreur en silence (`_ = ...`) masquait ça
+// jusqu'ici. Dans le cas courant, ce n'est pas une perte silencieuse : une
+// connexion coupée fait que RabbitMQ redistribue le message de toute façon,
+// avec ou sans notre Ack local. Mais des échecs répétés ici sont un vrai
+// signal de connexion instable qui mérite d'être visible, pas juste absorbé
+// -- exactement le genre d'état invisible qui a rendu le bug du 2026-08-19
+// plus dur à diagnostiquer que nécessaire.
+func ackOrLog(msg amqp.Delivery, audioFileID string) {
+	if err := msg.Ack(false); err != nil {
+		log.Printf("tts worker: ack failed for %s: %v", audioFileID, err)
+	}
+}
+
+func nackOrLog(msg amqp.Delivery, requeue bool, audioFileID string) {
+	if err := msg.Nack(false, requeue); err != nil {
+		log.Printf("tts worker: nack(requeue=%v) failed for %s: %v", requeue, audioFileID, err)
+	}
+}
+
 func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	var job ttsJobMessage
 	if err := json.Unmarshal(msg.Body, &job); err != nil {
@@ -86,7 +106,8 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 		// message, pas tous ceux reçus avant lui. requeue=false ici : un
 		// message malformé le restera pour toujours — le remettre en queue
 		// créerait une boucle infinie de re-livraison du même message cassé.
-		_ = msg.Nack(false, false)
+		// Pas d'AudioFileID fiable (le JSON n'a pas pu être lu) -- "unknown".
+		nackOrLog(msg, false, "unknown")
 		return
 	}
 
@@ -99,7 +120,7 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 		// de repository est probablement transitoire (base momentanément
 		// indisponible) — retenter a du sens.
 		time.Sleep(requeueDelay)
-		_ = msg.Nack(false, true)
+		nackOrLog(msg, true, job.AudioFileID)
 		return
 	}
 
@@ -113,7 +134,7 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 			}
 			// Ack, pas Nack : réessayer le même message ne changera rien à une
 			// clé invalide ou un texte/voice_id rejeté.
-			_ = msg.Ack(false)
+			ackOrLog(msg, job.AudioFileID)
 			return
 		}
 		log.Printf("tts worker: transient TTS error for %s (attempt %d/%d): %v",
@@ -124,7 +145,7 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 			if failErr := application.FailAudioGeneration(ctx, w.audioFileRepo, job.AudioFileID, err.Error()); failErr != nil {
 				log.Printf("tts worker: mark failed also failed for %s: %v", job.AudioFileID, failErr)
 			}
-			_ = msg.Ack(false)
+			ackOrLog(msg, job.AudioFileID)
 			return
 		}
 
@@ -136,10 +157,10 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 			// au prix de reperdre le compteur pour ce tour-ci (dégradé, pas
 			// silencieux : c'est loggé).
 			log.Printf("tts worker: failed to republish retry for %s, falling back to plain requeue: %v", job.AudioFileID, pubErr)
-			_ = msg.Nack(false, true)
+			nackOrLog(msg, true, job.AudioFileID)
 			return
 		}
-		_ = msg.Ack(false)
+		ackOrLog(msg, job.AudioFileID)
 		return
 	}
 
@@ -161,12 +182,12 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 			if failErr := application.FailAudioGeneration(ctx, w.audioFileRepo, job.AudioFileID, err.Error()); failErr != nil {
 				log.Printf("tts worker: mark failed also failed for %s: %v", job.AudioFileID, failErr)
 			}
-			_ = msg.Ack(false)
+			ackOrLog(msg, job.AudioFileID)
 			return
 		}
 		log.Printf("tts worker: upload failed after local retries for %s: %v", job.AudioFileID, err)
 		time.Sleep(requeueDelay)
-		_ = msg.Nack(false, true)
+		nackOrLog(msg, true, job.AudioFileID)
 		return
 	}
 
@@ -175,13 +196,13 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 	if err := application.CompleteAudioGeneration(ctx, w.scriptRepo, w.audioFileRepo, job.AudioFileID, storageURL, "", duration); err != nil {
 		log.Printf("tts worker: complete generation failed for %s: %v", job.AudioFileID, err)
 		time.Sleep(requeueDelay)
-		_ = msg.Nack(false, true)
+		nackOrLog(msg, true, job.AudioFileID)
 		return
 	}
 
 	// Tout a réussi : on accuse réception, RabbitMQ peut supprimer le
 	// message de la queue pour de bon.
-	_ = msg.Ack(false)
+	ackOrLog(msg, job.AudioFileID)
 }
 
 // requeueWithAttempt republie une copie du job avec Attempt incrémenté --
