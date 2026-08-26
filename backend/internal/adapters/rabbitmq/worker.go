@@ -71,11 +71,10 @@ const requeueDelay = 2 * time.Second
 
 // maxTTSAttempts borne les retries sur une erreur TTS transitoire (timeout,
 // 5xx, hoquet réseau) -- sans ce plafond, Nack(requeue=true) reconduit le
-// même message indéfiniment : chaque redelivery rappelle ElevenLabs (payant)
-// pour, potentiellement, échouer encore. Au-delà, on abandonne proprement
-// (AudioFile "failed", visible et rejouable via POST /audio-files/:id/retry)
-// plutôt que de boucler en silence. Même valeur que uploadWithRetryAttempts,
-// pas de raison technique de diverger, juste une même intuition "3 essais".
+// même message indéfiniment : chaque redelivery rappelle le provider TTS
+// (payant) pour, potentiellement, échouer encore. Au-delà, on abandonne
+// proprement (AudioFile "failed", visible et rejouable via
+// POST /audio-files/:id/retry) plutôt que de boucler en silence.
 const maxTTSAttempts = 3
 
 // ackOrLog/nackOrLog : Ack/Nack peuvent eux-mêmes échouer (canal déjà fermé,
@@ -124,7 +123,7 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 		return
 	}
 
-	audioBytes, duration, err := w.ttsGenerator.Generate(ctx, job.Text, job.Language, job.VoiceID)
+	storageURL, timestampsURL, duration, err := w.ttsGenerator.Generate(ctx, job.Text, job.Language, job.VoiceID)
 	if err != nil {
 		var permErr *ports.PermanentError
 		if errors.As(err, &permErr) {
@@ -133,7 +132,8 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 				log.Printf("tts worker: mark failed also failed for %s: %v", job.AudioFileID, failErr)
 			}
 			// Ack, pas Nack : réessayer le même message ne changera rien à une
-			// clé invalide ou un texte/voice_id rejeté.
+			// clé invalide, un texte/voice_id rejeté, ou une tâche Polly qui a
+			// définitivement échoué.
 			ackOrLog(msg, job.AudioFileID)
 			return
 		}
@@ -164,36 +164,11 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 		return
 	}
 
-	// Le fichier audio part sur S3 via le port AudioStorage, jamais dans
-	// RabbitMQ — la queue ne transporte que de petits messages de contrôle
-	// (voir ttsJobMessage côté publisher).
-	//
-	// uploadWithRetry réessaie l'upload lui-même, en gardant audioBytes déjà
-	// en mémoire -- sans ça, un Nack(requeue=true) ici referait tout le
-	// message depuis le début, y compris le rappel ElevenLabs payant, pour
-	// ne retenter au fond qu'un upload S3 gratuit. On ne tombe sur le Nack
-	// (donc une régénération complète) qu'après avoir épuisé ces tentatives
-	// locales, pas dès le premier hoquet réseau transitoire.
-	storageURL, err := uploadWithRetry(ctx, w.storage, job.AudioFileID+".mp3", audioBytes)
-	if err != nil {
-		var permErr *ports.PermanentError
-		if errors.As(err, &permErr) {
-			log.Printf("tts worker: permanent S3 error for %s, marking failed: %v", job.AudioFileID, err)
-			if failErr := application.FailAudioGeneration(ctx, w.audioFileRepo, job.AudioFileID, err.Error()); failErr != nil {
-				log.Printf("tts worker: mark failed also failed for %s: %v", job.AudioFileID, failErr)
-			}
-			ackOrLog(msg, job.AudioFileID)
-			return
-		}
-		log.Printf("tts worker: upload failed after local retries for %s: %v", job.AudioFileID, err)
-		time.Sleep(requeueDelay)
-		nackOrLog(msg, true, job.AudioFileID)
-		return
-	}
-
-	// Marque l'AudioFile "ready" ET publie le Script associé (l'événement
-	// de domaine "audio prêt → script publié" qu'on avait nommé plus tôt).
-	if err := application.CompleteAudioGeneration(ctx, w.scriptRepo, w.audioFileRepo, job.AudioFileID, storageURL, "", duration); err != nil {
+	// Polly a déjà écrit l'audio ET les timestamps sur S3 lui-même -- storageURL
+	// et timestampsURL sont déjà finaux, plus rien à uploader ici (contrairement
+	// à l'ancienne intégration ElevenLabs, qui rendait des bytes que ce worker
+	// uploadait via w.storage).
+	if err := application.CompleteAudioGeneration(ctx, w.scriptRepo, w.audioFileRepo, job.AudioFileID, storageURL, timestampsURL, duration); err != nil {
 		log.Printf("tts worker: complete generation failed for %s: %v", job.AudioFileID, err)
 		time.Sleep(requeueDelay)
 		nackOrLog(msg, true, job.AudioFileID)
@@ -221,41 +196,4 @@ func (w *Worker) requeueWithAttempt(ctx context.Context, job ttsJobMessage) erro
 		DeliveryMode: amqp.Persistent,
 		Body:         body,
 	})
-}
-
-// uploadWithRetryAttempts borne les tentatives locales -- un nombre fixe,
-// pas de recours à un contexte avec deadline propre : on veut juste éviter
-// qu'un hoquet réseau transitoire déclenche un Nack(requeue=true), qui lui
-// referait tout le message depuis le début (donc un nouvel appel ElevenLabs
-// payant) pour ne retenter, au fond, qu'un upload S3 gratuit qui n'a rien à
-// voir avec la génération audio elle-même.
-const uploadWithRetryAttempts = 3
-
-// uploadWithRetry réessaie l'upload S3 seul, en gardant audioBytes déjà en
-// mémoire -- jamais de rappel à ElevenLabs pour ces tentatives locales. On
-// ne laisse remonter l'erreur vers handle() (donc vers le Nack qui referait
-// tout) qu'après avoir épuisé ces tentatives, ou immédiatement si l'erreur
-// est permanente (identifiants invalides, bucket absent) : réessayer une
-// erreur permanente ne changerait rien, ni ici ni côté RabbitMQ.
-func uploadWithRetry(ctx context.Context, storage ports.AudioStorage, key string, audioBytes []byte) (string, error) {
-	var lastErr error
-	for attempt := 1; attempt <= uploadWithRetryAttempts; attempt++ {
-		storageURL, err := storage.Upload(ctx, key, audioBytes, "audio/mpeg")
-		if err == nil {
-			return storageURL, nil
-		}
-
-		var permErr *ports.PermanentError
-		if errors.As(err, &permErr) {
-			return "", err
-		}
-
-		lastErr = err
-		if attempt < uploadWithRetryAttempts {
-			log.Printf("tts worker: upload attempt %d/%d failed for %s, retrying: %v",
-				attempt, uploadWithRetryAttempts, key, err)
-			time.Sleep(time.Duration(attempt) * 500 * time.Millisecond) // 500ms, puis 1s
-		}
-	}
-	return "", lastErr
 }
