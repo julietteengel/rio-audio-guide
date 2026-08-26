@@ -54,7 +54,7 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	s.echo.GET("/cities/:city/manifest", s.getCityManifest)
 
 	auth := requireAuth(s.tokens)
-	// ReviewAndRequestAudio triggers a real, billed ElevenLabs call -- gated
+	// ReviewAndRequestAudio triggers a real, billed Polly call -- gated
 	// to RoleAdmin, not just any authenticated account (see requireRole).
 	adminOnly := requireRole(domain.RoleAdmin)
 	s.echo.POST("/scripts/:id/review", s.reviewScript, auth, adminOnly)
