@@ -158,8 +158,9 @@ négligeable. Simplification assumée, pas un oubli.
 - Retire l'import `rioaudioguide/backend/internal/adapters/elevenlabs` et la ligne
   `elevenlabs.NewGenerator(mustEnv("ELEVENLABS_API_KEY"))`.
 - Ajoute `pollyClient := polly.NewFromConfig(awsCfg)` (juste après la construction de `s3Client`,
-  même `awsCfg`) puis `ttsGenerator := awspolly.NewGenerator(pollyClient, envOr("S3_BUCKET",
-  "rio-audio-guide"))`.
+  même `awsCfg`) puis `ttsGenerator := awspolly.NewGenerator(pollyClient, s3Client, envOr("S3_BUCKET",
+  "rio-audio-guide"))` — `s3Client` réutilisé, pas reconstruit (voir la note sur `s3GetObjectAPI`
+  plus haut).
 - `mustEnv("ELEVENLABS_API_KEY")` disparaît — le binaire ne doit plus exiger une clé qui ne sert
   plus à rien au démarrage.
 - **Aucun changement Helm nécessaire** : `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/
