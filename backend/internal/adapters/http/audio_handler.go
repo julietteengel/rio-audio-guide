@@ -20,7 +20,8 @@ import (
 const presignExpiry = 15 * time.Minute
 
 type audioResponse struct {
-	URL string `json:"url"`
+	URL           string  `json:"url"`
+	TimestampsURL *string `json:"timestamps_url,omitempty"`
 }
 
 type audioNotReadyResponse struct {
@@ -91,7 +92,20 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
-	body, err := json.Marshal(audioResponse{URL: url})
+	resp := audioResponse{URL: url}
+	if timestampsStorageURL := audioFile.Audio().TimestampsURL(); timestampsStorageURL != "" {
+		timestampsKey, err := parseS3Key(timestampsStorageURL)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		}
+		timestampsURL, err := s.storage.PresignURL(c.Request().Context(), timestampsKey, presignExpiry)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		}
+		resp.TimestampsURL = &timestampsURL
+	}
+
+	body, err := json.Marshal(resp)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
