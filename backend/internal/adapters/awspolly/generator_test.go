@@ -4,11 +4,14 @@ package awspolly
 import (
 	"context"
 	"errors"
+	"io"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/polly"
 	"github.com/aws/aws-sdk-go-v2/service/polly/types"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/smithy-go"
 
 	"rioaudioguide/backend/internal/ports"
@@ -116,3 +119,99 @@ func TestGenerator_RunTask_StartErrorClassification(t *testing.T) {
 		})
 	}
 }
+
+// fakePollyAPIByFormat route Start/GetSpeechSynthesisTask par OutputFormat --
+// Generate lance deux tâches en parallèle (mp3 + json), il faut pouvoir leur
+// faire renvoyer des OutputUri différents pour vérifier que storageURL et
+// timestampsURL ne sont pas confondus.
+type fakePollyAPIByFormat struct {
+	mp3URI, jsonURI string
+}
+
+func (f *fakePollyAPIByFormat) StartSpeechSynthesisTask(_ context.Context, in *polly.StartSpeechSynthesisTaskInput, _ ...func(*polly.Options)) (*polly.StartSpeechSynthesisTaskOutput, error) {
+	taskID := string(in.OutputFormat)
+	return &polly.StartSpeechSynthesisTaskOutput{
+		SynthesisTask: &types.SynthesisTask{TaskId: &taskID, TaskStatus: types.TaskStatusScheduled},
+	}, nil
+}
+
+func (f *fakePollyAPIByFormat) GetSpeechSynthesisTask(_ context.Context, in *polly.GetSpeechSynthesisTaskInput, _ ...func(*polly.Options)) (*polly.GetSpeechSynthesisTaskOutput, error) {
+	uri := f.mp3URI
+	if *in.TaskId == string(types.OutputFormatJson) {
+		uri = f.jsonURI
+	}
+	return &polly.GetSpeechSynthesisTaskOutput{
+		SynthesisTask: &types.SynthesisTask{TaskStatus: types.TaskStatusCompleted, OutputUri: &uri},
+	}, nil
+}
+
+// fakeS3GetObject renvoie un corps NDJSON fixe pour n'importe quelle clé.
+type fakeS3GetObject struct{ body string }
+
+func (f *fakeS3GetObject) GetObject(_ context.Context, _ *s3.GetObjectInput, _ ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
+	return &s3.GetObjectOutput{Body: io.NopCloser(strings.NewReader(f.body))}, nil
+}
+
+func TestGenerator_Generate_ReturnsDistinctAudioAndTimestampsURLs(t *testing.T) {
+	polly := &fakePollyAPIByFormat{
+		mp3URI:  "https://s3.us-east-1.amazonaws.com/rio-audio-guide/audio/voice-1/a.mp3",
+		jsonURI: "https://s3.us-east-1.amazonaws.com/rio-audio-guide/timestamps/voice-1/a.json",
+	}
+	marks := `{"time":0,"type":"word","value":"Bonjour"}
+{"time":820,"type":"word","value":"le"}
+{"time":1150,"type":"word","value":"monde"}
+`
+	s3fake := &fakeS3GetObject{body: marks}
+	gen := &Generator{polly: polly, s3: s3fake, bucket: "rio-audio-guide", pollInterval: time.Millisecond}
+
+	storageURL, timestampsURL, duration, err := gen.Generate(context.Background(), "Bonjour le monde", "fr", "voice-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if storageURL != "s3://rio-audio-guide/audio/voice-1/a.mp3" {
+		t.Fatalf("got storageURL %q", storageURL)
+	}
+	if timestampsURL != "s3://rio-audio-guide/timestamps/voice-1/a.json" {
+		t.Fatalf("got timestampsURL %q", timestampsURL)
+	}
+	if duration != 1150*time.Millisecond {
+		t.Fatalf("got duration %v, want 1150ms (last word mark)", duration)
+	}
+}
+
+func TestGenerator_Generate_FallsBackToWordCountEstimateWhenMarksUnreadable(t *testing.T) {
+	polly := &fakePollyAPIByFormat{
+		mp3URI:  "https://s3.us-east-1.amazonaws.com/rio-audio-guide/audio/voice-1/a.mp3",
+		jsonURI: "https://s3.us-east-1.amazonaws.com/rio-audio-guide/timestamps/voice-1/a.json",
+	}
+	gen := &Generator{
+		polly: polly, bucket: "rio-audio-guide", pollInterval: time.Millisecond,
+		s3: &erroringS3GetObject{},
+	}
+
+	_, _, duration, err := gen.Generate(context.Background(), "Oi!", "pt", "voice-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if duration <= 0 {
+		t.Fatalf("got duration %v, want > 0 (fallback estimate)", duration)
+	}
+}
+
+type erroringS3GetObject struct{}
+
+func (erroringS3GetObject) GetObject(_ context.Context, _ *s3.GetObjectInput, _ ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
+	return nil, errors.New("s3: object not found")
+}
+
+func TestGenerator_Generate_UnsupportedLanguageFailsBeforeAnyPollyCall(t *testing.T) {
+	polly := &fakePollyAPIByFormat{}
+	gen := &Generator{polly: polly, bucket: "rio-audio-guide", pollInterval: time.Millisecond}
+
+	_, _, _, err := gen.Generate(context.Background(), "Hallo", "de", "voice-1")
+	if err == nil {
+		t.Fatal("expected an error for an unsupported language")
+	}
+}
+
+var _ ports.TTSGenerator = (*Generator)(nil)

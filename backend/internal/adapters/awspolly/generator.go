@@ -2,7 +2,9 @@
 package awspolly
 
 import (
+	"bufio"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -13,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/polly/types"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/smithy-go"
+	"golang.org/x/sync/errgroup"
 
 	"rioaudioguide/backend/internal/ports"
 )
@@ -135,4 +138,72 @@ func keyFromOutputURI(outputURI, bucket string) (string, error) {
 		return strings.TrimPrefix(u.Path, "/"), nil
 	}
 	return "", fmt.Errorf("awspolly: OutputUri %q does not reference bucket %q", outputURI, bucket)
+}
+
+func (g *Generator) Generate(ctx context.Context, text, language, voiceID string) (string, string, time.Duration, error) {
+	code, err := languageCode(language)
+	if err != nil {
+		return "", "", 0, err
+	}
+
+	var audioKey, marksKey string
+	group, gctx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		key, err := g.runTask(gctx, text, code, voiceID, types.OutputFormatMp3, nil, "audio/"+voiceID+"/")
+		audioKey = key
+		return err
+	})
+	group.Go(func() error {
+		key, err := g.runTask(gctx, text, code, voiceID, types.OutputFormatJson, []types.SpeechMarkType{types.SpeechMarkTypeWord}, "timestamps/"+voiceID+"/")
+		marksKey = key
+		return err
+	})
+	if err := group.Wait(); err != nil {
+		return "", "", 0, err
+	}
+
+	duration := g.durationFromMarks(ctx, marksKey, text)
+	return "s3://" + g.bucket + "/" + audioKey, "s3://" + g.bucket + "/" + marksKey, duration, nil
+}
+
+type wordMark struct {
+	Time int64  `json:"time"`
+	Type string `json:"type"`
+}
+
+// durationFromMarks lit le fichier NDJSON de marks juste écrit par Polly et
+// prend le "time" (ms) du dernier mot -- plus précis que l'estimation par
+// nombre de mots utilisée par le stub d'origine et par ElevenLabs. Ne
+// remonte jamais d'erreur : un fichier de marks illisible ne doit pas faire
+// échouer toute la génération, juste dégrader la précision de la durée.
+func (g *Generator) durationFromMarks(ctx context.Context, marksKey, fallbackText string) time.Duration {
+	out, err := g.s3.GetObject(ctx, &s3.GetObjectInput{Bucket: &g.bucket, Key: &marksKey})
+	if err != nil {
+		return estimateDuration(fallbackText)
+	}
+	defer func() { _ = out.Body.Close() }()
+
+	var lastTime int64
+	scanner := bufio.NewScanner(out.Body)
+	for scanner.Scan() {
+		var mark wordMark
+		if err := json.Unmarshal(scanner.Bytes(), &mark); err != nil {
+			continue
+		}
+		if mark.Type == "word" && mark.Time > lastTime {
+			lastTime = mark.Time
+		}
+	}
+	if lastTime <= 0 {
+		return estimateDuration(fallbackText)
+	}
+	return time.Duration(lastTime) * time.Millisecond
+}
+
+// estimateDuration : même formule que l'estimation ElevenLabs/stub -- ~5
+// caractères par mot, ~400ms par mot, plancher à 1 mot pour éviter une durée
+// nulle que domain.NewGeneratedAudio rejette.
+func estimateDuration(text string) time.Duration {
+	wordCount := max(1, len(text)/5)
+	return time.Duration(wordCount) * 400 * time.Millisecond
 }
