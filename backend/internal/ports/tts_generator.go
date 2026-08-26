@@ -17,9 +17,10 @@ type TTSGenerator interface {
 }
 
 // PermanentError indicates the TTS provider rejected the request in a way
-// retrying the same message won't fix (bad API key, invalid text/voice_id).
-// The RabbitMQ worker uses this to stop requeueing instead of looping
-// forever on an unrecoverable message.
+// retrying the same message won't fix (bad API key, invalid text/voice_id,
+// unsupported language, task failed for a non-transient reason). The
+// RabbitMQ worker uses this to stop requeueing instead of looping forever
+// on an unrecoverable message.
 type PermanentError struct {
 	StatusCode int
 	Body       string

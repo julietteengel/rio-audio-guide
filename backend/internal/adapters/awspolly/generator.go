@@ -67,6 +67,9 @@ func (g *Generator) runTask(ctx context.Context, text, languageCode, voiceID str
 	}
 
 	taskID := out.SynthesisTask.TaskId
+	if taskID == nil {
+		return "", fmt.Errorf("awspolly: task response missing TaskId")
+	}
 	for {
 		select {
 		case <-ctx.Done():
@@ -81,6 +84,9 @@ func (g *Generator) runTask(ctx context.Context, text, languageCode, voiceID str
 
 		switch got.SynthesisTask.TaskStatus {
 		case types.TaskStatusCompleted:
+			if got.SynthesisTask.OutputUri == nil {
+				return "", fmt.Errorf("awspolly: completed task %s missing OutputUri", *taskID)
+			}
 			return keyFromOutputURI(*got.SynthesisTask.OutputUri, g.bucket)
 		case types.TaskStatusFailed:
 			reason := "unknown reason"
@@ -140,11 +146,27 @@ func keyFromOutputURI(outputURI, bucket string) (string, error) {
 	return "", fmt.Errorf("awspolly: OutputUri %q does not reference bucket %q", outputURI, bucket)
 }
 
+// pollTimeout borne l'attente d'une tâche Polly (audio ou marks). Sans ça,
+// le ctx qui atteint runTask est celui, process-lifetime, du worker
+// (signal.NotifyContext dans cmd/worker/main.go) -- une tâche qui n'atteint
+// jamais un état terminal bloquerait le worker indéfiniment (traitement
+// strictement séquentiel, un seul handle() à la fois). 20 minutes : large
+// marge au-dessus de la plus longue narration observée sur le corpus
+// (11 378 caractères). Un timeout ici redescend comme une erreur simple
+// (non permanente), que le retry existant de worker.go (maxTTSAttempts)
+// gère déjà correctement. Remplace le &http.Client{Timeout: 5 * time.Minute}
+// de l'ancien adaptateur ElevenLabs, jamais réinstauré quand l'appel
+// synchrone a été remplacé par ce polling asynchrone.
+const pollTimeout = 20 * time.Minute
+
 func (g *Generator) Generate(ctx context.Context, text, language, voiceID string) (string, string, time.Duration, error) {
 	code, err := languageCode(language)
 	if err != nil {
 		return "", "", 0, err
 	}
+
+	ctx, cancel := context.WithTimeout(ctx, pollTimeout)
+	defer cancel()
 
 	var audioKey, marksKey string
 	group, gctx := errgroup.WithContext(ctx)
