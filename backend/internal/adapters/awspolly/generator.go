@@ -59,7 +59,7 @@ func (g *Generator) runTask(ctx context.Context, text, languageCode, voiceID str
 		OutputS3KeyPrefix:  &keyPrefix,
 		SpeechMarkTypes:    marks,
 		Text:               &text,
-		TextType:           types.TextTypeText,
+		TextType:           types.TextTypeSsml,
 		VoiceId:            types.VoiceId(voiceID),
 	})
 	if err != nil {
@@ -159,6 +159,26 @@ func keyFromOutputURI(outputURI, bucket string) (string, error) {
 // synchrone a été remplacé par ce polling asynchrone.
 const pollTimeout = 20 * time.Minute
 
+// speechRate pilote le débit de parole via SSML -- 90% (10% plus lent que le
+// débit par défaut du moteur Neural), retenu après un premier test réel jugé
+// "parle trop vite" (Cristo Redentor FR, 26/08). Valeur globale pour
+// l'instant, pas un paramètre par appel comme voiceID -- à ajuster ici selon
+// le retour terrain, ou à faire remonter en paramètre si un besoin de
+// variation par narration/voix apparaît un jour.
+const speechRate = "90%"
+
+// xmlEscaper échappe le minimum requis par SSML (&, <, >) -- le texte source
+// est de la prose ordinaire (ponctuation, guillemets français), donc le
+// risque est faible, mais un "&" ou un "<" littéral dans une narration
+// casserait le XML sans cet échappement.
+var xmlEscaper = strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;")
+
+// wrapSSML enrobe le texte brut en SSML avec le débit configuré -- nécessaire
+// pour piloter <prosody rate>, qu'un TextType=text en clair ne permet pas.
+func wrapSSML(text string) string {
+	return `<speak><prosody rate="` + speechRate + `">` + xmlEscaper.Replace(text) + `</prosody></speak>`
+}
+
 func (g *Generator) Generate(ctx context.Context, text, language, voiceID string) (string, string, time.Duration, error) {
 	code, err := languageCode(language)
 	if err != nil {
@@ -168,15 +188,16 @@ func (g *Generator) Generate(ctx context.Context, text, language, voiceID string
 	ctx, cancel := context.WithTimeout(ctx, pollTimeout)
 	defer cancel()
 
+	ssmlText := wrapSSML(text)
 	var audioKey, marksKey string
 	group, gctx := errgroup.WithContext(ctx)
 	group.Go(func() error {
-		key, err := g.runTask(gctx, text, code, voiceID, types.OutputFormatMp3, nil, "audio/"+voiceID+"/")
+		key, err := g.runTask(gctx, ssmlText, code, voiceID, types.OutputFormatMp3, nil, "audio/"+voiceID+"/")
 		audioKey = key
 		return err
 	})
 	group.Go(func() error {
-		key, err := g.runTask(gctx, text, code, voiceID, types.OutputFormatJson, []types.SpeechMarkType{types.SpeechMarkTypeWord}, "timestamps/"+voiceID+"/")
+		key, err := g.runTask(gctx, ssmlText, code, voiceID, types.OutputFormatJson, []types.SpeechMarkType{types.SpeechMarkTypeWord}, "timestamps/"+voiceID+"/")
 		marksKey = key
 		return err
 	})
@@ -184,6 +205,8 @@ func (g *Generator) Generate(ctx context.Context, text, language, voiceID string
 		return "", "", 0, err
 	}
 
+	// Estimation de secours (durationFromMarks) sur le texte brut, pas le
+	// SSML -- le compte de mots ne doit pas inclure les balises.
 	duration := g.durationFromMarks(ctx, marksKey, text)
 	return "s3://" + g.bucket + "/" + audioKey, "s3://" + g.bucket + "/" + marksKey, duration, nil
 }

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -266,3 +267,72 @@ func TestGenerator_Generate_UnsupportedLanguageFailsBeforeAnyPollyCall(t *testin
 }
 
 var _ ports.TTSGenerator = (*Generator)(nil)
+
+func TestWrapSSML_EscapesXMLSpecialCharsAndAppliesRate(t *testing.T) {
+	got := wrapSSML(`Tom & Jerry <said> "hi"`)
+	want := `<speak><prosody rate="90%">Tom &amp; Jerry &lt;said&gt; "hi"</prosody></speak>`
+	if got != want {
+		t.Fatalf("got %q, want %q", got, want)
+	}
+}
+
+func TestGenerator_Generate_SendsSSMLNotPlainText(t *testing.T) {
+	polly := &capturingPollyAPI{
+		mp3URI:  "https://s3.us-east-1.amazonaws.com/rio-audio-guide/audio/voice-1/a.mp3",
+		jsonURI: "https://s3.us-east-1.amazonaws.com/rio-audio-guide/timestamps/voice-1/a.json",
+	}
+	gen := &Generator{polly: polly, s3: &fakeS3GetObject{body: ""}, bucket: "rio-audio-guide", pollInterval: time.Millisecond}
+
+	if _, _, _, err := gen.Generate(context.Background(), "Bonjour", "fr", "voice-1"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Les deux tâches (mp3 + marks) reçoivent le même texte SSML -- on
+	// vérifie les deux, pas juste la première arrivée.
+	polly.mu.Lock()
+	defer polly.mu.Unlock()
+	if len(polly.startedWith) != 2 {
+		t.Fatalf("got %d StartSpeechSynthesisTask calls, want 2", len(polly.startedWith))
+	}
+	for _, in := range polly.startedWith {
+		if in.TextType != types.TextTypeSsml {
+			t.Fatalf("got TextType %q, want %q", in.TextType, types.TextTypeSsml)
+		}
+		if !strings.Contains(*in.Text, `<prosody rate="90%">Bonjour</prosody>`) {
+			t.Fatalf("got Text %q, want it wrapped in the configured prosody rate", *in.Text)
+		}
+	}
+}
+
+// capturingPollyAPI se comporte comme fakePollyAPIByFormat (complétion
+// immédiate, distinguée par OutputFormat) mais capture aussi chaque requête
+// StartSpeechSynthesisTask reçue -- pour vérifier ce qui est réellement
+// envoyé à Polly (TextType, Text), pas juste ce que Generate renvoie. Les
+// deux tâches (mp3 + marks) sont lancées en parallèle par errgroup, donc
+// l'écriture doit être protégée par un mutex plutôt que d'assigner
+// directement à des variables partagées (data race sous -race sinon).
+type capturingPollyAPI struct {
+	mu              sync.Mutex
+	startedWith     []*polly.StartSpeechSynthesisTaskInput
+	mp3URI, jsonURI string
+}
+
+func (f *capturingPollyAPI) StartSpeechSynthesisTask(_ context.Context, in *polly.StartSpeechSynthesisTaskInput, _ ...func(*polly.Options)) (*polly.StartSpeechSynthesisTaskOutput, error) {
+	f.mu.Lock()
+	f.startedWith = append(f.startedWith, in)
+	f.mu.Unlock()
+	taskID := string(in.OutputFormat)
+	return &polly.StartSpeechSynthesisTaskOutput{
+		SynthesisTask: &types.SynthesisTask{TaskId: &taskID, TaskStatus: types.TaskStatusScheduled},
+	}, nil
+}
+
+func (f *capturingPollyAPI) GetSpeechSynthesisTask(_ context.Context, in *polly.GetSpeechSynthesisTaskInput, _ ...func(*polly.Options)) (*polly.GetSpeechSynthesisTaskOutput, error) {
+	uri := f.mp3URI
+	if *in.TaskId == string(types.OutputFormatJson) {
+		uri = f.jsonURI
+	}
+	return &polly.GetSpeechSynthesisTaskOutput{
+		SynthesisTask: &types.SynthesisTask{TaskStatus: types.TaskStatusCompleted, OutputUri: &uri},
+	}, nil
+}
