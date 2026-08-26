@@ -161,11 +161,11 @@ export class HttpPlacesRepository implements PlacesRepository {
   // "script not yet published" -- all mean the same thing to the UI, not
   // playable yet. 404: no audio was ever requested for this place/language.
   async getAudioUrl(placeId: string, language: Locale): Promise<AudioAvailability> {
-    const { status, body } = await fetchJson<{ url?: string }>(
+    const { status, body } = await fetchJson<{ url?: string; timestamps_url?: string }>(
       `/places/${encodeURIComponent(placeId)}/audio?language=${language}`,
     );
     if (status === 200 && body?.url) {
-      return { state: "ready", url: body.url };
+      return { state: "ready", url: body.url, timestampsUrl: body.timestamps_url };
     }
     if (status === 202) {
       return { state: "pending" };

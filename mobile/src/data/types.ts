@@ -11,7 +11,7 @@ export type NarrationStatus = "ready" | "pending" | "unavailable";
 // generating, or the other way is never true (audio always needs a
 // published script first). "ready" carries the real presigned S3 URL.
 export type AudioAvailability =
-  | { state: "ready"; url: string }
+  | { state: "ready"; url: string; timestampsUrl?: string }
   | { state: "pending" }
   | { state: "unavailable" };
 
