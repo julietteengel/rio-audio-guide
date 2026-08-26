@@ -43,10 +43,23 @@ substitués). Écarté pour ce projet à cette échelle.
   coller à la nouvelle forme du port — il devient orphelin (n'implémente plus `ports.TTSGenerator`
   après le redesign ci-dessous), ce qui n'a aucune conséquence puisque rien ne l'appelle plus via
   cette interface.
-- **Voix par langue : pas décidées ici.** Comme pour ElevenLabs (hand-picked par la fondatrice, pas
-  auto-sélectionnées), le `voiceID` reste un paramètre passé à l'appel — jamais codé en dur dans
-  l'adaptateur. Seul le mapping *langue → code langue Polly* est verrouillé dans ce design (voir
-  plus bas), pas le choix de la voix précise dans chaque langue.
+- **Voix par langue : pas décidées dans ce design initial**, choisies ensuite par la fondatrice au
+  moment des premiers tests réels (26/08). Comme pour ElevenLabs (hand-picked, pas auto-sélectionnées),
+  le `voiceID` reste un paramètre passé à l'appel — jamais codé en dur dans l'adaptateur. Choix retenus,
+  toutes en moteur Neural :
+
+  | Langue | `LanguageCode` | Voix retenue | Genre |
+  |---|---|---|---|
+  | fr | fr-FR | `Remi` | Homme |
+  | en | en-US | `Ruth` | Femme |
+  | es | es-MX | `Mia` | Femme |
+  | pt | pt-BR | `Vitoria` | Femme |
+
+  Note : `es-MX` (espagnol mexicain) plutôt que `es-ES` (castillan) — Polly n'a pas de variante
+  argentine (`es-AR` n'existe pas dans son catalogue), le mexicain a été choisi comme le plus proche
+  disponible pour un public latino-américain. Ce choix n'est pas verrouillé dans le code : rien
+  n'empêche de changer de voix plus tard (nouveau `voiceID` passé à l'appel), mais cette table est la
+  référence à jour pour générer le corpus de façon cohérente.
 
 ## Contrainte technique clé : deux APIs Polly, pas une
 
