@@ -8,8 +8,8 @@ import (
 	"syscall"
 
 	"github.com/aws/aws-sdk-go-v2/config"
-	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/polly"
+	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	amqp "github.com/rabbitmq/amqp091-go"
 
