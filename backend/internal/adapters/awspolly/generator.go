@@ -194,7 +194,7 @@ func (g *Generator) durationFromMarks(ctx context.Context, marksKey, fallbackTex
 			lastTime = mark.Time
 		}
 	}
-	if lastTime <= 0 {
+	if scanner.Err() != nil || lastTime <= 0 {
 		return estimateDuration(fallbackText)
 	}
 	return time.Duration(lastTime) * time.Millisecond

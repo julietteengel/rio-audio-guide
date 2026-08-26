@@ -204,6 +204,57 @@ func (erroringS3GetObject) GetObject(_ context.Context, _ *s3.GetObjectInput, _ 
 	return nil, errors.New("s3: object not found")
 }
 
+// midStreamErrorReader returns data first, then a read error -- simulates a
+// connection reset partway through streaming the marks object from S3, as
+// opposed to the object simply not existing (erroringS3GetObject above).
+type midStreamErrorReader struct {
+	data []byte
+	err  error
+	pos  int
+}
+
+func (r *midStreamErrorReader) Read(p []byte) (int, error) {
+	if r.pos >= len(r.data) {
+		return 0, r.err
+	}
+	n := copy(p, r.data[r.pos:])
+	r.pos += n
+	return n, nil
+}
+
+type midStreamErrorS3GetObject struct{ body string }
+
+func (f *midStreamErrorS3GetObject) GetObject(_ context.Context, _ *s3.GetObjectInput, _ ...func(*s3.Options)) (*s3.GetObjectOutput, error) {
+	reader := &midStreamErrorReader{data: []byte(f.body), err: errors.New("read tcp: connection reset by peer")}
+	return &s3.GetObjectOutput{Body: io.NopCloser(reader)}, nil
+}
+
+func TestGenerator_Generate_FallsBackToWordCountEstimateWhenMarksStreamErrorsMidRead(t *testing.T) {
+	polly := &fakePollyAPIByFormat{
+		mp3URI:  "https://s3.us-east-1.amazonaws.com/rio-audio-guide/audio/voice-1/a.mp3",
+		jsonURI: "https://s3.us-east-1.amazonaws.com/rio-audio-guide/timestamps/voice-1/a.json",
+	}
+	// A real mark (820ms) precedes the read error -- without checking
+	// scanner.Err(), durationFromMarks would silently return 820ms as if it
+	// were the true (last) mark, instead of falling back.
+	marks := `{"time":0,"type":"word","value":"Bonjour"}
+{"time":820,"type":"word","value":"le"}
+`
+	text := "Bonjour le monde"
+	gen := &Generator{
+		polly: polly, bucket: "rio-audio-guide", pollInterval: time.Millisecond,
+		s3: &midStreamErrorS3GetObject{body: marks},
+	}
+
+	_, _, duration, err := gen.Generate(context.Background(), text, "fr", "voice-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if want := estimateDuration(text); duration != want {
+		t.Fatalf("got duration %v, want %v (word-count estimate, not the truncated 820ms mark)", duration, want)
+	}
+}
+
 func TestGenerator_Generate_UnsupportedLanguageFailsBeforeAnyPollyCall(t *testing.T) {
 	polly := &fakePollyAPIByFormat{}
 	gen := &Generator{polly: polly, bucket: "rio-audio-guide", pollInterval: time.Millisecond}
