@@ -17,18 +17,17 @@ type Worker struct {
 	channel       *amqp.Channel
 	scriptRepo    ports.ScriptRepository
 	audioFileRepo ports.AudioFileRepository
-	storage       ports.AudioStorage
 	ttsGenerator  ports.TTSGenerator
 }
 
-func NewWorker(channel *amqp.Channel, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, storage ports.AudioStorage, ttsGenerator ports.TTSGenerator) (*Worker, error) {
+func NewWorker(channel *amqp.Channel, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, ttsGenerator ports.TTSGenerator) (*Worker, error) {
 	// Même déclaration que côté publisher — idempotente, et nécessaire ici
 	// aussi : rien ne garantit que le publisher aura tourné avant le worker
 	// au premier démarrage (deux binaires séparés, cmd/api et cmd/worker).
 	if _, err := channel.QueueDeclare(TTSJobQueue, true, false, false, false, nil); err != nil {
 		return nil, err
 	}
-	return &Worker{channel: channel, scriptRepo: scriptRepo, audioFileRepo: audioFileRepo, storage: storage, ttsGenerator: ttsGenerator}, nil
+	return &Worker{channel: channel, scriptRepo: scriptRepo, audioFileRepo: audioFileRepo, ttsGenerator: ttsGenerator}, nil
 }
 
 // Run consomme tts_jobs jusqu'à annulation du ctx. Bloquant — à lancer dans
@@ -63,10 +62,10 @@ func (w *Worker) Run(ctx context.Context) error {
 }
 
 // requeueDelay temporise chaque remise en queue. Sans elle, un 429 persistant
-// devient une boucle serrée qui martèle ElevenLabs aussi vite que le réseau le
-// permet — le meilleur moyen de se faire throttler au niveau du compte. Le
-// worker traite les messages en série (un seul handle() à la fois dans Run),
-// donc dormir ici ne bloque rien d'autre.
+// devient une boucle serrée qui martèle le provider TTS aussi vite que le
+// réseau le permet — le meilleur moyen de se faire throttler au niveau du
+// compte. Le worker traite les messages en série (un seul handle() à la fois
+// dans Run), donc dormir ici ne bloque rien d'autre.
 const requeueDelay = 2 * time.Second
 
 // maxTTSAttempts borne les retries sur une erreur TTS transitoire (timeout,
@@ -110,8 +109,8 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 		return
 	}
 
-	// Marque l'AudioFile "generating" AVANT le travail lent (l'appel
-	// ElevenLabs) — pendant que ça tourne, Postgres reflète l'état réel
+	// Marque l'AudioFile "generating" AVANT le travail lent (l'appel au
+	// provider TTS) — pendant que ça tourne, Postgres reflète l'état réel
 	// plutôt qu'un mensonge ("queued" alors que ça travaille déjà).
 	if err := application.StartAudioGeneration(ctx, w.audioFileRepo, job.AudioFileID); err != nil {
 		log.Printf("tts worker: start generation failed for %s: %v", job.AudioFileID, err)
@@ -166,8 +165,8 @@ func (w *Worker) handle(ctx context.Context, msg amqp.Delivery) {
 
 	// Polly a déjà écrit l'audio ET les timestamps sur S3 lui-même -- storageURL
 	// et timestampsURL sont déjà finaux, plus rien à uploader ici (contrairement
-	// à l'ancienne intégration ElevenLabs, qui rendait des bytes que ce worker
-	// uploadait via w.storage).
+	// à l'ancienne intégration ElevenLabs, qui rendait des bytes qu'un Worker
+	// devait ensuite uploader lui-même vers S3).
 	if err := application.CompleteAudioGeneration(ctx, w.scriptRepo, w.audioFileRepo, job.AudioFileID, storageURL, timestampsURL, duration); err != nil {
 		log.Printf("tts worker: complete generation failed for %s: %v", job.AudioFileID, err)
 		time.Sleep(requeueDelay)

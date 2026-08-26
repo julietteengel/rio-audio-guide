@@ -88,16 +88,6 @@ func (f *fakeAudioFileRepo) FindByScriptID(_ context.Context, _ string) (*domain
 	return nil, errors.New("not implemented in fake")
 }
 
-type fakeStorage struct{}
-
-func (fakeStorage) Upload(_ context.Context, key string, _ []byte, _ string) (string, error) {
-	return "fake://bucket/" + key, nil
-}
-
-func (fakeStorage) PresignURL(_ context.Context, _ string, _ time.Duration) (string, error) {
-	return "", errors.New("not implemented in fake")
-}
-
 func TestWorker_ProcessesJobEndToEnd(t *testing.T) {
 	channel := testChannel(t)
 
@@ -114,7 +104,7 @@ func TestWorker_ProcessesJobEndToEnd(t *testing.T) {
 	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
 	_ = audioFileRepo.Save(context.Background(), audioFile)
 
-	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{}, fakeTTSGenerator{})
+	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeTTSGenerator{})
 	if err != nil {
 		t.Fatalf("new worker: %v", err)
 	}
@@ -198,7 +188,7 @@ func TestWorker_TransientTTSError_RetriesOnRedeliveryAndSucceeds(t *testing.T) {
 	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
 	_ = audioFileRepo.Save(context.Background(), audioFile)
 
-	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{}, &onceFailingTTSGenerator{})
+	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, &onceFailingTTSGenerator{})
 	if err != nil {
 		t.Fatalf("new worker: %v", err)
 	}
@@ -250,7 +240,7 @@ func TestWorker_TransientTTSError_RetriesOnRedeliveryAndSucceeds(t *testing.T) {
 // alwaysFailingTTSGenerator never recovers -- proves maxTTSAttempts is a
 // real ceiling, not just documentation: before this fix, a persistently
 // slow/unreachable TTS call retried forever (Nack(requeue=true) with no
-// counter), silently re-billing ElevenLabs on every redelivery.
+// counter), silently re-billing the TTS provider on every redelivery.
 type alwaysFailingTTSGenerator struct {
 	mu    sync.Mutex
 	calls int
@@ -284,7 +274,7 @@ func TestWorker_TransientTTSError_GivesUpAfterMaxAttempts(t *testing.T) {
 	_ = audioFileRepo.Save(context.Background(), audioFile)
 
 	generator := &alwaysFailingTTSGenerator{}
-	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{}, generator)
+	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, generator)
 	if err != nil {
 		t.Fatalf("new worker: %v", err)
 	}
@@ -356,7 +346,7 @@ func TestWorker_PermanentTTSError_MarksAudioFileFailedAndAcks(t *testing.T) {
 	_ = audioFileRepo.Save(context.Background(), audioFile)
 
 	permErr := &ports.PermanentError{StatusCode: 401, Body: "invalid api key"}
-	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, fakeStorage{}, failingTTSGenerator{err: permErr})
+	worker, err := NewWorker(channel, scriptRepo, audioFileRepo, failingTTSGenerator{err: permErr})
 	if err != nil {
 		t.Fatalf("new worker: %v", err)
 	}
