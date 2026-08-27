@@ -1,0 +1,55 @@
+export type WordMark = { time: number; value: string };
+
+type RawMark = { time?: number; type?: string; value?: string };
+
+/** Parses Polly's NDJSON speech marks, keeping only "word" entries. A
+ * corrupted line is skipped rather than failing the whole file — one
+ * mistimed word shouldn't cost the narration all highlighting. */
+export function parseWordMarks(ndjson: string): WordMark[] {
+  const marks: WordMark[] = [];
+  for (const line of ndjson.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    let raw: RawMark;
+    try {
+      raw = JSON.parse(trimmed) as RawMark;
+    } catch {
+      continue;
+    }
+    if (raw.type !== "word" || typeof raw.time !== "number" || typeof raw.value !== "string") {
+      continue;
+    }
+    marks.push({ time: raw.time, value: raw.value });
+  }
+  return marks;
+}
+
+/** Binary search for the last index with marks[i].time <= currentTimeMs.
+ * -1 if currentTimeMs precedes the first mark, or marks is empty. */
+export function findActiveWordIndex(marks: WordMark[], currentTimeMs: number): number {
+  if (marks.length === 0 || currentTimeMs < marks[0].time) return -1;
+  let lo = 0;
+  let hi = marks.length - 1;
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    if (marks[mid].time <= currentTimeMs) {
+      lo = mid;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return lo;
+}
+
+/** Never throws — any network or parse failure becomes null, which drives
+ * the static-text fallback in SyncedNarration without a separate error state. */
+export async function fetchWordMarks(url: string): Promise<WordMark[] | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const text = await res.text();
+    return parseWordMarks(text);
+  } catch {
+    return null;
+  }
+}
