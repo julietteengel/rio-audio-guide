@@ -24,6 +24,16 @@ export function SyncedNarration({ text, marks, currentTimeMs }: Props) {
 
   const activeIndex = marks ? findActiveWordIndex(marks, currentTimeMs) : -1;
 
+  // Runs before the scroll effect below on the same commit, so a `marks`
+  // swap (place/language change, no remount) clears out y-positions from
+  // the previous narration before they can be read as if they were the
+  // new one's -- fresh onLayout calls for the new words land later,
+  // asynchronously, so without this reset a stale position can survive
+  // long enough to drive one wrong scroll.
+  useEffect(() => {
+    wordYPositions.current = [];
+  }, [marks]);
+
   useEffect(() => {
     if (activeIndex < 0) return;
     const wordY = wordYPositions.current[activeIndex];
