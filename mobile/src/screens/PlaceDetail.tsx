@@ -11,6 +11,8 @@ import { useLocale } from "../i18n/LocaleContext";
 import { placesRepository } from "../data/PlacesRepository";
 import type { Place, AudioAvailability } from "../data/types";
 import { colors, fonts, radii } from "../theme/tokens";
+import { fetchWordMarks, type WordMark } from "../utils/syncedText";
+import { SyncedNarration } from "../components/SyncedNarration";
 
 type Props = NativeStackScreenProps<AppStackParamList, "PlaceDetail">;
 
@@ -41,6 +43,7 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   // failed to generate for Cristo Redentor, making it look broken).
   const [playerLocale, setPlayerLocale] = useState<Locale>(locale);
   const [audio, setAudio] = useState<AudioAvailability>({ state: "unavailable" });
+  const [marks, setMarks] = useState<WordMark[] | null>(null);
 
   useEffect(() => {
     placesRepository.getById(route.params.placeId).then((p) => setPlace(p ?? null));
@@ -61,6 +64,21 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
       cancelled = true;
     };
   }, [place?.id, playerLocale]);
+
+  // Vidé immédiatement, avant même que le fetch ne réponde -- sinon les
+  // marks de l'ancienne langue resteraient affichées un instant pendant la
+  // transition, surlignant les mauvais mots.
+  useEffect(() => {
+    setMarks(null);
+    if (audio.state !== "ready" || !audio.timestampsUrl) return;
+    let cancelled = false;
+    fetchWordMarks(audio.timestampsUrl).then((result) => {
+      if (!cancelled) setMarks(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [audio]);
 
   // Hooks must run unconditionally on every render -- source is null until
   // audio.state is "ready", which useAudioPlayer accepts (no source loaded
@@ -165,7 +183,9 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
             </Svg>
             <Text style={styles.groundText}>{t.placeDetail.groundBadge}</Text>
           </View>
-          <Text style={styles.body}>{place.body}</Text>
+          <View style={{ marginHorizontal: 20, marginTop: 18 }}>
+            <SyncedNarration text={place.body} marks={marks} currentTimeMs={status.currentTime * 1000} />
+          </View>
         </>
       ) : (
         <Text style={styles.body}>
