@@ -10,16 +10,18 @@ export function parseWordMarks(ndjson: string): WordMark[] {
   for (const line of ndjson.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    let raw: RawMark;
+    let raw: unknown;
     try {
-      raw = JSON.parse(trimmed) as RawMark;
+      raw = JSON.parse(trimmed);
     } catch {
       continue;
     }
-    if (raw.type !== "word" || typeof raw.time !== "number" || typeof raw.value !== "string") {
+    if (raw === null || typeof raw !== "object") continue;
+    const { type, time, value } = raw as RawMark;
+    if (type !== "word" || typeof time !== "number" || typeof value !== "string") {
       continue;
     }
-    marks.push({ time: raw.time, value: raw.value });
+    marks.push({ time, value });
   }
   return marks;
 }

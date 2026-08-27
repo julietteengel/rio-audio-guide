@@ -32,6 +32,18 @@ describe("parseWordMarks", () => {
     ]);
   });
 
+  it("skips a valid-JSON null line without throwing", () => {
+    const ndjson = [
+      '{"time":25,"type":"word","start":0,"end":2,"value":"Au"}',
+      "null",
+      '{"time":136,"type":"word","start":3,"end":9,"value":"sommet"}',
+    ].join("\n");
+    expect(parseWordMarks(ndjson)).toEqual([
+      { time: 25, value: "Au" },
+      { time: 136, value: "sommet" },
+    ]);
+  });
+
   it("returns an empty array for empty input", () => {
     expect(parseWordMarks("")).toEqual([]);
   });
