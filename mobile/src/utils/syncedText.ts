@@ -92,3 +92,21 @@ export function groupMarksIntoLines(marks: WordMark[], targetChars = 40): Narrat
 
   return lines;
 }
+
+// Same binary-search shape as findActiveWordIndex above, applied to
+// NarrationLine[] instead of WordMark[] -- kept as a separate function
+// (not a generic) so each call site's intent stays obvious from its name.
+export function findActiveLineIndex(lines: NarrationLine[], currentTimeMs: number): number {
+  if (lines.length === 0 || currentTimeMs < lines[0].time) return -1;
+  let lo = 0;
+  let hi = lines.length - 1;
+  while (lo < hi) {
+    const mid = Math.ceil((lo + hi) / 2);
+    if (lines[mid].time <= currentTimeMs) {
+      lo = mid;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return lo;
+}

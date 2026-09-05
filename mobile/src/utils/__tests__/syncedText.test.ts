@@ -1,4 +1,4 @@
-import { parseWordMarks, findActiveWordIndex, groupMarksIntoLines } from "../syncedText";
+import { parseWordMarks, findActiveWordIndex, groupMarksIntoLines, findActiveLineIndex } from "../syncedText";
 
 describe("parseWordMarks", () => {
   it("parses one word mark per line", () => {
@@ -136,5 +136,33 @@ describe("groupMarksIntoLines", () => {
       { time: 0, text: "El Cristo Redentor mira hacia la bahía" },
       { time: 350, text: "de Guanabara" },
     ]);
+  });
+});
+
+describe("findActiveLineIndex", () => {
+  const lines = [
+    { time: 0, text: "Au sommet" },
+    { time: 100, text: "du Corcovado" },
+    { time: 250, text: "se dresse" },
+  ];
+
+  it("returns -1 before the first line", () => {
+    expect(findActiveLineIndex(lines, -1)).toBe(-1);
+  });
+
+  it("returns the first index exactly at its own timestamp", () => {
+    expect(findActiveLineIndex(lines, 0)).toBe(0);
+  });
+
+  it("returns the previous index between two timestamps", () => {
+    expect(findActiveLineIndex(lines, 150)).toBe(1);
+  });
+
+  it("returns the last index once past the final timestamp", () => {
+    expect(findActiveLineIndex(lines, 10000)).toBe(2);
+  });
+
+  it("returns -1 for an empty lines array", () => {
+    expect(findActiveLineIndex([], 500)).toBe(-1);
   });
 });
