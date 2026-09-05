@@ -1,4 +1,4 @@
-import { parseWordMarks, findActiveWordIndex } from "../syncedText";
+import { parseWordMarks, findActiveWordIndex, groupMarksIntoLines } from "../syncedText";
 
 describe("parseWordMarks", () => {
   it("parses one word mark per line", () => {
@@ -79,5 +79,62 @@ describe("findActiveWordIndex", () => {
 
   it("returns -1 for an empty marks array", () => {
     expect(findActiveWordIndex([], 500)).toBe(-1);
+  });
+});
+
+describe("groupMarksIntoLines", () => {
+  it("groups words until adding the next would exceed the target length", () => {
+    const marks = [
+      { time: 0, value: "Au" },
+      { time: 100, value: "sommet" },
+      { time: 200, value: "du" },
+      { time: 300, value: "Corcovado" },
+    ];
+    // Target 10: "Au sommet" is 9 chars (fits); "Au sommet du" would be 12
+    // (flush, 2+ words already held) -- "du" alone is under the minimum of
+    // 2 words, so it's forced together with "Corcovado" even though that
+    // pair is also over the target.
+    expect(groupMarksIntoLines(marks, 10)).toEqual([
+      { time: 0, text: "Au sommet" },
+      { time: 200, text: "du Corcovado" },
+    ]);
+  });
+
+  it("does not split when the combined length exactly equals the target", () => {
+    const marks = [
+      { time: 0, value: "Au" },
+      { time: 100, value: "sommet" },
+    ];
+    expect(groupMarksIntoLines(marks, 9)).toEqual([{ time: 0, text: "Au sommet" }]);
+  });
+
+  it("keeps a single trailing word alone when there is nothing left to combine it with", () => {
+    expect(groupMarksIntoLines([{ time: 0, value: "Au" }], 10)).toEqual([
+      { time: 0, text: "Au" },
+    ]);
+  });
+
+  it("returns an empty array for empty input", () => {
+    expect(groupMarksIntoLines([], 40)).toEqual([]);
+  });
+
+  it("defaults the target to 40 characters", () => {
+    const marks = [
+      { time: 0, value: "El" },
+      { time: 50, value: "Cristo" },
+      { time: 100, value: "Redentor" },
+      { time: 150, value: "mira" },
+      { time: 200, value: "hacia" },
+      { time: 250, value: "la" },
+      { time: 300, value: "bahía" },
+      { time: 350, value: "de" },
+      { time: 400, value: "Guanabara" },
+    ];
+    // "El Cristo Redentor mira hacia la bahía de" is 42 chars -- over 40,
+    // so it flushes before "de", not after.
+    expect(groupMarksIntoLines(marks)).toEqual([
+      { time: 0, text: "El Cristo Redentor mira hacia la bahía" },
+      { time: 350, text: "de Guanabara" },
+    ]);
   });
 });
