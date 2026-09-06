@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { View, StyleSheet, PanResponder, type PanResponderGestureState } from "react-native";
+import { View, StyleSheet, PanResponder, type GestureResponderEvent } from "react-native";
 import { colors } from "../theme/tokens";
 
 type Props = {
@@ -30,25 +30,25 @@ export function AudioProgressBar({ progress, onSeek }: Props) {
     });
   };
 
-  const fractionFromGesture = (gestureState: PanResponderGestureState): number => {
+  const fractionFromEvent = (evt: GestureResponderEvent): number => {
     const { pageX, width } = trackLayout.current;
     if (width <= 0) return 0;
-    return Math.min(1, Math.max(0, (gestureState.moveX - pageX) / width));
+    return Math.min(1, Math.max(0, (evt.nativeEvent.pageX - pageX) / width));
   };
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (_evt, gestureState) => {
+      onPanResponderGrant: (evt) => {
         measureTrack();
-        setDragFraction(fractionFromGesture(gestureState));
+        setDragFraction(fractionFromEvent(evt));
       },
-      onPanResponderMove: (_evt, gestureState) => {
-        setDragFraction(fractionFromGesture(gestureState));
+      onPanResponderMove: (evt) => {
+        setDragFraction(fractionFromEvent(evt));
       },
-      onPanResponderRelease: (_evt, gestureState) => {
-        const fraction = fractionFromGesture(gestureState);
+      onPanResponderRelease: (evt) => {
+        const fraction = fractionFromEvent(evt);
         setDragFraction(null);
         onSeek(fraction);
       },

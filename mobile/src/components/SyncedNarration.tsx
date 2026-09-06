@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Text, View, ScrollView, StyleSheet } from "react-native";
 import { findActiveLineIndex, groupMarksIntoLines, type WordMark } from "../utils/syncedText";
 import { colors, fonts } from "../theme/tokens";
@@ -12,14 +12,22 @@ type Props = {
   mode: NarrationMode;
 };
 
-// Dimmed cream, matching the ~85% used for the hero eyebrow elsewhere in
-// PlaceDetail.tsx -- this component now always renders against the same
-// dark background, never the light theme it originally shared with the
-// rest of the (pre-redesign) screen.
+// Dimmed previous/next lyric lines, sitting either side of the active line.
 const DIM_TEXT = "rgba(250,245,238,0.45)";
+// Matching the ~85% used for the hero eyebrow elsewhere in PlaceDetail.tsx
+// -- this component now always renders against the same dark background,
+// never the light theme it originally shared with the rest of the
+// (pre-redesign) screen.
 const FREE_TEXT = "rgba(250,245,238,0.85)";
 
 export function SyncedNarration({ text, marks, currentTimeMs, mode }: Props) {
+  // Always called, even on the free/fallback path below, to satisfy the
+  // rules of hooks -- 26 keeps a grouped line to a single rendered line at
+  // the active-line font size (22px bold in a ~326pt-wide column), so a
+  // wrapped two-line group never reintroduces the minHeight jump dimLine
+  // guards against.
+  const lines = useMemo(() => groupMarksIntoLines(marks ?? [], 26), [marks]);
+
   // "Lecture libre" is the same rendering whether or not marks exist (no
   // marks at all falls back here too) -- it's the full narration text,
   // scrollable by hand, completely decoupled from playback position. It
@@ -36,7 +44,6 @@ export function SyncedNarration({ text, marks, currentTimeMs, mode }: Props) {
     );
   }
 
-  const lines = groupMarksIntoLines(marks);
   // Clamped to 0: before the first line's timestamp (findActiveLineIndex
   // returns -1), the first line displays as the upcoming/active one rather
   // than showing nothing.

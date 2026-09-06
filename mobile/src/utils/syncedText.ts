@@ -26,23 +26,6 @@ export function parseWordMarks(ndjson: string): WordMark[] {
   return marks;
 }
 
-/** Binary search for the last index with marks[i].time <= currentTimeMs.
- * -1 if currentTimeMs precedes the first mark, or marks is empty. */
-export function findActiveWordIndex(marks: WordMark[], currentTimeMs: number): number {
-  if (marks.length === 0 || currentTimeMs < marks[0].time) return -1;
-  let lo = 0;
-  let hi = marks.length - 1;
-  while (lo < hi) {
-    const mid = Math.ceil((lo + hi) / 2);
-    if (marks[mid].time <= currentTimeMs) {
-      lo = mid;
-    } else {
-      hi = mid - 1;
-    }
-  }
-  return lo;
-}
-
 /** Never throws — any network or parse failure becomes null, which drives
  * the static-text fallback in SyncedNarration without a separate error state. */
 export async function fetchWordMarks(url: string): Promise<WordMark[] | null> {

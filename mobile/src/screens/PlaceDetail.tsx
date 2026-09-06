@@ -50,8 +50,14 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   const [narrationMode, setNarrationMode] = useState<NarrationMode>("scroll");
 
   useEffect(() => {
-    placesRepository.getById(route.params.placeId).then((p) => setPlace(p ?? null));
-  }, [route.params.placeId]);
+    let cancelled = false;
+    placesRepository.getById(route.params.placeId).then((p) => {
+      if (!cancelled) setPlace(p ?? null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [route.params.placeId, locale]);
 
   // Narration audio and text both follow the app's own reading locale --
   // there is no more per-place language override (the removed language
@@ -168,22 +174,22 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
           <>
             <View style={styles.toggleRow}>
               <Pressable
-                style={[styles.toggleBtn, narrationMode === "scroll" && styles.toggleBtnActive]}
+                style={[styles.toggleBtn, narrationMode === "scroll" && marks !== null && styles.toggleBtnActive]}
                 onPress={() => setNarrationMode("scroll")}
               >
                 <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
-                  <Line x1={4} y1={7} x2={20} y2={7} stroke={narrationMode === "scroll" ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
-                  <Line x1={4} y1={12} x2={16} y2={12} stroke={narrationMode === "scroll" ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
-                  <Line x1={4} y1={17} x2={12} y2={17} stroke={narrationMode === "scroll" ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
+                  <Line x1={4} y1={7} x2={20} y2={7} stroke={narrationMode === "scroll" && marks !== null ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
+                  <Line x1={4} y1={12} x2={16} y2={12} stroke={narrationMode === "scroll" && marks !== null ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
+                  <Line x1={4} y1={17} x2={12} y2={17} stroke={narrationMode === "scroll" && marks !== null ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
                 </Svg>
               </Pressable>
               <Pressable
-                style={[styles.toggleBtn, narrationMode === "free" && styles.toggleBtnActive]}
+                style={[styles.toggleBtn, (narrationMode === "free" || marks === null) && styles.toggleBtnActive]}
                 onPress={() => setNarrationMode("free")}
               >
                 <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
-                  <Path d="M4 5.5C4 5.5 6 4.5 9 4.5S13 5.5 13 5.5V18.5C13 18.5 11 17.5 9 17.5S4 18.5 4 18.5V5.5Z" stroke={narrationMode === "free" ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
-                  <Path d="M20 5.5C20 5.5 18 4.5 15 4.5S11 5.5 11 5.5V18.5C11 18.5 13 17.5 15 17.5S20 18.5 20 18.5V5.5Z" stroke={narrationMode === "free" ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
+                  <Path d="M4 5.5C4 5.5 6 4.5 9 4.5S13 5.5 13 5.5V18.5C13 18.5 11 17.5 9 17.5S4 18.5 4 18.5V5.5Z" stroke={narrationMode === "free" || marks === null ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
+                  <Path d="M20 5.5C20 5.5 18 4.5 15 4.5S11 5.5 11 5.5V18.5C11 18.5 13 17.5 15 17.5S20 18.5 20 18.5V5.5Z" stroke={narrationMode === "free" || marks === null ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
                 </Svg>
               </Pressable>
             </View>
@@ -240,7 +246,7 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: DARK_BG },
   hero: {
-    height: 320,
+    height: 260,
     backgroundColor: colors.sand,
     justifyContent: "space-between",
     // Without this, react-native-web's absolutely-positioned cover Image
@@ -270,10 +276,10 @@ const styles = StyleSheet.create({
   },
   title: { fontFamily: fonts.displayBlack, fontSize: 30, color: colors.cream },
   rest: { flex: 1 },
-  progressSection: { paddingHorizontal: 20, paddingTop: 24 },
+  progressSection: { paddingHorizontal: 20, paddingTop: 16 },
   timeRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 8 },
   timeText: { fontFamily: fonts.body, fontSize: 12, color: DIM_55 },
-  playRow: { alignItems: "center", marginTop: 20 },
+  playRow: { alignItems: "center", marginTop: 12 },
   playBtn: {
     width: 56,
     height: 56,
@@ -283,7 +289,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   playBtnDisabled: { backgroundColor: "rgba(193,89,46,0.35)" },
-  toggleRow: { flexDirection: "row", justifyContent: "flex-end", gap: 8, paddingHorizontal: 20, marginTop: 28 },
+  toggleRow: { flexDirection: "row", justifyContent: "flex-end", gap: 8, paddingHorizontal: 20, marginTop: 16 },
   toggleBtn: { width: 34, height: 34, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
   toggleBtnActive: { backgroundColor: TINT_ACTIVE },
   lyricsArea: { flex: 1, minHeight: 0, paddingHorizontal: 32, justifyContent: "center" },

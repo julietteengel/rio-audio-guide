@@ -1,4 +1,4 @@
-import { parseWordMarks, findActiveWordIndex, groupMarksIntoLines, findActiveLineIndex } from "../syncedText";
+import { parseWordMarks, groupMarksIntoLines, findActiveLineIndex } from "../syncedText";
 
 describe("parseWordMarks", () => {
   it("parses one word mark per line", () => {
@@ -51,34 +51,6 @@ describe("parseWordMarks", () => {
   it("ignores blank lines", () => {
     const ndjson = '{"time":25,"type":"word","start":0,"end":2,"value":"Au"}\n\n';
     expect(parseWordMarks(ndjson)).toEqual([{ time: 25, value: "Au" }]);
-  });
-});
-
-describe("findActiveWordIndex", () => {
-  const marks = [
-    { time: 0, value: "Au" },
-    { time: 100, value: "sommet" },
-    { time: 250, value: "du" },
-  ];
-
-  it("returns -1 before the first mark", () => {
-    expect(findActiveWordIndex(marks, -1)).toBe(-1);
-  });
-
-  it("returns the first index exactly at its own timestamp", () => {
-    expect(findActiveWordIndex(marks, 0)).toBe(0);
-  });
-
-  it("returns the previous index between two timestamps", () => {
-    expect(findActiveWordIndex(marks, 150)).toBe(1);
-  });
-
-  it("returns the last index once past the final timestamp", () => {
-    expect(findActiveWordIndex(marks, 10000)).toBe(2);
-  });
-
-  it("returns -1 for an empty marks array", () => {
-    expect(findActiveWordIndex([], 500)).toBe(-1);
   });
 });
 
