@@ -41,11 +41,16 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Memória Carioca uses your location to show which places are nearby on the map."
+          "locationWhenInUsePermission": "Memória Carioca uses your location to show which places are nearby on the map.",
+          "locationAlwaysAndWhenInUsePermission": "Memória Carioca uses your location in the background to let you know when you're near a place with a story to tell.",
+          "isIosBackgroundLocationEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
         }
       ],
       "expo-secure-store",
-      "expo-audio"
+      "expo-audio",
+      "expo-notifications"
     ],
     "extra": {
       "eas": {
