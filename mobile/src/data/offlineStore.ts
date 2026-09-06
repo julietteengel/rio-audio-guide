@@ -66,25 +66,29 @@ function getDb(): Promise<SQLite.SQLiteDatabase> {
 // already-known audioLocalUri through so a resume never forgets progress).
 export async function saveCachedPlaces(places: CachedPlace[]): Promise<void> {
   const db = await getDb();
-  for (const p of places) {
-    await db.runAsync(
-      `INSERT INTO cached_places (id, name, category, lat, lon, body, audio_local_uri)
-       VALUES (?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(id) DO UPDATE SET
-         name = excluded.name,
-         category = excluded.category,
-         lat = excluded.lat,
-         lon = excluded.lon,
-         body = excluded.body`,
-      p.id,
-      p.name,
-      p.category,
-      p.lat,
-      p.lon,
-      p.body,
-      p.audioLocalUri,
-    );
-  }
+  // One transaction for the whole manifest (~254 rows): without it, being
+  // killed mid-loop leaves the table half-upserted.
+  await db.withTransactionAsync(async () => {
+    for (const p of places) {
+      await db.runAsync(
+        `INSERT INTO cached_places (id, name, category, lat, lon, body, audio_local_uri)
+         VALUES (?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET
+           name = excluded.name,
+           category = excluded.category,
+           lat = excluded.lat,
+           lon = excluded.lon,
+           body = excluded.body`,
+        p.id,
+        p.name,
+        p.category,
+        p.lat,
+        p.lon,
+        p.body,
+        p.audioLocalUri,
+      );
+    }
+  });
 }
 
 export async function setCachedPlaceAudioUri(id: string, audioLocalUri: string): Promise<void> {
@@ -111,7 +115,14 @@ export async function clearCachedPlaces(): Promise<void> {
 
 // --- pure helpers (no I/O -- unit-tested directly, see Step 1) -------------
 
+// A non-positive `availableBytes` means "unknown", not "the disk is full":
+// expo-file-system's web shim returns 0 for Paths.availableDiskSpace with a
+// console warning, and there's no way to tell that apart from a genuinely
+// full disk. Refusing every download on web because of an unreadable value
+// would be worse than not enforcing the limit at all, so an unknown value
+// is treated as unenforceable and lets the download through.
 export function hasSufficientStorage(availableBytes: number, requiredBytes: number): boolean {
+  if (availableBytes <= 0) return true;
   return availableBytes >= requiredBytes;
 }
 

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 import { Directory, File, Paths } from "expo-file-system";
 import type { Locale } from "../i18n/dictionary";
 import type { Place } from "./types";
@@ -146,6 +147,35 @@ export class InsufficientStorageError extends Error {
 }
 
 /**
+ * Some audio files failed to download but the rest of the city is saved and
+ * the summary is written, so re-calling `downloadCity` resumes and retries
+ * only what's missing. Distinct from a total failure: the caller should say
+ * "N places still to go, try again", not "the download failed".
+ */
+export class PartialDownloadError extends Error {
+  constructor(public failedCount: number) {
+    super(`${failedCount} place(s) could not be downloaded`);
+    this.name = "PartialDownloadError";
+  }
+}
+
+// Same estimate as planCityDownload's, but computed straight off a manifest
+// place list. downloadCity's own places come from the backend's manifest
+// route, already scoped to one city -- routing them back through
+// planCityDownload's `p.city === cityDisplayName` filter would silently
+// yield an empty list (and so a zero-byte, always-passing storage check) the
+// moment the caller's display name stopped matching the hardcoded city in
+// manifestPlaceToPlace.
+function estimateManifestSizeBytes(places: ManifestPlace[]): number {
+  return estimateDownloadSizeBytes(
+    places.flatMap((p) => [
+      { placeId: p.id, kind: "metadata" as const, path: `${p.id}/metadata.json` },
+      { placeId: p.id, kind: "audio" as const, path: `${p.id}/audio.mp3` },
+    ]),
+  );
+}
+
+/**
  * Downloads the real manifest, downloads and caches each place's audio file
  * on-device (expo-file-system), and persists the full place list — including
  * narration text, so PlaceDetail can render offline too — to SQLite via
@@ -158,6 +188,15 @@ export class InsufficientStorageError extends Error {
  * audio is already cached, via `planResumableAudioDownloads`, rather than
  * re-downloading everything from scratch. Switching to a different city or
  * language starts over clean.
+ *
+ * Throws `InsufficientStorageError` before writing anything, and
+ * `PartialDownloadError` after saving everything it could when some audio
+ * files failed -- the next call picks up exactly where this one stopped.
+ *
+ * On web this only ever writes the metadata: expo-file-system has no real
+ * filesystem there, so there is no offline audio to cache. A deliberate,
+ * visible platform limitation, in the same spirit as the map screen's
+ * `webMapUnavailable`.
  */
 export async function downloadCity(
   citySlug: string,
@@ -165,7 +204,6 @@ export async function downloadCity(
   language: Locale,
 ): Promise<OfflineDownloadSummary> {
   const rawPlaces = await fetchManifestRaw(citySlug, language);
-  const places = rawPlaces.map(manifestPlaceToPlace);
 
   // Determine if resuming and get already-cached places early (before storage check)
   const existingSummary = await getOfflineDownloadSummary();
@@ -175,22 +213,22 @@ export async function downloadCity(
 
   // Compute what still needs to be downloaded (resume-aware)
   const toDownload = planResumableAudioDownloads(rawPlaces, alreadyCached);
-
-  // Compute required bytes for storage check: only what needs downloading
-  const toDownloadAsPlaces = toDownload.map(manifestPlaceToPlace);
-  const toDownloadFiles = planCityDownload(toDownloadAsPlaces, cityDisplayName, language);
-  const requiredBytesForDownload = estimateDownloadSizeBytes(toDownloadFiles);
+  const requiredBytesForDownload = estimateManifestSizeBytes(toDownload);
 
   if (!hasSufficientStorage(Paths.availableDiskSpace, requiredBytesForDownload)) {
     throw new InsufficientStorageError(requiredBytesForDownload, Paths.availableDiskSpace);
   }
 
+  const isWeb = Platform.OS === "web";
+
   // Clear old data if switching to a different city/language
   if (!isResuming) {
     await clearCachedPlaces();
-    const audioDir = new Directory(Paths.document, AUDIO_DIR_NAME);
-    if (audioDir.exists) {
-      audioDir.delete();
+    if (!isWeb) {
+      const staleAudioDir = new Directory(Paths.document, AUDIO_DIR_NAME);
+      if (staleAudioDir.exists) {
+        staleAudioDir.delete();
+      }
     }
   }
 
@@ -209,29 +247,44 @@ export async function downloadCity(
     }),
   );
 
-  const audioDir = new Directory(Paths.document, AUDIO_DIR_NAME);
-  audioDir.create({ idempotent: true });
-
-  for (const place of toDownload) {
-    const destination = new File(audioDir, `${place.id}.mp3`);
-    const downloaded = await File.downloadFileAsync(place.audio_url, destination, {
-      idempotent: true,
-    });
-    await setCachedPlaceAudioUri(place.id, downloaded.uri);
-  }
-
-  // Compute total size for the summary (full city, not just what was downloaded)
-  const files = planCityDownload(places, cityDisplayName, language);
-  const totalSizeBytes = estimateDownloadSizeBytes(files);
-
   const summary: OfflineDownloadSummary = {
     city: cityDisplayName,
     language,
     placeCount: rawPlaces.length,
-    approxSizeBytes: totalSizeBytes,
+    approxSizeBytes: estimateManifestSizeBytes(rawPlaces),
     downloadedAt: new Date().toISOString(),
   };
+  // Written BEFORE the download loop, not after: it's what lets the next
+  // call recognise an interrupted attempt as the same city+language and
+  // resume it. Written after the loop, an interruption left no summary at
+  // all, so the next call read "different city" and wiped every file the
+  // interrupted attempt had already fetched.
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(summary));
+
+  if (isWeb) return summary;
+
+  const audioDir = new Directory(Paths.document, AUDIO_DIR_NAME);
+  audioDir.create({ idempotent: true });
+
+  // Per-place isolation matters here: the manifest's audio URLs are presigned
+  // with a 15-minute TTL (see audio_handler.go) and a full city is ~450MB, so
+  // late URLs expiring mid-loop is expected, not exceptional. A failed place
+  // keeps its null audio_local_uri, so the next call retries exactly it.
+  let failedCount = 0;
+  for (const place of toDownload) {
+    try {
+      const destination = new File(audioDir, `${place.id}.mp3`);
+      const downloaded = await File.downloadFileAsync(place.audio_url, destination, {
+        idempotent: true,
+      });
+      await setCachedPlaceAudioUri(place.id, downloaded.uri);
+    } catch (err) {
+      failedCount += 1;
+      console.warn(`offline download: skipping ${place.id}`, err);
+    }
+  }
+
+  if (failedCount > 0) throw new PartialDownloadError(failedCount);
   return summary;
 }
 

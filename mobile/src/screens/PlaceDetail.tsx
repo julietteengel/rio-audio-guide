@@ -52,6 +52,10 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   const { width: windowWidth } = useWindowDimensions();
   const heroImageSize = Math.min(windowWidth * 0.72, 340);
   const [place, setPlace] = useState<Place | null>(null);
+  // Distinct from `place === null`, which also covers "the fetch hasn't come
+  // back yet" -- without it, a place that isn't in the offline cache renders
+  // a permanently blank screen indistinguishable from loading.
+  const [notFound, setNotFound] = useState(false);
   const [audio, setAudio] = useState<AudioAvailability>({ state: "unavailable" });
   const [marks, setMarks] = useState<WordMark[] | null>(null);
   const [marksLoading, setMarksLoading] = useState(false);
@@ -64,8 +68,11 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
 
   useEffect(() => {
     let cancelled = false;
+    setNotFound(false);
     placesRepository.getById(route.params.placeId).then((p) => {
-      if (!cancelled) setPlace(p ?? null);
+      if (cancelled) return;
+      setPlace(p ?? null);
+      setNotFound(p === undefined);
     });
     return () => {
       cancelled = true;
@@ -128,6 +135,23 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   useEffect(() => {
     Animated.timing(screenOpacity, { toValue: 1, duration: 350, useNativeDriver: true }).start();
   }, [screenOpacity]);
+
+  if (notFound) {
+    return (
+      <View style={styles.screen}>
+        <SafeAreaView edges={["top"]} style={styles.topBar}>
+          <Pressable style={styles.iconBtn} onPress={() => navigation.goBack()}>
+            <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+              <Polyline points="15 6 9 12 15 18" stroke={colors.cream} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+            </Svg>
+          </Pressable>
+        </SafeAreaView>
+        <View style={styles.lyricsArea}>
+          <Text style={styles.pendingText}>{t.placeDetail.notAvailableOffline}</Text>
+        </View>
+      </View>
+    );
+  }
 
   if (!place) return null;
 

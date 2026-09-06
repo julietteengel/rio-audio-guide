@@ -26,9 +26,21 @@ export function SettingsScreen({ navigation }: Props) {
     getOfflineDownloadSummary().then(setSummary);
   }, []);
 
-  async function handleDeleteDownload() {
-    await clearOfflineDownload();
-    setSummary(null);
+  function confirmDeleteDownload() {
+    Alert.alert(t.settings.deleteDownloadConfirmTitle, t.settings.deleteDownloadConfirmMessage, [
+      { text: t.settings.deleteDownloadCancel, style: "cancel" },
+      {
+        text: t.settings.deleteDownloadConfirm,
+        style: "destructive",
+        onPress: () => {
+          clearOfflineDownload()
+            .then(() => setSummary(null))
+            .catch(() => {
+              Alert.alert(t.settings.deleteDownloadError);
+            });
+        },
+      },
+    ]);
   }
 
   function confirmDeleteAccount() {
@@ -113,7 +125,7 @@ export function SettingsScreen({ navigation }: Props) {
                 </Text>
               </View>
               {summary && (
-                <Pressable onPress={handleDeleteDownload}>
+                <Pressable onPress={confirmDeleteDownload}>
                   <Text style={styles.link}>{t.settings.delete}</Text>
                 </Pressable>
               )}

@@ -13,6 +13,13 @@ describe("hasSufficientStorage", () => {
   it("is false when available space is short", () => {
     expect(hasSufficientStorage(500, 1000)).toBe(false);
   });
+
+  // expo-file-system's web shim reports 0 free bytes for every platform it
+  // doesn't support -- an unknown value, not a full disk.
+  it("treats an unknown (non-positive) available space as unenforceable", () => {
+    expect(hasSufficientStorage(0, 1000)).toBe(true);
+    expect(hasSufficientStorage(-1, 1000)).toBe(true);
+  });
 });
 
 describe("planResumableAudioDownloads", () => {

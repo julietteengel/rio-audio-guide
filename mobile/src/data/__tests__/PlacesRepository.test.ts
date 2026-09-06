@@ -1,17 +1,33 @@
 import { HttpPlacesRepository } from "../PlacesRepository";
 import * as offlineStore from "../offlineStore";
+import * as downloadManager from "../downloadManager";
 import * as network from "../../utils/network";
 
 jest.mock("../offlineStore");
 jest.mock("../../utils/network");
 jest.mock("../downloadManager", () => ({
-  getOfflineDownloadSummary: jest.fn().mockResolvedValue(null),
+  getOfflineDownloadSummary: jest.fn(),
 }));
 
 const mockedIsOnline = network.isOnline as jest.MockedFunction<typeof network.isOnline>;
 const mockedGetCachedPlace = offlineStore.getCachedPlace as jest.MockedFunction<
   typeof offlineStore.getCachedPlace
 >;
+const mockedGetSummary = downloadManager.getOfflineDownloadSummary as jest.MockedFunction<
+  typeof downloadManager.getOfflineDownloadSummary
+>;
+
+// Every offline test below asks for "fr", the same language the guide was
+// downloaded in -- the mismatch case is covered by its own test.
+function summaryInFrench() {
+  mockedGetSummary.mockResolvedValue({
+    city: "Rio de Janeiro",
+    language: "fr",
+    placeCount: 1,
+    approxSizeBytes: 1_800_000,
+    downloadedAt: "2026-09-06T00:00:00.000Z",
+  });
+}
 
 const CACHED_CRISTO = {
   id: "cristo-redentor",
@@ -51,6 +67,7 @@ describe("HttpPlacesRepository.getAudioUrl", () => {
 
   it("serves the cached local file when offline and the place was downloaded", async () => {
     mockedIsOnline.mockResolvedValue(false);
+    summaryInFrench();
     mockedGetCachedPlace.mockResolvedValue(CACHED_CRISTO);
 
     expect(await repo.getAudioUrl("cristo-redentor", "fr")).toEqual({
@@ -61,13 +78,23 @@ describe("HttpPlacesRepository.getAudioUrl", () => {
 
   it("reports unavailable when offline and the place was never downloaded", async () => {
     mockedIsOnline.mockResolvedValue(false);
+    summaryInFrench();
     mockedGetCachedPlace.mockResolvedValue(null);
 
     expect(await repo.getAudioUrl("never-downloaded", "fr")).toEqual({ state: "unavailable" });
   });
 
+  it("reports unavailable rather than playing audio downloaded in another language", async () => {
+    mockedIsOnline.mockResolvedValue(false);
+    summaryInFrench();
+    mockedGetCachedPlace.mockResolvedValue(CACHED_CRISTO);
+
+    expect(await repo.getAudioUrl("cristo-redentor", "pt")).toEqual({ state: "unavailable" });
+  });
+
   it("falls back to the cache when the network request itself fails despite reporting online", async () => {
     mockedIsOnline.mockResolvedValue(true);
+    summaryInFrench();
     globalThis.fetch = jest.fn().mockRejectedValue(new Error("flaky connection")) as unknown as typeof fetch;
     mockedGetCachedPlace.mockResolvedValue(CACHED_CRISTO);
 
@@ -111,6 +138,7 @@ describe("HttpPlacesRepository.getById", () => {
 
   it("falls back to the cached place when offline", async () => {
     mockedIsOnline.mockResolvedValue(false);
+    summaryInFrench();
     mockedGetCachedPlace.mockResolvedValue(CACHED_CRISTO);
 
     const result = await repo.getById("cristo-redentor");
@@ -129,8 +157,20 @@ describe("HttpPlacesRepository.getById", () => {
 
   it("returns undefined when offline and the place was never downloaded", async () => {
     mockedIsOnline.mockResolvedValue(false);
+    summaryInFrench();
     mockedGetCachedPlace.mockResolvedValue(null);
 
     expect(await repo.getById("never-downloaded")).toBeUndefined();
+  });
+
+  // The download language is chosen independently of the UI language, so a
+  // guide downloaded in French must not be served as Portuguese narration.
+  it("returns undefined rather than cached content in another language", async () => {
+    const ptRepo = new HttpPlacesRepository(() => "pt");
+    mockedIsOnline.mockResolvedValue(false);
+    summaryInFrench();
+    mockedGetCachedPlace.mockResolvedValue(CACHED_CRISTO);
+
+    expect(await ptRepo.getById("cristo-redentor")).toBeUndefined();
   });
 });

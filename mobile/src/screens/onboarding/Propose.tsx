@@ -5,7 +5,7 @@ import Svg, { Path, Polyline, Line } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { OnboardingStackParamList } from "../../navigation/types";
 import { useLocale } from "../../i18n/LocaleContext";
-import type { Locale } from "../../i18n/dictionary";
+import type { Dictionary, Locale } from "../../i18n/dictionary";
 import { Dots } from "../../components/Dots";
 import { CityCard } from "../../components/CityCard";
 import { markOnboardingComplete } from "../../onboarding/onboardingStorage";
@@ -16,7 +16,10 @@ import {
   estimateDownloadSizeBytes,
   downloadCity,
   RIO_CITY_SLUG,
+  InsufficientStorageError,
+  PartialDownloadError,
 } from "../../data/downloadManager";
+import { alertInfo } from "../../utils/platformAlert";
 import { colors, fonts, spacing, radii } from "../../theme/tokens";
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "Propose">;
@@ -32,6 +35,13 @@ const CITY_NAME = "Rio de Janeiro";
 // une autre langue sans changer un seul mot du reste de l'écran.
 const LANG_ORDER: Locale[] = ["pt", "en", "fr", "es"];
 const LANG_LABEL: Record<Locale, string> = { pt: "PT", en: "EN", fr: "FR", es: "ES" };
+
+function downloadErrorMessage(err: unknown, copy: Dictionary["propose"]): string {
+  if (err instanceof InsufficientStorageError) return copy.downloadErrorStorage;
+  if (err instanceof PartialDownloadError)
+    return copy.downloadErrorPartial.replace("{count}", String(err.failedCount));
+  return copy.downloadErrorGeneric;
+}
 
 export function ProposeScreen({ navigation }: Props) {
   const { t, locale } = useLocale();
@@ -63,9 +73,14 @@ export function ProposeScreen({ navigation }: Props) {
 
   async function startDownload() {
     setDownloading(true);
-    await downloadCity(RIO_CITY_SLUG, CITY_NAME, downloadLocale);
-    setDownloading(false);
-    navigation.navigate("DownloadSuccess");
+    try {
+      await downloadCity(RIO_CITY_SLUG, CITY_NAME, downloadLocale);
+      navigation.navigate("DownloadSuccess");
+    } catch (err) {
+      alertInfo(t.propose.downloadErrorTitle, downloadErrorMessage(err, t.propose));
+    } finally {
+      setDownloading(false);
+    }
   }
 
   function pickDownloadLanguage(l: Locale) {

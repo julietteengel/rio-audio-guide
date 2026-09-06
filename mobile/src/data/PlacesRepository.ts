@@ -93,6 +93,13 @@ function toListPlace(item: PlaceListItem): Place {
   };
 }
 
+// Whether the one offline download that exists is in the language being
+// asked for. No summary at all means nothing was ever downloaded.
+async function isCachedLanguage(language: Locale): Promise<boolean> {
+  const summary = await getOfflineDownloadSummary();
+  return summary?.language === language;
+}
+
 async function fetchJson<T>(path: string): Promise<{ status: number; body: T | null }> {
   try {
     const res = await fetch(`${API_BASE_URL}${path}`);
@@ -167,6 +174,12 @@ export class HttpPlacesRepository implements PlacesRepository {
       // offline.
     }
 
+    // The cache only ever holds ONE language -- whichever the user picked at
+    // download time, deliberately independent from the UI language (see
+    // Propose.tsx). Serving it for a different requested language would show
+    // Portuguese narration as though it were French, with no error anywhere.
+    if (!(await isCachedLanguage(this.getLocale()))) return undefined;
+
     const cached = await getCachedPlace(id);
     if (!cached) return undefined;
     return {
@@ -209,6 +222,11 @@ export class HttpPlacesRepository implements PlacesRepository {
       // status === 0: fall through to the offline cache rather than
       // reporting "unavailable" for a place that IS downloaded.
     }
+
+    // Same single-cached-language rule as getById: the downloaded audio is
+    // in one language only, and playing the wrong one is worse than
+    // reporting none.
+    if (!(await isCachedLanguage(language))) return { state: "unavailable" };
 
     const cached = await getCachedPlace(placeId);
     if (cached?.audioLocalUri) {

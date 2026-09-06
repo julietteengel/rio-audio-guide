@@ -23,6 +23,13 @@ export const dictionary = {
       note: "Le téléchargement se poursuit en arrière-plan, vous pouvez continuer à utiliser l'app pendant ce temps.",
       download: "Télécharger",
       skip: "Continuer sans télécharger",
+      downloadErrorTitle: "Téléchargement interrompu",
+      downloadErrorStorage:
+        "Il n'y a pas assez d'espace libre sur cet appareil pour télécharger ce guide. Libérez de l'espace, puis réessayez.",
+      downloadErrorPartial:
+        "{count} lieux n'ont pas pu être téléchargés. Relancez le téléchargement : seuls les lieux manquants seront repris.",
+      downloadErrorGeneric:
+        "Le téléchargement n'a pas pu se terminer. Vérifiez votre connexion, puis réessayez.",
     },
     downloadSuccess: {
       eyebrow: "Rio de Janeiro",
@@ -53,6 +60,8 @@ export const dictionary = {
       itineraryComingSoonBody: "L'ajout de lieux à un itinéraire arrive prochainement.",
       narrationPending: "La narration de ce lieu est en cours de préparation.",
       narrationUnavailable: "Aucune narration n'est disponible pour ce lieu pour le moment.",
+      notAvailableOffline:
+        "Ce lieu ne fait pas partie de votre guide téléchargé. Reconnectez-vous à Internet pour le consulter.",
       pressPlayHint: "Écouter maintenant",
     },
     categories: {
@@ -132,6 +141,12 @@ export const dictionary = {
       deleteAccountConfirm: "Supprimer",
       offlineDataSection: "Données hors ligne",
       delete: "Supprimer",
+      deleteDownloadConfirmTitle: "Supprimer ce téléchargement ?",
+      deleteDownloadConfirmMessage:
+        "Les récits audio de cette ville seront effacés de cet appareil. Vous pourrez les retélécharger à tout moment avec une connexion.",
+      deleteDownloadCancel: "Annuler",
+      deleteDownloadConfirm: "Supprimer",
+      deleteDownloadError: "Le téléchargement n'a pas pu être supprimé. Réessayez.",
       noDownload: "Aucune ville téléchargée.",
       languageSection: "Langue",
       aboutSection: "À propos",
@@ -160,6 +175,13 @@ export const dictionary = {
       note: "The download continues in the background, you can keep using the app meanwhile.",
       download: "Download",
       skip: "Continue without downloading",
+      downloadErrorTitle: "Download interrupted",
+      downloadErrorStorage:
+        "There isn't enough free space on this device to download the guide. Free up some space and try again.",
+      downloadErrorPartial:
+        "{count} places couldn't be downloaded. Start the download again — it will only pick up what's missing.",
+      downloadErrorGeneric:
+        "The download couldn't finish. Check your connection and try again.",
     },
     downloadSuccess: {
       eyebrow: "Rio de Janeiro",
@@ -190,6 +212,8 @@ export const dictionary = {
       itineraryComingSoonBody: "Adding places to an itinerary is coming soon.",
       narrationPending: "This place's narration is being prepared.",
       narrationUnavailable: "No narration is available for this place yet.",
+      notAvailableOffline:
+        "This place isn't part of your downloaded guide. Reconnect to the internet to open it.",
       pressPlayHint: "Listen now",
     },
     categories: {
@@ -269,6 +293,12 @@ export const dictionary = {
       deleteAccountConfirm: "Delete",
       offlineDataSection: "Offline data",
       delete: "Delete",
+      deleteDownloadConfirmTitle: "Delete this download?",
+      deleteDownloadConfirmMessage:
+        "The audio stories for this city will be removed from this device. You can download them again any time you're online.",
+      deleteDownloadCancel: "Cancel",
+      deleteDownloadConfirm: "Delete",
+      deleteDownloadError: "The download couldn't be deleted. Please try again.",
       noDownload: "No city downloaded yet.",
       languageSection: "Language",
       aboutSection: "About",
@@ -297,6 +327,13 @@ export const dictionary = {
       note: "O download continua em segundo plano, você pode continuar usando o app enquanto isso.",
       download: "Baixar",
       skip: "Continuar sem baixar",
+      downloadErrorTitle: "Download interrompido",
+      downloadErrorStorage:
+        "Não há espaço livre suficiente neste aparelho para baixar o guia. Libere espaço e tente novamente.",
+      downloadErrorPartial:
+        "{count} lugares não puderam ser baixados. Inicie o download de novo — só o que falta será retomado.",
+      downloadErrorGeneric:
+        "Não foi possível concluir o download. Verifique sua conexão e tente novamente.",
     },
     downloadSuccess: {
       eyebrow: "Rio de Janeiro",
@@ -327,6 +364,8 @@ export const dictionary = {
       itineraryComingSoonBody: "Adicionar lugares a um itinerário estará disponível em breve.",
       narrationPending: "A narração deste lugar está sendo preparada.",
       narrationUnavailable: "Ainda não há narração disponível para este lugar.",
+      notAvailableOffline:
+        "Este lugar não faz parte do seu guia baixado. Conecte-se à internet para abri-lo.",
       pressPlayHint: "Ouvir agora",
     },
     categories: {
@@ -406,6 +445,12 @@ export const dictionary = {
       deleteAccountConfirm: "Excluir",
       offlineDataSection: "Dados offline",
       delete: "Excluir",
+      deleteDownloadConfirmTitle: "Excluir este download?",
+      deleteDownloadConfirmMessage:
+        "As narrações em áudio desta cidade serão apagadas deste aparelho. Você pode baixá-las de novo quando estiver on-line.",
+      deleteDownloadCancel: "Cancelar",
+      deleteDownloadConfirm: "Excluir",
+      deleteDownloadError: "Não foi possível excluir o download. Tente novamente.",
       noDownload: "Nenhuma cidade baixada ainda.",
       languageSection: "Idioma",
       aboutSection: "Sobre",
@@ -434,6 +479,13 @@ export const dictionary = {
       note: "La descarga continúa en segundo plano, puedes seguir usando la app mientras tanto.",
       download: "Descargar",
       skip: "Continuar sin descargar",
+      downloadErrorTitle: "Descarga interrumpida",
+      downloadErrorStorage:
+        "No hay suficiente espacio libre en este dispositivo para descargar la guía. Libera espacio e inténtalo de nuevo.",
+      downloadErrorPartial:
+        "No se pudieron descargar {count} lugares. Vuelve a iniciar la descarga: solo se retomará lo que falta.",
+      downloadErrorGeneric:
+        "La descarga no pudo completarse. Comprueba tu conexión e inténtalo de nuevo.",
     },
     downloadSuccess: {
       eyebrow: "Río de Janeiro",
@@ -464,6 +516,8 @@ export const dictionary = {
       itineraryComingSoonBody: "Añadir lugares a un itinerario estará disponible próximamente.",
       narrationPending: "La narración de este lugar se está preparando.",
       narrationUnavailable: "Todavía no hay narración disponible para este lugar.",
+      notAvailableOffline:
+        "Este lugar no forma parte de tu guía descargada. Conéctate a internet para abrirlo.",
       pressPlayHint: "Escuchar ahora",
     },
     categories: {
@@ -543,6 +597,12 @@ export const dictionary = {
       deleteAccountConfirm: "Eliminar",
       offlineDataSection: "Datos sin conexión",
       delete: "Eliminar",
+      deleteDownloadConfirmTitle: "¿Eliminar esta descarga?",
+      deleteDownloadConfirmMessage:
+        "Los relatos en audio de esta ciudad se borrarán de este dispositivo. Puedes volver a descargarlos cuando tengas conexión.",
+      deleteDownloadCancel: "Cancelar",
+      deleteDownloadConfirm: "Eliminar",
+      deleteDownloadError: "No se pudo eliminar la descarga. Inténtalo de nuevo.",
       noDownload: "Ninguna ciudad descargada todavía.",
       languageSection: "Idioma",
       aboutSection: "Acerca de",
