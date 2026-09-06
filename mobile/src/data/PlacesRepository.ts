@@ -3,6 +3,8 @@ import { MOCK_PLACES } from "./types";
 import { API_BASE_URL } from "../config";
 import type { Locale } from "../i18n/dictionary";
 import { getOfflineDownloadSummary } from "./downloadManager";
+import { getCachedPlace } from "./offlineStore";
+import { isOnline } from "../utils/network";
 
 export interface PlacesRepository {
   listNearby(): Promise<Place[]>;
@@ -92,14 +94,18 @@ function toListPlace(item: PlaceListItem): Place {
 }
 
 async function fetchJson<T>(path: string): Promise<{ status: number; body: T | null }> {
-  const res = await fetch(`${API_BASE_URL}${path}`);
-  let body: T | null = null;
   try {
-    body = (await res.json()) as T;
+    const res = await fetch(`${API_BASE_URL}${path}`);
+    let body: T | null = null;
+    try {
+      body = (await res.json()) as T;
+    } catch {
+      body = null;
+    }
+    return { status: res.status, body };
   } catch {
-    body = null;
+    return { status: 0, body: null };
   }
-  return { status: res.status, body };
 }
 
 export class HttpPlacesRepository implements PlacesRepository {
@@ -121,35 +127,59 @@ export class HttpPlacesRepository implements PlacesRepository {
     return body.map(toListPlace);
   }
 
+  // Online: unchanged network call. Offline: falls back to the cached place
+  // (narration text + fields) saved by downloadManager.downloadCity, rather
+  // than returning undefined -- a device with no signal must still be able
+  // to open a place it already downloaded.
   async getById(id: string): Promise<Place | undefined> {
-    const language = this.getLocale();
-    const { status, body } = await fetchJson<PlaceDetailReady | PlaceDetailNotReady>(
-      `/places/${encodeURIComponent(id)}?language=${language}`,
-    );
+    if (await isOnline()) {
+      const language = this.getLocale();
+      const { status, body } = await fetchJson<PlaceDetailReady | PlaceDetailNotReady>(
+        `/places/${encodeURIComponent(id)}?language=${language}`,
+      );
 
-    if (status === 200 && body && "narration" in body) {
-      return {
-        id: body.id,
-        name: body.name,
-        category: body.category,
-        lat: body.lat,
-        lon: body.lon,
-        city: CURRENT_BACKEND_CITY,
-        body: body.narration,
-        groundedSourceCount: body.source ? 1 : 0,
-        narrationStatus: "ready",
-      };
+      if (status === 200 && body && "narration" in body) {
+        return {
+          id: body.id,
+          name: body.name,
+          category: body.category,
+          lat: body.lat,
+          lon: body.lon,
+          city: CURRENT_BACKEND_CITY,
+          body: body.narration,
+          groundedSourceCount: body.source ? 1 : 0,
+          narrationStatus: "ready",
+        };
+      }
+
+      if (status !== 0) {
+        // 202 "not yet published", or 404 "no script for this place/language" --
+        // either way the place itself may still exist; /places/:id doesn't
+        // return place fields in those cases, so fall back to the list to at
+        // least show name/category/position while narration is unavailable.
+        const narrationStatus: NarrationStatus = status === 202 ? "pending" : "unavailable";
+        const basics = await this.listNearby();
+        const match = basics.find((p) => p.id === id);
+        if (match) return { ...match, narrationStatus };
+      }
+      // status === 0 (the request itself failed despite isOnline() saying
+      // yes) falls through to the offline cache below, same as genuinely
+      // offline.
     }
 
-    // 202 "not yet published", or 404 "no script for this place/language" —
-    // either way the place itself may still exist; /places/:id doesn't
-    // return place fields in those cases, so fall back to the list to at
-    // least show name/category/position while narration is unavailable.
-    const narrationStatus: NarrationStatus = status === 202 ? "pending" : "unavailable";
-    const basics = await this.listNearby();
-    const match = basics.find((p) => p.id === id);
-    if (!match) return undefined;
-    return { ...match, narrationStatus };
+    const cached = await getCachedPlace(id);
+    if (!cached) return undefined;
+    return {
+      id: cached.id,
+      name: cached.name,
+      category: cached.category,
+      lat: cached.lat,
+      lon: cached.lon,
+      city: CURRENT_BACKEND_CITY,
+      body: cached.body,
+      groundedSourceCount: cached.body ? 1 : 0,
+      narrationStatus: "ready",
+    };
   }
 
   async downloadedCount(): Promise<number> {
@@ -157,18 +187,32 @@ export class HttpPlacesRepository implements PlacesRepository {
     return summary?.placeCount ?? 0;
   }
 
-  // 200 {url}: ready, real presigned S3 URL. 202 {status}: queued/generating/
-  // "script not yet published" -- all mean the same thing to the UI, not
-  // playable yet. 404: no audio was ever requested for this place/language.
+  // Online: unchanged streamed URL, real presigned S3 URL. Offline: the
+  // locally cached audio file (downloadManager.downloadCity already wrote it
+  // and recorded its URI in offlineStore) if this place was downloaded, else
+  // "unavailable" -- never claims a place is playable offline when it wasn't
+  // actually downloaded.
   async getAudioUrl(placeId: string, language: Locale): Promise<AudioAvailability> {
-    const { status, body } = await fetchJson<{ url?: string; timestamps_url?: string }>(
-      `/places/${encodeURIComponent(placeId)}/audio?language=${language}`,
-    );
-    if (status === 200 && body?.url) {
-      return { state: "ready", url: body.url, timestampsUrl: body.timestamps_url };
+    if (await isOnline()) {
+      const { status, body } = await fetchJson<{ url?: string; timestamps_url?: string }>(
+        `/places/${encodeURIComponent(placeId)}/audio?language=${language}`,
+      );
+      if (status === 200 && body?.url) {
+        return { state: "ready", url: body.url, timestampsUrl: body.timestamps_url };
+      }
+      if (status === 202) {
+        return { state: "pending" };
+      }
+      if (status !== 0) {
+        return { state: "unavailable" };
+      }
+      // status === 0: fall through to the offline cache rather than
+      // reporting "unavailable" for a place that IS downloaded.
     }
-    if (status === 202) {
-      return { state: "pending" };
+
+    const cached = await getCachedPlace(placeId);
+    if (cached?.audioLocalUri) {
+      return { state: "ready", url: cached.audioLocalUri };
     }
     return { state: "unavailable" };
   }
