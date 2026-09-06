@@ -76,6 +76,7 @@ export const dictionary = {
       inputPlaceholder: "Poser une question…",
     },
     itineraries: {
+      pleaseLogIn: "Connecte-toi pour voir tes itinéraires.",
       listTitle: "Mes itinéraires",
       listEmptyTitle: "Aucun itinéraire pour l'instant",
       listEmptyBody: "Décris ce que tu as envie de faire, l'IA te propose un parcours à partir des lieux vérifiés du guide.",
@@ -202,6 +203,7 @@ export const dictionary = {
       inputPlaceholder: "Ask a question…",
     },
     itineraries: {
+      pleaseLogIn: "Log in to see your itineraries.",
       listTitle: "My itineraries",
       listEmptyTitle: "No itineraries yet",
       listEmptyBody: "Describe what you'd like to do, and the AI will propose a route built from the guide's verified places.",
@@ -328,6 +330,7 @@ export const dictionary = {
       inputPlaceholder: "Fazer uma pergunta…",
     },
     itineraries: {
+      pleaseLogIn: "Faça login para ver seus roteiros.",
       listTitle: "Meus roteiros",
       listEmptyTitle: "Nenhum roteiro ainda",
       listEmptyBody: "Descreva o que você quer fazer, e a IA propõe um roteiro a partir dos lugares verificados do guia.",
@@ -454,6 +457,7 @@ export const dictionary = {
       inputPlaceholder: "Hacer una pregunta…",
     },
     itineraries: {
+      pleaseLogIn: "Inicia sesión para ver tus itinerarios.",
       listTitle: "Mis itinerarios",
       listEmptyTitle: "Todavía no hay itinerarios",
       listEmptyBody: "Describe lo que quieres hacer y la IA propondrá un recorrido con lugares verificados de la guía.",

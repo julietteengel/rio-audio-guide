@@ -6,6 +6,7 @@ import Svg, { Circle, Line, Path } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
+import { useAuth } from "../auth/AuthContext";
 import { placesRepository } from "../data/PlacesRepository";
 import { fetchCityManifest, RIO_CITY_SLUG } from "../data/downloadManager";
 import type { Place } from "../data/types";
@@ -31,6 +32,7 @@ const RIO_REGION = {
 
 export function MapScreen({ navigation }: Props) {
   const { t, locale } = useLocale();
+  const { isLoggedIn } = useAuth();
   const [places, setPlaces] = useState<Place[]>([]);
   const [offlineCount, setOfflineCount] = useState(0);
   const [userLocation, setUserLocation] = useState<LatLon | null>(null);
@@ -133,7 +135,7 @@ export function MapScreen({ navigation }: Props) {
               {t.map.offlineBadge.replace("{count}", String(offlineCount))}
             </Text>
           </View>
-          <Pressable style={styles.gearBtn} onPress={() => navigation.navigate("ItinerariesList")}>
+          <Pressable style={styles.gearBtn} onPress={() => navigation.navigate(isLoggedIn ? "ItinerariesList" : "Auth")}>
             <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
               <Circle cx={6} cy={7} r={2} stroke={colors.ink} strokeWidth={2} />
               <Circle cx={18} cy={17} r={2} stroke={colors.ink} strokeWidth={2} />

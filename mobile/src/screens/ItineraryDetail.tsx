@@ -9,7 +9,7 @@ import { useLocale } from "../i18n/LocaleContext";
 import { useAuth } from "../auth/AuthContext";
 import { getItinerary, type Itinerary } from "../data/ItinerariesRepository";
 import { formatDuration } from "../utils/itineraryFormat";
-import { colors, fonts, radii } from "../theme/tokens";
+import { colors, fonts } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<AppStackParamList, "ItineraryDetail">;
 
@@ -44,7 +44,11 @@ export function ItineraryDetailScreen({ route, navigation }: Props) {
         </Pressable>
       </View>
 
-      {notFound ? (
+      {!token ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyBody}>{t.itineraries.pleaseLogIn}</Text>
+        </View>
+      ) : notFound ? (
         <View style={styles.empty}>
           <Text style={styles.emptyBody}>{t.itineraries.detailNotFound}</Text>
         </View>

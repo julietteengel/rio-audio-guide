@@ -30,7 +30,10 @@ export function ItinerariesListScreen({ navigation }: Props) {
           if (!cancelled) setItineraries(result);
         })
         .catch(() => {
-          if (!cancelled) setItineraries([]);
+          // Keep whatever was already loaded (if anything) rather than
+          // overwriting a real list with an empty one on a transient
+          // error -- only a genuinely-first, failed load falls back to [].
+          if (!cancelled) setItineraries((prev) => prev ?? []);
         });
       return () => {
         cancelled = true;
@@ -56,7 +59,11 @@ export function ItinerariesListScreen({ navigation }: Props) {
         <Text style={styles.createBtnText}>{t.itineraries.createButton}</Text>
       </Pressable>
 
-      {itineraries === null ? (
+      {!token ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyBody}>{t.itineraries.pleaseLogIn}</Text>
+        </View>
+      ) : itineraries === null ? (
         <ActivityIndicator style={styles.loading} color={colors.terracotta} />
       ) : itineraries.length === 0 ? (
         <View style={styles.empty}>

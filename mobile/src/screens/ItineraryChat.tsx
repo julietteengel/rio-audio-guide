@@ -12,7 +12,10 @@ import { colors, fonts, radii } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<AppStackParamList, "ItineraryChat">;
 
-type Turn = { question: string; result: Itinerary | null };
+// result is never actually null here -- a failed generation never gets
+// pushed into `turns` at all (see the catch block in handleSend), so this
+// type stays non-optional rather than carrying a dead null-handling branch.
+type Turn = { question: string; result: Itinerary };
 
 export function ItineraryChatScreen({ navigation }: Props) {
   const { t } = useLocale();
@@ -50,83 +53,93 @@ export function ItineraryChatScreen({ navigation }: Props) {
           </Pressable>
         </View>
 
-        <View style={styles.head}>
-          <Text style={styles.title}>{t.itineraries.chatTitle}</Text>
-          <Text style={styles.subtitle}>{t.itineraries.chatSubtitle}</Text>
-        </View>
+        {!token ? (
+          <View style={styles.empty}>
+            <Text style={styles.emptyBody}>{t.itineraries.pleaseLogIn}</Text>
+          </View>
+        ) : (
+          <>
+            <View style={styles.head}>
+              <Text style={styles.title}>{t.itineraries.chatTitle}</Text>
+              <Text style={styles.subtitle}>{t.itineraries.chatSubtitle}</Text>
+            </View>
 
-        <ScrollView style={styles.chat} contentContainerStyle={styles.chatContent}>
-          {turns.map((turn, i) => (
-            <View key={i}>
-              <View style={styles.rowUser}>
-                <View style={styles.bubbleUser}>
-                  <Text style={styles.bubbleUserText}>{turn.question}</Text>
-                </View>
-              </View>
-              <View style={styles.rowAi}>
-                {turn.result ? (
-                  <Pressable
-                    style={styles.itineraryCard}
-                    onPress={() => navigation.navigate("ItineraryDetail", { itineraryId: turn.result!.id })}
-                  >
-                    <Text style={styles.itineraryCardTitle}>{turn.result.title}</Text>
-                    <Text style={styles.itineraryCardMeta}>
-                      {formatDuration(turn.result.totalMinutes)} · {t.itineraries.stopCount.replace("{count}", String(turn.result.placeCount))}
-                    </Text>
-                    {turn.result.stops.map((stop, si) => (
-                      <Text
-                        key={si}
-                        style={stop.kind === "suggestion" ? styles.stopLineSuggestion : styles.stopLine}
+            <ScrollView style={styles.chat} contentContainerStyle={styles.chatContent}>
+              {turns.map((turn, i) => {
+                let placeNumber = 0;
+                return (
+                  <View key={i}>
+                    <View style={styles.rowUser}>
+                      <View style={styles.bubbleUser}>
+                        <Text style={styles.bubbleUserText}>{turn.question}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.rowAi}>
+                      <Pressable
+                        style={styles.itineraryCard}
+                        onPress={() => navigation.navigate("ItineraryDetail", { itineraryId: turn.result.id })}
                       >
-                        {si + 1}. {stop.label}
-                        {stop.kind === "suggestion" ? ` (${t.itineraries.suggestionLabel})` : ""}
-                      </Text>
-                    ))}
-                    <Text style={styles.viewFullLink}>{t.itineraries.viewFullItinerary}</Text>
-                  </Pressable>
-                ) : (
-                  <View style={styles.bubbleAi}>
-                    <Text style={styles.bubbleAiText}>{t.itineraries.chatSendError}</Text>
+                        <Text style={styles.itineraryCardTitle}>{turn.result.title}</Text>
+                        <Text style={styles.itineraryCardMeta}>
+                          {formatDuration(turn.result.totalMinutes)} · {t.itineraries.stopCount.replace("{count}", String(turn.result.placeCount))}
+                        </Text>
+                        {turn.result.stops.map((stop, si) => {
+                          const isSuggestion = stop.kind === "suggestion";
+                          if (!isSuggestion) placeNumber += 1;
+                          return (
+                            <Text key={si} style={isSuggestion ? styles.stopLineSuggestion : styles.stopLine}>
+                              {isSuggestion ? stop.label : `${placeNumber}. ${stop.label}`}
+                              {isSuggestion ? ` (${t.itineraries.suggestionLabel})` : ""}
+                            </Text>
+                          );
+                        })}
+                        <Text style={styles.viewFullLink}>{t.itineraries.viewFullItinerary}</Text>
+                      </Pressable>
+                    </View>
                   </View>
-                )}
-              </View>
-            </View>
-          ))}
-          {pendingQuestion && (
-            <View>
-              <View style={styles.rowUser}>
-                <View style={styles.bubbleUser}>
-                  <Text style={styles.bubbleUserText}>{pendingQuestion}</Text>
+                );
+              })}
+              {pendingQuestion && (
+                <View>
+                  <View style={styles.rowUser}>
+                    <View style={styles.bubbleUser}>
+                      <Text style={styles.bubbleUserText}>{pendingQuestion}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.rowAi}>
+                    <View style={styles.bubbleAi}>
+                      <ActivityIndicator color={colors.terracotta} />
+                    </View>
+                  </View>
                 </View>
-              </View>
-              <View style={styles.rowAi}>
-                <View style={styles.bubbleAi}>
-                  <ActivityIndicator color={colors.terracotta} />
-                </View>
-              </View>
+              )}
+            </ScrollView>
+
+            {error && <Text style={styles.errorText}>{error}</Text>}
+
+            <View style={styles.inputBar}>
+              <TextInput
+                style={styles.input}
+                value={input}
+                onChangeText={setInput}
+                placeholder={t.itineraries.chatInputPlaceholder}
+                placeholderTextColor={colors.inkFaint}
+                onSubmitEditing={handleSend}
+                returnKeyType="send"
+              />
+              <Pressable
+                style={[styles.sendBtn, (!input.trim() || !!pendingQuestion) && styles.sendBtnDisabled]}
+                disabled={!input.trim() || !!pendingQuestion}
+                onPress={handleSend}
+              >
+                <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+                  <Path d="M22 2 11 13" stroke={colors.cream} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                  <Path d="M22 2 15 22 11 13 2 9 22 2Z" stroke={colors.cream} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                </Svg>
+              </Pressable>
             </View>
-          )}
-        </ScrollView>
-
-        {error && <Text style={styles.errorText}>{error}</Text>}
-
-        <View style={styles.inputBar}>
-          <TextInput
-            style={styles.input}
-            value={input}
-            onChangeText={setInput}
-            placeholder={t.itineraries.chatInputPlaceholder}
-            placeholderTextColor={colors.inkFaint}
-            onSubmitEditing={handleSend}
-            returnKeyType="send"
-          />
-          <Pressable style={[styles.sendBtn, !input.trim() && styles.sendBtnDisabled]} disabled={!input.trim() || !!pendingQuestion} onPress={handleSend}>
-            <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-              <Path d="M22 2 11 13" stroke={colors.cream} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-              <Path d="M22 2 15 22 11 13 2 9 22 2Z" stroke={colors.cream} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-            </Svg>
-          </Pressable>
-        </View>
+          </>
+        )}
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
@@ -146,6 +159,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  empty: { paddingHorizontal: 32, marginTop: 48, alignItems: "center" },
+  emptyBody: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.inkSoft, textAlign: "center" },
   head: { paddingHorizontal: 22, paddingTop: 16 },
   title: { fontFamily: fonts.display, fontSize: 22, color: colors.ink, marginBottom: 6 },
   subtitle: { fontFamily: fonts.body, fontSize: 13.5, lineHeight: 19, color: colors.inkSoft },
