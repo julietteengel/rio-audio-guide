@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Polyline } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -14,6 +14,12 @@ import {
   formatApproxSize,
   type OfflineDownloadSummary,
 } from "../data/downloadManager";
+import {
+  requestProximityPermissions,
+  isProximityMonitoringActive,
+  startProximityMonitoring,
+  stopProximityMonitoring,
+} from "../location/geofenceTask";
 
 type Props = NativeStackScreenProps<AppStackParamList, "Settings">;
 
@@ -21,9 +27,11 @@ export function SettingsScreen({ navigation }: Props) {
   const { t, locale, setLocale } = useLocale();
   const { user, isLoggedIn, logout, deleteAccount } = useAuth();
   const [summary, setSummary] = useState<OfflineDownloadSummary | null>(null);
+  const [proximityEnabled, setProximityEnabled] = useState(false);
 
   useEffect(() => {
     getOfflineDownloadSummary().then(setSummary);
+    isProximityMonitoringActive().then(setProximityEnabled);
   }, []);
 
   function confirmDeleteDownload() {
@@ -56,6 +64,24 @@ export function SettingsScreen({ navigation }: Props) {
         },
       },
     ]);
+  }
+
+  async function toggleProximity() {
+    if (proximityEnabled) {
+      await stopProximityMonitoring();
+      setProximityEnabled(false);
+      return;
+    }
+    const granted = await requestProximityPermissions();
+    if (!granted) {
+      Alert.alert(t.settings.proximityPermissionDeniedTitle, t.settings.proximityPermissionDeniedBody, [
+        { text: t.settings.deleteAccountCancel, style: "cancel" },
+        { text: t.settings.openSystemSettings, onPress: () => Linking.openSettings() },
+      ]);
+      return;
+    }
+    await startProximityMonitoring();
+    setProximityEnabled(true);
   }
 
   return (
@@ -130,6 +156,25 @@ export function SettingsScreen({ navigation }: Props) {
                 </Pressable>
               )}
             </View>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>{t.settings.proximitySection}</Text>
+          <View style={styles.group}>
+            <Pressable style={[styles.row, styles.rowLast]} onPress={toggleProximity}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.rowLabel}>{t.settings.proximityToggleLabel}</Text>
+                <Text style={styles.rowSub}>{t.settings.proximityToggleSub}</Text>
+              </View>
+              {proximityEnabled && (
+                <View style={styles.check}>
+                  <Svg width={11} height={11} viewBox="0 0 24 24" fill="none">
+                    <Polyline points="5 13 10 18 19 7" stroke={colors.cream} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+                  </Svg>
+                </View>
+              )}
+            </Pressable>
           </View>
         </View>
 
