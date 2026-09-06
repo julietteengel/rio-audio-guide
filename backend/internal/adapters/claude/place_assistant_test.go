@@ -57,10 +57,23 @@ func TestPlaceAssistant_Ask_ParsesToolUseResponse(t *testing.T) {
 	}
 }
 
+func TestPlaceAssistant_Ask_DefaultsUnknownGroundingLevelToGeneral(t *testing.T) {
+	input := map[string]any{"answer": "Something.", "grounding_level": "confident"} // not one of the 3 valid values
+	fake := &fakeMessagesAPI{response: answerToolUseResponse(t, input)}
+	assistant := NewPlaceAssistant(fake)
+
+	got, err := assistant.Ask(context.Background(), "narration text", nil, "question")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got.GroundingLevel != "general" {
+		t.Fatalf("got grounding level %q, want it defaulted to \"general\" for an unrecognized value", got.GroundingLevel)
+	}
+}
+
 func TestPlaceAssistant_Ask_SendsHistoryAsPriorMessages(t *testing.T) {
 	var captured []anthropic.MessageParam
 	fake := &fakeMessagesAPI{response: answerToolUseResponse(t, map[string]any{"answer": "42", "grounding_level": "general"})}
-	// Wrap fake to capture the params New() was called with.
 	capturing := &capturingMessagesAPI{inner: fake, onCall: func(p anthropic.MessageNewParams) { captured = p.Messages }}
 	assistant := NewPlaceAssistant(capturing)
 
@@ -69,19 +82,35 @@ func TestPlaceAssistant_Ask_SendsHistoryAsPriorMessages(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	// 1 prior user turn + 1 prior assistant turn + the new question = 3 messages.
 	if len(captured) != 3 {
 		t.Fatalf("got %d messages sent to Claude, want 3 (1 history pair + 1 new question)", len(captured))
+	}
+	wantOrder := []struct {
+		role anthropic.MessageParamRole
+		text string
+	}{
+		{anthropic.MessageParamRoleUser, "What is this place?"},
+		{anthropic.MessageParamRoleAssistant, "A statue."},
+		{anthropic.MessageParamRoleUser, "How tall is it?"},
+	}
+	for i, want := range wantOrder {
+		if captured[i].Role != want.role {
+			t.Fatalf("message %d: got role %q, want %q", i, captured[i].Role, want.role)
+		}
+		if len(captured[i].Content) != 1 || captured[i].Content[0].OfText == nil || captured[i].Content[0].OfText.Text != want.text {
+			t.Fatalf("message %d: got content %+v, want text %q", i, captured[i].Content, want.text)
+		}
 	}
 }
 
 func TestPlaceAssistant_Ask_WrapsClientError(t *testing.T) {
-	fake := &fakeMessagesAPI{err: errors.New("connection reset")}
+	wantErr := errors.New("connection reset")
+	fake := &fakeMessagesAPI{err: wantErr}
 	assistant := NewPlaceAssistant(fake)
 
 	_, err := assistant.Ask(context.Background(), "narration text", nil, "question")
-	if err == nil {
-		t.Fatal("expected an error to propagate")
+	if !errors.Is(err, wantErr) {
+		t.Fatalf("got %v, want an error wrapping the original client error", err)
 	}
 }
 

@@ -4,7 +4,10 @@ package application
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
+
+	"github.com/jackc/pgx/v5"
 
 	"rioaudioguide/backend/internal/domain"
 	"rioaudioguide/backend/internal/ports"
@@ -54,7 +57,7 @@ func (f *fakeScriptRepoApp) FindByID(context.Context, string) (*domain.Script, e
 func (f *fakeScriptRepoApp) FindByPlaceIDAndLanguage(_ context.Context, placeID, language string) (*domain.Script, error) {
 	s, ok := f.scripts[placeID+"|"+language]
 	if !ok {
-		return nil, errors.New("not found")
+		return nil, pgx.ErrNoRows
 	}
 	return s, nil
 }
@@ -79,14 +82,43 @@ func TestAskAssistant_AsksWithTheScriptsGroundedText(t *testing.T) {
 	}
 }
 
-func TestAskAssistant_RejectsAPlaceWithNoPublishedScript(t *testing.T) {
+func TestAskAssistant_PropagatesRepositoryErrorWhenScriptMissing(t *testing.T) {
 	repo := &fakeScriptRepoApp{scripts: map[string]*domain.Script{}}
 	assistant := &fakePlaceAssistant{}
 
 	_, err := AskAssistant(context.Background(), assistant, repo, "place-1", "fr", nil, "question")
-	if !errors.Is(err, ErrNoPublishedScript) {
-		t.Fatalf("got %v, want ErrNoPublishedScript", err)
+	if !errors.Is(err, pgx.ErrNoRows) {
+		t.Fatalf("got %v, want an error wrapping pgx.ErrNoRows (a genuinely missing script propagates the repo's own error now, not ErrNoPublishedScript)", err)
 	}
+}
+
+func TestAskAssistant_PropagatesUnexpectedRepositoryError(t *testing.T) {
+	repo := &fakeScriptRepoAppErroring{err: errors.New("connection reset by peer")}
+	assistant := &fakePlaceAssistant{}
+
+	_, err := AskAssistant(context.Background(), assistant, repo, "place-1", "fr", nil, "question")
+	if err == nil {
+		t.Fatal("expected a real repository failure to propagate, not be swallowed")
+	}
+	if errors.Is(err, ErrNoPublishedScript) {
+		t.Fatal("a real repository failure must never be misreported as ErrNoPublishedScript")
+	}
+}
+
+// fakeScriptRepoAppErroring simulates a genuine repository failure (a DB
+// outage, not a missing row) -- distinct from fakeScriptRepoApp's map-miss
+// case, which now returns pgx.ErrNoRows specifically.
+type fakeScriptRepoAppErroring struct{ err error }
+
+func (f *fakeScriptRepoAppErroring) Save(context.Context, *domain.Script) error { return nil }
+func (f *fakeScriptRepoAppErroring) FindByID(context.Context, string) (*domain.Script, error) {
+	return nil, f.err
+}
+func (f *fakeScriptRepoAppErroring) FindByPlaceIDAndLanguage(context.Context, string, string) (*domain.Script, error) {
+	return nil, f.err
+}
+func (f *fakeScriptRepoAppErroring) FindByPlaceID(context.Context, string) ([]*domain.Script, error) {
+	return nil, f.err
 }
 
 func TestAskAssistant_RejectsAnUnpublishedScript(t *testing.T) {
@@ -109,7 +141,7 @@ func TestAskAssistant_TruncatesHistoryToLastSixTurns(t *testing.T) {
 
 	history := make([]ports.ConversationTurn, 9)
 	for i := range history {
-		history[i] = ports.ConversationTurn{Question: "q", Answer: "a"}
+		history[i] = ports.ConversationTurn{Question: fmt.Sprintf("q%d", i), Answer: fmt.Sprintf("a%d", i)}
 	}
 
 	_, err := AskAssistant(context.Background(), assistant, repo, "place-1", "fr", history, "question")
@@ -118,6 +150,14 @@ func TestAskAssistant_TruncatesHistoryToLastSixTurns(t *testing.T) {
 	}
 	if len(assistant.lastHistory) != 6 {
 		t.Fatalf("got %d history turns passed to the assistant, want 6 (truncated from 9)", len(assistant.lastHistory))
+	}
+	// The LAST 6 of the original 9 (indices 3-8), not just any 6 -- a
+	// history[:6] bug would pass the count check above but fail this one.
+	for i, turn := range assistant.lastHistory {
+		wantIndex := i + 3
+		if turn.Question != fmt.Sprintf("q%d", wantIndex) || turn.Answer != fmt.Sprintf("a%d", wantIndex) {
+			t.Fatalf("turn %d: got {%q, %q}, want {q%d, a%d} (the truncation must keep the most recent turns)", i, turn.Question, turn.Answer, wantIndex, wantIndex)
+		}
 	}
 }
 

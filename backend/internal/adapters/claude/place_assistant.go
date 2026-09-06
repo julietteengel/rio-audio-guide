@@ -52,6 +52,8 @@ type answerToolInput struct {
 	GroundingLevel string `json:"grounding_level"`
 }
 
+var validGroundingLevels = map[string]bool{"grounded": true, "mixed": true, "general": true}
+
 func (a *PlaceAssistant) Ask(ctx context.Context, groundedText string, history []ports.ConversationTurn, question string) (ports.AssistantAnswer, error) {
 	messages := make([]anthropic.MessageParam, 0, len(history)*2+1)
 	for _, turn := range history {
@@ -82,7 +84,15 @@ func (a *PlaceAssistant) Ask(ctx context.Context, groundedText string, history [
 			if err := json.Unmarshal(variant.Input, &in); err != nil {
 				return ports.AssistantAnswer{}, fmt.Errorf("claude: parse answer_question input: %w", err)
 			}
-			return ports.AssistantAnswer{Answer: in.Answer, GroundingLevel: in.GroundingLevel}, nil
+			// Defense in depth: the tool schema's enum is advisory only --
+			// this is the actual enforcement, so ports.AssistantAnswer's
+			// GroundingLevel is genuinely constrained to these 3 values by
+			// the time it leaves this adapter, not just by convention.
+			groundingLevel := in.GroundingLevel
+			if !validGroundingLevels[groundingLevel] {
+				groundingLevel = "general"
+			}
+			return ports.AssistantAnswer{Answer: in.Answer, GroundingLevel: groundingLevel}, nil
 		}
 	}
 	return ports.AssistantAnswer{}, fmt.Errorf("claude: response contained no answer_question tool call")

@@ -18,7 +18,7 @@ import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
 import { useAuth } from "../auth/AuthContext";
 import { placesRepository } from "../data/PlacesRepository";
-import { askAssistant, type ConversationTurn, type GroundingLevel } from "../data/AssistantRepository";
+import { askAssistant, AssistantApiError, type ConversationTurn, type GroundingLevel } from "../data/AssistantRepository";
 import { colors, fonts, radii } from "../theme/tokens";
 import type { Dictionary } from "../i18n/dictionary";
 
@@ -27,13 +27,12 @@ type Props = NativeStackScreenProps<AppStackParamList, "Assistant">;
 type Turn = { question: string; answer: string; groundingLevel: GroundingLevel };
 
 function GroundingBadge({ level, t }: { level: GroundingLevel; t: Dictionary }) {
-  const isGrounded = level === "grounded";
-  const bg = isGrounded ? colors.groundBg : colors.roadmapBg;
-  const text = isGrounded ? colors.groundText : colors.roadmapText;
+  const bg = level === "grounded" ? colors.groundBg : level === "mixed" ? colors.roadmapBg : colors.roadmapText;
+  const text = level === "grounded" ? colors.groundText : level === "mixed" ? colors.roadmapText : colors.cream;
   const label = level === "grounded" ? t.assistant.groundedBadge : level === "mixed" ? t.assistant.mixedBadge : t.assistant.generalBadge;
   return (
     <View style={[styles.sourceChip, { backgroundColor: bg }]}>
-      {isGrounded ? (
+      {level === "grounded" ? (
         <Svg width={11} height={11} viewBox="0 0 24 24" fill="none">
           <Polyline points="5 13 10 18 19 7" stroke={text} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
@@ -59,9 +58,17 @@ export function AssistantScreen({ route, navigation }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    placesRepository.getById(route.params.placeId).then((place) => {
-      if (!cancelled) setAvailable(place?.narrationStatus === "ready");
-    });
+    placesRepository
+      .getById(route.params.placeId)
+      .then((place) => {
+        if (!cancelled) setAvailable(place?.narrationStatus === "ready");
+      })
+      .catch(() => {
+        // Fail closed, not open -- if we can't even confirm the place has
+        // published narration, treat it the same as "not available" rather
+        // than showing a chat that might immediately 404.
+        if (!cancelled) setAvailable(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -74,14 +81,22 @@ export function AssistantScreen({ route, navigation }: Props) {
     setError(null);
     setPendingQuestion(question);
     try {
-      const history: ConversationTurn[] = turns.map(({ question, answer }) => ({ question, answer }));
+      // Capped to the last 6 turns client-side too, matching the backend's
+      // own history cap (internal/application/ask_assistant.go) -- no point
+      // shipping an ever-growing request body for turns the server would
+      // truncate away anyway.
+      const history: ConversationTurn[] = turns.slice(-6).map(({ question, answer }) => ({ question, answer }));
       const result = await askAssistant(token, route.params.placeId, locale, question, history);
       setTurns((prev) => [...prev, { question, answer: result.answer, groundingLevel: result.groundingLevel }]);
-    } catch {
-      // Put the question back in the input rather than silently losing it --
-      // the user can retry without retyping it.
-      setInput(question);
-      setError(t.assistant.sendError);
+    } catch (err) {
+      if (err instanceof AssistantApiError && err.status === 404) {
+        setAvailable(false);
+      } else {
+        // Put the question back in the input rather than silently losing it --
+        // the user can retry without retyping it.
+        setInput(question);
+        setError(t.assistant.sendError);
+      }
     } finally {
       setPendingQuestion(null);
     }
@@ -155,7 +170,7 @@ export function AssistantScreen({ route, navigation }: Props) {
                 onSubmitEditing={handleSend}
                 returnKeyType="send"
               />
-              <Pressable style={[styles.sendBtn, !input.trim() && styles.sendBtnDisabled]} disabled={!input.trim() || !!pendingQuestion} onPress={handleSend}>
+              <Pressable style={[styles.sendBtn, (!input.trim() || !token) && styles.sendBtnDisabled]} disabled={!input.trim() || !!pendingQuestion || !token} onPress={handleSend}>
                 <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
                   <Path d="M22 2 11 13" stroke={colors.cream} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   <Path d="M22 2 15 22 11 13 2 9 22 2Z" stroke={colors.cream} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />

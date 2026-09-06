@@ -71,8 +71,8 @@ services:
       AWS_REGION: ${AWS_REGION:-us-east-1}
       JWT_SECRET: dev-only-insecure-secret-change-me
       # Same rule as the AWS keys above: fill in the real value in .env
-      # yourself, never here -- needed for POST /itineraries to actually
-      # call Claude.
+      # yourself, never here -- needed for POST /itineraries and
+      # POST /places/:id/assistant to actually call Claude.
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     volumes:
       - .:/src

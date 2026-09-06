@@ -104,6 +104,33 @@ func TestAskAssistant_NoPublishedScript_Returns404(t *testing.T) {
 	}
 }
 
+func TestAskAssistant_UnpublishedScript_Returns404(t *testing.T) {
+	lang, err := domain.NewLanguage("fr")
+	if err != nil {
+		t.Fatalf("build fixture language: %v", err)
+	}
+	text, err := domain.NewScriptText("brouillon")
+	if err != nil {
+		t.Fatalf("build fixture script text: %v", err)
+	}
+	draft := domain.NewScript("place-1", lang, text, "source") // never reviewed/published -- stays draft
+	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{draft.ID(): draft}}
+	tokens := fakeTokenIssuer{}
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
+
+	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
+	body, _ := json.Marshal(map[string]string{"language": "fr", "question": "Quand ?"})
+	req := httptest.NewRequest(http.MethodPost, "/places/place-1/assistant", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusNotFound {
+		t.Fatalf("got status %d, want 404 for an unpublished (draft) script", rec.Code)
+	}
+}
+
 func TestAskAssistant_EmptyQuestion_Returns400(t *testing.T) {
 	tokens := fakeTokenIssuer{}
 	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}}, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})

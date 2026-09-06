@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 
 	"rioaudioguide/backend/internal/application"
@@ -44,6 +45,8 @@ func (s *Server) askAssistant(c echo.Context) error {
 	answer, err := application.AskAssistant(c.Request().Context(), s.assistant, s.scriptRepo, c.Param("id"), req.Language, history, req.Question)
 	if err != nil {
 		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			return c.JSON(http.StatusNotFound, echo.Map{"error": "no narration for this place/language yet"})
 		case errors.Is(err, application.ErrNoPublishedScript):
 			return c.JSON(http.StatusNotFound, echo.Map{"error": "no narration for this place/language yet"})
 		case errors.Is(err, application.ErrAssistantFailed):
