@@ -5,12 +5,26 @@ import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
+import * as Notifications from "expo-notifications";
 import { LocaleProvider } from "./src/i18n/LocaleContext";
 import { AuthProvider } from "./src/auth/AuthContext";
 import { RootNavigator } from "./src/navigation/RootNavigator";
+import { navigationRef, navigateToPlace } from "./src/utils/navigationRef";
 import { colors } from "./src/theme/tokens";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// Must be set once, at module scope, before any notification could arrive
+// (including one that woke the app from the background) -- controls how a
+// notification presents while the app is in the foreground.
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -28,6 +42,14 @@ export default function App() {
       .catch(() => setFontsLoaded(true));
   }, []);
 
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      const placeId = response.notification.request.content.data?.placeId;
+      if (typeof placeId === "string") navigateToPlace(placeId);
+    });
+    return () => subscription.remove();
+  }, []);
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
@@ -41,7 +63,10 @@ export default function App() {
       <SafeAreaProvider>
         <LocaleProvider>
           <AuthProvider>
-            <NavigationContainer documentTitle={{ formatter: () => "Memória Carioca" }}>
+            <NavigationContainer
+              ref={navigationRef}
+              documentTitle={{ formatter: () => "Memória Carioca" }}
+            >
               <RootNavigator />
             </NavigationContainer>
           </AuthProvider>
