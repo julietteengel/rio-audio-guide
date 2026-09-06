@@ -20,23 +20,27 @@ type Server struct {
 	scriptRepo    ports.ScriptRepository
 	audioFileRepo ports.AudioFileRepository
 	userRepo      ports.UserRepository
+	itineraryRepo ports.ItineraryRepository
 	publisher     ports.AudioJobPublisher
 	storage       ports.AudioStorage
 	cache         ports.Cache
 	tokens        ports.TokenIssuer
+	generator     ports.ItineraryGenerator
 }
 
-func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, userRepo ports.UserRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage, cache ports.Cache, tokens ports.TokenIssuer) *Server {
+func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, userRepo ports.UserRepository, itineraryRepo ports.ItineraryRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage, cache ports.Cache, tokens ports.TokenIssuer, generator ports.ItineraryGenerator) *Server {
 	s := &Server{
 		echo:          echo.New(),
 		placeRepo:     placeRepo,
 		scriptRepo:    scriptRepo,
 		audioFileRepo: audioFileRepo,
 		userRepo:      userRepo,
+		itineraryRepo: itineraryRepo,
 		publisher:     publisher,
 		storage:       storage,
 		cache:         cache,
 		tokens:        tokens,
+		generator:     generator,
 	}
 	// Sans ce middleware, un navigateur (web/, mobile/ en cible web via
 	// react-native-web) bloque toute réponse de cette API -- curl et l'app
@@ -65,6 +69,12 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	s.echo.POST("/logout", s.logout, auth)
 	s.echo.PATCH("/me", s.updateMe, auth)
 	s.echo.DELETE("/me", s.deleteMe, auth)
+
+	// Itineraries are always tied to the caller's own account (contextUserID),
+	// never a client-supplied user ID -- same reasoning as updateMe/deleteMe.
+	s.echo.POST("/itineraries", s.createItinerary, auth)
+	s.echo.GET("/itineraries", s.listItineraries, auth)
+	s.echo.GET("/itineraries/:id", s.getItinerary, auth)
 	return s
 }
 

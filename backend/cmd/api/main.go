@@ -6,12 +6,14 @@ import (
 	"os"
 	"time"
 
+	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/aws/aws-sdk-go-v2/config"
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	amqp "github.com/rabbitmq/amqp091-go"
 	goredis "github.com/redis/go-redis/v9"
 
+	"rioaudioguide/backend/internal/adapters/claude"
 	httpadapter "rioaudioguide/backend/internal/adapters/http"
 	"rioaudioguide/backend/internal/adapters/jwt"
 	"rioaudioguide/backend/internal/adapters/postgres"
@@ -60,6 +62,7 @@ func main() {
 	scriptRepo := postgres.NewScriptRepository(pool)
 	audioFileRepo := postgres.NewAudioFileRepository(pool)
 	userRepo := postgres.NewUserRepository(pool)
+	itineraryRepo := postgres.NewItineraryRepository(pool)
 
 	// Le fallback ci-dessous n'est là que pour le confort du dev local (même
 	// esprit que DATABASE_URL/RABBITMQ_URL) -- mais contrairement à ceux-là,
@@ -106,7 +109,13 @@ func main() {
 	})
 	cache := redis.NewCache(redisClient)
 
-	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, userRepo, publisher, storage, cache, tokens)
+	// ANTHROPIC_API_KEY is read directly by anthropic.NewClient() from the
+	// environment -- no custom env var plumbing needed, same as every other
+	// SDK-standard credential this project doesn't re-wrap.
+	anthropicClient := anthropic.NewClient()
+	itineraryGenerator := claude.NewItineraryGenerator(&anthropicClient.Messages)
+
+	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, userRepo, itineraryRepo, publisher, storage, cache, tokens, itineraryGenerator)
 	log.Println("api ready, listening on :8080")
 	if err := server.Start(":8080"); err != nil {
 		log.Fatalf("http server: %v", err)
