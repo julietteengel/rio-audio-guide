@@ -3,6 +3,7 @@ import {
   estimateDownloadSizeBytes,
   fetchCityManifest,
   formatApproxSize,
+  InsufficientStorageError,
 } from "../downloadManager";
 import type { Place } from "../types";
 
@@ -130,5 +131,14 @@ describe("fetchCityManifest", () => {
   it("returns an empty array instead of throwing on a network failure", async () => {
     globalThis.fetch = jest.fn().mockRejectedValue(new Error("network down")) as unknown as typeof fetch;
     expect(await fetchCityManifest("rio", "fr")).toEqual([]);
+  });
+});
+
+describe("InsufficientStorageError", () => {
+  it("carries the required and available byte counts", () => {
+    const err = new InsufficientStorageError(500_000_000, 100_000_000);
+    expect(err.requiredBytes).toBe(500_000_000);
+    expect(err.availableBytes).toBe(100_000_000);
+    expect(err.name).toBe("InsufficientStorageError");
   });
 });

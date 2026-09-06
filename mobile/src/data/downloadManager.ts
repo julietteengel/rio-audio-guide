@@ -1,7 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Directory, File, Paths } from "expo-file-system";
 import type { Locale } from "../i18n/dictionary";
 import type { Place } from "./types";
 import { API_BASE_URL } from "../config";
+import {
+  saveCachedPlaces,
+  getAllCachedPlaces,
+  setCachedPlaceAudioUri,
+  clearCachedPlaces,
+  hasSufficientStorage,
+  planResumableAudioDownloads,
+} from "./offlineStore";
 
 export type DownloadFileRef = {
   placeId: string;
@@ -69,43 +78,48 @@ type ManifestResponse = {
 // rioCitySlug in manifest_handler.go).
 export const RIO_CITY_SLUG = "rio";
 
-/**
- * Calls GET /cities/:city/manifest?language=xx and maps the result to
- * `Place[]` so it can go straight through `planCityDownload`/
- * `estimateDownloadSizeBytes` like any other place list. Every place the
- * manifest returns already has a published narration and a ready audio
- * file — that's the whole point of the route (see manifest_handler.go) — so
- * they're all mapped as narrationStatus "ready".
- *
- * Returns an empty array (not an error) on any non-200 response or network
- * failure — a city with nothing published yet, or a briefly unreachable
- * backend, should read as "nothing downloadable right now", not crash the
- * onboarding flow.
- */
-export async function fetchCityManifest(
-  citySlug: string,
-  language: Locale,
-): Promise<Place[]> {
+async function fetchManifestRaw(citySlug: string, language: Locale): Promise<ManifestPlace[]> {
   try {
     const res = await fetch(
       `${API_BASE_URL}/cities/${encodeURIComponent(citySlug)}/manifest?language=${language}`,
     );
     if (res.status !== 200) return [];
     const body = (await res.json()) as ManifestResponse;
-    return body.places.map((p) => ({
-      id: p.id,
-      name: p.name,
-      category: p.category,
-      lat: p.lat,
-      lon: p.lon,
-      city: "Rio de Janeiro",
-      body: p.narration,
-      groundedSourceCount: p.source ? 1 : 0,
-      narrationStatus: "ready" as const,
-    }));
+    return body.places;
   } catch {
     return [];
   }
+}
+
+function manifestPlaceToPlace(p: ManifestPlace): Place {
+  return {
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    lat: p.lat,
+    lon: p.lon,
+    city: "Rio de Janeiro",
+    body: p.narration,
+    groundedSourceCount: p.source ? 1 : 0,
+    narrationStatus: "ready" as const,
+  };
+}
+
+/**
+ * Calls GET /cities/:city/manifest?language=xx and maps the result to
+ * `Place[]` so it can go straight through `planCityDownload`/
+ * `estimateDownloadSizeBytes` like any other place list. Every place the
+ * manifest returns already has a published narration and a ready audio
+ * file -- that's the whole point of the route (see manifest_handler.go).
+ *
+ * Returns an empty array (not an error) on any non-200 response or network
+ * failure -- a city with nothing published yet, or a briefly unreachable
+ * backend, should read as "nothing downloadable right now", not crash the
+ * onboarding flow.
+ */
+export async function fetchCityManifest(citySlug: string, language: Locale): Promise<Place[]> {
+  const raw = await fetchManifestRaw(citySlug, language);
+  return raw.map(manifestPlaceToPlace);
 }
 
 export type OfflineDownloadSummary = {
@@ -117,29 +131,88 @@ export type OfflineDownloadSummary = {
 };
 
 const STORAGE_KEY = "memoria-carioca:offline-download";
+const AUDIO_DIR_NAME = "offline-audio";
+
+export class InsufficientStorageError extends Error {
+  constructor(
+    public requiredBytes: number,
+    public availableBytes: number,
+  ) {
+    super(
+      `Not enough free storage to download this city (${requiredBytes} bytes needed, ${availableBytes} available)`,
+    );
+    this.name = "InsufficientStorageError";
+  }
+}
 
 /**
- * Fetches the real manifest, computes its size the same way the rest of the
- * app estimates download size, and persists a summary on-device — this is
- * what makes "42 lieux · 184 Mo" (and Settings' delete button, eventually) a
- * real number instead of copy hardcoded into the dictionary.
+ * Downloads the real manifest, downloads and caches each place's audio file
+ * on-device (expo-file-system), and persists the full place list -- including
+ * narration text, so PlaceDetail can render offline too -- to SQLite via
+ * offlineStore. This is what makes both proximity notifications and offline
+ * playback actually work, not just the size-estimate summary this function
+ * produced before.
  *
- * Note: this downloads *metadata* (which places, their narration text, an
- * estimated size) — it does not yet fetch and store the actual audio bytes
- * for offline playback. See the mobile app spec's known-gaps section.
+ * Resumable: re-calling this for the same city+language after an interrupted
+ * download (app killed, network dropped mid-loop) skips any place whose
+ * audio is already cached, via `planResumableAudioDownloads`, rather than
+ * re-downloading everything from scratch. Switching to a different city or
+ * language starts over clean.
  */
 export async function downloadCity(
   citySlug: string,
   cityDisplayName: string,
   language: Locale,
 ): Promise<OfflineDownloadSummary> {
-  const places = await fetchCityManifest(citySlug, language);
+  const rawPlaces = await fetchManifestRaw(citySlug, language);
+  const places = rawPlaces.map(manifestPlaceToPlace);
   const files = planCityDownload(places, cityDisplayName, language);
+  const requiredBytes = estimateDownloadSizeBytes(files);
+
+  if (!hasSufficientStorage(Paths.availableDiskSpace, requiredBytes)) {
+    throw new InsufficientStorageError(requiredBytes, Paths.availableDiskSpace);
+  }
+
+  const existingSummary = await getOfflineDownloadSummary();
+  const isResuming =
+    existingSummary?.city === cityDisplayName && existingSummary?.language === language;
+  const alreadyCached = isResuming ? await getAllCachedPlaces() : [];
+  if (!isResuming) {
+    await clearCachedPlaces();
+  }
+
+  await saveCachedPlaces(
+    rawPlaces.map((p) => {
+      const existing = alreadyCached.find((c) => c.id === p.id);
+      return {
+        id: p.id,
+        name: p.name,
+        category: p.category,
+        lat: p.lat,
+        lon: p.lon,
+        body: p.narration,
+        audioLocalUri: existing?.audioLocalUri ?? null,
+      };
+    }),
+  );
+
+  const audioDir = new Directory(Paths.document, AUDIO_DIR_NAME);
+  audioDir.create({ idempotent: true });
+
+  const toDownload = planResumableAudioDownloads(rawPlaces, alreadyCached);
+  for (const place of toDownload) {
+    const destination = new File(audioDir, `${place.id}.mp3`);
+    const downloaded = await File.downloadFileAsync(place.audio_url, destination, {
+      idempotent: true,
+    });
+    await setCachedPlaceAudioUri(place.id, downloaded.uri);
+  }
+
   const summary: OfflineDownloadSummary = {
     city: cityDisplayName,
     language,
-    placeCount: places.length,
-    approxSizeBytes: estimateDownloadSizeBytes(files),
+    placeCount: rawPlaces.length,
+    approxSizeBytes: requiredBytes,
     downloadedAt: new Date().toISOString(),
   };
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(summary));
@@ -156,8 +229,18 @@ export async function getOfflineDownloadSummary(): Promise<OfflineDownloadSummar
   }
 }
 
+/**
+ * Clears everything a download wrote: the AsyncStorage summary, every
+ * cached_places row, and the on-disk audio files themselves -- Settings.tsx's
+ * delete button calls this directly.
+ */
 export async function clearOfflineDownload(): Promise<void> {
   await AsyncStorage.removeItem(STORAGE_KEY);
+  await clearCachedPlaces();
+  const audioDir = new Directory(Paths.document, AUDIO_DIR_NAME);
+  if (audioDir.exists) {
+    audioDir.delete();
+  }
 }
 
 const SIZE_UNIT: Record<Locale, string> = { fr: "Mo", en: "MB", pt: "MB", es: "MB" };
