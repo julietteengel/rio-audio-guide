@@ -11,4 +11,7 @@ export type AppStackParamList = {
   Settings: undefined;
   Auth: undefined;
   EditProfile: undefined;
+  ItinerariesList: undefined;
+  ItineraryChat: undefined;
+  ItineraryDetail: { itineraryId: string };
 };
