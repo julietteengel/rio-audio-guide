@@ -114,8 +114,9 @@ func main() {
 	// SDK-standard credential this project doesn't re-wrap.
 	anthropicClient := anthropic.NewClient()
 	itineraryGenerator := claude.NewItineraryGenerator(&anthropicClient.Messages)
+	placeAssistant := claude.NewPlaceAssistant(&anthropicClient.Messages)
 
-	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, userRepo, itineraryRepo, publisher, storage, cache, tokens, itineraryGenerator)
+	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, userRepo, itineraryRepo, publisher, storage, cache, tokens, itineraryGenerator, placeAssistant)
 	log.Println("api ready, listening on :8080")
 	if err := server.Start(":8080"); err != nil {
 		log.Fatalf("http server: %v", err)

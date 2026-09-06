@@ -26,9 +26,10 @@ type Server struct {
 	cache         ports.Cache
 	tokens        ports.TokenIssuer
 	generator     ports.ItineraryGenerator
+	assistant     ports.PlaceAssistant
 }
 
-func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, userRepo ports.UserRepository, itineraryRepo ports.ItineraryRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage, cache ports.Cache, tokens ports.TokenIssuer, generator ports.ItineraryGenerator) *Server {
+func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, userRepo ports.UserRepository, itineraryRepo ports.ItineraryRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage, cache ports.Cache, tokens ports.TokenIssuer, generator ports.ItineraryGenerator, assistant ports.PlaceAssistant) *Server {
 	s := &Server{
 		echo:          echo.New(),
 		placeRepo:     placeRepo,
@@ -41,6 +42,7 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 		cache:         cache,
 		tokens:        tokens,
 		generator:     generator,
+		assistant:     assistant,
 	}
 	// Sans ce middleware, un navigateur (web/, mobile/ en cible web via
 	// react-native-web) bloque toute réponse de cette API -- curl et l'app
@@ -75,6 +77,7 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	s.echo.POST("/itineraries", s.createItinerary, auth)
 	s.echo.GET("/itineraries", s.listItineraries, auth)
 	s.echo.GET("/itineraries/:id", s.getItinerary, auth)
+	s.echo.POST("/places/:id/assistant", s.askAssistant, auth)
 	return s
 }
 

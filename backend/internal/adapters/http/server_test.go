@@ -173,7 +173,7 @@ func TestListPlaces(t *testing.T) {
 
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{})
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places", nil)
 	rec := httptest.NewRecorder()
@@ -195,7 +195,7 @@ func TestReviewScript(t *testing.T) {
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}
 	publisher := &fakePublisher{}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, publisher, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{})
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, publisher, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
 
 	token, _ := tokens.Issue("julie", domain.RoleAdmin)
 	body := strings.NewReader(`{"voice_id":"voice-1"}`)
@@ -230,7 +230,7 @@ func TestReviewScript_RejectsNonAdmin(t *testing.T) {
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}
 	publisher := &fakePublisher{}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, publisher, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{})
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, publisher, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
 
 	token, _ := tokens.Issue("someone-else", domain.RoleUser)
 	body := strings.NewReader(`{"voice_id":"voice-1"}`)
@@ -259,7 +259,7 @@ func TestRetryAudio_Admin(t *testing.T) {
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
 	publisher := &fakePublisher{}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, publisher, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{})
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, publisher, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
 
 	token, _ := tokens.Issue("julie", domain.RoleAdmin)
 	req := httptest.NewRequest(http.MethodPost, "/audio-files/"+audioFile.ID()+"/retry", nil)
@@ -287,7 +287,7 @@ func TestRetryAudio_RejectsNonAdmin(t *testing.T) {
 	publisher := &fakePublisher{}
 	tokens := fakeTokenIssuer{}
 	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}}, audioFileRepo,
-		newFakeUserRepo(), &fakeItineraryRepoHTTP{}, publisher, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{})
+		newFakeUserRepo(), &fakeItineraryRepoHTTP{}, publisher, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
 
 	token, _ := tokens.Issue("someone-else", domain.RoleUser)
 	req := httptest.NewRequest(http.MethodPost, "/audio-files/"+audioFile.ID()+"/retry", nil)
@@ -309,7 +309,7 @@ func TestReviewScript_RequiresAuth(t *testing.T) {
 
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{})
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
 
 	body := strings.NewReader(`{"voice_id":"voice-1"}`)
 	req := httptest.NewRequest(http.MethodPost, "/scripts/"+script.ID()+"/review", body)
@@ -332,7 +332,7 @@ func TestListPlaces_CachesOnSecondCall(t *testing.T) {
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	cache := newFakeCache()
 	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, cache, fakeTokenIssuer{}, &fakeGeneratorHTTP{})
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, cache, fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
 
 	for i := 0; i < 2; i++ {
 		req := httptest.NewRequest(http.MethodGet, "/places", nil)
@@ -355,7 +355,7 @@ func TestListPlaces_FailsOpenWhenCacheErrors(t *testing.T) {
 
 	placeRepo := &fakePlaceRepo{places: []*domain.Place{place}}
 	server := NewServer(placeRepo, &fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, erroringCache{}, fakeTokenIssuer{}, &fakeGeneratorHTTP{})
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, erroringCache{}, fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places", nil)
 	rec := httptest.NewRecorder()
