@@ -1,9 +1,13 @@
+// mobile/src/components/PlaceMap.web.tsx
 import React, { useMemo } from "react";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { PlaceMapProps } from "./PlaceMap";
 import { colors } from "../theme/tokens";
+import { GOOGLE_MAPS_API_KEY } from "../config";
+import { MAP_STYLE, PIN_ICON_SVG, ME_ICON_SVG } from "./googleMapStyle";
 
 // Custom divIcon HTML instead of Leaflet's default marker image -- the
 // default relies on image URLs (marker-icon.png etc.) that break under
@@ -28,10 +32,11 @@ function meIcon(): L.DivIcon {
   });
 }
 
-// Leaflet + OpenStreetMap tiles -- free, no API key, no billing account,
-// unlike a Google Maps JS API web equivalent. See PlaceMap.tsx for the
+// Leaflet + OpenStreetMap tiles -- free, no API key, no billing account.
+// Kept as the automatic fallback for anyone without GOOGLE_MAPS_API_KEY
+// configured (a contributor's machine, or CI). See PlaceMap.tsx for the
 // native counterpart (react-native-maps); same props on both.
-export function PlaceMap({ places, region, userLocation, youAreHereLabel, onSelectPlace }: PlaceMapProps) {
+function LeafletPlaceMap({ places, region, userLocation, youAreHereLabel, onSelectPlace }: PlaceMapProps) {
   const pin = useMemo(() => pinIcon(), []);
   const me = useMemo(() => meIcon(), []);
 
@@ -67,4 +72,69 @@ export function PlaceMap({ places, region, userLocation, youAreHereLabel, onSele
       ) : null}
     </MapContainer>
   );
+}
+
+const GOOGLE_MAP_CONTAINER_STYLE = { height: "100%", width: "100%" };
+const GOOGLE_MAP_OPTIONS = { styles: MAP_STYLE };
+
+// Google Maps JS API, on-brand styled (see googleMapStyle.ts). Only
+// rendered when GOOGLE_MAPS_API_KEY is configured -- see the default
+// export below for the fallback-to-Leaflet selection.
+function GoogleWebPlaceMap({ places, region, userLocation, youAreHereLabel, onSelectPlace }: PlaceMapProps) {
+  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
+  const center = useMemo(
+    () => ({ lat: region.latitude, lng: region.longitude }),
+    [region.latitude, region.longitude],
+  );
+
+  // Google's Size/Point constructors only exist once the script has loaded
+  // (they live on the runtime `google` global, not a static import) -- this
+  // component renders nothing until then rather than risk calling them too
+  // early. The map's sand-colored parent background (Map.tsx's `styles.map`)
+  // already shows through during this brief gap, so no separate loading
+  // state is needed.
+  if (!isLoaded) return null;
+
+  const pinIcon: google.maps.Icon = {
+    url: PIN_ICON_SVG,
+    scaledSize: new google.maps.Size(16, 16),
+    anchor: new google.maps.Point(8, 8),
+  };
+  const meIcon: google.maps.Icon = {
+    url: ME_ICON_SVG,
+    scaledSize: new google.maps.Size(34, 34),
+    anchor: new google.maps.Point(17, 17),
+  };
+
+  return (
+    <GoogleMap mapContainerStyle={GOOGLE_MAP_CONTAINER_STYLE} center={center} zoom={12} options={GOOGLE_MAP_OPTIONS}>
+      {places.map((p) => (
+        <MarkerF
+          key={p.id}
+          position={{ lat: p.lat, lng: p.lon }}
+          icon={pinIcon}
+          title={p.name}
+          onClick={() => onSelectPlace(p.id)}
+        />
+      ))}
+      {userLocation ? (
+        <MarkerF
+          position={{ lat: userLocation.latitude, lng: userLocation.longitude }}
+          icon={meIcon}
+          title={youAreHereLabel}
+          clickable={false}
+        />
+      ) : null}
+    </GoogleMap>
+  );
+}
+
+// Picks Google Maps when a key is configured, Leaflet otherwise -- see
+// GOOGLE_MAPS_API_KEY's own doc comment in config.ts for why an unset key
+// is a valid, expected state rather than an error.
+export function PlaceMap(props: PlaceMapProps) {
+  if (GOOGLE_MAPS_API_KEY) {
+    return <GoogleWebPlaceMap {...props} />;
+  }
+  return <LeafletPlaceMap {...props} />;
 }
