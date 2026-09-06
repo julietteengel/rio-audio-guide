@@ -63,7 +63,7 @@ CREATE INDEX itineraries_user_id_idx ON itineraries (user_id);
 
 CREATE TABLE itinerary_stops (
     id                   TEXT PRIMARY KEY,
-    itinerary_id         TEXT NOT NULL REFERENCES itineraries(id),
+    itinerary_id         TEXT NOT NULL REFERENCES itineraries(id) ON DELETE CASCADE,
     position             INT NOT NULL,
     kind                 TEXT NOT NULL,
     place_id             TEXT REFERENCES places(id),

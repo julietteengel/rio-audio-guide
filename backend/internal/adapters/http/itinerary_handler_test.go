@@ -94,6 +94,45 @@ func TestCreateItinerary_Success(t *testing.T) {
 	}
 }
 
+func TestCreateItinerary_ResponseIncludesStopKinds(t *testing.T) {
+	place := testPlace(t, "Escadaria Selarón", -22.9147, -43.1806)
+	itineraryRepo := &fakeItineraryRepoHTTP{}
+	generator := &fakeGeneratorHTTP{result: ports.GeneratedItinerary{
+		Title: "Art et rue à Santa Teresa",
+		Stops: []ports.GeneratedStop{
+			{PlaceID: place.ID(), Label: place.Name().String(), TimeOnSiteMinutes: 10, WalkToNextMinutes: 5},
+			{IsSuggestion: true, Label: "Pause déjeuner", WalkToNextMinutes: 0},
+		},
+	}}
+	tokens := fakeTokenIssuer{}
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, generator)
+
+	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
+	body, _ := json.Marshal(map[string]string{"request": "1h à Santa Teresa"})
+	req := httptest.NewRequest(http.MethodPost, "/itineraries", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("got status %d, want 201: %s", rec.Code, rec.Body.String())
+	}
+	var resp itineraryResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if len(resp.Stops) != 2 {
+		t.Fatalf("got %d stops, want 2", len(resp.Stops))
+	}
+	if resp.Stops[0].Kind != "place" || resp.Stops[0].PlaceID == "" {
+		t.Fatalf("stop 0: got kind=%q place_id=%q, want kind=place with a place_id", resp.Stops[0].Kind, resp.Stops[0].PlaceID)
+	}
+	if resp.Stops[1].Kind != "suggestion" || resp.Stops[1].PlaceID != "" {
+		t.Fatalf("stop 1: got kind=%q place_id=%q, want kind=suggestion with no place_id", resp.Stops[1].Kind, resp.Stops[1].PlaceID)
+	}
+}
+
 func TestListItineraries_Success(t *testing.T) {
 	title, _ := domain.NewItineraryTitle("Art et rue à Santa Teresa")
 	place := testPlace(t, "Escadaria Selarón", -22.9147, -43.1806)

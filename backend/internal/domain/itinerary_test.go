@@ -97,6 +97,19 @@ func TestNewItinerary(t *testing.T) {
 			t.Fatalf("got %v, want ErrItineraryNoStops", err)
 		}
 	})
+	t.Run("more than one suggestion stop", func(t *testing.T) {
+		lunch1, _ := NewSuggestionStop("Pause déjeuner", 5)
+		lunch2, _ := NewSuggestionStop("Café", 5)
+		if _, err := NewItinerary("user-1", title, []ItineraryStop{stop, lunch1, lunch2}); err != ErrItineraryTooManySuggestions {
+			t.Fatalf("got %v, want ErrItineraryTooManySuggestions", err)
+		}
+	})
+	t.Run("no real place stops", func(t *testing.T) {
+		lunch, _ := NewSuggestionStop("Pause déjeuner", 5)
+		if _, err := NewItinerary("user-1", title, []ItineraryStop{lunch}); err != ErrItineraryNoPlaceStops {
+			t.Fatalf("got %v, want ErrItineraryNoPlaceStops", err)
+		}
+	})
 }
 
 func TestItinerary_TotalMinutesAndPlaceCount(t *testing.T) {

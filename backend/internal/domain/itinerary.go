@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"slices"
 	"time"
 )
 
@@ -13,6 +14,8 @@ var (
 	ErrItineraryStopLabelRequired   = errors.New("itinerary: a stop requires a label")
 	ErrItineraryStopInvalidDuration = errors.New("itinerary: a place stop's time on site must be positive")
 	ErrItineraryStopInvalidWalk     = errors.New("itinerary: walking time to the next stop cannot be negative")
+	ErrItineraryTooManySuggestions  = errors.New("itinerary: at most one suggestion stop is allowed")
+	ErrItineraryNoPlaceStops        = errors.New("itinerary: at least one real place stop is required")
 )
 
 // --- Value Objects ---
@@ -124,6 +127,20 @@ func NewItinerary(userID string, title ItineraryTitle, stops []ItineraryStop) (*
 	if len(stops) == 0 {
 		return nil, ErrItineraryNoStops
 	}
+	suggestionCount, placeCount := 0, 0
+	for _, s := range stops {
+		if s.Kind() == ItineraryStopKindSuggestion {
+			suggestionCount++
+		} else {
+			placeCount++
+		}
+	}
+	if suggestionCount > 1 {
+		return nil, ErrItineraryTooManySuggestions
+	}
+	if placeCount == 0 {
+		return nil, ErrItineraryNoPlaceStops
+	}
 	return &Itinerary{id: newID(), userID: userID, title: title, stops: stops, createdAt: time.Now()}, nil
 }
 
@@ -136,7 +153,7 @@ func ReconstructItinerary(id, userID string, title ItineraryTitle, stops []Itine
 func (i *Itinerary) ID() string             { return i.id }
 func (i *Itinerary) UserID() string         { return i.userID }
 func (i *Itinerary) Title() ItineraryTitle  { return i.title }
-func (i *Itinerary) Stops() []ItineraryStop { return i.stops }
+func (i *Itinerary) Stops() []ItineraryStop { return slices.Clone(i.stops) }
 func (i *Itinerary) CreatedAt() time.Time   { return i.createdAt }
 
 // TotalMinutes sums every stop's time-on-site plus every walk segment --

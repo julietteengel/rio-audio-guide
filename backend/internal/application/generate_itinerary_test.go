@@ -10,10 +10,10 @@ import (
 )
 
 type fakeItineraryRepo struct {
-	saved       *domain.Itinerary
-	byID        map[string]*domain.Itinerary
-	byUserID    map[string][]*domain.Itinerary
-	saveErr     error
+	saved    *domain.Itinerary
+	byID     map[string]*domain.Itinerary
+	byUserID map[string][]*domain.Itinerary
+	saveErr  error
 }
 
 func (f *fakeItineraryRepo) Save(_ context.Context, itinerary *domain.Itinerary) error {
@@ -101,6 +101,55 @@ func TestGenerateItinerary_RejectsAnEmptyGeneratedItinerary(t *testing.T) {
 	_, err := GenerateItinerary(context.Background(), gen, repo, "user-1", "1h à Santa Teresa", []*domain.Place{place})
 	if err == nil {
 		t.Fatal("expected an error for a zero-stop generated itinerary (domain.NewItinerary rejects it)")
+	}
+}
+
+func TestGenerateItinerary_RejectsEmptyCandidateList(t *testing.T) {
+	repo := &fakeItineraryRepo{}
+	gen := &fakeGenerator{result: ports.GeneratedItinerary{Title: "Vide"}}
+
+	_, err := GenerateItinerary(context.Background(), gen, repo, "user-1", "1h à Santa Teresa", nil)
+	if !errors.Is(err, ErrNoCandidatePlaces) {
+		t.Fatalf("got %v, want ErrNoCandidatePlaces", err)
+	}
+}
+
+func TestGenerateItinerary_RejectsAPlaceIDNotInCandidates(t *testing.T) {
+	place := testPlace(t, "Escadaria Selarón", -22.9147, -43.1806)
+	repo := &fakeItineraryRepo{}
+	gen := &fakeGenerator{result: ports.GeneratedItinerary{
+		Title: "Art et rue à Santa Teresa",
+		Stops: []ports.GeneratedStop{{PlaceID: "not-a-real-place", Label: "Ghost", TimeOnSiteMinutes: 10, WalkToNextMinutes: 0}},
+	}}
+
+	_, err := GenerateItinerary(context.Background(), gen, repo, "user-1", "1h à Santa Teresa", []*domain.Place{place})
+	if err == nil {
+		t.Fatal("expected an error for a place id absent from the candidate list")
+	}
+}
+
+func TestGenerateItinerary_WrapsGeneratorError(t *testing.T) {
+	place := testPlace(t, "Escadaria Selarón", -22.9147, -43.1806)
+	repo := &fakeItineraryRepo{}
+	gen := &fakeGenerator{err: errors.New("claude: rate limited")}
+
+	_, err := GenerateItinerary(context.Background(), gen, repo, "user-1", "1h à Santa Teresa", []*domain.Place{place})
+	if !errors.Is(err, ErrGenerationFailed) {
+		t.Fatalf("got %v, want an error wrapping ErrGenerationFailed", err)
+	}
+}
+
+func TestGenerateItinerary_WrapsSaveError(t *testing.T) {
+	place := testPlace(t, "Escadaria Selarón", -22.9147, -43.1806)
+	repo := &fakeItineraryRepo{saveErr: errors.New("connection reset")}
+	gen := &fakeGenerator{result: ports.GeneratedItinerary{
+		Title: "Art et rue à Santa Teresa",
+		Stops: []ports.GeneratedStop{{PlaceID: place.ID(), Label: "Escadaria Selarón", TimeOnSiteMinutes: 10, WalkToNextMinutes: 0}},
+	}}
+
+	_, err := GenerateItinerary(context.Background(), gen, repo, "user-1", "1h à Santa Teresa", []*domain.Place{place})
+	if !errors.Is(err, ErrSaveFailed) {
+		t.Fatalf("got %v, want an error wrapping ErrSaveFailed", err)
 	}
 }
 

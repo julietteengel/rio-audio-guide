@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
@@ -78,7 +79,7 @@ func (g *ItineraryGenerator) Generate(ctx context.Context, request string, candi
 	candidateLines := make([]string, 0, len(candidates))
 	validPlaceIDs := make(map[string]bool, len(candidates))
 	for _, c := range candidates {
-		candidateLines = append(candidateLines, fmt.Sprintf("- %s (%s): %s, category=%s", c.ID, c.Name, c.Category, c.Category))
+		candidateLines = append(candidateLines, fmt.Sprintf("- %s (%s): %.5f,%.5f, category=%s", c.ID, c.Name, c.Lat, c.Lon, c.Category))
 		validPlaceIDs[c.ID] = true
 	}
 	userMessage := fmt.Sprintf("Request: %s\n\nCandidate places:\n%s", request, joinLines(candidateLines))
@@ -114,9 +115,12 @@ func (g *ItineraryGenerator) Generate(ctx context.Context, request string, candi
 		return ports.GeneratedItinerary{}, fmt.Errorf("claude: response contained no propose_itinerary tool call")
 	}
 
-	// Defense in depth: even though the system prompt instructs Claude to
-	// only use real candidate IDs, this is the one place that actually
-	// enforces it -- a prompt is not a validation layer.
+	// Defense in depth: internal/application/generate_itinerary.go independently
+	// validates every place_id against its own candidate list and rejects more
+	// than one suggestion stop too. This adapter-level check is not the only
+	// place this happens anymore -- it catches the same problems earlier,
+	// right where the LLM's raw response is parsed, and fails fast before any
+	// round-trip back through the application layer.
 	suggestionCount := 0
 	stops := make([]ports.GeneratedStop, 0, len(parsed.Stops))
 	for _, s := range parsed.Stops {
@@ -141,12 +145,12 @@ func (g *ItineraryGenerator) Generate(ctx context.Context, request string, candi
 }
 
 func joinLines(lines []string) string {
-	out := ""
+	var b strings.Builder
 	for i, l := range lines {
 		if i > 0 {
-			out += "\n"
+			b.WriteByte('\n')
 		}
-		out += l
+		b.WriteString(l)
 	}
-	return out
+	return b.String()
 }

@@ -1,6 +1,8 @@
 package http
 
 import (
+	"errors"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -8,11 +10,6 @@ import (
 	"rioaudioguide/backend/internal/application"
 	"rioaudioguide/backend/internal/domain"
 )
-
-// Rio de Janeiro's bounding box -- same constants already defined in
-// places_handler.go, reused here (same package) rather than duplicated.
-// Every itinerary candidate comes from this same box, matching how every
-// other place-listing route in this API already scopes itself to Rio.
 
 type createItineraryRequest struct {
 	Request string `json:"request"`
@@ -60,14 +57,27 @@ func (s *Server) createItinerary(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "a non-empty \"request\" field is required"})
 	}
 
+	// Every itinerary candidate comes from Rio's bounding box (rioMinLat etc.,
+	// defined in places_handler.go, same package) -- capped downstream by
+	// application.GenerateItinerary before being sent to the LLM.
 	places, err := s.placeRepo.FindActiveInBoundingBox(c.Request().Context(), rioMinLat, rioMinLon, rioMaxLat, rioMaxLon)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		log.Printf("itinerary: could not load candidate places: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "could not load candidate places"})
 	}
 
 	itinerary, err := application.GenerateItinerary(c.Request().Context(), s.generator, s.itineraryRepo, contextUserID(c), req.Request, places)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": err.Error()})
+		switch {
+		case errors.Is(err, application.ErrGenerationFailed):
+			log.Printf("itinerary: generation failed: %v", err)
+			return c.JSON(http.StatusBadGateway, echo.Map{"error": "itinerary generation is temporarily unavailable, please try again"})
+		case errors.Is(err, application.ErrSaveFailed):
+			log.Printf("itinerary: save failed: %v", err)
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "could not save the generated itinerary"})
+		default:
+			return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": err.Error()})
+		}
 	}
 	return c.JSON(http.StatusCreated, toItineraryResponse(itinerary))
 }
