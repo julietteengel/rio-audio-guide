@@ -8,6 +8,7 @@ import { SettingsScreen } from "../screens/Settings";
 import { AuthScreen } from "../screens/Auth";
 import { EditProfileScreen } from "../screens/EditProfile";
 import { ItinerariesListScreen } from "../screens/ItinerariesList";
+import { ItineraryChatScreen } from "../screens/ItineraryChat";
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -19,6 +20,7 @@ export function AppNavigator() {
       <Stack.Screen name="Assistant" component={AssistantScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="ItinerariesList" component={ItinerariesListScreen} />
+      <Stack.Screen name="ItineraryChat" component={ItineraryChatScreen} />
       <Stack.Screen name="Auth" component={AuthScreen} options={{ presentation: "modal" }} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
     </Stack.Navigator>
