@@ -37,9 +37,10 @@ function toDataUri(svg: string): string {
 const PIN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="${colors.terracottaDark}" stroke="${colors.cream}" stroke-width="2"/></svg>`;
 
 // Matches today's Leaflet "you are here" marker exactly: a 34x34 translucent
-// terracotta halo behind a solid 15px terracotta dot with a 2.5px cream
-// border -- see PlaceMap.web.tsx's existing meIcon().
-const ME_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="rgba(193,89,46,0.22)"/><circle cx="17" cy="17" r="7.5" fill="${colors.terracotta}" stroke="${colors.cream}" stroke-width="2.5"/></svg>`;
+// blue halo behind a solid 15px blue dot with a 2.5px cream border -- see
+// PlaceMap.web.tsx's existing meIcon(). Blue (colors.groundText), not
+// terracotta, so the user's own position is never confused with a place pin.
+const ME_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="17" fill="rgba(46,90,172,0.22)"/><circle cx="17" cy="17" r="7.5" fill="${colors.groundText}" stroke="${colors.cream}" stroke-width="2.5"/></svg>`;
 
 export const PIN_ICON_SVG = toDataUri(PIN_SVG);
 export const ME_ICON_SVG = toDataUri(ME_SVG);

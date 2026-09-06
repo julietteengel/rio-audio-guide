@@ -22,10 +22,13 @@ function pinIcon(): L.DivIcon {
   });
 }
 
+// A distinct blue (colors.groundText, already used elsewhere for the
+// "sources verified" badge) rather than terracotta -- the user's own
+// position must never be confused with a place pin at a glance.
 function meIcon(): L.DivIcon {
   return L.divIcon({
     className: "",
-    html: `<div style="width:34px;height:34px;border-radius:17px;background:rgba(193,89,46,0.22);display:flex;align-items:center;justify-content:center;"><div style="width:15px;height:15px;border-radius:7.5px;background:${colors.terracotta};border:2.5px solid ${colors.cream};"></div></div>`,
+    html: `<div style="width:34px;height:34px;border-radius:17px;background:rgba(46,90,172,0.22);display:flex;align-items:center;justify-content:center;"><div style="width:15px;height:15px;border-radius:7.5px;background:${colors.groundText};border:2.5px solid ${colors.cream};"></div></div>`,
     iconSize: [34, 34],
     iconAnchor: [17, 17],
   });

@@ -58,11 +58,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.cream,
   },
+  // A distinct blue (colors.groundText, already used elsewhere for the
+  // "sources verified" badge) rather than terracotta -- the user's own
+  // position must never be confused with a place pin at a glance.
   me: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: "rgba(193,89,46,0.22)",
+    backgroundColor: "rgba(46,90,172,0.22)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -70,7 +73,7 @@ const styles = StyleSheet.create({
     width: 15,
     height: 15,
     borderRadius: 7.5,
-    backgroundColor: colors.terracotta,
+    backgroundColor: colors.groundText,
     borderWidth: 2.5,
     borderColor: colors.cream,
   },
