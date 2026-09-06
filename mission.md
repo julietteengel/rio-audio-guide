@@ -18,9 +18,10 @@ technical portfolio piece (fullstack + cloud + AI).
 directions (see `docs/superpowers/specs/2026-08-04-backend-stack-decision.md` for a concrete case —
 Kafka/MongoDB/Redis proposed purely to match a job posting's keyword list, then cut), the governing
 rule is: **a technology only enters scope for a genuine product need; portfolio value is a tie-breaker,
-never the primary justification.** The exception is the guide runtime and the backend's domain/ports
-layers, deliberately hand-written (not AI-generated) specifically for their learning/portfolio value —
-see Phases below and the 2026-08-15 note on the rest of the backend.
+never the primary justification.** Through 2026-09-06, the backend's domain/ports layers were an
+exception to AI authorship, hand-written specifically for their learning/portfolio value — see Phases
+below and the 2026-08-15 note on the rest of the backend. That exception was lifted 2026-09-06: Claude
+may now write domain/ports code too, human-reviewed like every other layer.
 
 ## What this is not
 
@@ -50,7 +51,7 @@ see Phases below and the 2026-08-15 note on the rest of the backend.
 | Sourcing pipeline | Python (Overture Maps, Wikidata, feiras registry) | Built, tested, **not yet merged to master** (pending human code review) |
 | Content pipeline (batch) | Python (grounding, narration, translation, anti-hallucination judge) | In progress — see status below |
 | Guide runtime (v1 scope) | Mobile app logic (React Native) — proximity-triggered narration + local tour memory, no server-side agent | Not started. Scope resolved 2026-08-12 — live Q&A/tool calling/human-in-the-loop deferred to Phase 2, per `docs/superpowers/specs/2026-08-12-guide-runtime-v1-scope-design.md` |
-| Backend | Go, hexagonal architecture + DDD, PostgreSQL/PostGIS, RabbitMQ (TTS job queue), K8s (EKS demo)/Scaleway (real prod) | In progress — domain layer (Place/Script/AudioFile) and ports **written by hand** by the founder. Remaining layers (Postgres/RabbitMQ adapters, HTTP API, CI/CD) switched to **AI-written, human-reviewed** on 2026-08-15 — a deliberate, time-boxed call, not a silent default. See note below. |
+| Backend | Go, hexagonal architecture + DDD, PostgreSQL/PostGIS, RabbitMQ (TTS job queue), K8s (EKS demo)/Scaleway (real prod) | In progress — domain layer (Place/Script/AudioFile) and ports were **written by hand** by the founder through 2026-09-06; that restriction is now lifted, all layers (including new domain concepts, e.g. `Itinerary`) are **AI-written, human-reviewed**. See note below. |
 | Ops depth | CI/CD canary+rollback, distributed observability, security guardrails, compliance | Not started — explicitly scoped in depth, not minimal, per roadmap v2 |
 | Admin dashboard + mobile app | React Native app, admin dashboard | Not started |
 
@@ -66,6 +67,12 @@ writes a given piece only when explicitly asked for that piece**, not as a stand
 to Postgres adapters (already AI-written under the brief window — kept as-is, not redone) and
 everything after: RabbitMQ (publisher done under the old default; the worker/AWS S3/HTTP API/CI-CD
 are unplanned as of this note — see "what's not yet planned" below). Revisit after 2026-08-18.
+
+**2026-09-06 update:** the domain/ports hand-written exception itself is lifted — Claude may now write
+`internal/domain/`/`internal/ports/` code too, human-reviewed like everything else. First exercised for
+the new `Itinerary` domain concept (see `docs/superpowers/specs/2026-09-06-ai-itineraries-design.md`).
+Existing hand-written domain code (Place/Script/AudioFile) is not being retrofitted or redone — this
+only changes who may write *new* domain/ports code going forward.
 
 **What's not yet planned** (discussed in conversation, never through brainstorming/writing-plans):
 RabbitMQ consumer/worker, AWS S3 adapter, HTTP API, CI/CD pipeline, pipeline-to-Postgres import
