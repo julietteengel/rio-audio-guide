@@ -221,7 +221,8 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
         )}
 
         <Pressable
-          style={styles.ask}
+          style={[styles.ask, place.narrationStatus !== "ready" && styles.askDisabled]}
+          disabled={place.narrationStatus !== "ready"}
           onPress={() => navigation.navigate("Assistant", { placeId: place.id })}
         >
           <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
@@ -320,4 +321,5 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   askText: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 14.5, color: colors.cream },
+  askDisabled: { opacity: 0.4 },
 });
