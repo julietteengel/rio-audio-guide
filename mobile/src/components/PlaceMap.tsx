@@ -21,9 +21,10 @@ export type PlaceMapProps = {
 };
 
 // Native implementation, react-native-maps. See PlaceMap.web.tsx for the
-// web counterpart (Leaflet) -- same props, Metro picks whichever file
-// matches the target platform, so Map.tsx just renders <PlaceMap ... />
-// without any Platform branching of its own.
+// web counterpart (Leaflet or Google Maps, depending on configuration) --
+// same props, Metro picks whichever file matches the target platform, so
+// Map.tsx just renders <PlaceMap ... /> without any Platform branching of
+// its own.
 export function PlaceMap({ places, region, userLocation, youAreHereLabel, onSelectPlace }: PlaceMapProps) {
   return (
     <MapView style={StyleSheet.absoluteFill} initialRegion={region}>

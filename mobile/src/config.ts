@@ -30,6 +30,8 @@ export const API_BASE_URL: string =
  *   1. `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` in a local, gitignored `.env` file
  *      (or exported in your shell).
  *   2. `expo.extra.googleMapsApiKey` in app.json, checked second.
+ *   3. Restrict the key in Cloud Console (HTTP referrers + Maps JavaScript
+ *      API only) -- it ships inside the web bundle and is publicly readable.
  * An empty string (not set) is a valid, expected state -- PlaceMap.web.tsx
  * falls back to its existing Leaflet/OpenStreetMap rendering rather than
  * breaking for anyone without a key configured.

@@ -1,4 +1,3 @@
-// mobile/src/components/PlaceMap.web.tsx
 import React, { useMemo } from "react";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api";
@@ -78,14 +77,21 @@ const GOOGLE_MAP_CONTAINER_STYLE = { height: "100%", width: "100%" };
 const GOOGLE_MAP_OPTIONS = { styles: MAP_STYLE };
 
 // Google Maps JS API, on-brand styled (see googleMapStyle.ts). Only
-// rendered when GOOGLE_MAPS_API_KEY is configured -- see the default
-// export below for the fallback-to-Leaflet selection.
+// rendered when GOOGLE_MAPS_API_KEY is configured -- see PlaceMap below
+// for the fallback-to-Leaflet selection.
 function GoogleWebPlaceMap({ places, region, userLocation, youAreHereLabel, onSelectPlace }: PlaceMapProps) {
-  const { isLoaded } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
+  const { isLoaded, loadError } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
   const center = useMemo(
     () => ({ lat: region.latitude, lng: region.longitude }),
     [region.latitude, region.longitude],
   );
+
+  // A script-load failure (network blocked, ad-blocker, malformed key
+  // rejected at load time) leaves isLoaded false forever -- fall back to
+  // Leaflet rather than showing a permanently blank map. This is distinct
+  // from an invalid/unbilled key, where the script loads fine and Google
+  // renders its own error overlay.
+  if (loadError) return <LeafletPlaceMap places={places} region={region} userLocation={userLocation} youAreHereLabel={youAreHereLabel} onSelectPlace={onSelectPlace} />;
 
   // Google's Size/Point constructors only exist once the script has loaded
   // (they live on the runtime `google` global, not a static import) -- this
