@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import * as SQLite from "expo-sqlite";
 
 export type CachedPlace = {
@@ -39,6 +40,20 @@ function rowToCachedPlace(row: CachedPlaceRow): CachedPlace {
   };
 }
 
+// expo-sqlite's web build resolves to a real WASM-backed implementation
+// (see expo-sqlite/src/ExpoSQLite.web.ts), not a clean no-op like
+// expo-file-system's web shim -- but this project has none of the Metro/
+// cross-origin-isolation setup that WASM SQLite needs to actually load in a
+// browser, so `openDatabaseAsync` never resolves there: not an error to
+// catch, a genuine hang. Web is a secondary testing surface for this app
+// (see mobile/AGENTS.md), never the shipping target, so rather than solving
+// WASM bundling for a platform that was never going to have real offline
+// audio anyway (downloadCity's own isWeb branch already skips that), this
+// swaps in an in-memory Map on web -- same interface, lost on refresh, never
+// hangs. Native platforms are completely unaffected; this branch never runs
+// there.
+const webStore = new Map<string, CachedPlace>();
+
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
 function getDb(): Promise<SQLite.SQLiteDatabase> {
@@ -65,6 +80,10 @@ function getDb(): Promise<SQLite.SQLiteDatabase> {
 // null) and when resuming an interrupted one (downloadManager.ts passes the
 // already-known audioLocalUri through so a resume never forgets progress).
 export async function saveCachedPlaces(places: CachedPlace[]): Promise<void> {
+  if (Platform.OS === "web") {
+    for (const p of places) webStore.set(p.id, p);
+    return;
+  }
   const db = await getDb();
   // One transaction for the whole manifest (~254 rows): without it, being
   // killed mid-loop leaves the table half-upserted.
@@ -92,23 +111,34 @@ export async function saveCachedPlaces(places: CachedPlace[]): Promise<void> {
 }
 
 export async function setCachedPlaceAudioUri(id: string, audioLocalUri: string): Promise<void> {
+  if (Platform.OS === "web") {
+    const existing = webStore.get(id);
+    if (existing) webStore.set(id, { ...existing, audioLocalUri });
+    return;
+  }
   const db = await getDb();
   await db.runAsync(`UPDATE cached_places SET audio_local_uri = ? WHERE id = ?`, audioLocalUri, id);
 }
 
 export async function getCachedPlace(id: string): Promise<CachedPlace | null> {
+  if (Platform.OS === "web") return webStore.get(id) ?? null;
   const db = await getDb();
   const row = await db.getFirstAsync<CachedPlaceRow>(`SELECT * FROM cached_places WHERE id = ?`, id);
   return row ? rowToCachedPlace(row) : null;
 }
 
 export async function getAllCachedPlaces(): Promise<CachedPlace[]> {
+  if (Platform.OS === "web") return Array.from(webStore.values());
   const db = await getDb();
   const rows = await db.getAllAsync<CachedPlaceRow>(`SELECT * FROM cached_places`);
   return rows.map(rowToCachedPlace);
 }
 
 export async function clearCachedPlaces(): Promise<void> {
+  if (Platform.OS === "web") {
+    webStore.clear();
+    return;
+  }
   const db = await getDb();
   await db.execAsync(`DELETE FROM cached_places;`);
 }
