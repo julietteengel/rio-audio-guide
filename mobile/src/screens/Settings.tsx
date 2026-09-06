@@ -71,6 +71,17 @@ export function SettingsScreen({ navigation }: Props) {
           </View>
         </View>
 
+        {isLoggedIn && (
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>{t.itineraries.listTitle}</Text>
+            <View style={styles.group}>
+              <Pressable style={[styles.row, styles.rowLast]} onPress={() => navigation.navigate("ItinerariesList")}>
+                <Text style={styles.rowLabel}>{t.itineraries.listTitle}</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>{t.settings.offlineDataSection}</Text>
           <View style={styles.group}>

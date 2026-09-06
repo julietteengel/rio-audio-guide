@@ -133,6 +133,13 @@ export function MapScreen({ navigation }: Props) {
               {t.map.offlineBadge.replace("{count}", String(offlineCount))}
             </Text>
           </View>
+          <Pressable style={styles.gearBtn} onPress={() => navigation.navigate("ItinerariesList")}>
+            <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+              <Circle cx={6} cy={7} r={2} stroke={colors.ink} strokeWidth={2} />
+              <Circle cx={18} cy={17} r={2} stroke={colors.ink} strokeWidth={2} />
+              <Path d="M8 8.5 16 15.5" stroke={colors.ink} strokeWidth={2} strokeLinecap="round" />
+            </Svg>
+          </Pressable>
           <Pressable style={styles.gearBtn} onPress={() => navigation.navigate("Settings")}>
             <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
               <Circle cx={12} cy={12} r={3} stroke={colors.ink} strokeWidth={2} />
