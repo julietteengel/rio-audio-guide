@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Polyline } from "react-native-svg";
@@ -8,12 +8,28 @@ import { useLocale } from "../i18n/LocaleContext";
 import { SUPPORTED_LOCALES, Locale } from "../i18n/dictionary";
 import { useAuth } from "../auth/AuthContext";
 import { colors, fonts, radii } from "../theme/tokens";
+import {
+  getOfflineDownloadSummary,
+  clearOfflineDownload,
+  formatApproxSize,
+  type OfflineDownloadSummary,
+} from "../data/downloadManager";
 
 type Props = NativeStackScreenProps<AppStackParamList, "Settings">;
 
 export function SettingsScreen({ navigation }: Props) {
   const { t, locale, setLocale } = useLocale();
   const { user, isLoggedIn, logout, deleteAccount } = useAuth();
+  const [summary, setSummary] = useState<OfflineDownloadSummary | null>(null);
+
+  useEffect(() => {
+    getOfflineDownloadSummary().then(setSummary);
+  }, []);
+
+  async function handleDeleteDownload() {
+    await clearOfflineDownload();
+    setSummary(null);
+  }
 
   function confirmDeleteAccount() {
     Alert.alert(t.settings.deleteAccountConfirmTitle, t.settings.deleteAccountConfirmMessage, [
@@ -88,14 +104,19 @@ export function SettingsScreen({ navigation }: Props) {
             <View style={styles.row}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.rowLabel}>Rio de Janeiro</Text>
-                <Text style={styles.rowSub}>42 lieux · 184 Mo</Text>
+                <Text style={styles.rowSub}>
+                  {summary
+                    ? t.downloadSuccess.cityMeta
+                        .replace("{count}", String(summary.placeCount))
+                        .replace("{size}", formatApproxSize(summary.approxSizeBytes, locale))
+                    : t.settings.noDownload}
+                </Text>
               </View>
-              {/* No real persisted download exists yet (mock data layer only,
-                  see the final report) — this is a visual affordance, not wired
-                  to a real delete operation. */}
-              <Pressable onPress={() => {}}>
-                <Text style={styles.link}>{t.settings.delete}</Text>
-              </Pressable>
+              {summary && (
+                <Pressable onPress={handleDeleteDownload}>
+                  <Text style={styles.link}>{t.settings.delete}</Text>
+                </Pressable>
+              )}
             </View>
           </View>
         </View>
