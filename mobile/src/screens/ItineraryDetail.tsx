@@ -1,0 +1,145 @@
+// mobile/src/screens/ItineraryDetail.tsx
+import React, { useEffect, useState } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Svg, { Polyline } from "react-native-svg";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { AppStackParamList } from "../navigation/types";
+import { useLocale } from "../i18n/LocaleContext";
+import { useAuth } from "../auth/AuthContext";
+import { getItinerary, type Itinerary } from "../data/ItinerariesRepository";
+import { formatDuration } from "../utils/itineraryFormat";
+import { colors, fonts, radii } from "../theme/tokens";
+
+type Props = NativeStackScreenProps<AppStackParamList, "ItineraryDetail">;
+
+export function ItineraryDetailScreen({ route, navigation }: Props) {
+  const { t } = useLocale();
+  const { token } = useAuth();
+  const [itinerary, setItinerary] = useState<Itinerary | null>(null);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    getItinerary(token, route.params.itineraryId)
+      .then((result) => {
+        if (!cancelled) setItinerary(result);
+      })
+      .catch(() => {
+        if (!cancelled) setNotFound(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token, route.params.itineraryId]);
+
+  return (
+    <SafeAreaView style={styles.screen}>
+      <View style={styles.topbar}>
+        <Pressable style={styles.back} onPress={() => navigation.goBack()}>
+          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+            <Polyline points="15 6 9 12 15 18" stroke={colors.ink} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+        </Pressable>
+      </View>
+
+      {notFound ? (
+        <View style={styles.empty}>
+          <Text style={styles.emptyBody}>{t.itineraries.detailNotFound}</Text>
+        </View>
+      ) : !itinerary ? (
+        <ActivityIndicator style={styles.loading} color={colors.terracotta} />
+      ) : (
+        <ScrollView contentContainerStyle={styles.content}>
+          <Text style={styles.title}>{itinerary.title}</Text>
+          <Text style={styles.meta}>
+            {formatDuration(itinerary.totalMinutes)} · {t.itineraries.stopCount.replace("{count}", String(itinerary.placeCount))}
+          </Text>
+
+          <View style={styles.timeline}>
+            {(() => {
+              let placeNumber = 0;
+              return itinerary.stops.map((stop, i) => {
+                const isSuggestion = stop.kind === "suggestion";
+                if (!isSuggestion) placeNumber += 1;
+                const isLast = i === itinerary.stops.length - 1;
+                return (
+                  <View key={i} style={styles.stopRow}>
+                    <View style={styles.badgeColumn}>
+                      <View style={[styles.badge, isSuggestion && styles.badgeSuggestion]}>
+                        {!isSuggestion && <Text style={styles.badgeText}>{placeNumber}</Text>}
+                      </View>
+                      {!isLast && <View style={styles.connector} />}
+                    </View>
+                    <View style={styles.stopBody}>
+                      <Text style={[styles.stopLabel, isSuggestion && styles.stopLabelSuggestion]}>
+                        {stop.label}
+                      </Text>
+                      {isSuggestion ? (
+                        <Text style={styles.suggestionCaption}>{t.itineraries.suggestionLabel}</Text>
+                      ) : (
+                        <Text style={styles.stopMeta}>{formatDuration(stop.timeOnSiteMinutes)}</Text>
+                      )}
+                      {!isLast && stop.walkToNextMinutes > 0 && (
+                        <Text style={styles.walkMeta}>
+                          {t.itineraries.walkToNext.replace("{minutes}", String(stop.walkToNextMinutes))}
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                );
+              });
+            })()}
+          </View>
+        </ScrollView>
+      )}
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.cream },
+  topbar: { flexDirection: "row", alignItems: "center", paddingHorizontal: 20, paddingTop: 8 },
+  back: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.line,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loading: { marginTop: 40 },
+  empty: { paddingHorizontal: 32, marginTop: 48, alignItems: "center" },
+  emptyBody: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.inkSoft, textAlign: "center" },
+  content: { paddingHorizontal: 22, paddingTop: 16, paddingBottom: 40 },
+  title: { fontFamily: fonts.display, fontSize: 24, color: colors.ink, marginBottom: 6 },
+  meta: { fontFamily: fonts.body, fontSize: 13.5, color: colors.inkSoft, marginBottom: 24 },
+  timeline: {},
+  stopRow: { flexDirection: "row", gap: 14 },
+  badgeColumn: { alignItems: "center", width: 28 },
+  badge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.terracotta,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeSuggestion: {
+    backgroundColor: "transparent",
+    borderWidth: 1.5,
+    borderColor: colors.inkFaint,
+    borderStyle: "dashed",
+  },
+  badgeText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.cream },
+  connector: { width: 2, flex: 1, minHeight: 24, backgroundColor: colors.line, marginTop: 2 },
+  stopBody: { flex: 1, paddingBottom: 22 },
+  stopLabel: { fontFamily: fonts.bodySemiBold, fontSize: 15.5, color: colors.ink },
+  stopLabelSuggestion: { fontStyle: "italic", color: colors.inkSoft },
+  stopMeta: { fontFamily: fonts.body, fontSize: 12.5, color: colors.inkSoft, marginTop: 2 },
+  suggestionCaption: { fontFamily: fonts.body, fontSize: 12, fontStyle: "italic", color: colors.inkFaint, marginTop: 2 },
+  walkMeta: { fontFamily: fonts.body, fontSize: 12, color: colors.inkFaint, marginTop: 8 },
+});
