@@ -1,4 +1,3 @@
-// internal/domain/itinerary_test.go
 package domain
 
 import "testing"

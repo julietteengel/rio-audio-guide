@@ -98,12 +98,12 @@ func ReconstructSuggestionStop(id, label string, walkToNextMinutes int) Itinerar
 	return ItineraryStop{id: id, kind: ItineraryStopKindSuggestion, label: label, walkToNextMinutes: walkToNextMinutes}
 }
 
-func (s ItineraryStop) ID() string                  { return s.id }
-func (s ItineraryStop) Kind() ItineraryStopKind      { return s.kind }
-func (s ItineraryStop) PlaceID() string              { return s.placeID }
-func (s ItineraryStop) Label() string                { return s.label }
-func (s ItineraryStop) TimeOnSiteMinutes() int       { return s.timeOnSiteMinutes }
-func (s ItineraryStop) WalkToNextMinutes() int       { return s.walkToNextMinutes }
+func (s ItineraryStop) ID() string              { return s.id }
+func (s ItineraryStop) Kind() ItineraryStopKind { return s.kind }
+func (s ItineraryStop) PlaceID() string         { return s.placeID }
+func (s ItineraryStop) Label() string           { return s.label }
+func (s ItineraryStop) TimeOnSiteMinutes() int  { return s.timeOnSiteMinutes }
+func (s ItineraryStop) WalkToNextMinutes() int  { return s.walkToNextMinutes }
 
 // --- Entity ---
 
