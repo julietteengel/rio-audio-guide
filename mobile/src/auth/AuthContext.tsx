@@ -8,6 +8,7 @@ const USER_KEY = "auth.user";
 
 type AuthContextValue = {
   user: AuthUser | null;
+  token: string | null;
   isLoggedIn: boolean;
   isLoading: boolean;
   register: (email: string, password: string) => Promise<void>;
@@ -130,6 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
+      token,
       isLoggedIn: user !== null,
       isLoading,
       register: registerFn,
