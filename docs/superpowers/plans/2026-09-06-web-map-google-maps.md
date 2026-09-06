@@ -1,6 +1,6 @@
 # Web Map Google Maps Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace Leaflet/OpenStreetMap with the Google Maps JavaScript API as the web build's map
 renderer, styled on-brand, with an automatic fallback to today's Leaflet rendering when no API key is
@@ -45,7 +45,7 @@ plus `@types/google.maps` as a dev dependency for its ambient `google.maps.*` ty
 - Produces: `@react-google-maps/api` importable in `mobile/src/components/`, ambient `google.maps.*`
   types available project-wide via `@types/google.maps` — consumed by Task 3 and Task 4.
 
-- [ ] **Step 1: Add the two dependencies**
+- [x] **Step 1: Add the two dependencies**
 
 In `mobile/package.json`, add to `"dependencies"` (keep alphabetical order — insert right before
 `"expo"`):
@@ -60,20 +60,20 @@ Add to `"devDependencies"` (keep alphabetical order — insert right after `"@ty
     "@types/google.maps": "^3.66.2",
 ```
 
-- [ ] **Step 2: Install**
+- [x] **Step 2: Install**
 
 Run: `cd mobile && npm install`
 Expected: installs cleanly, `package-lock.json` updates, no peer-dependency error (this project's
 `react`/`react-dom` are `19.2.3`; `@react-google-maps/api@2.20.8`'s published peer range is
 `^16.8 || ^17 || ^18 || ^19` for both, so 19.2.3 satisfies it).
 
-- [ ] **Step 3: Confirm the baseline still type-checks**
+- [x] **Step 3: Confirm the baseline still type-checks**
 
 Run: `cd mobile && npx tsc --noEmit`
 Expected: no new errors (nothing references the new packages yet — this step only confirms the install
 itself didn't break anything, e.g. a conflicting transitive type declaration).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add mobile/package.json mobile/package-lock.json
@@ -90,7 +90,7 @@ git commit -m "mobile: add @react-google-maps/api for the web map"
 **Interfaces:**
 - Produces: `GOOGLE_MAPS_API_KEY: string` — consumed by Task 4 (`PlaceMap.web.tsx`).
 
-- [ ] **Step 1: Add the export**
+- [x] **Step 1: Add the export**
 
 Append to `mobile/src/config.ts` (after the existing `API_BASE_URL` export):
 
@@ -114,12 +114,12 @@ export const GOOGLE_MAPS_API_KEY: string =
   "";
 ```
 
-- [ ] **Step 2: Type-check**
+- [x] **Step 2: Type-check**
 
 Run: `cd mobile && npx tsc --noEmit`
 Expected: no new errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add mobile/src/config.ts
@@ -140,7 +140,7 @@ git commit -m "mobile: add GOOGLE_MAPS_API_KEY config, empty by default"
 No TDD here — this is styling/data-declaration code, no branching logic to test, matching this
 project's convention of not testing declarative UI configuration.
 
-- [ ] **Step 1: Write the file**
+- [x] **Step 1: Write the file**
 
 ```ts
 // mobile/src/components/googleMapStyle.ts
@@ -191,13 +191,13 @@ export const PIN_ICON_SVG = toDataUri(PIN_SVG);
 export const ME_ICON_SVG = toDataUri(ME_SVG);
 ```
 
-- [ ] **Step 2: Type-check**
+- [x] **Step 2: Type-check**
 
 Run: `cd mobile && npx tsc --noEmit`
 Expected: no new errors — `google.maps.MapTypeStyle` resolves via the `@types/google.maps` dev
 dependency added in Task 1 (ambient global type, no import needed for the `google` namespace itself).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add mobile/src/components/googleMapStyle.ts
@@ -221,7 +221,7 @@ git commit -m "mobile: on-brand Google Maps style + marker icon SVGs"
 
 No TDD here — matches this project's convention of not unit-testing map/gesture UI components.
 
-- [ ] **Step 1: Replace the file**
+- [x] **Step 1: Replace the file**
 
 Replace the entire contents of `mobile/src/components/PlaceMap.web.tsx`:
 
@@ -368,19 +368,19 @@ export function PlaceMap(props: PlaceMapProps) {
 }
 ```
 
-- [ ] **Step 2: Type-check**
+- [x] **Step 2: Type-check**
 
 Run: `cd mobile && npx tsc --noEmit`
 Expected: no errors.
 
-- [ ] **Step 3: Manually verify — Leaflet fallback (no key)**
+- [x] **Step 3: Manually verify — Leaflet fallback (no key)**
 
 Run: `cd mobile && npx expo start --web` with `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` unset (the default —
 don't export it, don't add it to a `.env` file for this check).
 Expected: the map renders exactly as it did before this plan (Leaflet/OpenStreetMap tiles, same pins),
 confirming the fallback path is unbroken.
 
-- [ ] **Step 4: Manually verify — Google Maps (with a real key)**
+- [x] **Step 4: Manually verify — Google Maps (with a real key)**
 
 This step requires a real Google Maps JavaScript API key with billing enabled in Google Cloud Console —
 that account/billing setup is the founder's own action, not something to do from this plan.
@@ -395,7 +395,7 @@ Expected:
   (if location permission is granted) shows the translucent halo + solid dot.
 - Clicking a place pin navigates to that place's `PlaceDetail` screen, same as it does today.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add mobile/src/components/PlaceMap.web.tsx
