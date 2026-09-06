@@ -32,14 +32,14 @@ TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data, error }) => {
   const placeId = region.identifier;
   if (!placeId) return;
 
-  const lastNotifiedAt = await getLastNotifiedAt(placeId);
-  if (isCooldownActive(lastNotifiedAt, Date.now())) return;
-
-  const places = await getAllCachedPlaces();
-  const place = places.find((p) => p.id === placeId);
-  if (!place) return;
-
   try {
+    const lastNotifiedAt = await getLastNotifiedAt(placeId);
+    if (isCooldownActive(lastNotifiedAt, Date.now())) return;
+
+    const places = await getAllCachedPlaces();
+    const place = places.find((p) => p.id === placeId);
+    if (!place) return;
+
     await Notifications.scheduleNotificationAsync({
       content: {
         title: place.name,
@@ -69,11 +69,11 @@ TaskManager.defineTask(LOCATION_UPDATE_TASK_NAME, async ({ data, error }) => {
   };
   if (!shouldReregister(lastRegisteredCenter, currentPosition)) return;
 
-  const places = await getAllCachedPlaces();
-  const regions = selectNearestRegions(places, currentPosition);
-  if (regions.length === 0) return;
-
   try {
+    const places = await getAllCachedPlaces();
+    const regions = selectNearestRegions(places, currentPosition);
+    if (regions.length === 0) return;
+
     // stopGeofencingAsync before re-starting: startGeofencingAsync replaces
     // the monitored set, but going through stop first avoids relying on
     // that being safe to call twice with an already-active task under the

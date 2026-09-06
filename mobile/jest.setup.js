@@ -66,10 +66,10 @@ jest.mock('expo-sqlite', () => {
         }),
 
         runAsync: jest.fn(async (sql, ...params) => {
-          // Handle INSERT OR REPLACE
+          // Handle INSERT OR REPLACE with ON CONFLICT
           if (sql.includes('INSERT INTO cached_places')) {
             const id = params[0];
-            const row = {
+            const newRow = {
               id: params[0],
               name: params[1],
               category: params[2],
@@ -79,11 +79,40 @@ jest.mock('expo-sqlite', () => {
               audio_local_uri: params[6],
               last_notified_at: null,
             };
-            // Preserve existing last_notified_at if this is an upsert
+
             if (db.data.has(id)) {
-              row.last_notified_at = db.data.get(id).last_notified_at;
+              // Upsert: preserve columns NOT in the UPDATE SET clause
+              const existing = db.data.get(id);
+              const merged = { ...existing };
+
+              // Parse which columns are in the ON CONFLICT ... DO UPDATE SET clause
+              const updateMatch = sql.match(/ON CONFLICT\s*\([^)]+\)\s*DO UPDATE SET\s+(.+?)(?:;|$)/i);
+              const columnsToUpdate = new Set();
+              if (updateMatch) {
+                const setClause = updateMatch[1];
+                const assignments = setClause.split(',').map(s => s.trim());
+                for (const assignment of assignments) {
+                  const columnMatch = assignment.match(/^(\w+)\s*=/);
+                  if (columnMatch) {
+                    columnsToUpdate.add(columnMatch[1]);
+                  }
+                }
+              }
+
+              // Apply updates only to columns explicitly in the SET clause
+              if (columnsToUpdate.has('name')) merged.name = newRow.name;
+              if (columnsToUpdate.has('category')) merged.category = newRow.category;
+              if (columnsToUpdate.has('lat')) merged.lat = newRow.lat;
+              if (columnsToUpdate.has('lon')) merged.lon = newRow.lon;
+              if (columnsToUpdate.has('body')) merged.body = newRow.body;
+              if (columnsToUpdate.has('audio_local_uri')) merged.audio_local_uri = newRow.audio_local_uri;
+              if (columnsToUpdate.has('last_notified_at')) merged.last_notified_at = newRow.last_notified_at;
+
+              db.data.set(id, merged);
+            } else {
+              // Insert: new row
+              db.data.set(id, newRow);
             }
-            db.data.set(id, row);
           }
 
           // Handle UPDATE cached_places SET last_notified_at
