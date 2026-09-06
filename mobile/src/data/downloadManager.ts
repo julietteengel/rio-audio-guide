@@ -147,8 +147,8 @@ export class InsufficientStorageError extends Error {
 
 /**
  * Downloads the real manifest, downloads and caches each place's audio file
- * on-device (expo-file-system), and persists the full place list -- including
- * narration text, so PlaceDetail can render offline too -- to SQLite via
+ * on-device (expo-file-system), and persists the full place list — including
+ * narration text, so PlaceDetail can render offline too — to SQLite via
  * offlineStore. This is what makes both proximity notifications and offline
  * playback actually work, not just the size-estimate summary this function
  * produced before.
@@ -166,19 +166,32 @@ export async function downloadCity(
 ): Promise<OfflineDownloadSummary> {
   const rawPlaces = await fetchManifestRaw(citySlug, language);
   const places = rawPlaces.map(manifestPlaceToPlace);
-  const files = planCityDownload(places, cityDisplayName, language);
-  const requiredBytes = estimateDownloadSizeBytes(files);
 
-  if (!hasSufficientStorage(Paths.availableDiskSpace, requiredBytes)) {
-    throw new InsufficientStorageError(requiredBytes, Paths.availableDiskSpace);
-  }
-
+  // Determine if resuming and get already-cached places early (before storage check)
   const existingSummary = await getOfflineDownloadSummary();
   const isResuming =
     existingSummary?.city === cityDisplayName && existingSummary?.language === language;
   const alreadyCached = isResuming ? await getAllCachedPlaces() : [];
+
+  // Compute what still needs to be downloaded (resume-aware)
+  const toDownload = planResumableAudioDownloads(rawPlaces, alreadyCached);
+
+  // Compute required bytes for storage check: only what needs downloading
+  const toDownloadAsPlaces = toDownload.map(manifestPlaceToPlace);
+  const toDownloadFiles = planCityDownload(toDownloadAsPlaces, cityDisplayName, language);
+  const requiredBytesForDownload = estimateDownloadSizeBytes(toDownloadFiles);
+
+  if (!hasSufficientStorage(Paths.availableDiskSpace, requiredBytesForDownload)) {
+    throw new InsufficientStorageError(requiredBytesForDownload, Paths.availableDiskSpace);
+  }
+
+  // Clear old data if switching to a different city/language
   if (!isResuming) {
     await clearCachedPlaces();
+    const audioDir = new Directory(Paths.document, AUDIO_DIR_NAME);
+    if (audioDir.exists) {
+      audioDir.delete();
+    }
   }
 
   await saveCachedPlaces(
@@ -199,7 +212,6 @@ export async function downloadCity(
   const audioDir = new Directory(Paths.document, AUDIO_DIR_NAME);
   audioDir.create({ idempotent: true });
 
-  const toDownload = planResumableAudioDownloads(rawPlaces, alreadyCached);
   for (const place of toDownload) {
     const destination = new File(audioDir, `${place.id}.mp3`);
     const downloaded = await File.downloadFileAsync(place.audio_url, destination, {
@@ -208,11 +220,15 @@ export async function downloadCity(
     await setCachedPlaceAudioUri(place.id, downloaded.uri);
   }
 
+  // Compute total size for the summary (full city, not just what was downloaded)
+  const files = planCityDownload(places, cityDisplayName, language);
+  const totalSizeBytes = estimateDownloadSizeBytes(files);
+
   const summary: OfflineDownloadSummary = {
     city: cityDisplayName,
     language,
     placeCount: rawPlaces.length,
-    approxSizeBytes: requiredBytes,
+    approxSizeBytes: totalSizeBytes,
     downloadedAt: new Date().toISOString(),
   };
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(summary));
@@ -231,7 +247,7 @@ export async function getOfflineDownloadSummary(): Promise<OfflineDownloadSummar
 
 /**
  * Clears everything a download wrote: the AsyncStorage summary, every
- * cached_places row, and the on-disk audio files themselves -- Settings.tsx's
+ * cached_places row, and the on-disk audio files themselves — Settings.tsx's
  * delete button calls this directly.
  */
 export async function clearOfflineDownload(): Promise<void> {
