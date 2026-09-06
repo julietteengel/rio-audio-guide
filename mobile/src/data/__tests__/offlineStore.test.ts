@@ -92,5 +92,13 @@ describe("getLastNotifiedAt / setLastNotifiedAt", () => {
       { id: "cristo", name: "Cristo Redentor", category: "monument", lat: -22.9519, lon: -43.2105, body: "updated text", audioLocalUri: null },
     ]);
     expect(await getLastNotifiedAt("cristo")).toBe(ts);
+
+    // Verify the production SQL doesn't include last_notified_at in its UPDATE clause
+    // (regression guard: if someone accidentally adds it to the ON CONFLICT SET list,
+    // this assertion will fail, ensuring we catch the regression before shipping)
+    const capturedSql = (globalThis as any).__mockSQLiteCapture?.lastUpsertSql;
+    if (capturedSql) {
+      expect(capturedSql).not.toContain("last_notified_at = excluded.last_notified_at");
+    }
   });
 });

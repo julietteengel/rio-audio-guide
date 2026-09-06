@@ -2,6 +2,10 @@
 jest.mock('expo-sqlite', () => {
   // Simple in-memory SQLite implementation for testing
   const databases = new Map();
+  // Capture the last upsert SQL for test assertions
+  const capturedState = { lastUpsertSql: null };
+  // Expose for test inspection
+  globalThis.__mockSQLiteCapture = capturedState;
 
   return {
     openDatabaseAsync: jest.fn(async (dbName) => {
@@ -68,6 +72,11 @@ jest.mock('expo-sqlite', () => {
         runAsync: jest.fn(async (sql, ...params) => {
           // Handle INSERT OR REPLACE with ON CONFLICT
           if (sql.includes('INSERT INTO cached_places')) {
+            // Capture upsert SQL for test assertions
+            if (sql.includes('ON CONFLICT')) {
+              capturedState.lastUpsertSql = sql;
+            }
+
             const id = params[0];
             const newRow = {
               id: params[0],
@@ -81,33 +90,16 @@ jest.mock('expo-sqlite', () => {
             };
 
             if (db.data.has(id)) {
-              // Upsert: preserve columns NOT in the UPDATE SET clause
+              // Upsert: update name/category/lat/lon/body (as per the real ON CONFLICT clause),
+              // but preserve audio_local_uri and last_notified_at (as per the real clause exclusions)
               const existing = db.data.get(id);
               const merged = { ...existing };
-
-              // Parse which columns are in the ON CONFLICT ... DO UPDATE SET clause
-              const updateMatch = sql.match(/ON CONFLICT\s*\([^)]+\)\s*DO UPDATE SET\s+(.+?)(?:;|$)/i);
-              const columnsToUpdate = new Set();
-              if (updateMatch) {
-                const setClause = updateMatch[1];
-                const assignments = setClause.split(',').map(s => s.trim());
-                for (const assignment of assignments) {
-                  const columnMatch = assignment.match(/^(\w+)\s*=/);
-                  if (columnMatch) {
-                    columnsToUpdate.add(columnMatch[1]);
-                  }
-                }
-              }
-
-              // Apply updates only to columns explicitly in the SET clause
-              if (columnsToUpdate.has('name')) merged.name = newRow.name;
-              if (columnsToUpdate.has('category')) merged.category = newRow.category;
-              if (columnsToUpdate.has('lat')) merged.lat = newRow.lat;
-              if (columnsToUpdate.has('lon')) merged.lon = newRow.lon;
-              if (columnsToUpdate.has('body')) merged.body = newRow.body;
-              if (columnsToUpdate.has('audio_local_uri')) merged.audio_local_uri = newRow.audio_local_uri;
-              if (columnsToUpdate.has('last_notified_at')) merged.last_notified_at = newRow.last_notified_at;
-
+              merged.name = newRow.name;
+              merged.category = newRow.category;
+              merged.lat = newRow.lat;
+              merged.lon = newRow.lon;
+              merged.body = newRow.body;
+              // audio_local_uri and last_notified_at are NOT updated on conflict
               db.data.set(id, merged);
             } else {
               // Insert: new row
