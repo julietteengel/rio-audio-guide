@@ -17,10 +17,11 @@ filtered per subsystem so an unrelated change doesn't run irrelevant checks.
   implementation plan. Originally merged flat into the repo root (no subfolder); reorganized into
   `backend/` on 2026-08-19 to match `web/`/`mobile/`/`pipeline/`'s existing pattern — each subsystem
   now a clean top-level folder with its own README.
-  **Authorship split (see `mission.md` for the full note)**: `internal/domain/` and `internal/ports/`
-  are hand-written by the founder — Claude's role there stays explanation/review only, never editing
-  those files directly. Everything from `internal/adapters/` onward (Postgres, RabbitMQ, HTTP, CI/CD)
-  switched to AI-written/human-reviewed on 2026-08-15, a deliberate time-boxed call, not the default.
+  **Authorship (see `mission.md` for the full note)**: `internal/domain/` and `internal/ports/` were
+  hand-written by the founder through 2026-09-06, deliberately, for their learning/portfolio value.
+  That restriction was lifted on 2026-09-06 (first exercised for the `Itinerary` domain concept) —
+  Claude may now write domain/ports code project-wide like any other layer, human-reviewed same as
+  everything from `internal/adapters/` onward.
 - **`pipeline/`** — the location-sourcing pipeline and its curation scripts (Python).
 - **`web/`** — the Next.js landing page (started 2026-08-18, see
   `docs/superpowers/specs/2026-08-18-landing-page-design.md`). Purely static (no backend calls), hosted

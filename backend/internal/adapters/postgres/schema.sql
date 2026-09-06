@@ -52,3 +52,23 @@ CREATE TABLE audio_files (
     created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE TABLE itineraries (
+    id         TEXT PRIMARY KEY,
+    user_id    TEXT NOT NULL REFERENCES users(id),
+    title      TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX itineraries_user_id_idx ON itineraries (user_id);
+
+CREATE TABLE itinerary_stops (
+    id                   TEXT PRIMARY KEY,
+    itinerary_id         TEXT NOT NULL REFERENCES itineraries(id) ON DELETE CASCADE,
+    position             INT NOT NULL,
+    kind                 TEXT NOT NULL,
+    place_id             TEXT REFERENCES places(id),
+    label                TEXT NOT NULL,
+    time_on_site_minutes INT NOT NULL DEFAULT 0,
+    walk_to_next_minutes INT NOT NULL DEFAULT 0,
+    UNIQUE (itinerary_id, position)
+);

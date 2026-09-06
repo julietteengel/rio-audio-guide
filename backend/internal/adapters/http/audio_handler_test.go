@@ -40,8 +40,8 @@ func TestGetPlaceAudio_Ready(t *testing.T) {
 
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
-	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(),
-		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{},
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -75,8 +75,8 @@ func TestGetPlaceAudio_FailsOpenWhenCacheErrors(t *testing.T) {
 
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
-	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(),
-		&fakePublisher{}, fakeAudioStorage{}, erroringCache{}, fakeTokenIssuer{})
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{},
+		&fakePublisher{}, fakeAudioStorage{}, erroringCache{}, fakeTokenIssuer{}, &fakeGeneratorHTTP{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -107,8 +107,8 @@ func TestGetPlaceAudio_NotReadyYet(t *testing.T) {
 
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
-	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(),
-		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{},
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -144,8 +144,8 @@ func TestGetPlaceAudio_ScriptNotPublished(t *testing.T) {
 
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
-	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(),
-		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{},
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -167,7 +167,7 @@ func TestGetPlaceAudio_NoScriptForLanguage(t *testing.T) {
 
 	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}},
 		&fakeScriptRepo{scripts: map[string]*domain.Script{}},
-		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
+		&fakeAudioFileRepo{files: map[string]*domain.AudioFile{}}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -195,8 +195,8 @@ func TestGetPlaceAudio_Ready_IncludesPresignedTimestampsURLWhenPresent(t *testin
 
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
-	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(),
-		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{},
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()
@@ -228,8 +228,8 @@ func TestGetPlaceAudio_Ready_OmitsTimestampsURLWhenAbsent(t *testing.T) {
 
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
-	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(),
-		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(), &fakeItineraryRepoHTTP{},
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{})
 
 	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
 	rec := httptest.NewRecorder()
