@@ -43,7 +43,7 @@ may now write domain/ports code too, human-reviewed like every other layer.
 - **Languages**: English, French, Portuguese, Spanish.
 - **Voice**: single adult voice for v1 (cloned, consent-based). Teen/child voices explicitly deferred
   to Phase 2 after cost analysis.
-- **Explicitly out of scope for v1**: bars/restaurants, live chat/Q&A, teen/child voices, affiliate
+- **Explicitly out of scope for v1**: bars/restaurants, teen/child voices, affiliate
   monetization, self-hosted TTS infrastructure, city-wide coverage beyond what the sourcing pipeline
   actually grounds (partial coverage is acceptable at launch — see Content pipeline status).
 

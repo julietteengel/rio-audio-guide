@@ -41,7 +41,7 @@ export default function App() {
       <SafeAreaProvider>
         <LocaleProvider>
           <AuthProvider>
-            <NavigationContainer>
+            <NavigationContainer documentTitle={{ formatter: () => "Memória Carioca" }}>
               <RootNavigator />
             </NavigationContainer>
           </AuthProvider>

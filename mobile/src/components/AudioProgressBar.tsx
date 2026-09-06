@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { View, StyleSheet, PanResponder, type GestureResponderEvent } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { View, StyleSheet, PanResponder, Platform, type GestureResponderEvent } from "react-native";
 import { colors } from "../theme/tokens";
 
 type Props = {
@@ -25,6 +25,14 @@ export function AudioProgressBar({ progress, onSeek }: Props) {
   const [dragFraction, setDragFraction] = useState<number | null>(null);
 
   const measureTrack = () => {
+    if (Platform.OS === "web") {
+      const node = trackRef.current as unknown as HTMLElement | null;
+      if (node?.getBoundingClientRect) {
+        const rect = node.getBoundingClientRect();
+        trackLayout.current = { pageX: rect.left, width: rect.width };
+        return;
+      }
+    }
     trackRef.current?.measure((_x, _y, width, _height, pageX) => {
       trackLayout.current = { pageX, width };
     });
@@ -35,6 +43,9 @@ export function AudioProgressBar({ progress, onSeek }: Props) {
     if (width <= 0) return 0;
     return Math.min(1, Math.max(0, (evt.nativeEvent.pageX - pageX) / width));
   };
+
+  const onSeekRef = useRef(onSeek);
+  onSeekRef.current = onSeek;
 
   const panResponder = useRef(
     PanResponder.create({
@@ -50,28 +61,79 @@ export function AudioProgressBar({ progress, onSeek }: Props) {
       onPanResponderRelease: (evt) => {
         const fraction = fractionFromEvent(evt);
         setDragFraction(null);
-        onSeek(fraction);
+        onSeekRef.current(fraction);
       },
       onPanResponderTerminate: () => setDragFraction(null),
     }),
   ).current;
+
+  // On web, PanResponder's translation of mouse events through RN's touch
+  // Responder System is not reliable for this kind of press-drag-release
+  // track (clicks and drags could land wrong or do nothing at all).
+  // Attaching plain DOM mouse listeners directly to the underlying element
+  // sidesteps that translation layer entirely -- these are ordinary,
+  // well-understood browser APIs, not a guess about how RN's responder
+  // system behaves once it goes through react-native-web.
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const node = trackRef.current as unknown as HTMLElement | null;
+    if (!node) return;
+
+    const fractionFromClientX = (clientX: number): number => {
+      const rect = node.getBoundingClientRect();
+      if (rect.width <= 0) return 0;
+      return Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    };
+
+    let dragging = false;
+    const onMouseDown = (e: MouseEvent) => {
+      dragging = true;
+      setDragFraction(fractionFromClientX(e.clientX));
+    };
+    const onMouseMove = (e: MouseEvent) => {
+      if (!dragging) return;
+      setDragFraction(fractionFromClientX(e.clientX));
+    };
+    const onMouseUp = (e: MouseEvent) => {
+      if (!dragging) return;
+      dragging = false;
+      const fraction = fractionFromClientX(e.clientX);
+      setDragFraction(null);
+      onSeekRef.current(fraction);
+    };
+
+    node.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+    return () => {
+      node.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, []);
 
   const displayProgress = dragFraction ?? progress;
 
   return (
     <View
       ref={trackRef}
-      style={styles.track}
+      style={styles.hitArea}
       onLayout={measureTrack}
-      {...panResponder.panHandlers}
+      hitSlop={{ top: 12, bottom: 12 }}
+      {...(Platform.OS === "web" ? {} : panResponder.panHandlers)}
     >
-      <View style={[styles.fill, { width: `${displayProgress * 100}%` }]} />
-      <View style={[styles.thumb, { left: `${displayProgress * 100}%` }]} />
+      <View style={styles.track}>
+        <View style={[styles.fill, { width: `${displayProgress * 100}%` }]} />
+        <View style={[styles.thumb, { left: `${displayProgress * 100}%` }]} />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // A taller invisible touch target around the thin visual track -- 4px is
+  // too thin to reliably tap/click, on any platform.
+  hitArea: { paddingVertical: 12, justifyContent: "center" },
   track: {
     height: TRACK_HEIGHT,
     borderRadius: TRACK_HEIGHT / 2,
