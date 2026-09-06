@@ -1,24 +1,34 @@
+// mobile/src/screens/PlaceDetail.tsx
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, ScrollView, Image, StyleSheet } from "react-native";
+import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
-import Svg, { Polyline, Path } from "react-native-svg";
+import Svg, { Polyline, Path, Line } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
-import type { Locale } from "../i18n/dictionary";
 import { useLocale } from "../i18n/LocaleContext";
 import { placesRepository } from "../data/PlacesRepository";
 import type { Place, AudioAvailability } from "../data/types";
 import { colors, fonts, radii } from "../theme/tokens";
+import { fetchWordMarks, type WordMark } from "../utils/syncedText";
+import { SyncedNarration, type NarrationMode } from "../components/SyncedNarration";
+import { AudioProgressBar } from "../components/AudioProgressBar";
 
 type Props = NativeStackScreenProps<AppStackParamList, "PlaceDetail">;
 
-const LANG_ORDER: Locale[] = ["pt", "en", "fr", "es"];
-const LANG_LABEL: Record<Locale, string> = { pt: "PT", en: "EN", fr: "FR", es: "ES" };
-
-const WAVE_HEIGHTS_PLAYED = [8, 16, 24, 14, 22];
-const WAVE_HEIGHTS_REST = [10, 18, 26, 12, 20, 9, 16];
+// PlaceDetail is an immersive "now playing" screen with its own dark
+// palette, derived from the app's existing brand tokens rather than an
+// invented one. #1C0E07 is not a new color: it's the existing hero
+// gradient's base (rgba(28,14,7,...), below), reused as a solid fill so
+// the whole screen reads as one continuous dark surface, not just the
+// hero image. Scoped to this screen's own files only -- mobile/src/theme/tokens.ts,
+// shared by every other screen, is untouched.
+const DARK_BG = "#1C0E07";
+const DIM_55 = "rgba(250,245,238,0.55)";
+const DIM_45 = "rgba(250,245,238,0.45)";
+const DIM_18 = "rgba(250,245,238,0.18)";
+const TINT_ACTIVE = "rgba(193,89,46,0.18)";
 
 // currentTime/duration come from expo-audio's AudioStatus in seconds
 // (fractional while loading) -- "0:00" rather than "0:NaN" before a source
@@ -35,32 +45,48 @@ function formatTime(seconds: number): string {
 export function PlaceDetailScreen({ route, navigation }: Props) {
   const { t, locale } = useLocale();
   const [place, setPlace] = useState<Place | null>(null);
-  // Defaults to the app's own reading locale, not a fixed language -- it was
-  // hardcoded to "pt" before, which silently broke for anyone reading in a
-  // different language (and happened to be exactly the one language that
-  // failed to generate for Cristo Redentor, making it look broken).
-  const [playerLocale, setPlayerLocale] = useState<Locale>(locale);
   const [audio, setAudio] = useState<AudioAvailability>({ state: "unavailable" });
+  const [marks, setMarks] = useState<WordMark[] | null>(null);
+  const [narrationMode, setNarrationMode] = useState<NarrationMode>("scroll");
 
   useEffect(() => {
-    placesRepository.getById(route.params.placeId).then((p) => setPlace(p ?? null));
-  }, [route.params.placeId]);
+    let cancelled = false;
+    placesRepository.getById(route.params.placeId).then((p) => {
+      if (!cancelled) setPlace(p ?? null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [route.params.placeId, locale]);
 
-  // Re-fetches whenever the player's own language selection changes -- this
-  // is deliberately independent from useLocale()'s app-wide locale, which
-  // only drives the readable narration text below (see getById in
-  // PlacesRepository.ts). A place can have audio ready in one language and
-  // not another, so this has to be its own fetch, not reuse the text one.
+  // Narration audio and text both follow the app's own reading locale --
+  // there is no more per-place language override (the removed language
+  // pills). Changing language happens once, in Settings.
   useEffect(() => {
     if (!place) return;
     let cancelled = false;
-    placesRepository.getAudioUrl(place.id, playerLocale).then((result) => {
+    placesRepository.getAudioUrl(place.id, locale).then((result) => {
       if (!cancelled) setAudio(result);
     });
     return () => {
       cancelled = true;
     };
-  }, [place?.id, playerLocale]);
+  }, [place?.id, locale]);
+
+  // Vidé immédiatement, avant même que le fetch ne réponde -- sinon les
+  // marks de l'ancienne langue resteraient affichées un instant pendant la
+  // transition, surlignant les mauvais mots.
+  useEffect(() => {
+    setMarks(null);
+    if (audio.state !== "ready" || !audio.timestampsUrl) return;
+    let cancelled = false;
+    fetchWordMarks(audio.timestampsUrl).then((result) => {
+      if (!cancelled) setMarks(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [audio]);
 
   // Hooks must run unconditionally on every render -- source is null until
   // audio.state is "ready", which useAudioPlayer accepts (no source loaded
@@ -75,9 +101,10 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   // dictionary, rather than showing nothing.
   const categoryLabel =
     (t.categories as Record<string, string>)[place.category] ?? place.category;
+  const progress = status.duration > 0 ? status.currentTime / status.duration : 0;
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 40 }}>
+    <View style={styles.screen}>
       <View style={styles.hero}>
         <Image
           source={require("../../assets/images/place-hero.jpg")}
@@ -85,7 +112,7 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
           resizeMode="cover"
         />
         <LinearGradient
-          colors={["rgba(28,14,7,0.72)", "rgba(28,14,7,0.15)", "rgba(28,14,7,0)"]}
+          colors={["rgba(28,14,7,0.78)", "rgba(28,14,7,0.22)", "rgba(28,14,7,0)"]}
           start={{ x: 0, y: 1 }}
           end={{ x: 0, y: 0 }}
           style={StyleSheet.absoluteFill}
@@ -105,102 +132,121 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
         </View>
       </View>
 
-      <View style={styles.langRow}>
-        {LANG_ORDER.map((l) => (
-          <Pressable
-            key={l}
-            onPress={() => setPlayerLocale(l)}
-            style={[styles.pill, l === playerLocale && styles.pillActive]}
-          >
-            <Text style={[styles.pillText, l === playerLocale && styles.pillTextActive]}>
-              {LANG_LABEL[l]}
+      <SafeAreaView edges={["bottom"]} style={styles.rest}>
+        <View style={styles.progressSection}>
+          <AudioProgressBar
+            progress={progress}
+            onSeek={(fraction) => {
+              if (status.duration > 0) player.seekTo(fraction * status.duration);
+            }}
+          />
+          <View style={styles.timeRow}>
+            <Text style={styles.timeText}>{formatTime(status.currentTime)}</Text>
+            <Text style={styles.timeText}>
+              {canPlay
+                ? formatTime(status.duration)
+                : audio.state === "pending"
+                  ? t.placeDetail.narrationPending
+                  : t.placeDetail.narrationUnavailable}
             </Text>
-          </Pressable>
-        ))}
-      </View>
+          </View>
+        </View>
 
-      <View style={styles.player}>
-        <View style={styles.playerTop}>
+        <View style={styles.playRow}>
           <Pressable
             style={[styles.playBtn, !canPlay && styles.playBtnDisabled]}
             disabled={!canPlay}
             onPress={() => (status.playing ? player.pause() : player.play())}
           >
             {status.playing ? (
-              <Svg width={14} height={14} viewBox="0 0 24 24" fill={colors.cream}>
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill={colors.cream}>
                 <Path d="M6 4h4v16H6zM14 4h4v16h-4z" />
               </Svg>
             ) : (
-              <Svg width={14} height={14} viewBox="0 0 24 24" fill={colors.cream}>
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill={colors.cream}>
                 <Path d="M6 4l14 8-14 8V4z" />
               </Svg>
             )}
           </Pressable>
-          <View style={styles.wave}>
-            {WAVE_HEIGHTS_PLAYED.map((h, i) => (
-              <View key={`p${i}`} style={[styles.bar, styles.barPlayed, { height: h }]} />
-            ))}
-            {WAVE_HEIGHTS_REST.map((h, i) => (
-              <View key={`r${i}`} style={[styles.bar, { height: h }]} />
-            ))}
-          </View>
         </View>
-        <View style={styles.timeRow}>
-          <Text style={styles.timeText}>{formatTime(status.currentTime)}</Text>
-          <Text style={styles.timeText}>
-            {canPlay
-              ? formatTime(status.duration)
-              : audio.state === "pending"
+
+        {place.narrationStatus === "ready" ? (
+          <>
+            <View style={styles.toggleRow}>
+              <Pressable
+                style={[styles.toggleBtn, narrationMode === "scroll" && marks !== null && styles.toggleBtnActive]}
+                onPress={() => setNarrationMode("scroll")}
+              >
+                <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
+                  <Line x1={4} y1={7} x2={20} y2={7} stroke={narrationMode === "scroll" && marks !== null ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
+                  <Line x1={4} y1={12} x2={16} y2={12} stroke={narrationMode === "scroll" && marks !== null ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
+                  <Line x1={4} y1={17} x2={12} y2={17} stroke={narrationMode === "scroll" && marks !== null ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
+                </Svg>
+              </Pressable>
+              <Pressable
+                style={[styles.toggleBtn, (narrationMode === "free" || marks === null) && styles.toggleBtnActive]}
+                onPress={() => setNarrationMode("free")}
+              >
+                <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
+                  <Path d="M4 5.5C4 5.5 6 4.5 9 4.5S13 5.5 13 5.5V18.5C13 18.5 11 17.5 9 17.5S4 18.5 4 18.5V5.5Z" stroke={narrationMode === "free" || marks === null ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
+                  <Path d="M20 5.5C20 5.5 18 4.5 15 4.5S11 5.5 11 5.5V18.5C11 18.5 13 17.5 15 17.5S20 18.5 20 18.5V5.5Z" stroke={narrationMode === "free" || marks === null ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
+                </Svg>
+              </Pressable>
+            </View>
+
+            <View style={styles.lyricsArea}>
+              <SyncedNarration
+                text={place.body}
+                marks={marks}
+                currentTimeMs={status.currentTime * 1000}
+                mode={narrationMode}
+              />
+            </View>
+
+            <View style={styles.ground}>
+              <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
+                <Polyline points="5 13 10 18 19 7" stroke={colors.groundText} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+              <Text style={styles.groundText}>{t.placeDetail.groundBadge}</Text>
+            </View>
+          </>
+        ) : (
+          <View style={styles.lyricsArea}>
+            <Text style={styles.pendingText}>
+              {place.narrationStatus === "pending"
                 ? t.placeDetail.narrationPending
                 : t.placeDetail.narrationUnavailable}
-          </Text>
-        </View>
-      </View>
-
-      {place.narrationStatus === "ready" ? (
-        <>
-          <View style={styles.ground}>
-            <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-              <Polyline points="5 13 10 18 19 7" stroke={colors.groundText} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-            </Svg>
-            <Text style={styles.groundText}>{t.placeDetail.groundBadge}</Text>
+            </Text>
           </View>
-          <Text style={styles.body}>{place.body}</Text>
-        </>
-      ) : (
-        <Text style={styles.body}>
-          {place.narrationStatus === "pending"
-            ? t.placeDetail.narrationPending
-            : t.placeDetail.narrationUnavailable}
-        </Text>
-      )}
+        )}
 
-      <Pressable
-        style={styles.ask}
-        onPress={() => navigation.navigate("Assistant", { placeId: place.id })}
-      >
-        <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-          <Path
-            d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
-            stroke={colors.terracotta}
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </Svg>
-        <Text style={styles.askText}>{t.placeDetail.ask}</Text>
-        <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-          <Polyline points="9 6 15 12 9 18" stroke={colors.inkFaint} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-      </Pressable>
-    </ScrollView>
+        <Pressable
+          style={styles.ask}
+          onPress={() => navigation.navigate("Assistant", { placeId: place.id })}
+        >
+          <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+            <Path
+              d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+              stroke={colors.terracotta}
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </Svg>
+          <Text style={styles.askText}>{t.placeDetail.ask}</Text>
+          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+            <Polyline points="9 6 15 12 9 18" stroke={DIM_45} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+        </Pressable>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.cream },
+  screen: { flex: 1, backgroundColor: DARK_BG },
   hero: {
-    height: 320,
+    height: 260,
     backgroundColor: colors.sand,
     justifyContent: "space-between",
     // Without this, react-native-web's absolutely-positioned cover Image
@@ -229,35 +275,25 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   title: { fontFamily: fonts.displayBlack, fontSize: 30, color: colors.cream },
-  langRow: { flexDirection: "row", gap: 8, paddingHorizontal: 20, paddingTop: 18 },
-  pill: { borderRadius: radii.pill, paddingVertical: 8, paddingHorizontal: 16, backgroundColor: colors.sand },
-  pillActive: { backgroundColor: colors.terracotta },
-  pillText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.inkSoft },
-  pillTextActive: { color: colors.cream },
-  player: {
-    marginHorizontal: 20,
-    marginTop: 18,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: radii.lg,
-    padding: 16,
-  },
-  playerTop: { flexDirection: "row", alignItems: "center", gap: 14 },
+  rest: { flex: 1 },
+  progressSection: { paddingHorizontal: 20, paddingTop: 16 },
+  timeRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 8 },
+  timeText: { fontFamily: fonts.body, fontSize: 12, color: DIM_55 },
+  playRow: { alignItems: "center", marginTop: 12 },
   playBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: colors.terracotta,
     alignItems: "center",
     justifyContent: "center",
   },
-  playBtnDisabled: { backgroundColor: colors.sand },
-  wave: { flex: 1, flexDirection: "row", alignItems: "center", gap: 3, height: 28 },
-  bar: { width: 3, borderRadius: 2, backgroundColor: colors.sand },
-  barPlayed: { backgroundColor: colors.terracotta },
-  timeRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
-  timeText: { fontFamily: fonts.body, fontSize: 12, color: colors.inkFaint },
+  playBtnDisabled: { backgroundColor: "rgba(193,89,46,0.35)" },
+  toggleRow: { flexDirection: "row", justifyContent: "flex-end", gap: 8, paddingHorizontal: 20, marginTop: 16 },
+  toggleBtn: { width: 34, height: 34, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
+  toggleBtnActive: { backgroundColor: TINT_ACTIVE },
+  lyricsArea: { flex: 1, minHeight: 0, paddingHorizontal: 32, justifyContent: "center" },
+  pendingText: { fontFamily: fonts.body, fontSize: 15, lineHeight: 24, color: DIM_55, textAlign: "center" },
   ground: {
     flexDirection: "row",
     alignItems: "center",
@@ -271,24 +307,17 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   groundText: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.groundText },
-  body: {
-    fontFamily: fonts.body,
-    fontSize: 15,
-    lineHeight: 24,
-    color: colors.inkSoft,
-    marginHorizontal: 20,
-    marginTop: 18,
-  },
   ask: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
     borderWidth: 1,
-    borderColor: colors.line,
+    borderColor: DIM_18,
     borderRadius: radii.md,
     padding: 14,
     marginHorizontal: 20,
-    marginTop: 22,
+    marginTop: 16,
+    marginBottom: 12,
   },
-  askText: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 14.5, color: colors.ink },
+  askText: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 14.5, color: colors.cream },
 });

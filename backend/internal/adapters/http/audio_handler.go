@@ -20,7 +20,8 @@ import (
 const presignExpiry = 15 * time.Minute
 
 type audioResponse struct {
-	URL string `json:"url"`
+	URL           string  `json:"url"`
+	TimestampsURL *string `json:"timestamps_url,omitempty"`
 }
 
 type audioNotReadyResponse struct {
@@ -91,7 +92,20 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 
-	body, err := json.Marshal(audioResponse{URL: url})
+	resp := audioResponse{URL: url}
+	if timestampsStorageURL := audioFile.Audio().TimestampsURL(); timestampsStorageURL != "" {
+		timestampsKey, err := parseS3Key(timestampsStorageURL)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		}
+		timestampsURL, err := s.storage.PresignURL(c.Request().Context(), timestampsKey, presignExpiry)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		}
+		resp.TimestampsURL = &timestampsURL
+	}
+
+	body, err := json.Marshal(resp)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
@@ -103,7 +117,10 @@ func (s *Server) getPlaceAudio(c echo.Context) error {
 
 // parseS3Key extrait la clé d'objet d'un storage_url au format s3://bucket/clé
 // — c'est ce que domain.AudioFile.Audio().StorageURL() contient toujours,
-// c'est le seul format que le worker écrit (internal/adapters/s3.Upload).
+// quel que soit l'adaptateur TTS actif qui l'a produit (actuellement Polly,
+// via OutputS3KeyPrefix dans internal/adapters/awspolly) : ce format-là est
+// le contrat à préserver, pas un détail d'implémentation d'un adaptateur
+// donné.
 //
 // getPlaceAudio distingue explicitement "vraiment absent" (pgx.ErrNoRows,
 // 404) de toute autre erreur (panne DB transitoire, 500) — traiter toute

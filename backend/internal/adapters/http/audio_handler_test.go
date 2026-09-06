@@ -177,3 +177,71 @@ func TestGetPlaceAudio_NoScriptForLanguage(t *testing.T) {
 		t.Fatalf("got status %d, want 404: %s", rec.Code, rec.Body.String())
 	}
 }
+
+func TestGetPlaceAudio_Ready_IncludesPresignedTimestampsURLWhenPresent(t *testing.T) {
+	placeName, _ := domain.NewPlaceName("Cristo Redentor")
+	coords, _ := domain.NewCoordinates(-22.9519, -43.2105)
+	place := domain.NewPlace(placeName, "monument", coords, "", "wikidata", "rich")
+
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript(place.ID(), domain.LanguageFR, text, "source")
+	_ = script.MarkReviewed("julie")
+	_ = script.Publish()
+
+	audio, _ := domain.NewGeneratedAudio("s3://rio-audio-guide/abc123.mp3", "s3://rio-audio-guide/abc123.marks", 30*time.Second)
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	_ = audioFile.MarkGenerating()
+	_ = audioFile.MarkReady(audio)
+
+	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
+	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(),
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
+
+	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want 200: %s", rec.Code, rec.Body.String())
+	}
+	if !strings.Contains(rec.Body.String(), `"timestamps_url":"https://presigned.example.com/abc123.marks?X-Amz-Signature=fake"`) {
+		t.Fatalf("expected a presigned timestamps_url in the response, got %s", rec.Body.String())
+	}
+}
+
+func TestGetPlaceAudio_Ready_OmitsTimestampsURLWhenAbsent(t *testing.T) {
+	placeName, _ := domain.NewPlaceName("Cristo Redentor")
+	coords, _ := domain.NewCoordinates(-22.9519, -43.2105)
+	place := domain.NewPlace(placeName, "monument", coords, "", "wikidata", "rich")
+
+	text, _ := domain.NewScriptText("Texte")
+	script := domain.NewScript(place.ID(), domain.LanguageFR, text, "source")
+	_ = script.MarkReviewed("julie")
+	_ = script.Publish()
+
+	// timestampsURL vide -- reproduit une génération ElevenLabs d'avant Polly.
+	audio, _ := domain.NewGeneratedAudio("s3://rio-audio-guide/abc123.mp3", "", 30*time.Second)
+	audioFile, _ := domain.NewAudioFile(script.ID(), "voice-1")
+	_ = audioFile.MarkGenerating()
+	_ = audioFile.MarkReady(audio)
+
+	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
+	audioFileRepo := &fakeAudioFileRepo{files: map[string]*domain.AudioFile{audioFile.ID(): audioFile}}
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, scriptRepo, audioFileRepo, newFakeUserRepo(),
+		&fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{})
+
+	req := httptest.NewRequest(http.MethodGet, "/places/"+place.ID()+"/audio?language=fr", nil)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want 200: %s", rec.Code, rec.Body.String())
+	}
+	// La clé elle-même doit être absente (omitempty), pas juste vide -- un
+	// simple `"timestamps_url":""` serait un contrat différent (le client
+	// devrait alors distinguer "absent" de "vide", inutilement).
+	if strings.Contains(rec.Body.String(), "timestamps_url") {
+		t.Fatalf("expected no timestamps_url key at all, got %s", rec.Body.String())
+	}
+}

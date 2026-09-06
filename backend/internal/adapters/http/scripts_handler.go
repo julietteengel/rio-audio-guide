@@ -35,7 +35,7 @@ func (s *Server) reviewScript(c echo.Context) error {
 }
 
 // retryAudio is behind requireRole(RoleAdmin) too (see server.go) -- same
-// reasoning as reviewScript, it triggers a real, billed ElevenLabs call.
+// reasoning as reviewScript, it triggers a real, billed Polly call.
 // Reuses the AudioFile's already-stored voice_id (RetryAudioGeneration),
 // no body needed.
 func (s *Server) retryAudio(c echo.Context) error {

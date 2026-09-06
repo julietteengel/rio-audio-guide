@@ -8,14 +8,14 @@ import (
 	"syscall"
 
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/polly"
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/jackc/pgx/v5/pgxpool"
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	"rioaudioguide/backend/internal/adapters/elevenlabs"
+	"rioaudioguide/backend/internal/adapters/awspolly"
 	"rioaudioguide/backend/internal/adapters/postgres"
 	"rioaudioguide/backend/internal/adapters/rabbitmq"
-	"rioaudioguide/backend/internal/adapters/s3"
 )
 
 func main() {
@@ -64,13 +64,14 @@ func main() {
 		log.Fatalf("load aws config: %v", err)
 	}
 	s3Client := awss3.NewFromConfig(awsCfg)
-	storage := s3.NewAudioStorage(s3Client, envOr("S3_BUCKET", "rio-audio-guide"))
+	bucket := envOr("S3_BUCKET", "rio-audio-guide")
 
 	scriptRepo := postgres.NewScriptRepository(pool)
 	audioFileRepo := postgres.NewAudioFileRepository(pool)
-	ttsGenerator := elevenlabs.NewGenerator(mustEnv("ELEVENLABS_API_KEY"))
+	pollyClient := polly.NewFromConfig(awsCfg)
+	ttsGenerator := awspolly.NewGenerator(pollyClient, s3Client, bucket)
 
-	worker, err := rabbitmq.NewWorker(channel, scriptRepo, audioFileRepo, storage, ttsGenerator)
+	worker, err := rabbitmq.NewWorker(channel, scriptRepo, audioFileRepo, ttsGenerator)
 	if err != nil {
 		log.Fatalf("set up worker: %v", err)
 	}
@@ -87,12 +88,4 @@ func envOr(key, fallback string) string {
 		return v
 	}
 	return fallback
-}
-
-func mustEnv(key string) string {
-	v := os.Getenv(key)
-	if v == "" {
-		log.Fatalf("%s is required", key)
-	}
-	return v
 }
