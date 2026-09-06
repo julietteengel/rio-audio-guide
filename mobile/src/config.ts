@@ -21,3 +21,20 @@ export const API_BASE_URL: string =
   process.env.EXPO_PUBLIC_API_BASE_URL ??
   (Constants.expoConfig?.extra?.apiBaseUrl as string | undefined) ??
   "http://localhost:8080";
+
+/**
+ * Google Maps JavaScript API key, web build only (see
+ * mobile/src/components/PlaceMap.web.tsx). No real value is hardcoded here
+ * or in app.json -- create your own key in Google Cloud Console (Maps
+ * JavaScript API enabled, billing configured) and set it locally:
+ *   1. `EXPO_PUBLIC_GOOGLE_MAPS_API_KEY` in a local, gitignored `.env` file
+ *      (or exported in your shell).
+ *   2. `expo.extra.googleMapsApiKey` in app.json, checked second.
+ * An empty string (not set) is a valid, expected state -- PlaceMap.web.tsx
+ * falls back to its existing Leaflet/OpenStreetMap rendering rather than
+ * breaking for anyone without a key configured.
+ */
+export const GOOGLE_MAPS_API_KEY: string =
+  process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ??
+  (Constants.expoConfig?.extra?.googleMapsApiKey as string | undefined) ??
+  "";
