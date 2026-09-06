@@ -67,21 +67,33 @@ export function SettingsScreen({ navigation }: Props) {
   }
 
   async function toggleProximity() {
-    if (proximityEnabled) {
-      await stopProximityMonitoring();
-      setProximityEnabled(false);
-      return;
+    try {
+      if (proximityEnabled) {
+        await stopProximityMonitoring();
+        setProximityEnabled(false);
+        return;
+      }
+      const granted = await requestProximityPermissions();
+      if (!granted) {
+        Alert.alert(t.settings.proximityPermissionDeniedTitle, t.settings.proximityPermissionDeniedBody, [
+          { text: t.settings.deleteAccountCancel, style: "cancel" },
+          { text: t.settings.openSystemSettings, onPress: () => Linking.openSettings() },
+        ]);
+        return;
+      }
+      await startProximityMonitoring();
+      // Read back rather than assuming: startProximityMonitoring silently
+      // no-ops when nothing is downloaded, and showing a checkmark for
+      // monitoring that isn't running is worse than showing nothing.
+      const active = await isProximityMonitoringActive();
+      setProximityEnabled(active);
+      if (!active) {
+        Alert.alert(t.settings.proximityNoDownloadTitle, t.settings.proximityNoDownloadBody);
+      }
+    } catch (err) {
+      console.warn("proximity toggle failed", err);
+      Alert.alert(t.auth.genericError);
     }
-    const granted = await requestProximityPermissions();
-    if (!granted) {
-      Alert.alert(t.settings.proximityPermissionDeniedTitle, t.settings.proximityPermissionDeniedBody, [
-        { text: t.settings.deleteAccountCancel, style: "cancel" },
-        { text: t.settings.openSystemSettings, onPress: () => Linking.openSettings() },
-      ]);
-      return;
-    }
-    await startProximityMonitoring();
-    setProximityEnabled(true);
   }
 
   return (

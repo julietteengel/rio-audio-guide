@@ -159,7 +159,13 @@ export const dictionary = {
       proximityPermissionDeniedTitle: "Permission requise",
       proximityPermissionDeniedBody: "Pour activer les notifications de proximité, autorise la localisation \"Toujours\" et les notifications dans les réglages du téléphone.",
       openSystemSettings: "Ouvrir les réglages",
+      proximityNoDownloadTitle: "Aucune ville téléchargée",
+      proximityNoDownloadBody:
+        "Télécharge d'abord une ville pour activer les notifications de proximité.",
       languageNames: { pt: "Português", en: "English", fr: "Français", es: "Español" },
+    },
+    notifications: {
+      proximityBody: "Écoute son histoire.",
     },
   },
   en: {
@@ -317,7 +323,13 @@ export const dictionary = {
       proximityPermissionDeniedTitle: "Permission required",
       proximityPermissionDeniedBody: "To enable proximity notifications, allow \"Always\" location and notifications in your phone's settings.",
       openSystemSettings: "Open settings",
+      proximityNoDownloadTitle: "No city downloaded",
+      proximityNoDownloadBody:
+        "Download a city first to turn on proximity notifications.",
       languageNames: { pt: "Português", en: "English", fr: "Français", es: "Español" },
+    },
+    notifications: {
+      proximityBody: "Listen to its story.",
     },
   },
   pt: {
@@ -475,7 +487,13 @@ export const dictionary = {
       proximityPermissionDeniedTitle: "Permissão necessária",
       proximityPermissionDeniedBody: "Para ativar as notificações de proximidade, permita a localização \"Sempre\" e as notificações nas configurações do telefone.",
       openSystemSettings: "Abrir configurações",
+      proximityNoDownloadTitle: "Nenhuma cidade baixada",
+      proximityNoDownloadBody:
+        "Baixe uma cidade primeiro para ativar as notificações de proximidade.",
       languageNames: { pt: "Português", en: "English", fr: "Français", es: "Español" },
+    },
+    notifications: {
+      proximityBody: "Ouça a sua história.",
     },
   },
   es: {
@@ -633,7 +651,13 @@ export const dictionary = {
       proximityPermissionDeniedTitle: "Permiso necesario",
       proximityPermissionDeniedBody: "Para activar las notificaciones de proximidad, permite la ubicación \"Siempre\" y las notificaciones en los ajustes del teléfono.",
       openSystemSettings: "Abrir ajustes",
+      proximityNoDownloadTitle: "Ninguna ciudad descargada",
+      proximityNoDownloadBody:
+        "Descarga una ciudad primero para activar las notificaciones de proximidad.",
       languageNames: { pt: "Português", en: "English", fr: "Français", es: "Español" },
+    },
+    notifications: {
+      proximityBody: "Escucha su historia.",
     },
   },
 };

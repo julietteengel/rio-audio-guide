@@ -3,6 +3,8 @@ import * as TaskManager from "expo-task-manager";
 import * as Notifications from "expo-notifications";
 import { getAllCachedPlaces, getLastNotifiedAt, setLastNotifiedAt } from "../data/offlineStore";
 import { selectNearestRegions, shouldReregister, isCooldownActive } from "./geofenceLogic";
+import { detectInitialLocale } from "../i18n/LocaleContext";
+import { dictionary } from "../i18n/dictionary";
 
 export const GEOFENCE_TASK_NAME = "memoria-carioca-geofence";
 export const LOCATION_UPDATE_TASK_NAME = "memoria-carioca-location-update";
@@ -40,10 +42,13 @@ TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data, error }) => {
     const place = places.find((p) => p.id === placeId);
     if (!place) return;
 
+    // Device locale, not the in-app override: this callback runs outside the
+    // component tree, so LocaleContext's state isn't reachable from here.
+    const locale = detectInitialLocale();
     await Notifications.scheduleNotificationAsync({
       content: {
         title: place.name,
-        body: "Écoute son histoire.",
+        body: dictionary[locale].notifications.proximityBody,
         data: { placeId },
       },
       trigger: null,

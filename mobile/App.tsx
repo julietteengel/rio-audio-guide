@@ -9,8 +9,18 @@ import * as Notifications from "expo-notifications";
 import { LocaleProvider } from "./src/i18n/LocaleContext";
 import { AuthProvider } from "./src/auth/AuthContext";
 import { RootNavigator } from "./src/navigation/RootNavigator";
-import { navigationRef, navigateToPlace } from "./src/utils/navigationRef";
+import {
+  navigationRef,
+  navigateToPlace,
+  setPendingPlaceId,
+  flushPendingNavigation,
+} from "./src/utils/navigationRef";
 import { colors } from "./src/theme/tokens";
+// Side-effect import: geofenceTask's TaskManager.defineTask calls must run at
+// module scope on every launch, including a headless background one. Importing
+// it here rather than relying on Settings.tsx happening to be in the bundle's
+// eagerly-evaluated import graph.
+import "./src/location/geofenceTask";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -50,6 +60,18 @@ export default function App() {
     return () => subscription.remove();
   }, []);
 
+  // The listener above is only registered once JS is running, so it never sees
+  // the tap that launched a killed app -- that response comes from here.
+  useEffect(() => {
+    Notifications.getLastNotificationResponseAsync().then((response) => {
+      const placeId = response?.notification.request.content.data?.placeId;
+      if (typeof placeId === "string") {
+        setPendingPlaceId(placeId);
+        flushPendingNavigation();
+      }
+    });
+  }, []);
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();
@@ -66,6 +88,7 @@ export default function App() {
             <NavigationContainer
               ref={navigationRef}
               documentTitle={{ formatter: () => "Memória Carioca" }}
+              onReady={flushPendingNavigation}
             >
               <RootNavigator />
             </NavigationContainer>

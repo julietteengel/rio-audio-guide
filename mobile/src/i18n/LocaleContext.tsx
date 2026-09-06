@@ -3,7 +3,10 @@ import * as Localization from "expo-localization";
 import { dictionary, DEFAULT_LOCALE, SUPPORTED_LOCALES, Locale, Dictionary } from "./dictionary";
 import { setPlacesRepositoryLocale } from "../data/PlacesRepository";
 
-function detectInitialLocale(): Locale {
+// Exported so non-React callers (the background geofence task, which has no
+// component tree to read context from) can resolve the device locale the same
+// way the provider does.
+export function detectInitialLocale(): Locale {
   const deviceLocales = Localization.getLocales();
   for (const l of deviceLocales) {
     const code = l.languageCode?.toLowerCase();

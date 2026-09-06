@@ -10,3 +10,20 @@ export function navigateToPlace(placeId: string): void {
   if (!navigationRef.isReady()) return;
   navigationRef.navigate("App", { screen: "PlaceDetail", params: { placeId } });
 }
+
+// A cold start reads its launching notification before the container is ready
+// (RootNavigator renders null until its async onboarding check resolves), so
+// the target is parked here and flushed from NavigationContainer's onReady.
+let pendingPlaceId: string | null = null;
+
+export function setPendingPlaceId(placeId: string): void {
+  pendingPlaceId = placeId;
+}
+
+export function flushPendingNavigation(): void {
+  if (pendingPlaceId && navigationRef.isReady()) {
+    const placeId = pendingPlaceId;
+    pendingPlaceId = null;
+    navigateToPlace(placeId);
+  }
+}
