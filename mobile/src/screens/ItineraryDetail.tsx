@@ -2,14 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Svg, { Polyline } from "react-native-svg";
+import Svg, { Polyline, Path } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
 import { useAuth } from "../auth/AuthContext";
 import { getItinerary, type Itinerary } from "../data/ItinerariesRepository";
 import { formatDuration } from "../utils/itineraryFormat";
-import { colors, fonts } from "../theme/tokens";
+import { colors, fonts, radii } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<AppStackParamList, "ItineraryDetail">;
 
@@ -55,6 +55,7 @@ export function ItineraryDetailScreen({ route, navigation }: Props) {
       ) : !itinerary ? (
         <ActivityIndicator style={styles.loading} color={colors.terracotta} />
       ) : (
+        <>
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.title}>{itinerary.title}</Text>
           <Text style={styles.meta}>
@@ -72,7 +73,11 @@ export function ItineraryDetailScreen({ route, navigation }: Props) {
                   <View key={i} style={styles.stopRow}>
                     <View style={styles.badgeColumn}>
                       <View style={[styles.badge, isSuggestion && styles.badgeSuggestion]}>
-                        {!isSuggestion && <Text style={styles.badgeText}>{placeNumber}</Text>}
+                        {isSuggestion ? (
+                          <Text style={styles.badgeEmoji}>🍽️</Text>
+                        ) : (
+                          <Text style={styles.badgeText}>{placeNumber}</Text>
+                        )}
                       </View>
                       {!isLast && <View style={styles.connector} />}
                     </View>
@@ -97,6 +102,13 @@ export function ItineraryDetailScreen({ route, navigation }: Props) {
             })()}
           </View>
         </ScrollView>
+        <Pressable style={styles.startBtn} onPress={() => navigation.navigate("Map")}>
+          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+            <Path d="M5 12h14M13 5l7 7-7 7" stroke={colors.cream} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+          <Text style={styles.startBtnText}>{t.itineraries.startItinerary}</Text>
+        </Pressable>
+        </>
       )}
     </SafeAreaView>
   );
@@ -139,6 +151,7 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
   },
   badgeText: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.cream },
+  badgeEmoji: { fontSize: 12 },
   connector: { width: 2, flex: 1, minHeight: 24, backgroundColor: colors.line, marginTop: 2 },
   stopBody: { flex: 1, paddingBottom: 22 },
   stopLabel: { fontFamily: fonts.bodySemiBold, fontSize: 15.5, color: colors.ink },
@@ -146,4 +159,16 @@ const styles = StyleSheet.create({
   stopMeta: { fontFamily: fonts.body, fontSize: 12.5, color: colors.inkSoft, marginTop: 2 },
   suggestionCaption: { fontFamily: fonts.body, fontSize: 12, fontStyle: "italic", color: colors.inkFaint, marginTop: 2 },
   walkMeta: { fontFamily: fonts.body, fontSize: 12, color: colors.inkFaint, marginTop: 8 },
+  startBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: colors.terracotta,
+    borderRadius: radii.md,
+    marginHorizontal: 20,
+    marginBottom: 16,
+    paddingVertical: 16,
+  },
+  startBtnText: { fontFamily: fonts.bodyBold, fontSize: 15, color: colors.cream },
 });

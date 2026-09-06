@@ -56,6 +56,11 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   const [marks, setMarks] = useState<WordMark[] | null>(null);
   const [marksLoading, setMarksLoading] = useState(false);
   const [narrationMode, setNarrationMode] = useState<NarrationMode>("scroll");
+  // Reading the first line before Play reads as a bug, not a preview --
+  // once playback has genuinely started at least once, this stays true even
+  // through a later pause/seek back to 0, so the placeholder never reappears
+  // mid-listen.
+  const [hasStarted, setHasStarted] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -108,6 +113,10 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   // yet, not an error).
   const player = useAudioPlayer(audio.state === "ready" ? audio.url : null);
   const status = useAudioPlayerStatus(player);
+
+  useEffect(() => {
+    if (status.playing) setHasStarted(true);
+  }, [status.playing]);
 
   // React Navigation's own screen-transition animations don't run on web
   // (react-native-screens has no web implementation of them) -- this fades
@@ -221,6 +230,8 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
                 text={place.body}
                 marks={marks}
                 marksLoading={marksLoading}
+                hasStarted={hasStarted}
+                pressPlayHint={t.placeDetail.pressPlayHint}
                 currentTimeMs={status.currentTime * 1000}
                 mode={narrationMode}
               />

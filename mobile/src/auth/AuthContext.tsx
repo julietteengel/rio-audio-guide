@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import * as SecureStore from "expo-secure-store";
 import * as Auth from "../data/AuthRepository";
 import type { AuthUser } from "../data/AuthRepository";
+import { secureGetItem, secureSetItem, secureDeleteItem } from "../utils/platformSecureStore";
 
 const TOKEN_KEY = "auth.token";
 const USER_KEY = "auth.user";
@@ -21,13 +21,13 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 async function persistSession(token: string, user: AuthUser): Promise<void> {
-  await SecureStore.setItemAsync(TOKEN_KEY, token);
-  await SecureStore.setItemAsync(USER_KEY, JSON.stringify(user));
+  await secureSetItem(TOKEN_KEY, token);
+  await secureSetItem(USER_KEY, JSON.stringify(user));
 }
 
 async function clearPersistedSession(): Promise<void> {
-  await SecureStore.deleteItemAsync(TOKEN_KEY);
-  await SecureStore.deleteItemAsync(USER_KEY);
+  await secureDeleteItem(TOKEN_KEY);
+  await secureDeleteItem(USER_KEY);
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -45,8 +45,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       const [storedToken, storedUser] = await Promise.all([
-        SecureStore.getItemAsync(TOKEN_KEY),
-        SecureStore.getItemAsync(USER_KEY),
+        secureGetItem(TOKEN_KEY),
+        secureGetItem(USER_KEY),
       ]);
       if (storedToken && storedUser) {
         setToken(storedToken);

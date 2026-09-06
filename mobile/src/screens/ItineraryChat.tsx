@@ -88,7 +88,7 @@ export function ItineraryChatScreen({ navigation }: Props) {
                           if (!isSuggestion) placeNumber += 1;
                           return (
                             <Text key={si} style={isSuggestion ? styles.stopLineSuggestion : styles.stopLine}>
-                              {isSuggestion ? stop.label : `${placeNumber}. ${stop.label}`}
+                              {isSuggestion ? `🍽️ ${stop.label}` : `${placeNumber}. ${stop.label}`}
                               {isSuggestion ? ` (${t.itineraries.suggestionLabel})` : ""}
                             </Text>
                           );

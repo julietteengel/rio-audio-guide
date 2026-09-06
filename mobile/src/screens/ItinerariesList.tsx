@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { View, Text, Pressable, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
-import Svg, { Polyline, Path } from "react-native-svg";
+import Svg, { Polyline, Path, Line } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
@@ -80,10 +80,20 @@ export function ItinerariesListScreen({ navigation }: Props) {
               style={styles.card}
               onPress={() => navigation.navigate("ItineraryDetail", { itineraryId: item.id })}
             >
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.cardMeta}>
-                {formatDuration(item.totalMinutes)} · {t.itineraries.stopCount.replace("{count}", String(item.placeCount))}
-              </Text>
+              <View style={styles.cardIcon}>
+                <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+                  <Line x1={4} y1={9} x2={20} y2={9} stroke={colors.groundText} strokeWidth={2} strokeLinecap="round" />
+                  <Line x1={4} y1={15} x2={20} y2={15} stroke={colors.groundText} strokeWidth={2} strokeLinecap="round" />
+                  <Line x1={10} y1={3} x2={8} y2={21} stroke={colors.groundText} strokeWidth={2} strokeLinecap="round" />
+                  <Line x1={16} y1={3} x2={14} y2={21} stroke={colors.groundText} strokeWidth={2} strokeLinecap="round" />
+                </Svg>
+              </View>
+              <View style={styles.cardBody}>
+                <Text style={styles.cardTitle}>{item.title}</Text>
+                <Text style={styles.cardMeta}>
+                  {formatDuration(item.totalMinutes)} · {t.itineraries.stopCount.replace("{count}", String(item.placeCount))}
+                </Text>
+              </View>
             </Pressable>
           )}
         />
@@ -124,12 +134,24 @@ const styles = StyleSheet.create({
   emptyBody: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: colors.inkSoft, textAlign: "center" },
   list: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 32, gap: 12 },
   card: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
     backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.line,
     borderRadius: radii.md,
     padding: 16,
   },
+  cardIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: radii.sm,
+    backgroundColor: colors.groundBg,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardBody: { flex: 1 },
   cardTitle: { fontFamily: fonts.bodySemiBold, fontSize: 16, color: colors.ink, marginBottom: 4 },
   cardMeta: { fontFamily: fonts.body, fontSize: 13, color: colors.inkSoft },
 });

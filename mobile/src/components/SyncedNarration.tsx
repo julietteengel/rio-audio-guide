@@ -13,6 +13,13 @@ type Props = {
   // the full free-text fallback (marks === null) and then snapped to the
   // synced panel the instant marks arrived, a jarring flicker on every load.
   marksLoading: boolean;
+  // False until playback has genuinely started at least once -- reading the
+  // first synced line before Play reads as a bug (it looked like playback
+  // had already jumped ahead), not a helpful preview.
+  hasStarted: boolean;
+  // Localized prompt shown instead of the first line while !hasStarted --
+  // this component has no locale of its own, callers already own their t().
+  pressPlayHint: string;
   currentTimeMs: number;
   mode: NarrationMode;
 };
@@ -25,7 +32,7 @@ const DIM_TEXT = "rgba(250,245,238,0.45)";
 // (pre-redesign) screen.
 const FREE_TEXT = "rgba(250,245,238,0.85)";
 
-export function SyncedNarration({ text, marks, marksLoading, currentTimeMs, mode }: Props) {
+export function SyncedNarration({ text, marks, marksLoading, hasStarted, pressPlayHint, currentTimeMs, mode }: Props) {
   // Always called, even on the free/fallback/loading paths below, to
   // satisfy the rules of hooks -- 26 keeps a grouped line to a single
   // rendered line at the active-line font size (22px bold in a ~326pt-wide
@@ -71,6 +78,18 @@ export function SyncedNarration({ text, marks, marksLoading, currentTimeMs, mode
     return (
       <View style={styles.panel}>
         <ActivityIndicator color={colors.terracotta} />
+      </View>
+    );
+  }
+
+  // Marks are ready but playback hasn't started -- show a press-play prompt
+  // instead of the first line, which otherwise looked like narration
+  // already in progress. "Lecture libre" is unaffected: showing the full
+  // text up front is that mode's whole point.
+  if (mode === "scroll" && marks && !hasStarted) {
+    return (
+      <View style={styles.panel}>
+        <Text style={styles.pressPlayHint}>{pressPlayHint}</Text>
       </View>
     );
   }
@@ -144,5 +163,13 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     color: colors.cream,
     textAlign: "center",
+  },
+  pressPlayHint: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 15,
+    color: DIM_TEXT,
+    textAlign: "center",
+    textTransform: "uppercase",
+    letterSpacing: 1,
   },
 });

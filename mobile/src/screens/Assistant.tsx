@@ -113,7 +113,11 @@ export function AssistantScreen({ route, navigation }: Props) {
           </Pressable>
         </View>
 
-        {available === false ? (
+        {!token ? (
+          <View style={styles.unavailable}>
+            <Text style={styles.unavailableBody}>{t.assistant.pleaseLogIn}</Text>
+          </View>
+        ) : available === false ? (
           <View style={styles.unavailable}>
             <Text style={styles.unavailableTitle}>{t.assistant.unavailableTitle}</Text>
             <Text style={styles.unavailableBody}>{t.assistant.unavailableBody}</Text>
@@ -170,7 +174,7 @@ export function AssistantScreen({ route, navigation }: Props) {
                 onSubmitEditing={handleSend}
                 returnKeyType="send"
               />
-              <Pressable style={[styles.sendBtn, (!input.trim() || !token) && styles.sendBtnDisabled]} disabled={!input.trim() || !!pendingQuestion || !token} onPress={handleSend}>
+              <Pressable style={[styles.sendBtn, !input.trim() && styles.sendBtnDisabled]} disabled={!input.trim() || !!pendingQuestion} onPress={handleSend}>
                 <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
                   <Path d="M22 2 11 13" stroke={colors.cream} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                   <Path d="M22 2 15 22 11 13 2 9 22 2Z" stroke={colors.cream} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />

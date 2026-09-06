@@ -53,6 +53,7 @@ export const dictionary = {
       itineraryComingSoonBody: "L'ajout de lieux à un itinéraire arrive prochainement.",
       narrationPending: "La narration de ce lieu est en cours de préparation.",
       narrationUnavailable: "Aucune narration n'est disponible pour ce lieu pour le moment.",
+      pressPlayHint: "Écouter maintenant",
     },
     categories: {
       church: "Église",
@@ -80,6 +81,7 @@ export const dictionary = {
       unavailableTitle: "Pas encore disponible",
       unavailableBody: "L'assistant a besoin d'une narration vérifiée pour ce lieu, pas encore publiée dans cette langue.",
       sendError: "Une erreur est survenue. Réessaie.",
+      pleaseLogIn: "Connecte-toi pour poser une question à l'assistant.",
     },
     itineraries: {
       pleaseLogIn: "Connecte-toi pour voir tes itinéraires.",
@@ -96,6 +98,7 @@ export const dictionary = {
       suggestionLabel: "Suggestion de l'IA, non vérifiée",
       walkToNext: "{minutes} min à pied",
       detailNotFound: "Cet itinéraire est introuvable.",
+      startItinerary: "Démarrer l'itinéraire",
     },
     auth: {
       loginTitle: "Se connecter",
@@ -186,6 +189,7 @@ export const dictionary = {
       itineraryComingSoonBody: "Adding places to an itinerary is coming soon.",
       narrationPending: "This place's narration is being prepared.",
       narrationUnavailable: "No narration is available for this place yet.",
+      pressPlayHint: "Listen now",
     },
     categories: {
       church: "Church",
@@ -213,6 +217,7 @@ export const dictionary = {
       unavailableTitle: "Not available yet",
       unavailableBody: "The assistant needs verified narration for this place, not yet published in this language.",
       sendError: "Something went wrong. Please try again.",
+      pleaseLogIn: "Log in to ask the assistant a question.",
     },
     itineraries: {
       pleaseLogIn: "Log in to see your itineraries.",
@@ -229,6 +234,7 @@ export const dictionary = {
       suggestionLabel: "AI suggestion, unverified",
       walkToNext: "{minutes} min walk",
       detailNotFound: "This itinerary could not be found.",
+      startItinerary: "Start itinerary",
     },
     auth: {
       loginTitle: "Log in",
@@ -319,6 +325,7 @@ export const dictionary = {
       itineraryComingSoonBody: "Adicionar lugares a um itinerário estará disponível em breve.",
       narrationPending: "A narração deste lugar está sendo preparada.",
       narrationUnavailable: "Ainda não há narração disponível para este lugar.",
+      pressPlayHint: "Ouvir agora",
     },
     categories: {
       church: "Igreja",
@@ -346,6 +353,7 @@ export const dictionary = {
       unavailableTitle: "Ainda não disponível",
       unavailableBody: "O assistente precisa de uma narração verificada para este lugar, ainda não publicada neste idioma.",
       sendError: "Ocorreu um erro. Tente novamente.",
+      pleaseLogIn: "Faça login para perguntar ao assistente.",
     },
     itineraries: {
       pleaseLogIn: "Faça login para ver seus roteiros.",
@@ -362,6 +370,7 @@ export const dictionary = {
       suggestionLabel: "Sugestão da IA, não verificada",
       walkToNext: "{minutes} min a pé",
       detailNotFound: "Este roteiro não foi encontrado.",
+      startItinerary: "Começar o roteiro",
     },
     auth: {
       loginTitle: "Entrar",
@@ -452,6 +461,7 @@ export const dictionary = {
       itineraryComingSoonBody: "Añadir lugares a un itinerario estará disponible próximamente.",
       narrationPending: "La narración de este lugar se está preparando.",
       narrationUnavailable: "Todavía no hay narración disponible para este lugar.",
+      pressPlayHint: "Escuchar ahora",
     },
     categories: {
       church: "Iglesia",
@@ -479,6 +489,7 @@ export const dictionary = {
       unavailableTitle: "Aún no disponible",
       unavailableBody: "El asistente necesita una narración verificada para este lugar, aún no publicada en este idioma.",
       sendError: "Ocurrió un error. Inténtalo de nuevo.",
+      pleaseLogIn: "Inicia sesión para preguntarle al asistente.",
     },
     itineraries: {
       pleaseLogIn: "Inicia sesión para ver tus itinerarios.",
@@ -495,6 +506,7 @@ export const dictionary = {
       suggestionLabel: "Sugerencia de la IA, no verificada",
       walkToNext: "{minutes} min a pie",
       detailNotFound: "No se encontró este itinerario.",
+      startItinerary: "Iniciar itinerario",
     },
     auth: {
       loginTitle: "Iniciar sesión",
