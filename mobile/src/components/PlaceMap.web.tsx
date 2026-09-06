@@ -74,7 +74,15 @@ function LeafletPlaceMap({ places, region, userLocation, youAreHereLabel, onSele
 }
 
 const GOOGLE_MAP_CONTAINER_STYLE = { height: "100%", width: "100%" };
-const GOOGLE_MAP_OPTIONS = { styles: MAP_STYLE };
+// Google's default chrome (map-type toggle, Street View pegman, fullscreen
+// button) is switched off -- Leaflet never had it, and this map is meant to
+// read as on-brand, not as an embedded Google product.
+const GOOGLE_MAP_OPTIONS = {
+  styles: MAP_STYLE,
+  mapTypeControl: false,
+  streetViewControl: false,
+  fullscreenControl: false,
+};
 
 // Google Maps JS API, on-brand styled (see googleMapStyle.ts). Only
 // rendered when GOOGLE_MAPS_API_KEY is configured -- see PlaceMap below
