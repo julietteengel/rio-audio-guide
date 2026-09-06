@@ -1,4 +1,11 @@
-import { hasSufficientStorage, planResumableAudioDownloads } from "../offlineStore";
+import {
+  hasSufficientStorage,
+  planResumableAudioDownloads,
+  getLastNotifiedAt,
+  setLastNotifiedAt,
+  saveCachedPlaces,
+  clearCachedPlaces,
+} from "../offlineStore";
 import type { CachedPlace } from "../offlineStore";
 
 describe("hasSufficientStorage", () => {
@@ -50,5 +57,40 @@ describe("planResumableAudioDownloads", () => {
   it("returns everything when nothing is cached yet", () => {
     const manifest = [{ id: "a" }, { id: "b" }];
     expect(planResumableAudioDownloads(manifest, [])).toEqual(manifest);
+  });
+});
+
+describe("getLastNotifiedAt / setLastNotifiedAt", () => {
+  afterEach(async () => {
+    await clearCachedPlaces();
+  });
+
+  it("is null for a place that was never notified about", async () => {
+    await saveCachedPlaces([
+      { id: "cristo", name: "Cristo Redentor", category: "monument", lat: -22.9519, lon: -43.2105, body: "text", audioLocalUri: null },
+    ]);
+    expect(await getLastNotifiedAt("cristo")).toBeNull();
+  });
+
+  it("returns the timestamp set by setLastNotifiedAt", async () => {
+    await saveCachedPlaces([
+      { id: "cristo", name: "Cristo Redentor", category: "monument", lat: -22.9519, lon: -43.2105, body: "text", audioLocalUri: null },
+    ]);
+    const ts = Date.now();
+    await setLastNotifiedAt("cristo", ts);
+    expect(await getLastNotifiedAt("cristo")).toBe(ts);
+  });
+
+  it("is not clobbered by a later saveCachedPlaces upsert of the same place", async () => {
+    await saveCachedPlaces([
+      { id: "cristo", name: "Cristo Redentor", category: "monument", lat: -22.9519, lon: -43.2105, body: "text", audioLocalUri: null },
+    ]);
+    const ts = Date.now();
+    await setLastNotifiedAt("cristo", ts);
+    // Re-saving (as a fresh download would) must not reset the cooldown clock.
+    await saveCachedPlaces([
+      { id: "cristo", name: "Cristo Redentor", category: "monument", lat: -22.9519, lon: -43.2105, body: "updated text", audioLocalUri: null },
+    ]);
+    expect(await getLastNotifiedAt("cristo")).toBe(ts);
   });
 });

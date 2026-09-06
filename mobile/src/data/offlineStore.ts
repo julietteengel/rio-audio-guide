@@ -14,6 +14,9 @@ export type CachedPlace = {
   // null until downloadManager.ts's download loop actually writes the audio
   // file and records its local file:// URI here.
   audioLocalUri: string | null;
+  // Optional: Plan 1's downloadManager.ts never sets this, and doesn't need
+  // to -- it's populated only by setLastNotifiedAt, below.
+  lastNotifiedAt?: number | null;
 };
 
 type CachedPlaceRow = {
@@ -24,6 +27,7 @@ type CachedPlaceRow = {
   lon: number;
   body: string;
   audio_local_uri: string | null;
+  last_notified_at: number | null;
 };
 
 const DB_NAME = "memoria-carioca-offline.db";
@@ -37,6 +41,7 @@ function rowToCachedPlace(row: CachedPlaceRow): CachedPlace {
     lon: row.lon,
     body: row.body,
     audioLocalUri: row.audio_local_uri,
+    lastNotifiedAt: row.last_notified_at,
   };
 }
 
@@ -70,6 +75,12 @@ function getDb(): Promise<SQLite.SQLiteDatabase> {
           audio_local_uri TEXT
         );`,
       );
+      const versionRow = await db.getFirstAsync<{ user_version: number }>(`PRAGMA user_version;`);
+      const version = versionRow?.user_version ?? 0;
+      if (version < 1) {
+        await db.execAsync(`ALTER TABLE cached_places ADD COLUMN last_notified_at INTEGER;`);
+        await db.execAsync(`PRAGMA user_version = 1;`);
+      }
       return db;
     });
   }
@@ -141,6 +152,26 @@ export async function clearCachedPlaces(): Promise<void> {
   }
   const db = await getDb();
   await db.execAsync(`DELETE FROM cached_places;`);
+}
+
+export async function getLastNotifiedAt(id: string): Promise<number | null> {
+  if (Platform.OS === "web") return webStore.get(id)?.lastNotifiedAt ?? null;
+  const db = await getDb();
+  const row = await db.getFirstAsync<{ last_notified_at: number | null }>(
+    `SELECT last_notified_at FROM cached_places WHERE id = ?`,
+    id,
+  );
+  return row?.last_notified_at ?? null;
+}
+
+export async function setLastNotifiedAt(id: string, timestampMs: number): Promise<void> {
+  if (Platform.OS === "web") {
+    const existing = webStore.get(id);
+    if (existing) webStore.set(id, { ...existing, lastNotifiedAt: timestampMs });
+    return;
+  }
+  const db = await getDb();
+  await db.runAsync(`UPDATE cached_places SET last_notified_at = ? WHERE id = ?`, timestampMs, id);
 }
 
 // --- pure helpers (no I/O -- unit-tested directly, see Step 1) -------------
