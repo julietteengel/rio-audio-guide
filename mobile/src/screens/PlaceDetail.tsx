@@ -1,10 +1,9 @@
 // mobile/src/screens/PlaceDetail.tsx
-import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, Image, StyleSheet } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, View, Text, Pressable, Image, StyleSheet, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
-import Svg, { Polyline, Path, Line } from "react-native-svg";
+import Svg, { Polyline, Path, Line, Circle } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
@@ -14,6 +13,7 @@ import { colors, fonts, radii } from "../theme/tokens";
 import { fetchWordMarks, type WordMark } from "../utils/syncedText";
 import { SyncedNarration, type NarrationMode } from "../components/SyncedNarration";
 import { AudioProgressBar } from "../components/AudioProgressBar";
+import { alertInfo } from "../utils/platformAlert";
 
 type Props = NativeStackScreenProps<AppStackParamList, "PlaceDetail">;
 
@@ -44,9 +44,17 @@ function formatTime(seconds: number): string {
 
 export function PlaceDetailScreen({ route, navigation }: Props) {
   const { t, locale } = useLocale();
+  // A fixed pixel size looks fine on a real phone's ~375-430px-wide screen
+  // but reads as tiny on a wide desktop/tablet testing window -- sizing off
+  // the actual window width keeps it proportionally the same "most of the
+  // screen" square on both, capped so it doesn't become absurd on a large
+  // display.
+  const { width: windowWidth } = useWindowDimensions();
+  const heroImageSize = Math.min(windowWidth * 0.72, 340);
   const [place, setPlace] = useState<Place | null>(null);
   const [audio, setAudio] = useState<AudioAvailability>({ state: "unavailable" });
   const [marks, setMarks] = useState<WordMark[] | null>(null);
+  const [marksLoading, setMarksLoading] = useState(false);
   const [narrationMode, setNarrationMode] = useState<NarrationMode>("scroll");
 
   useEffect(() => {
@@ -78,10 +86,17 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   // transition, surlignant les mauvais mots.
   useEffect(() => {
     setMarks(null);
-    if (audio.state !== "ready" || !audio.timestampsUrl) return;
+    if (audio.state !== "ready" || !audio.timestampsUrl) {
+      setMarksLoading(false);
+      return;
+    }
+    setMarksLoading(true);
     let cancelled = false;
     fetchWordMarks(audio.timestampsUrl).then((result) => {
-      if (!cancelled) setMarks(result);
+      if (!cancelled) {
+        setMarks(result);
+        setMarksLoading(false);
+      }
     });
     return () => {
       cancelled = true;
@@ -94,6 +109,17 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   const player = useAudioPlayer(audio.state === "ready" ? audio.url : null);
   const status = useAudioPlayerStatus(player);
 
+  // React Navigation's own screen-transition animations don't run on web
+  // (react-native-screens has no web implementation of them) -- this fades
+  // the screen in on mount instead, entirely independent of the navigator,
+  // so the jump from the rest of the app's light theme into this screen's
+  // dark one reads as a deliberate dissolve rather than an abrupt cut on
+  // every platform, not just wherever the native transition happens to work.
+  const screenOpacity = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(screenOpacity, { toValue: 1, duration: 350, useNativeDriver: true }).start();
+  }, [screenOpacity]);
+
   if (!place) return null;
 
   const canPlay = audio.state === "ready";
@@ -104,32 +130,28 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   const progress = status.duration > 0 ? status.currentTime / status.duration : 0;
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.hero}>
+    <Animated.View style={[styles.screen, { opacity: screenOpacity }]}>
+      <SafeAreaView edges={["top"]} style={styles.topBar}>
+        <Pressable style={styles.iconBtn} onPress={() => navigation.goBack()}>
+          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+            <Polyline points="15 6 9 12 15 18" stroke={colors.cream} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+        </Pressable>
+      </SafeAreaView>
+
+      <View style={[styles.heroImageWrap, { width: heroImageSize, height: heroImageSize }]}>
         <Image
           source={require("../../assets/images/place-hero.jpg")}
-          style={StyleSheet.absoluteFill}
+          style={styles.heroImage}
           resizeMode="cover"
         />
-        <LinearGradient
-          colors={["rgba(28,14,7,0.78)", "rgba(28,14,7,0.22)", "rgba(28,14,7,0)"]}
-          start={{ x: 0, y: 1 }}
-          end={{ x: 0, y: 0 }}
-          style={StyleSheet.absoluteFill}
-        />
-        <SafeAreaView edges={["top"]}>
-          <Pressable style={styles.back} onPress={() => navigation.goBack()}>
-            <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-              <Polyline points="15 6 9 12 15 18" stroke={colors.cream} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
-            </Svg>
-          </Pressable>
-        </SafeAreaView>
-        <View style={styles.heroText}>
-          <Text style={styles.eyebrow}>
-            {place.neighborhood ? `${categoryLabel} · ${place.neighborhood}` : categoryLabel}
-          </Text>
-          <Text style={styles.title}>{place.name}</Text>
-        </View>
+      </View>
+
+      <View style={styles.heroText}>
+        <Text style={styles.eyebrow}>
+          {place.neighborhood ? `${categoryLabel} · ${place.neighborhood}` : categoryLabel}
+        </Text>
+        <Text style={styles.title}>{place.name}</Text>
       </View>
 
       <SafeAreaView edges={["bottom"]} style={styles.rest}>
@@ -198,16 +220,10 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
               <SyncedNarration
                 text={place.body}
                 marks={marks}
+                marksLoading={marksLoading}
                 currentTimeMs={status.currentTime * 1000}
                 mode={narrationMode}
               />
-            </View>
-
-            <View style={styles.ground}>
-              <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-                <Polyline points="5 13 10 18 19 7" stroke={colors.groundText} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-              </Svg>
-              <Text style={styles.groundText}>{t.placeDetail.groundBadge}</Text>
             </View>
           </>
         ) : (
@@ -225,7 +241,7 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
           disabled={place.narrationStatus !== "ready"}
           onPress={() => navigation.navigate("Assistant", { placeId: place.id })}
         >
-          <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+          <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
             <Path
               d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
               stroke={colors.terracotta}
@@ -235,38 +251,54 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
             />
           </Svg>
           <Text style={styles.askText}>{t.placeDetail.ask}</Text>
-          <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
+            <Polyline points="9 6 15 12 9 18" stroke={DIM_45} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+        </Pressable>
+
+        <Pressable
+          style={[styles.ask, styles.askLast]}
+          onPress={() => alertInfo(t.placeDetail.itineraryComingSoonTitle, t.placeDetail.itineraryComingSoonBody)}
+        >
+          <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
+            <Circle cx={12} cy={12} r={9} stroke={colors.terracotta} strokeWidth={2} />
+            <Line x1={12} y1={8} x2={12} y2={16} stroke={colors.terracotta} strokeWidth={2} strokeLinecap="round" />
+            <Line x1={8} y1={12} x2={16} y2={12} stroke={colors.terracotta} strokeWidth={2} strokeLinecap="round" />
+          </Svg>
+          <Text style={styles.askText}>{t.placeDetail.addToItinerary}</Text>
+          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
             <Polyline points="9 6 15 12 9 18" stroke={DIM_45} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>
         </Pressable>
       </SafeAreaView>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: DARK_BG },
-  hero: {
-    height: 260,
-    backgroundColor: colors.sand,
-    justifyContent: "space-between",
-    // Without this, react-native-web's absolutely-positioned cover Image
-    // (and its gradient overlay) can render taller than this fixed-height
-    // container and bleed into the content below on web -- native clips
-    // this automatically, web doesn't.
-    overflow: "hidden",
-  },
-  back: {
-    marginLeft: 18,
-    marginTop: 8,
+  topBar: { flexDirection: "row", justifyContent: "space-between", paddingHorizontal: 18, paddingTop: 8 },
+  iconBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "rgba(28,14,7,0.4)",
+    backgroundColor: "rgba(250,245,238,0.1)",
     alignItems: "center",
     justifyContent: "center",
   },
-  heroText: { paddingHorizontal: 20, paddingBottom: 18 },
+  // A centered square image card, Spotify-album-art style, rather than a
+  // full-bleed banner -- the generic hero photo (not yet a real per-place
+  // image, see the backend gap list) reads better at this smaller,
+  // deliberate size than stretched wide with text overlaid on top of it.
+  heroImageWrap: {
+    alignSelf: "center",
+    borderRadius: radii.lg,
+    overflow: "hidden",
+    marginTop: 12,
+    backgroundColor: colors.sand,
+  },
+  heroImage: { width: "100%", height: "100%" },
+  heroText: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 4 },
   eyebrow: {
     fontFamily: fonts.bodyBold,
     fontSize: 11.5,
@@ -295,31 +327,19 @@ const styles = StyleSheet.create({
   toggleBtnActive: { backgroundColor: TINT_ACTIVE },
   lyricsArea: { flex: 1, minHeight: 0, paddingHorizontal: 32, justifyContent: "center" },
   pendingText: { fontFamily: fonts.body, fontSize: 15, lineHeight: 24, color: DIM_55, textAlign: "center" },
-  ground: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    alignSelf: "flex-start",
-    backgroundColor: colors.groundBg,
-    borderRadius: radii.pill,
-    paddingVertical: 7,
-    paddingHorizontal: 12,
-    marginHorizontal: 20,
-    marginTop: 16,
-  },
-  groundText: { fontFamily: fonts.bodyBold, fontSize: 12, color: colors.groundText },
   ask: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+    backgroundColor: TINT_ACTIVE,
     borderWidth: 1,
     borderColor: DIM_18,
     borderRadius: radii.md,
-    padding: 14,
+    padding: 16,
     marginHorizontal: 20,
-    marginTop: 16,
-    marginBottom: 12,
+    marginTop: 12,
   },
-  askText: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 14.5, color: colors.cream },
+  askText: { flex: 1, fontFamily: fonts.bodyBold, fontSize: 15, color: colors.cream },
+  askLast: { marginBottom: 16 },
   askDisabled: { opacity: 0.4 },
 });
