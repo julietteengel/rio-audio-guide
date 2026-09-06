@@ -25,9 +25,12 @@ may now write domain/ports code too, human-reviewed like every other layer.
 
 ## What this is not
 
-- Not a live RAG chat / research copilot — explicitly considered and rejected as feature creep for a
-  tourist audio guide. AI here is a content-production tool, not the product itself. (Reconsiderable
-  in Phase 2 if a real user need emerges — see Guide runtime.)
+- Through 2026-09-06, not a live RAG chat / research copilot — explicitly considered and rejected as
+  feature creep for a tourist audio guide, AI here being a content-production tool, not the product
+  itself. Reversed 2026-09-06: a real per-place Q&A assistant (grounded in that place's own narration
+  content, with an honestly-marked general-knowledge fallback) is now in scope — see
+  `docs/superpowers/specs/2026-09-06-place-assistant-design.md`. Distinct from the itineraries feature's
+  own chat, which composes routes across places rather than answering about one.
 - Not a copy of any specific existing project — "AI geolocated audio guide" is an established product
   category (VoiceMap, izi.TRAVEL, GPSmyCity, Summer AI...). Differentiation is real multilingual
   content (not just translated UI), audio as the primary experience, locally-verified content, and
