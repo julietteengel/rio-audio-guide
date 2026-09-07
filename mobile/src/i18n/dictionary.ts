@@ -162,6 +162,9 @@ export const dictionary = {
       proximityNoDownloadTitle: "Aucune ville téléchargée",
       proximityNoDownloadBody:
         "Télécharge d'abord une ville pour activer les notifications de proximité.",
+      proximityWebUnsupportedTitle: "Non disponible sur navigateur",
+      proximityWebUnsupportedBody:
+        "Les notifications de proximité nécessitent l'application mobile — cette fonctionnalité ne peut pas fonctionner dans un navigateur.",
       languageNames: { pt: "Português", en: "English", fr: "Français", es: "Español" },
     },
     notifications: {
@@ -326,6 +329,9 @@ export const dictionary = {
       proximityNoDownloadTitle: "No city downloaded",
       proximityNoDownloadBody:
         "Download a city first to turn on proximity notifications.",
+      proximityWebUnsupportedTitle: "Not available on web",
+      proximityWebUnsupportedBody:
+        "Proximity notifications need the mobile app — this feature can't work in a browser.",
       languageNames: { pt: "Português", en: "English", fr: "Français", es: "Español" },
     },
     notifications: {
@@ -490,6 +496,9 @@ export const dictionary = {
       proximityNoDownloadTitle: "Nenhuma cidade baixada",
       proximityNoDownloadBody:
         "Baixe uma cidade primeiro para ativar as notificações de proximidade.",
+      proximityWebUnsupportedTitle: "Não disponível no navegador",
+      proximityWebUnsupportedBody:
+        "As notificações de proximidade precisam do aplicativo móvel — esse recurso não funciona em um navegador.",
       languageNames: { pt: "Português", en: "English", fr: "Français", es: "Español" },
     },
     notifications: {
@@ -654,6 +663,9 @@ export const dictionary = {
       proximityNoDownloadTitle: "Ninguna ciudad descargada",
       proximityNoDownloadBody:
         "Descarga una ciudad primero para activar las notificaciones de proximidad.",
+      proximityWebUnsupportedTitle: "No disponible en el navegador",
+      proximityWebUnsupportedBody:
+        "Las notificaciones de proximidad necesitan la aplicación móvil — esta función no puede funcionar en un navegador.",
       languageNames: { pt: "Português", en: "English", fr: "Français", es: "Español" },
     },
     notifications: {

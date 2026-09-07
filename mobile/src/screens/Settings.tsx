@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Svg, { Polyline } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -67,6 +67,16 @@ export function SettingsScreen({ navigation }: Props) {
   }
 
   async function toggleProximity() {
+    // expo-task-manager/expo-location have no real background-execution
+    // surface on web (no native geofencing hardware, no background JS
+    // runtime) -- calling startLocationUpdatesAsync/startGeofencingAsync
+    // there hits an undefined native method and throws a confusing generic
+    // error. An honest, explicit message here is the same choice already
+    // made for the map screen's own web gap (webMapUnavailable).
+    if (Platform.OS === "web") {
+      Alert.alert(t.settings.proximityWebUnsupportedTitle, t.settings.proximityWebUnsupportedBody);
+      return;
+    }
     try {
       if (proximityEnabled) {
         await stopProximityMonitoring();
