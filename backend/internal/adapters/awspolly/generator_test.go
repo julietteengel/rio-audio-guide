@@ -269,8 +269,24 @@ func TestGenerator_Generate_UnsupportedLanguageFailsBeforeAnyPollyCall(t *testin
 var _ ports.TTSGenerator = (*Generator)(nil)
 
 func TestWrapSSML_EscapesXMLSpecialCharsAndAppliesRate(t *testing.T) {
-	got := wrapSSML(`Tom & Jerry <said> "hi"`)
+	got := wrapSSML(`Tom & Jerry <said> "hi"`, "fr")
 	want := `<speak><prosody rate="90%">Tom &amp; Jerry &lt;said&gt; "hi"</prosody></speak>`
+	if got != want {
+		t.Fatalf("got %q, want %q", got, want)
+	}
+}
+
+func TestWrapSSML_PortugueseUsesItsOwnRate(t *testing.T) {
+	got := wrapSSML("Olá", "pt")
+	want := `<speak><prosody rate="100%">Olá</prosody></speak>`
+	if got != want {
+		t.Fatalf("got %q, want %q", got, want)
+	}
+}
+
+func TestWrapSSML_UnlistedLanguageFallsBackToDefaultRate(t *testing.T) {
+	got := wrapSSML("Hello", "en")
+	want := `<speak><prosody rate="90%">Hello</prosody></speak>`
 	if got != want {
 		t.Fatalf("got %q, want %q", got, want)
 	}

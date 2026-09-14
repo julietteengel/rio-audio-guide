@@ -159,13 +159,26 @@ func keyFromOutputURI(outputURI, bucket string) (string, error) {
 // synchrone a été remplacé par ce polling asynchrone.
 const pollTimeout = 20 * time.Minute
 
-// speechRate pilote le débit de parole via SSML -- 90% (10% plus lent que le
-// débit par défaut du moteur Neural), retenu après un premier test réel jugé
-// "parle trop vite" (Cristo Redentor FR, 26/08). Valeur globale pour
-// l'instant, pas un paramètre par appel comme voiceID -- à ajuster ici selon
-// le retour terrain, ou à faire remonter en paramètre si un besoin de
-// variation par narration/voix apparaît un jour.
-const speechRate = "90%"
+// defaultSpeechRate pilote le débit de parole via SSML -- 90% (10% plus lent
+// que le débit par défaut du moteur Neural), retenu après un premier test
+// réel jugé "parle trop vite" (Cristo Redentor FR, 26/08).
+const defaultSpeechRate = "90%"
+
+// speechRateByLanguage surcharge defaultSpeechRate par langue -- nécessaire
+// depuis qu'un même pourcentage se lit différemment selon la voix Neural
+// utilisée : 90% (réglé sur la voix française Remi) a été jugé trop lent une
+// fois entendu sur la voix portugaise Vitória (test réel, 14/09). Seules les
+// langues qui ont besoin d'un réglage différent du défaut apparaissent ici.
+var speechRateByLanguage = map[string]string{
+	"pt": "100%",
+}
+
+func speechRateFor(language string) string {
+	if rate, ok := speechRateByLanguage[language]; ok {
+		return rate
+	}
+	return defaultSpeechRate
+}
 
 // xmlEscaper échappe le minimum requis par SSML (&, <, >) -- le texte source
 // est de la prose ordinaire (ponctuation, guillemets français), donc le
@@ -173,10 +186,11 @@ const speechRate = "90%"
 // casserait le XML sans cet échappement.
 var xmlEscaper = strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;")
 
-// wrapSSML enrobe le texte brut en SSML avec le débit configuré -- nécessaire
-// pour piloter <prosody rate>, qu'un TextType=text en clair ne permet pas.
-func wrapSSML(text string) string {
-	return `<speak><prosody rate="` + speechRate + `">` + xmlEscaper.Replace(text) + `</prosody></speak>`
+// wrapSSML enrobe le texte brut en SSML avec le débit configuré pour cette
+// langue -- nécessaire pour piloter <prosody rate>, qu'un TextType=text en
+// clair ne permet pas.
+func wrapSSML(text, language string) string {
+	return `<speak><prosody rate="` + speechRateFor(language) + `">` + xmlEscaper.Replace(text) + `</prosody></speak>`
 }
 
 func (g *Generator) Generate(ctx context.Context, text, language, voiceID string) (string, string, time.Duration, error) {
@@ -188,7 +202,7 @@ func (g *Generator) Generate(ctx context.Context, text, language, voiceID string
 	ctx, cancel := context.WithTimeout(ctx, pollTimeout)
 	defer cancel()
 
-	ssmlText := wrapSSML(text)
+	ssmlText := wrapSSML(text, language)
 	var audioKey, marksKey string
 	group, gctx := errgroup.WithContext(ctx)
 	group.Go(func() error {
