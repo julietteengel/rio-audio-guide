@@ -2138,10 +2138,28 @@ tightly-scoped inline policy restricted to `ses:SendEmail`/`ses:SendRawEmail` on
 identity's ARN is preferable to match `rio-cicd`'s existing minimal-permissions posture, but the managed
 policy is faster to attach today — tightening it later is a config-only change, not a code change.)
 
-- [ ] **Step 4: Set `SES_SENDER_EMAIL` on the deployed backend**
+- [ ] **Step 4: Apply the schema change to the deployed database**
 
-SSH into the EC2 instance (via the AWS Console's EC2 Instance Connect, same as every other manual step
-this session used), then:
+Same `ALTER TABLE` as Task 2 Step 6, run against the EC2 instance's Postgres container instead of the
+local one (via the AWS Console's EC2 Instance Connect, same as every other manual step this session
+used). **This must run BEFORE Step 5's redeploy** — the new binary's `SELECT`/`INSERT` statements name
+`email_verified` explicitly, so redeploying first would make every user-touching route (`/login`,
+`/register`, `/me`, everything behind `requireAuth`) 500 until this runs. Running it first is safe
+against the currently-deployed OLD binary too: it lists every column explicitly, so three new columns
+with defaults are invisible to it.
+
+```bash
+sudo docker exec rio-backend-postgres-1 psql -U postgres -d postgres -c "
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS verification_code TEXT,
+  ADD COLUMN IF NOT EXISTS verification_code_expires_at TIMESTAMPTZ;
+"
+```
+
+- [ ] **Step 5: Set `SES_SENDER_EMAIL` on the deployed backend and redeploy**
+
+From the same EC2 Instance Connect terminal session as Step 4:
 
 ```bash
 cd ~/rio-backend
@@ -2154,20 +2172,6 @@ deployment step follows this plan's implementation — if the instance is still 
 without Tasks 1-6's changes, this command alone won't yet reflect them; that redeploy is outside this
 plan's scope, the same way the rest of this session's live-testing loop has redeployed the backend
 manually each time.)
-
-- [ ] **Step 5: Apply the schema change to the deployed database**
-
-Same `ALTER TABLE` as Task 2 Step 6, run against the EC2 instance's Postgres container instead of the
-local one (from the same EC2 Instance Connect terminal session as Step 4):
-
-```bash
-sudo docker exec rio-backend-postgres-1 psql -U postgres -d postgres -c "
-ALTER TABLE users
-  ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false,
-  ADD COLUMN IF NOT EXISTS verification_code TEXT,
-  ADD COLUMN IF NOT EXISTS verification_code_expires_at TIMESTAMPTZ;
-"
-```
 
 - [ ] **Step 6: Request production access (not blocking, do when convenient)**
 
