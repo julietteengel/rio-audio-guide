@@ -55,7 +55,7 @@ func testPlace(t *testing.T, name string, lat, lon float64) *domain.Place {
 }
 
 func TestCreateItinerary_RequiresAuth(t *testing.T) {
-	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
+	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
 
 	body, _ := json.Marshal(map[string]string{"request": "1h à Santa Teresa"})
 	req := httptest.NewRequest(http.MethodPost, "/itineraries", bytes.NewReader(body))
@@ -76,7 +76,7 @@ func TestCreateItinerary_Success(t *testing.T) {
 		Stops: []ports.GeneratedStop{{PlaceID: place.ID(), Label: place.Name().String(), TimeOnSiteMinutes: 10, WalkToNextMinutes: 0}},
 	}}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, generator, &fakePlaceAssistantHTTP{})
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, generator, &fakePlaceAssistantHTTP{}, nil)
 
 	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
 	body, _ := json.Marshal(map[string]string{"request": "1h à Santa Teresa"})
@@ -105,7 +105,7 @@ func TestCreateItinerary_ResponseIncludesStopKinds(t *testing.T) {
 		},
 	}}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, generator, &fakePlaceAssistantHTTP{})
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, generator, &fakePlaceAssistantHTTP{}, nil)
 
 	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
 	body, _ := json.Marshal(map[string]string{"request": "1h à Santa Teresa"})
@@ -143,7 +143,7 @@ func TestListItineraries_Success(t *testing.T) {
 	}
 	itineraryRepo := &fakeItineraryRepoHTTP{byUserID: map[string][]*domain.Itinerary{"test-user-id": {existing}}}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
+	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
 
 	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
 	req := httptest.NewRequest(http.MethodGet, "/itineraries", nil)
@@ -166,7 +166,7 @@ func TestGetItinerary_NotFoundForAnotherUser(t *testing.T) {
 	}
 	itineraryRepo := &fakeItineraryRepoHTTP{byID: map[string]*domain.Itinerary{existing.ID(): existing}}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
+	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
 
 	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
 	req := httptest.NewRequest(http.MethodGet, "/itineraries/"+existing.ID(), nil)

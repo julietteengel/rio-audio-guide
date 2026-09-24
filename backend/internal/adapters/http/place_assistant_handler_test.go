@@ -43,7 +43,7 @@ func publishedScriptFixtureHTTP(t *testing.T, placeID, language, text string) *d
 }
 
 func TestAskAssistant_RequiresAuth(t *testing.T) {
-	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}}, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
+	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}}, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
 
 	body, _ := json.Marshal(map[string]string{"language": "fr", "question": "Quand ?"})
 	req := httptest.NewRequest(http.MethodPost, "/places/place-1/assistant", bytes.NewReader(body))
@@ -61,7 +61,7 @@ func TestAskAssistant_Success(t *testing.T) {
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{script.ID(): script}}
 	assistant := &fakePlaceAssistantHTTP{result: ports.AssistantAnswer{Answer: "En 1931.", GroundingLevel: "grounded"}}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, assistant)
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, assistant, nil)
 
 	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
 	body, _ := json.Marshal(map[string]string{"language": "fr", "question": "Quand a-t-il été construit ?"})
@@ -89,7 +89,7 @@ func TestAskAssistant_Success(t *testing.T) {
 func TestAskAssistant_NoPublishedScript_Returns404(t *testing.T) {
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{}}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
 
 	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
 	body, _ := json.Marshal(map[string]string{"language": "fr", "question": "Quand ?"})
@@ -116,7 +116,7 @@ func TestAskAssistant_UnpublishedScript_Returns404(t *testing.T) {
 	draft := domain.NewScript("place-1", lang, text, "source") // never reviewed/published -- stays draft
 	scriptRepo := &fakeScriptRepo{scripts: map[string]*domain.Script{draft.ID(): draft}}
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{}, scriptRepo, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
+	server := NewServer(&fakePlaceRepo{}, scriptRepo, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
 
 	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
 	body, _ := json.Marshal(map[string]string{"language": "fr", "question": "Quand ?"})
@@ -133,7 +133,7 @@ func TestAskAssistant_UnpublishedScript_Returns404(t *testing.T) {
 
 func TestAskAssistant_EmptyQuestion_Returns400(t *testing.T) {
 	tokens := fakeTokenIssuer{}
-	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}}, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{})
+	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{scripts: map[string]*domain.Script{}}, &fakeAudioFileRepo{}, newFakeUserRepo(), &fakeItineraryRepoHTTP{}, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
 
 	token, _ := tokens.Issue("test-user-id", domain.RoleUser)
 	body, _ := json.Marshal(map[string]string{"language": "fr", "question": ""})
