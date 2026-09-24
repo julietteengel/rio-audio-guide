@@ -9,10 +9,12 @@ import (
 	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/aws/aws-sdk-go-v2/config"
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/jackc/pgx/v5/pgxpool"
 	amqp "github.com/rabbitmq/amqp091-go"
 	goredis "github.com/redis/go-redis/v9"
 
+	"rioaudioguide/backend/internal/adapters/awsses"
 	"rioaudioguide/backend/internal/adapters/claude"
 	httpadapter "rioaudioguide/backend/internal/adapters/http"
 	"rioaudioguide/backend/internal/adapters/jwt"
@@ -86,6 +88,9 @@ func main() {
 	s3Client := awss3.NewFromConfig(awsCfg)
 	storage := s3.NewAudioStorage(s3Client, envOr("S3_BUCKET", "rio-audio-guide"))
 
+	sesClient := sesv2.NewFromConfig(awsCfg)
+	emailSender := awsses.NewSender(sesClient, envOr("SES_SENDER_EMAIL", "noreply@example.com"))
+
 	// Timeouts courts + retries quasi désactivés : le cache est en fail-open (toute
 	// erreur Redis = miss), mais avec les valeurs par défaut du SDK (dial 5s, 3
 	// retries, backoff jusqu'à 1s) un Redis en panne transformerait ce fail-open en
@@ -116,7 +121,7 @@ func main() {
 	itineraryGenerator := claude.NewItineraryGenerator(&anthropicClient.Messages)
 	placeAssistant := claude.NewPlaceAssistant(&anthropicClient.Messages)
 
-	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, userRepo, itineraryRepo, publisher, storage, cache, tokens, itineraryGenerator, placeAssistant)
+	server := httpadapter.NewServer(placeRepo, scriptRepo, audioFileRepo, userRepo, itineraryRepo, publisher, storage, cache, tokens, itineraryGenerator, placeAssistant, emailSender)
 	log.Println("api ready, listening on :8080")
 	if err := server.Start(":8080"); err != nil {
 		log.Fatalf("http server: %v", err)

@@ -31,7 +31,7 @@ func (s *Server) registerUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
 	}
 
-	user, err := application.RegisterUser(c.Request().Context(), s.userRepo, req.Email, req.Password, domain.RoleUser)
+	user, err := application.RegisterUser(c.Request().Context(), s.userRepo, s.emailSender, req.Email, req.Password, domain.RoleUser)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": err.Error()})
 	}
@@ -55,6 +55,9 @@ func (s *Server) login(c echo.Context) error {
 
 	token, err := application.LoginUser(c.Request().Context(), s.userRepo, s.tokens, req.Email, req.Password)
 	if err != nil {
+		if errors.Is(err, application.ErrEmailNotVerified) {
+			return c.JSON(http.StatusForbidden, echo.Map{"error": "email not verified"})
+		}
 		// Toujours 401 générique ici, jamais de détail sur "email inconnu" vs
 		// "mot de passe faux" -- ApplicationErrInvalidCredentials existe
 		// justement pour ne jamais faire cette distinction.
@@ -104,4 +107,41 @@ func (s *Server) deleteMe(c echo.Context) error {
 		return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": err.Error()})
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+type verifyEmailRequest struct {
+	Email string `json:"email"`
+	Code  string `json:"code"`
+}
+
+func (s *Server) verifyEmail(c echo.Context) error {
+	var req verifyEmailRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
+	}
+
+	if err := application.VerifyEmail(c.Request().Context(), s.userRepo, req.Email, req.Code); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": "invalid or expired code"})
+	}
+	return c.JSON(http.StatusOK, echo.Map{})
+}
+
+type resendVerificationCodeRequest struct {
+	Email string `json:"email"`
+}
+
+// resendVerificationCode always returns 200, whether or not the email
+// belongs to a real account -- application.ResendVerificationCode already
+// enforces this anti-enumeration behavior, this handler just doesn't
+// second-guess it.
+func (s *Server) resendVerificationCode(c echo.Context) error {
+	var req resendVerificationCodeRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
+	}
+
+	if err := application.ResendVerificationCode(c.Request().Context(), s.userRepo, s.emailSender, req.Email); err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, echo.Map{})
 }

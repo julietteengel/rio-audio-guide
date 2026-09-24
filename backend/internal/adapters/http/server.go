@@ -27,9 +27,10 @@ type Server struct {
 	tokens        ports.TokenIssuer
 	generator     ports.ItineraryGenerator
 	assistant     ports.PlaceAssistant
+	emailSender   ports.EmailSender
 }
 
-func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, userRepo ports.UserRepository, itineraryRepo ports.ItineraryRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage, cache ports.Cache, tokens ports.TokenIssuer, generator ports.ItineraryGenerator, assistant ports.PlaceAssistant) *Server {
+func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepository, audioFileRepo ports.AudioFileRepository, userRepo ports.UserRepository, itineraryRepo ports.ItineraryRepository, publisher ports.AudioJobPublisher, storage ports.AudioStorage, cache ports.Cache, tokens ports.TokenIssuer, generator ports.ItineraryGenerator, assistant ports.PlaceAssistant, emailSender ports.EmailSender) *Server {
 	s := &Server{
 		echo:          echo.New(),
 		placeRepo:     placeRepo,
@@ -43,6 +44,7 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 		tokens:        tokens,
 		generator:     generator,
 		assistant:     assistant,
+		emailSender:   emailSender,
 	}
 	// Sans ce middleware, un navigateur (web/, mobile/ en cible web via
 	// react-native-web) bloque toute réponse de cette API -- curl et l'app
@@ -68,6 +70,8 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 
 	s.echo.POST("/register", s.registerUser)
 	s.echo.POST("/login", s.login)
+	s.echo.POST("/verify-email", s.verifyEmail)
+	s.echo.POST("/resend-verification-code", s.resendVerificationCode)
 	s.echo.POST("/logout", s.logout, auth)
 	s.echo.PATCH("/me", s.updateMe, auth)
 	s.echo.DELETE("/me", s.deleteMe, auth)
