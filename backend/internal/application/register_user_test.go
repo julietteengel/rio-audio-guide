@@ -10,10 +10,10 @@ import (
 )
 
 type fakeUserRepo struct {
-	users            map[string]*domain.User
-	byEmail          map[string]string // email -> userID
-	codes            map[string]string
-	codeExpiries     map[string]time.Time
+	users        map[string]*domain.User
+	byEmail      map[string]string // email -> userID
+	codes        map[string]string
+	codeExpiries map[string]time.Time
 }
 
 func newFakeUserRepo() *fakeUserRepo {
