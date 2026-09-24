@@ -78,11 +78,12 @@ func (r Role) String() string { return string(r) }
 // --- Entity ---
 
 type User struct {
-	id           string
-	email        Email
-	passwordHash PasswordHash
-	role         Role
-	status       UserStatus
+	id            string
+	email         Email
+	passwordHash  PasswordHash
+	role          Role
+	status        UserStatus
+	emailVerified bool
 }
 
 // NewUser ne retourne plus d'erreur : email/passwordHash/role sont déjà
@@ -90,23 +91,26 @@ type User struct {
 // NewPlace/NewScript.
 func NewUser(email Email, passwordHash PasswordHash, role Role) *User {
 	return &User{
-		id:           newID(),
-		email:        email,
-		passwordHash: passwordHash,
-		role:         role,
-		status:       UserStatusActive,
+		id:            newID(),
+		email:         email,
+		passwordHash:  passwordHash,
+		role:          role,
+		status:        UserStatusActive,
+		emailVerified: false,
 	}
 }
 
 // ReconstructUser rebâtit un User depuis des données déjà valides (une
-// ligne Postgres) -- préserve l'ID et le statut donnés, ne revalide rien.
-func ReconstructUser(id string, email Email, passwordHash PasswordHash, role Role, status UserStatus) *User {
+// ligne Postgres) -- préserve l'ID, le statut, et l'état de vérification
+// donnés, ne revalide rien.
+func ReconstructUser(id string, email Email, passwordHash PasswordHash, role Role, status UserStatus, emailVerified bool) *User {
 	return &User{
-		id:           id,
-		email:        email,
-		passwordHash: passwordHash,
-		role:         role,
-		status:       status,
+		id:            id,
+		email:         email,
+		passwordHash:  passwordHash,
+		role:          role,
+		status:        status,
+		emailVerified: emailVerified,
 	}
 }
 
@@ -134,6 +138,18 @@ func (u *User) ChangeRole(role Role) error {
 	return nil
 }
 
+// MarkEmailVerified is idempotent -- re-submitting a still-valid code (or a
+// stale client retrying) on an already-verified account is a harmless
+// no-op, not an error. Only a deleted account is rejected, same guard every
+// other mutator on this entity already uses.
+func (u *User) MarkEmailVerified() error {
+	if u.status == UserStatusDeleted {
+		return ErrUserDeleted
+	}
+	u.emailVerified = true
+	return nil
+}
+
 // Delete est un soft delete (même logique que Place.Remove) -- le compte
 // disparaît du produit sans perdre la trace de qui a réalisé quelles
 // actions passées (ex. Script.reviewerID pointant vers cet ID).
@@ -152,3 +168,4 @@ func (u *User) Email() Email               { return u.email }
 func (u *User) PasswordHash() PasswordHash { return u.passwordHash }
 func (u *User) Role() Role                 { return u.role }
 func (u *User) Status() UserStatus         { return u.status }
+func (u *User) EmailVerified() bool        { return u.emailVerified }
