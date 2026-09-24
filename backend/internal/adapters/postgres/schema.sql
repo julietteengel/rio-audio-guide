@@ -1,13 +1,16 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 CREATE TABLE users (
-    id            TEXT PRIMARY KEY,
-    email         TEXT NOT NULL UNIQUE,
-    password_hash TEXT NOT NULL,
-    role          TEXT NOT NULL DEFAULT 'user',
-    status        TEXT NOT NULL DEFAULT 'active',
-    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    id                             TEXT PRIMARY KEY,
+    email                          TEXT NOT NULL UNIQUE,
+    password_hash                  TEXT NOT NULL,
+    role                           TEXT NOT NULL DEFAULT 'user',
+    status                         TEXT NOT NULL DEFAULT 'active',
+    email_verified                 BOOLEAN NOT NULL DEFAULT false,
+    verification_code              TEXT,
+    verification_code_expires_at   TIMESTAMPTZ,
+    created_at                     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at                     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE places (
