@@ -30,7 +30,12 @@ export function VerifyEmailScreen({ route, navigation }: Props) {
       // started with (password was carried through via route params
       // specifically so they don't have to type it twice).
       await login(email, password);
-      navigation.getParent()?.goBack();
+      // VerifyEmail and Auth are both plain screens on AppNavigator's own
+      // stack (siblings of Map/Settings/etc, not nested navigators), so
+      // popping 2 dismisses both and lands back on whatever screen opened
+      // Auth -- getParent() would instead walk up to RootNavigator, whose
+      // stack has nothing to pop once onboarding is done, and silently no-op.
+      navigation.pop(2);
     } catch (err) {
       setError(err instanceof AuthApiError ? t.verifyEmail.invalidCode : t.auth.networkError);
     } finally {
@@ -65,20 +70,21 @@ export function VerifyEmailScreen({ route, navigation }: Props) {
           maxLength={6}
           placeholder={t.verifyEmail.codePlaceholder}
           placeholderTextColor={colors.inkFaint}
+          editable={!submitting && !resending}
         />
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
         {resendMessage ? <Text style={styles.resendMessage}>{resendMessage}</Text> : null}
 
         <Pressable
-          style={[styles.btn, (!code.trim() || submitting) && styles.btnDisabled]}
+          style={[styles.btn, (!code.trim() || submitting || resending) && styles.btnDisabled]}
           onPress={submit}
-          disabled={!code.trim() || submitting}
+          disabled={!code.trim() || submitting || resending}
         >
           {submitting ? <ActivityIndicator color={colors.cream} /> : <Text style={styles.btnText}>{t.verifyEmail.submitCta}</Text>}
         </Pressable>
 
-        <Pressable style={styles.resendLinkWrap} onPress={resend} disabled={resending}>
+        <Pressable style={styles.resendLinkWrap} onPress={resend} disabled={resending || submitting}>
           <Text style={styles.resendLinkText}>{t.verifyEmail.resendLink}</Text>
         </Pressable>
       </View>
