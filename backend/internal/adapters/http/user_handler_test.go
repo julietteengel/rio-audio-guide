@@ -67,10 +67,14 @@ func (f *fakeHTTPUserRepo) FindVerificationCode(_ context.Context, userID string
 
 type fakeHTTPEmailSender struct {
 	lastCode string
+	err      error
 }
 
 func (f *fakeHTTPEmailSender) SendVerificationCode(_ context.Context, _, code string) error {
 	f.lastCode = code
+	if f.err != nil {
+		return f.err
+	}
 	return nil
 }
 
@@ -89,6 +93,25 @@ func (fakeTokenIssuerForHTTP) Issue(userID string, role domain.Role) (string, er
 
 func (fakeTokenIssuerForHTTP) Verify(token string) (string, domain.Role, error) {
 	return "", "", errors.New("not implemented in fake")
+}
+
+func TestRegisterHandler_Returns201EvenWhenVerificationEmailFailsToSend(t *testing.T) {
+	userRepo := newFakeHTTPUserRepo()
+	emailSender := &fakeHTTPEmailSender{err: errors.New("ses rejected the request")}
+	server := newTestServerForUserHandlers(userRepo, emailSender)
+
+	body, _ := json.Marshal(map[string]string{"email": "sendfails@example.com", "password": "password123"})
+	req := httptest.NewRequest("POST", "/register", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != 201 {
+		t.Fatalf("got status %d, want 201 even though the verification email failed to send, body: %s", rec.Code, rec.Body.String())
+	}
+	if _, err := userRepo.FindByEmail(context.Background(), "sendfails@example.com"); err != nil {
+		t.Fatalf("expected the account to still be persisted: %v", err)
+	}
 }
 
 func TestVerifyEmailHandler_CorrectCodeReturns200(t *testing.T) {
@@ -142,6 +165,30 @@ func TestResendVerificationCodeHandler_AlwaysReturns200(t *testing.T) {
 
 	if rec.Code != 200 {
 		t.Fatalf("got status %d, want 200 even for an unknown email, body: %s", rec.Code, rec.Body.String())
+	}
+}
+
+// This is the anti-enumeration property that matters most: without it, an
+// unauthenticated caller could tell "no such account" (200, nil error) apart
+// from "account exists, send failed" (would-be 500) -- exactly the outcome
+// SES sandbox mode produces for every address that isn't pre-verified.
+func TestResendVerificationCodeHandler_Returns200EvenWhenSendFails(t *testing.T) {
+	userRepo := newFakeHTTPUserRepo()
+	registerSender := &fakeHTTPEmailSender{}
+	if _, err := application.RegisterUser(context.Background(), userRepo, registerSender, "resend-fails@example.com", "password123", domain.RoleUser); err != nil {
+		t.Fatalf("register: %v", err)
+	}
+	emailSender := &fakeHTTPEmailSender{err: errors.New("ses rejected the request")}
+	server := newTestServerForUserHandlers(userRepo, emailSender)
+
+	body, _ := json.Marshal(map[string]string{"email": "resend-fails@example.com"})
+	req := httptest.NewRequest("POST", "/resend-verification-code", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != 200 {
+		t.Fatalf("got status %d, want 200 even though the resend's email send failed, body: %s", rec.Code, rec.Body.String())
 	}
 }
 

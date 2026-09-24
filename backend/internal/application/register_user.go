@@ -2,6 +2,8 @@ package application
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -14,6 +16,15 @@ import (
 // 15 minutes, per the design spec.
 const verificationCodeTTL = 15 * time.Minute
 
+// ErrVerificationEmailNotSent wraps a failure from the email provider itself
+// -- distinct from every other RegisterUser error, because the account was
+// still created successfully. The caller (registerUser handler) uses
+// errors.Is against this to still return 201: the user exists and can
+// verify later via /resend-verification-code, so treating this the same as
+// a genuine registration failure (bad email, duplicate account) would be
+// wrong per the design spec's HTTP section.
+var ErrVerificationEmailNotSent = errors.New("application: failed to send verification email")
+
 // RegisterUser hashes the plaintext password with bcrypt -- the domain
 // PasswordHash Value Object only validates "non-empty", it has no idea how
 // a hash is produced. The plaintext password never leaves this function:
@@ -24,10 +35,14 @@ const verificationCodeTTL = 15 * time.Minute
 // so a duplicate surfaces as a Save error instead of a racy check-then-act.
 //
 // After the account is persisted, a 6-digit verification code is generated,
-// stored, and emailed. If the email send fails, the error is returned to
-// the caller -- but the account and its stored code are NOT rolled back:
-// a transient email-provider failure shouldn't destroy a just-created
-// account, and the client can always fall back to the resend endpoint.
+// stored, and emailed. If the email send fails, ErrVerificationEmailNotSent
+// is returned (wrapping the underlying error) alongside the created user --
+// the account and its stored code are NOT rolled back: a transient
+// email-provider failure shouldn't destroy a just-created account, and the
+// client can always fall back to the resend endpoint. Callers must check
+// errors.Is(err, ErrVerificationEmailNotSent) to distinguish this from a
+// genuine registration failure (the returned *domain.User is nil in every
+// other error case, non-nil only here).
 func RegisterUser(ctx context.Context, userRepo ports.UserRepository, emailSender ports.EmailSender, email, plaintextPassword string, role domain.Role) (*domain.User, error) {
 	emailVO, err := domain.NewEmail(email)
 	if err != nil {
@@ -56,7 +71,7 @@ func RegisterUser(ctx context.Context, userRepo ports.UserRepository, emailSende
 		return nil, err
 	}
 	if err := emailSender.SendVerificationCode(ctx, user.Email().String(), code); err != nil {
-		return nil, err
+		return user, fmt.Errorf("%w: %v", ErrVerificationEmailNotSent, err)
 	}
 
 	return user, nil

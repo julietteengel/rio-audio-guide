@@ -2,6 +2,7 @@ package http
 
 import (
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/jackc/pgx/v5"
@@ -33,7 +34,15 @@ func (s *Server) registerUser(c echo.Context) error {
 
 	user, err := application.RegisterUser(c.Request().Context(), s.userRepo, s.emailSender, req.Email, req.Password, domain.RoleUser)
 	if err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": err.Error()})
+		if !errors.Is(err, application.ErrVerificationEmailNotSent) {
+			return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": err.Error()})
+		}
+		// The account was created successfully -- only the email failed to
+		// send (the default outcome for any non-pre-verified address while
+		// SES is in sandbox mode). Per the design spec, this must still be a
+		// 201: the account works once verified, and the client can always
+		// fall back to /resend-verification-code.
+		log.Printf("registerUser: verification email failed to send for user %s: %v", user.ID(), err)
 	}
 	return c.JSON(http.StatusCreated, userResponse{ID: user.ID(), Email: user.Email().String(), Role: user.Role().String()})
 }
@@ -131,9 +140,13 @@ type resendVerificationCodeRequest struct {
 }
 
 // resendVerificationCode always returns 200, whether or not the email
-// belongs to a real account -- application.ResendVerificationCode already
-// enforces this anti-enumeration behavior, this handler just doesn't
-// second-guess it.
+// belongs to a real account, and whether or not the send itself succeeded --
+// the anti-enumeration guarantee is not conditional on SES cooperating. A
+// caller distinguishing "no such account" (nil error) from "account exists,
+// send failed" (500) would defeat the entire point of this endpoint, which
+// is exactly what happens for every non-pre-verified address while SES is
+// in sandbox mode. A send failure is logged server-side instead, and the
+// user can just tap resend again.
 func (s *Server) resendVerificationCode(c echo.Context) error {
 	var req resendVerificationCodeRequest
 	if err := c.Bind(&req); err != nil {
@@ -141,7 +154,7 @@ func (s *Server) resendVerificationCode(c echo.Context) error {
 	}
 
 	if err := application.ResendVerificationCode(c.Request().Context(), s.userRepo, s.emailSender, req.Email); err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		log.Printf("resendVerificationCode: %v", err)
 	}
 	return c.JSON(http.StatusOK, echo.Map{})
 }
