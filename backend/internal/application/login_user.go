@@ -15,6 +15,13 @@ import (
 // response would let an attacker enumerate which emails have accounts.
 var ErrInvalidCredentials = errors.New("application: invalid email or password")
 
+// ErrEmailNotVerified is deliberately distinct from ErrInvalidCredentials:
+// the caller has already proven they know the correct password for this
+// exact email, so confirming "this account needs verification" leaks no
+// information an attacker didn't already have -- unlike ErrInvalidCredentials,
+// there is no enumeration risk here.
+var ErrEmailNotVerified = errors.New("application: email not verified")
+
 // LoginUser verifies the password against the stored bcrypt hash and, on
 // success, issues a signed JWT carrying the user's ID and role -- nothing
 // else goes in the token (see internal/adapters/jwt: the payload is
@@ -30,6 +37,10 @@ func LoginUser(ctx context.Context, userRepo ports.UserRepository, tokens ports.
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash().String()), []byte(plaintextPassword)); err != nil {
 		return "", ErrInvalidCredentials
+	}
+
+	if !user.EmailVerified() {
+		return "", ErrEmailNotVerified
 	}
 
 	return tokens.Issue(user.ID(), user.Role())
