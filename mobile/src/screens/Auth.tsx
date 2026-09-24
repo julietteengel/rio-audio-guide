@@ -31,14 +31,18 @@ export function AuthScreen({ navigation }: Props) {
         navigation.goBack();
       } else {
         await register(email.trim(), password);
-        navigation.navigate("VerifyEmail", { email: email.trim(), password });
+        navigation.navigate("VerifyEmail", { email: email.trim(), password, codeAlreadySent: true });
       }
     } catch (err) {
       if (err instanceof AuthApiError && err.status === 403) {
         // Registered previously but never verified (e.g. closed the app
-        // before entering the code) -- route to the same screen rather
-        // than showing a generic login error.
-        navigation.navigate("VerifyEmail", { email: email.trim(), password });
+        // before entering the code, or a pre-existing account that predates
+        // this feature) -- route to the same screen rather than showing a
+        // generic login error. codeAlreadySent is false here: unlike the
+        // register branch above, we have no idea whether a code was ever
+        // actually sent to this address, so VerifyEmail sends a fresh one
+        // itself before telling the user to check their inbox.
+        navigation.navigate("VerifyEmail", { email: email.trim(), password, codeAlreadySent: false });
       } else {
         setError(err instanceof AuthApiError ? t.auth.genericError : t.auth.networkError);
       }
