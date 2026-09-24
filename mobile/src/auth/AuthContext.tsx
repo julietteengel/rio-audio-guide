@@ -16,6 +16,8 @@ type AuthContextValue = {
   logout: () => Promise<void>;
   updateProfile: (changes: { email?: string; password?: string }) => Promise<void>;
   deleteAccount: () => Promise<void>;
+  verifyEmail: (email: string, code: string) => Promise<void>;
+  resendVerificationCode: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -71,11 +73,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function registerFn(email: string, password: string) {
-    const newUser = await Auth.register(email, password);
-    const newToken = await Auth.login(email, password);
-    await persistSession(newToken, newUser);
-    setToken(newToken);
-    setUser(newUser);
+    await Auth.register(email, password);
+    // Deliberately no auto-login here anymore: a freshly registered
+    // account isn't verified yet, and /login now rejects with 403 until it
+    // is. AuthScreen.submit() navigates to VerifyEmail next, which calls
+    // login() itself once the code is confirmed.
   }
 
   async function loginFn(email: string, password: string) {
@@ -139,6 +141,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout: logoutFn,
       updateProfile: updateProfileFn,
       deleteAccount: deleteAccountFn,
+      verifyEmail: Auth.verifyEmail,
+      resendVerificationCode: Auth.resendVerificationCode,
     }),
     [user, token, isLoading],
   );

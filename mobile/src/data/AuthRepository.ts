@@ -80,3 +80,11 @@ export async function updateProfile(
 export async function deleteAccount(token: string): Promise<void> {
   await authFetch<null>("/me", { method: "DELETE", token });
 }
+
+export async function verifyEmail(email: string, code: string): Promise<void> {
+  await authFetch<Record<string, never>>("/verify-email", { method: "POST", body: { email, code } });
+}
+
+export async function resendVerificationCode(email: string): Promise<void> {
+  await authFetch<Record<string, never>>("/resend-verification-code", { method: "POST", body: { email } });
+}

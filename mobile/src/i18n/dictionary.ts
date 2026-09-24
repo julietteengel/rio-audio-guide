@@ -120,6 +120,7 @@ export const dictionary = {
       switchToLogin: "Déjà un compte ? Connectez-vous",
       genericError: "E-mail ou mot de passe incorrect.",
       networkError: "Impossible de se connecter au serveur. Vérifiez votre connexion.",
+      emailNotVerified: "Vérifie ton e-mail avant de te connecter.",
     },
     editProfile: {
       title: "Modifier le profil",
@@ -127,6 +128,15 @@ export const dictionary = {
       newPasswordPlaceholder: "Laisser vide pour ne pas changer",
       save: "Enregistrer",
       saved: "Profil mis à jour.",
+    },
+    verifyEmail: {
+      title: "Vérifie ton e-mail",
+      subtitle: "On t'a envoyé un code à 6 chiffres à {email}. Entre-le ci-dessous.",
+      codePlaceholder: "123456",
+      submitCta: "Valider",
+      resendLink: "Renvoyer le code",
+      resendSent: "Code renvoyé.",
+      invalidCode: "Code invalide ou expiré.",
     },
     settings: {
       title: "Réglages",
@@ -287,6 +297,7 @@ export const dictionary = {
       switchToLogin: "Already have an account? Log in",
       genericError: "Incorrect email or password.",
       networkError: "Couldn't reach the server. Check your connection.",
+      emailNotVerified: "Verify your email before logging in.",
     },
     editProfile: {
       title: "Edit profile",
@@ -294,6 +305,15 @@ export const dictionary = {
       newPasswordPlaceholder: "Leave blank to keep the current one",
       save: "Save",
       saved: "Profile updated.",
+    },
+    verifyEmail: {
+      title: "Verify your email",
+      subtitle: "We sent a 6-digit code to {email}. Enter it below.",
+      codePlaceholder: "123456",
+      submitCta: "Verify",
+      resendLink: "Resend code",
+      resendSent: "Code resent.",
+      invalidCode: "Invalid or expired code.",
     },
     settings: {
       title: "Settings",
@@ -454,6 +474,7 @@ export const dictionary = {
       switchToLogin: "Já tem conta? Entre",
       genericError: "E-mail ou senha incorretos.",
       networkError: "Não foi possível conectar ao servidor. Verifique sua conexão.",
+      emailNotVerified: "Verifique seu e-mail antes de fazer login.",
     },
     editProfile: {
       title: "Editar perfil",
@@ -461,6 +482,15 @@ export const dictionary = {
       newPasswordPlaceholder: "Deixe em branco para não alterar",
       save: "Salvar",
       saved: "Perfil atualizado.",
+    },
+    verifyEmail: {
+      title: "Verifique seu e-mail",
+      subtitle: "Enviamos um código de 6 dígitos para {email}. Digite-o abaixo.",
+      codePlaceholder: "123456",
+      submitCta: "Verificar",
+      resendLink: "Reenviar código",
+      resendSent: "Código reenviado.",
+      invalidCode: "Código inválido ou expirado.",
     },
     settings: {
       title: "Configurações",
@@ -621,6 +651,7 @@ export const dictionary = {
       switchToLogin: "¿Ya tienes cuenta? Inicia sesión",
       genericError: "Correo o contraseña incorrectos.",
       networkError: "No se pudo conectar con el servidor. Revisa tu conexión.",
+      emailNotVerified: "Verifica tu correo antes de iniciar sesión.",
     },
     editProfile: {
       title: "Editar perfil",
@@ -628,6 +659,15 @@ export const dictionary = {
       newPasswordPlaceholder: "Déjalo en blanco para no cambiarla",
       save: "Guardar",
       saved: "Perfil actualizado.",
+    },
+    verifyEmail: {
+      title: "Verifica tu correo",
+      subtitle: "Te enviamos un código de 6 dígitos a {email}. Ingrésalo abajo.",
+      codePlaceholder: "123456",
+      submitCta: "Verificar",
+      resendLink: "Reenviar código",
+      resendSent: "Código reenviado.",
+      invalidCode: "Código inválido o expirado.",
     },
     settings: {
       title: "Ajustes",

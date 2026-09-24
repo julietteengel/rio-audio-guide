@@ -28,18 +28,20 @@ export function AuthScreen({ navigation }: Props) {
     try {
       if (mode === "login") {
         await login(email.trim(), password);
+        navigation.goBack();
       } else {
         await register(email.trim(), password);
+        navigation.navigate("VerifyEmail", { email: email.trim(), password });
       }
-      navigation.goBack();
     } catch (err) {
-      // /login always returns the same generic error whether the email or
-      // the password was wrong (see application.ErrInvalidCredentials on the
-      // backend) — the UI shows that same generic message rather than
-      // guessing which field was the problem.
-      setError(
-        err instanceof AuthApiError ? t.auth.genericError : t.auth.networkError,
-      );
+      if (err instanceof AuthApiError && err.status === 403) {
+        // Registered previously but never verified (e.g. closed the app
+        // before entering the code) -- route to the same screen rather
+        // than showing a generic login error.
+        navigation.navigate("VerifyEmail", { email: email.trim(), password });
+      } else {
+        setError(err instanceof AuthApiError ? t.auth.genericError : t.auth.networkError);
+      }
     } finally {
       setSubmitting(false);
     }
