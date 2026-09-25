@@ -28,6 +28,12 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
     setSubmitting(true);
     try {
       await resetPassword(email, code.trim(), newPassword);
+    } catch (err) {
+      setError(err instanceof AuthApiError && err.status === 422 ? t.resetPassword.invalidCode : t.auth.networkError);
+      setSubmitting(false);
+      return;
+    }
+    try {
       // Complete the login with the password the user just set, same
       // "finish what they came here to do" pattern VerifyEmail.tsx uses.
       await login(email, newPassword);
@@ -38,7 +44,15 @@ export function ResetPasswordScreen({ route, navigation }: Props) {
       // popping 3 lands back on whatever screen originally opened Auth.
       navigation.pop(3);
     } catch (err) {
-      setError(err instanceof AuthApiError ? t.resetPassword.invalidCode : t.auth.networkError);
+      if (err instanceof AuthApiError && err.status === 403) {
+        // The reset itself succeeded -- only the follow-up login was
+        // rejected because the account was never email-verified. Route to
+        // VerifyEmail rather than showing an "invalid code" error for a
+        // code that already worked (same 403 handling as Auth.tsx's submit()).
+        navigation.navigate("VerifyEmail", { email, password: newPassword, codeAlreadySent: false });
+      } else {
+        setError(t.auth.networkError);
+      }
     } finally {
       setSubmitting(false);
     }

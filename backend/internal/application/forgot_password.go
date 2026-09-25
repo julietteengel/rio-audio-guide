@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"rioaudioguide/backend/internal/domain"
 	"rioaudioguide/backend/internal/ports"
 )
 
@@ -15,6 +16,9 @@ import (
 func ForgotPassword(ctx context.Context, userRepo ports.UserRepository, emailSender ports.EmailSender, email, language string) error {
 	user, err := userRepo.FindByEmail(ctx, email)
 	if err != nil {
+		return nil
+	}
+	if user.Status() == domain.UserStatusDeleted {
 		return nil
 	}
 

@@ -7,6 +7,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
 import { useAuth } from "../auth/AuthContext";
+import { AuthApiError } from "../data/AuthRepository";
 import { colors, fonts, spacing, radii } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<AppStackParamList, "ForgotPassword">;
@@ -15,22 +16,33 @@ export function ForgotPasswordScreen({ navigation }: Props) {
   const { t, locale } = useLocale();
   const { forgotPassword } = useAuth();
   const [email, setEmail] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function submit() {
+    setError(null);
     setSubmitting(true);
     try {
       // Always "succeeds" from this screen's point of view -- the backend
       // never reveals whether the email belongs to a real account
       // (anti-enumeration), so there is nothing to branch on here.
       await forgotPassword(email.trim(), locale);
-    } catch {
-      // A network failure still moves on to ResetPassword: the "resend"
-      // link there covers retrying the actual send.
-    } finally {
-      setSubmitting(false);
-      navigation.navigate("ResetPassword", { email: email.trim() });
+    } catch (err) {
+      if (err instanceof AuthApiError) {
+        // The backend responded -- its anti-enumeration contract guarantees
+        // this is always a 200, so no real HTTP response should ever land
+        // here, but even hypothetically the request did reach the backend.
+        // The "resend" link on ResetPassword covers retrying the actual send.
+      } else {
+        // The request never reached the backend at all (offline, timeout,
+        // etc.) -- do NOT move on to a screen claiming a code was sent.
+        setSubmitting(false);
+        setError(t.auth.networkError);
+        return;
+      }
     }
+    setSubmitting(false);
+    navigation.navigate("ResetPassword", { email: email.trim() });
   }
 
   const canSubmit = email.trim().length > 0 && !submitting;
@@ -60,6 +72,8 @@ export function ForgotPasswordScreen({ navigation }: Props) {
           placeholderTextColor={colors.inkFaint}
           editable={!submitting}
         />
+
+        {error ? <Text style={styles.error}>{error}</Text> : null}
 
         <Pressable style={[styles.btn, !canSubmit && styles.btnDisabled]} onPress={submit} disabled={!canSubmit}>
           {submitting ? <ActivityIndicator color={colors.cream} /> : <Text style={styles.btnText}>{t.forgotPassword.submitCta}</Text>}
@@ -97,6 +111,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     marginBottom: spacing.md,
   },
+  error: { fontFamily: fonts.body, fontSize: 13, color: colors.terracottaDark, marginBottom: spacing.sm },
   btn: {
     backgroundColor: colors.terracotta,
     borderRadius: radii.sm,

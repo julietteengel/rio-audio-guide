@@ -44,6 +44,28 @@ func TestForgotPassword_UnknownEmailReturnsNilSilently(t *testing.T) {
 	}
 }
 
+func TestForgotPassword_DeletedAccountReturnsNilSilently(t *testing.T) {
+	repo := newFakeUserRepo()
+	sender := &fakeEmailSender{}
+	user, err := RegisterUser(context.Background(), repo, sender, "deleted@example.com", "password123", "en", domain.RoleUser)
+	if err != nil {
+		t.Fatalf("register: %v", err)
+	}
+	if err := user.Delete(); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	if err := repo.Save(context.Background(), user); err != nil {
+		t.Fatalf("save: %v", err)
+	}
+
+	if err := ForgotPassword(context.Background(), repo, sender, "deleted@example.com", "en"); err != nil {
+		t.Fatalf("expected nil error for a deleted account (anti-enumeration), got %v", err)
+	}
+	if len(sender.resetSentTo) != 0 {
+		t.Fatal("expected no reset email sent for a deleted account")
+	}
+}
+
 func TestForgotPassword_DoesNotTouchVerificationCode(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}

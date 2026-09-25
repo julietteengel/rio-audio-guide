@@ -31,6 +31,9 @@ func ResetPassword(ctx context.Context, userRepo ports.UserRepository, email, co
 	if err != nil {
 		return ErrResetCodeInvalid
 	}
+	if user.Status() == domain.UserStatusDeleted {
+		return ErrResetCodeInvalid
+	}
 
 	storedCode, expiresAt, err := userRepo.FindResetCode(ctx, user.ID())
 	if err != nil {

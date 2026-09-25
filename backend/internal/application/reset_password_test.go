@@ -93,6 +93,33 @@ func TestResetPassword_UnknownEmailFails(t *testing.T) {
 	}
 }
 
+func TestResetPassword_DeletedAccountFails(t *testing.T) {
+	repo := newFakeUserRepo()
+	sender := &fakeEmailSender{}
+	user, err := RegisterUser(context.Background(), repo, sender, "deleted-reset@example.com", "old-password", "en", domain.RoleUser)
+	if err != nil {
+		t.Fatalf("register: %v", err)
+	}
+	if err := ForgotPassword(context.Background(), repo, sender, "deleted-reset@example.com", "en"); err != nil {
+		t.Fatalf("forgot password: %v", err)
+	}
+	code, _, err := repo.FindResetCode(context.Background(), user.ID())
+	if err != nil {
+		t.Fatalf("find reset code: %v", err)
+	}
+	if err := user.Delete(); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	if err := repo.Save(context.Background(), user); err != nil {
+		t.Fatalf("save: %v", err)
+	}
+
+	err = ResetPassword(context.Background(), repo, "deleted-reset@example.com", code, "new-password")
+	if !errors.Is(err, ErrResetCodeInvalid) {
+		t.Fatalf("got error %v, want ErrResetCodeInvalid", err)
+	}
+}
+
 func TestResetPassword_ClearsCodeAfterSuccess(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}
