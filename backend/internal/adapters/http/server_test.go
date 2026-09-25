@@ -88,16 +88,20 @@ func (f *fakeAudioFileRepo) FindByScriptID(_ context.Context, scriptID string) (
 }
 
 type fakeUserRepo struct {
-	users        map[string]*domain.User
-	codes        map[string]string
-	codeExpiries map[string]time.Time
+	users             map[string]*domain.User
+	codes             map[string]string
+	codeExpiries      map[string]time.Time
+	resetCodes        map[string]string
+	resetCodeExpiries map[string]time.Time
 }
 
 func newFakeUserRepo() *fakeUserRepo {
 	return &fakeUserRepo{
-		users:        map[string]*domain.User{},
-		codes:        map[string]string{},
-		codeExpiries: map[string]time.Time{},
+		users:             map[string]*domain.User{},
+		codes:             map[string]string{},
+		codeExpiries:      map[string]time.Time{},
+		resetCodes:        map[string]string{},
+		resetCodeExpiries: map[string]time.Time{},
 	}
 }
 
@@ -131,6 +135,24 @@ func (f *fakeUserRepo) FindVerificationCode(_ context.Context, userID string) (s
 		return "", time.Time{}, errors.New("not found")
 	}
 	return code, f.codeExpiries[userID], nil
+}
+
+func (f *fakeUserRepo) SaveResetCode(_ context.Context, userID, code string, expiresAt time.Time) error {
+	if f.resetCodes == nil {
+		f.resetCodes = map[string]string{}
+		f.resetCodeExpiries = map[string]time.Time{}
+	}
+	f.resetCodes[userID] = code
+	f.resetCodeExpiries[userID] = expiresAt
+	return nil
+}
+
+func (f *fakeUserRepo) FindResetCode(_ context.Context, userID string) (string, time.Time, error) {
+	code, ok := f.resetCodes[userID]
+	if !ok {
+		return "", time.Time{}, errors.New("not found")
+	}
+	return code, f.resetCodeExpiries[userID], nil
 }
 
 // fakeTokenIssuer skips real signing entirely -- "userID:role" is opaque

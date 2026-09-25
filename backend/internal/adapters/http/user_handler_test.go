@@ -14,18 +14,22 @@ import (
 )
 
 type fakeHTTPUserRepo struct {
-	users        map[string]*domain.User
-	byEmail      map[string]string
-	codes        map[string]string
-	codeExpiries map[string]time.Time
+	users             map[string]*domain.User
+	byEmail           map[string]string
+	codes             map[string]string
+	codeExpiries      map[string]time.Time
+	resetCodes        map[string]string
+	resetCodeExpiries map[string]time.Time
 }
 
 func newFakeHTTPUserRepo() *fakeHTTPUserRepo {
 	return &fakeHTTPUserRepo{
-		users:        map[string]*domain.User{},
-		byEmail:      map[string]string{},
-		codes:        map[string]string{},
-		codeExpiries: map[string]time.Time{},
+		users:             map[string]*domain.User{},
+		byEmail:           map[string]string{},
+		codes:             map[string]string{},
+		codeExpiries:      map[string]time.Time{},
+		resetCodes:        map[string]string{},
+		resetCodeExpiries: map[string]time.Time{},
 	}
 }
 
@@ -63,6 +67,24 @@ func (f *fakeHTTPUserRepo) FindVerificationCode(_ context.Context, userID string
 		return "", time.Time{}, errors.New("not found")
 	}
 	return code, f.codeExpiries[userID], nil
+}
+
+func (f *fakeHTTPUserRepo) SaveResetCode(_ context.Context, userID, code string, expiresAt time.Time) error {
+	if f.resetCodes == nil {
+		f.resetCodes = map[string]string{}
+		f.resetCodeExpiries = map[string]time.Time{}
+	}
+	f.resetCodes[userID] = code
+	f.resetCodeExpiries[userID] = expiresAt
+	return nil
+}
+
+func (f *fakeHTTPUserRepo) FindResetCode(_ context.Context, userID string) (string, time.Time, error) {
+	code, ok := f.resetCodes[userID]
+	if !ok {
+		return "", time.Time{}, errors.New("no reset code found")
+	}
+	return code, f.resetCodeExpiries[userID], nil
 }
 
 type fakeHTTPEmailSender struct {

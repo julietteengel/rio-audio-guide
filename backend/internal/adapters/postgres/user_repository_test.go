@@ -219,3 +219,77 @@ func TestUserRepository_EmailVerifiedRoundTrips(t *testing.T) {
 		t.Fatal("expected EmailVerified() true after reload from Postgres")
 	}
 }
+
+func TestUserRepository_SaveAndFindResetCode(t *testing.T) {
+	pool := testPool(t)
+	repo := NewUserRepository(pool)
+	ctx := context.Background()
+
+	email, _ := domain.NewEmail("reset-code+" + fmt.Sprintf("%d", time.Now().UnixNano()) + "@example.com")
+	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
+	user := domain.NewUser(email, passwordHash, domain.RoleUser)
+	if err := repo.Save(ctx, user); err != nil {
+		t.Fatalf("save user: %v", err)
+	}
+
+	expiresAt := time.Now().Add(15 * time.Minute).Truncate(time.Second)
+	if err := repo.SaveResetCode(ctx, user.ID(), "654321", expiresAt); err != nil {
+		t.Fatalf("save reset code: %v", err)
+	}
+
+	code, gotExpiresAt, err := repo.FindResetCode(ctx, user.ID())
+	if err != nil {
+		t.Fatalf("find reset code: %v", err)
+	}
+	if code != "654321" {
+		t.Fatalf("got code %q, want %q", code, "654321")
+	}
+	if !gotExpiresAt.Equal(expiresAt) {
+		t.Fatalf("got expiry %v, want %v", gotExpiresAt, expiresAt)
+	}
+}
+
+func TestUserRepository_SaveResetCode_OverwritesPrevious(t *testing.T) {
+	pool := testPool(t)
+	repo := NewUserRepository(pool)
+	ctx := context.Background()
+
+	email, _ := domain.NewEmail("reset-overwrite+" + fmt.Sprintf("%d", time.Now().UnixNano()) + "@example.com")
+	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
+	user := domain.NewUser(email, passwordHash, domain.RoleUser)
+	if err := repo.Save(ctx, user); err != nil {
+		t.Fatalf("save user: %v", err)
+	}
+
+	if err := repo.SaveResetCode(ctx, user.ID(), "111111", time.Now().Add(15*time.Minute)); err != nil {
+		t.Fatalf("save first code: %v", err)
+	}
+	if err := repo.SaveResetCode(ctx, user.ID(), "222222", time.Now().Add(15*time.Minute)); err != nil {
+		t.Fatalf("save second code: %v", err)
+	}
+
+	code, _, err := repo.FindResetCode(ctx, user.ID())
+	if err != nil {
+		t.Fatalf("find reset code: %v", err)
+	}
+	if code != "222222" {
+		t.Fatalf("got code %q, want the overwritten %q, not the first one", code, "222222")
+	}
+}
+
+func TestUserRepository_FindResetCode_NotFound(t *testing.T) {
+	pool := testPool(t)
+	repo := NewUserRepository(pool)
+	ctx := context.Background()
+
+	email, _ := domain.NewEmail("no-reset-code+" + fmt.Sprintf("%d", time.Now().UnixNano()) + "@example.com")
+	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
+	user := domain.NewUser(email, passwordHash, domain.RoleUser)
+	if err := repo.Save(ctx, user); err != nil {
+		t.Fatalf("save user: %v", err)
+	}
+
+	if _, _, err := repo.FindResetCode(ctx, user.ID()); err != pgx.ErrNoRows {
+		t.Fatalf("got error %v, want pgx.ErrNoRows for a user with no stored reset code", err)
+	}
+}

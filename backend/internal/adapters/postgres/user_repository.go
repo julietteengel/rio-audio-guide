@@ -81,6 +81,34 @@ func (r *UserRepository) FindVerificationCode(ctx context.Context, userID string
 	return *code, *expiresAt, nil
 }
 
+// SaveResetCode overwrites any previously stored reset code for this user --
+// same overwrite-not-accumulate semantics as SaveVerificationCode.
+func (r *UserRepository) SaveResetCode(ctx context.Context, userID, code string, expiresAt time.Time) error {
+	_, err := r.db.Exec(ctx, `
+		UPDATE users SET reset_code = $1, reset_code_expires_at = $2, updated_at = now() WHERE id = $3
+	`, code, expiresAt, userID)
+	return err
+}
+
+// FindResetCode returns pgx.ErrNoRows when the user has no currently-stored
+// reset code -- never requested one, or it was already cleared after a
+// successful reset. Same nullable-pointer-then-nil-check pattern as
+// FindVerificationCode.
+func (r *UserRepository) FindResetCode(ctx context.Context, userID string) (string, time.Time, error) {
+	var code *string
+	var expiresAt *time.Time
+	err := r.db.QueryRow(ctx, `
+		SELECT reset_code, reset_code_expires_at FROM users WHERE id = $1
+	`, userID).Scan(&code, &expiresAt)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+	if code == nil || expiresAt == nil {
+		return "", time.Time{}, pgx.ErrNoRows
+	}
+	return *code, *expiresAt, nil
+}
+
 func scanUser(row rowScanner) (*domain.User, error) {
 	var id, emailRaw, passwordHashRaw, roleRaw, statusRaw string
 	var emailVerified bool

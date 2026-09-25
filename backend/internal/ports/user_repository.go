@@ -19,4 +19,11 @@ type UserRepository interface {
 	// translation happens at the HTTP layer, not here) when no code is
 	// currently stored for this user.
 	FindVerificationCode(ctx context.Context, userID string) (code string, expiresAt time.Time, err error)
+	// SaveResetCode/FindResetCode mirror SaveVerificationCode/FindVerificationCode
+	// exactly, but store into reset_code/reset_code_expires_at instead --
+	// deliberately separate columns so a password-reset request and an
+	// email-verification request for the same account can never overwrite
+	// each other's in-flight code.
+	SaveResetCode(ctx context.Context, userID, code string, expiresAt time.Time) error
+	FindResetCode(ctx context.Context, userID string) (code string, expiresAt time.Time, err error)
 }

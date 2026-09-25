@@ -9,6 +9,8 @@ CREATE TABLE users (
     email_verified                 BOOLEAN NOT NULL DEFAULT false,
     verification_code              TEXT,
     verification_code_expires_at   TIMESTAMPTZ,
+    reset_code                     TEXT,
+    reset_code_expires_at          TIMESTAMPTZ,
     created_at                     TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at                     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
