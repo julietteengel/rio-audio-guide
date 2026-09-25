@@ -24,7 +24,7 @@ func (fakeTokenIssuer) Verify(token string) (string, domain.Role, error) {
 func TestLoginUser_RejectsUnverifiedAccount(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}
-	if _, err := RegisterUser(context.Background(), repo, sender, "unverified@example.com", "password123", domain.RoleUser); err != nil {
+	if _, err := RegisterUser(context.Background(), repo, sender, "unverified@example.com", "password123", "en", domain.RoleUser); err != nil {
 		t.Fatalf("register: %v", err)
 	}
 
@@ -37,7 +37,7 @@ func TestLoginUser_RejectsUnverifiedAccount(t *testing.T) {
 func TestLoginUser_SucceedsOnceVerified(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}
-	if _, err := RegisterUser(context.Background(), repo, sender, "will-verify@example.com", "password123", domain.RoleUser); err != nil {
+	if _, err := RegisterUser(context.Background(), repo, sender, "will-verify@example.com", "password123", "en", domain.RoleUser); err != nil {
 		t.Fatalf("register: %v", err)
 	}
 	code := sender.sentCode[0]

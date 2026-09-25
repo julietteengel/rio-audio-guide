@@ -13,7 +13,7 @@ import (
 // distinguishes "no such email" from "wrong password"). A resend endpoint
 // that reveals which emails have accounts would be a regression from that
 // stance.
-func ResendVerificationCode(ctx context.Context, userRepo ports.UserRepository, emailSender ports.EmailSender, email string) error {
+func ResendVerificationCode(ctx context.Context, userRepo ports.UserRepository, emailSender ports.EmailSender, email, language string) error {
 	user, err := userRepo.FindByEmail(ctx, email)
 	if err != nil {
 		return nil
@@ -26,5 +26,5 @@ func ResendVerificationCode(ctx context.Context, userRepo ports.UserRepository, 
 	if err := userRepo.SaveVerificationCode(ctx, user.ID(), code, time.Now().Add(verificationCodeTTL)); err != nil {
 		return err
 	}
-	return emailSender.SendVerificationCode(ctx, user.Email().String(), code)
+	return emailSender.SendVerificationCode(ctx, user.Email().String(), code, language)
 }

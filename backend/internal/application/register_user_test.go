@@ -84,19 +84,31 @@ func (f *fakeUserRepo) FindResetCode(_ context.Context, userID string) (string, 
 }
 
 type fakeEmailSender struct {
-	sentTo   []string
-	sentCode []string
+	sentTo       []string
+	sentCode     []string
+	sentLanguage []string
+	resetSentTo  []string
 }
 
-func (f *fakeEmailSender) SendVerificationCode(_ context.Context, toEmail, code string) error {
+func (f *fakeEmailSender) SendVerificationCode(_ context.Context, toEmail, code, language string) error {
 	f.sentTo = append(f.sentTo, toEmail)
 	f.sentCode = append(f.sentCode, code)
+	f.sentLanguage = append(f.sentLanguage, language)
+	return nil
+}
+
+func (f *fakeEmailSender) SendPasswordResetCode(_ context.Context, toEmail, _, _ string) error {
+	f.resetSentTo = append(f.resetSentTo, toEmail)
 	return nil
 }
 
 type erroringEmailSender struct{}
 
-func (erroringEmailSender) SendVerificationCode(context.Context, string, string) error {
+func (erroringEmailSender) SendVerificationCode(context.Context, string, string, string) error {
+	return errors.New("ses is down")
+}
+
+func (erroringEmailSender) SendPasswordResetCode(context.Context, string, string, string) error {
 	return errors.New("ses is down")
 }
 
@@ -104,7 +116,7 @@ func TestRegisterUser_GeneratesAndSendsVerificationCode(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}
 
-	user, err := RegisterUser(context.Background(), repo, sender, "new@example.com", "password123", domain.RoleUser)
+	user, err := RegisterUser(context.Background(), repo, sender, "new@example.com", "password123", "fr", domain.RoleUser)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -114,6 +126,9 @@ func TestRegisterUser_GeneratesAndSendsVerificationCode(t *testing.T) {
 
 	if len(sender.sentTo) != 1 || sender.sentTo[0] != "new@example.com" {
 		t.Fatalf("expected exactly one email sent to new@example.com, got %v", sender.sentTo)
+	}
+	if sender.sentLanguage[0] != "fr" {
+		t.Fatalf("got language %q sent to the adapter, want %q", sender.sentLanguage[0], "fr")
 	}
 	code := sender.sentCode[0]
 	if len(code) != 6 {
@@ -137,7 +152,7 @@ func TestRegisterUser_GeneratesAndSendsVerificationCode(t *testing.T) {
 func TestRegisterUser_ReturnsErrorWhenEmailSendFails(t *testing.T) {
 	repo := newFakeUserRepo()
 
-	_, err := RegisterUser(context.Background(), repo, erroringEmailSender{}, "fail@example.com", "password123", domain.RoleUser)
+	_, err := RegisterUser(context.Background(), repo, erroringEmailSender{}, "fail@example.com", "password123", "en", domain.RoleUser)
 	if err == nil {
 		t.Fatal("expected an error when the email send fails")
 	}

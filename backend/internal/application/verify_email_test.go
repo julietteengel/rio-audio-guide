@@ -12,7 +12,7 @@ import (
 func TestVerifyEmail_CorrectCodeMarksVerified(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}
-	user, err := RegisterUser(context.Background(), repo, sender, "verify@example.com", "password123", domain.RoleUser)
+	user, err := RegisterUser(context.Background(), repo, sender, "verify@example.com", "password123", "en", domain.RoleUser)
 	if err != nil {
 		t.Fatalf("register: %v", err)
 	}
@@ -34,7 +34,7 @@ func TestVerifyEmail_CorrectCodeMarksVerified(t *testing.T) {
 func TestVerifyEmail_WrongCodeFails(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}
-	if _, err := RegisterUser(context.Background(), repo, sender, "wrong-code@example.com", "password123", domain.RoleUser); err != nil {
+	if _, err := RegisterUser(context.Background(), repo, sender, "wrong-code@example.com", "password123", "en", domain.RoleUser); err != nil {
 		t.Fatalf("register: %v", err)
 	}
 
@@ -47,7 +47,7 @@ func TestVerifyEmail_WrongCodeFails(t *testing.T) {
 func TestVerifyEmail_ExpiredCodeFails(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}
-	user, err := RegisterUser(context.Background(), repo, sender, "expired@example.com", "password123", domain.RoleUser)
+	user, err := RegisterUser(context.Background(), repo, sender, "expired@example.com", "password123", "en", domain.RoleUser)
 	if err != nil {
 		t.Fatalf("register: %v", err)
 	}
@@ -66,13 +66,13 @@ func TestVerifyEmail_ExpiredCodeFails(t *testing.T) {
 func TestResendVerificationCode_GeneratesADifferentCode(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}
-	user, err := RegisterUser(context.Background(), repo, sender, "resend@example.com", "password123", domain.RoleUser)
+	user, err := RegisterUser(context.Background(), repo, sender, "resend@example.com", "password123", "en", domain.RoleUser)
 	if err != nil {
 		t.Fatalf("register: %v", err)
 	}
 	firstCode := sender.sentCode[0]
 
-	if err := ResendVerificationCode(context.Background(), repo, sender, "resend@example.com"); err != nil {
+	if err := ResendVerificationCode(context.Background(), repo, sender, "resend@example.com", "en"); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if len(sender.sentCode) != 2 {
@@ -96,7 +96,7 @@ func TestResendVerificationCode_UnknownEmailReturnsNilSilently(t *testing.T) {
 	repo := newFakeUserRepo()
 	sender := &fakeEmailSender{}
 
-	if err := ResendVerificationCode(context.Background(), repo, sender, "nobody@example.com"); err != nil {
+	if err := ResendVerificationCode(context.Background(), repo, sender, "nobody@example.com", "en"); err != nil {
 		t.Fatalf("expected nil error for an unknown email (anti-enumeration), got %v", err)
 	}
 	if len(sender.sentTo) != 0 {

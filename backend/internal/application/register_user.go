@@ -43,7 +43,7 @@ var ErrVerificationEmailNotSent = errors.New("application: failed to send verifi
 // errors.Is(err, ErrVerificationEmailNotSent) to distinguish this from a
 // genuine registration failure (the returned *domain.User is nil in every
 // other error case, non-nil only here).
-func RegisterUser(ctx context.Context, userRepo ports.UserRepository, emailSender ports.EmailSender, email, plaintextPassword string, role domain.Role) (*domain.User, error) {
+func RegisterUser(ctx context.Context, userRepo ports.UserRepository, emailSender ports.EmailSender, email, plaintextPassword, language string, role domain.Role) (*domain.User, error) {
 	emailVO, err := domain.NewEmail(email)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func RegisterUser(ctx context.Context, userRepo ports.UserRepository, emailSende
 	if err := userRepo.SaveVerificationCode(ctx, user.ID(), code, time.Now().Add(verificationCodeTTL)); err != nil {
 		return nil, err
 	}
-	if err := emailSender.SendVerificationCode(ctx, user.Email().String(), code); err != nil {
+	if err := emailSender.SendVerificationCode(ctx, user.Email().String(), code, language); err != nil {
 		return user, fmt.Errorf("%w: %v", ErrVerificationEmailNotSent, err)
 	}
 
