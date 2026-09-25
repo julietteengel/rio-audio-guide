@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config";
+import type { Locale } from "../i18n/dictionary";
 
 // Shapes returned by the backend's real auth routes (internal/adapters/http
 // on the `backend` branch, commit bbae160) — kept in sync by hand like
@@ -52,8 +53,8 @@ async function authFetch<T>(
   return body as T | null;
 }
 
-export async function register(email: string, password: string): Promise<AuthUser> {
-  const user = await authFetch<AuthUser>("/register", { method: "POST", body: { email, password } });
+export async function register(email: string, password: string, language: Locale): Promise<AuthUser> {
+  const user = await authFetch<AuthUser>("/register", { method: "POST", body: { email, password, language } });
   if (!user) throw new AuthApiError("empty response", 500);
   return user;
 }
@@ -85,6 +86,14 @@ export async function verifyEmail(email: string, code: string): Promise<void> {
   await authFetch<Record<string, never>>("/verify-email", { method: "POST", body: { email, code } });
 }
 
-export async function resendVerificationCode(email: string): Promise<void> {
-  await authFetch<Record<string, never>>("/resend-verification-code", { method: "POST", body: { email } });
+export async function resendVerificationCode(email: string, language: Locale): Promise<void> {
+  await authFetch<Record<string, never>>("/resend-verification-code", { method: "POST", body: { email, language } });
+}
+
+export async function forgotPassword(email: string, language: Locale): Promise<void> {
+  await authFetch<Record<string, never>>("/forgot-password", { method: "POST", body: { email, language } });
+}
+
+export async function resetPassword(email: string, code: string, newPassword: string): Promise<void> {
+  await authFetch<Record<string, never>>("/reset-password", { method: "POST", body: { email, code, newPassword } });
 }

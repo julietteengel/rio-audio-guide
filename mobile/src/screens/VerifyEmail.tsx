@@ -14,7 +14,7 @@ type Props = NativeStackScreenProps<AppStackParamList, "VerifyEmail">;
 
 export function VerifyEmailScreen({ route, navigation }: Props) {
   const { email, password, codeAlreadySent } = route.params;
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { verifyEmail, resendVerificationCode, login } = useAuth();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export function VerifyEmailScreen({ route, navigation }: Props) {
   useEffect(() => {
     if (codeAlreadySent) return;
     let cancelled = false;
-    resendVerificationCode(email)
+    resendVerificationCode(email, locale)
       .catch(() => {
         if (!cancelled) setError(t.auth.networkError);
       })
@@ -42,7 +42,7 @@ export function VerifyEmailScreen({ route, navigation }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [codeAlreadySent, email, resendVerificationCode, t]);
+  }, [codeAlreadySent, email, locale, resendVerificationCode, t]);
 
   async function submit() {
     setError(null);
@@ -70,7 +70,7 @@ export function VerifyEmailScreen({ route, navigation }: Props) {
     setResendMessage(null);
     setResending(true);
     try {
-      await resendVerificationCode(email);
+      await resendVerificationCode(email, locale);
       setResendMessage(t.verifyEmail.resendSent);
     } catch {
       setError(t.auth.networkError);

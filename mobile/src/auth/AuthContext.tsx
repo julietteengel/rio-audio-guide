@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import * as Auth from "../data/AuthRepository";
 import type { AuthUser } from "../data/AuthRepository";
+import type { Locale } from "../i18n/dictionary";
 import { secureGetItem, secureSetItem, secureDeleteItem } from "../utils/platformSecureStore";
 
 const TOKEN_KEY = "auth.token";
@@ -11,13 +12,15 @@ type AuthContextValue = {
   token: string | null;
   isLoggedIn: boolean;
   isLoading: boolean;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, language: Locale) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (changes: { email?: string; password?: string }) => Promise<void>;
   deleteAccount: () => Promise<void>;
   verifyEmail: (email: string, code: string) => Promise<void>;
-  resendVerificationCode: (email: string) => Promise<void>;
+  resendVerificationCode: (email: string, language: Locale) => Promise<void>;
+  forgotPassword: (email: string, language: Locale) => Promise<void>;
+  resetPassword: (email: string, code: string, newPassword: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -72,8 +75,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     throw err;
   }
 
-  async function registerFn(email: string, password: string) {
-    await Auth.register(email, password);
+  async function registerFn(email: string, password: string, language: Locale) {
+    await Auth.register(email, password, language);
     // Deliberately no auto-login here anymore: a freshly registered
     // account isn't verified yet, and /login now rejects with 403 until it
     // is. AuthScreen.submit() navigates to VerifyEmail next, which calls
@@ -143,6 +146,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       deleteAccount: deleteAccountFn,
       verifyEmail: Auth.verifyEmail,
       resendVerificationCode: Auth.resendVerificationCode,
+      forgotPassword: Auth.forgotPassword,
+      resetPassword: Auth.resetPassword,
     }),
     [user, token, isLoading],
   );

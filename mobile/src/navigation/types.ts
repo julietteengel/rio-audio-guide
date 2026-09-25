@@ -15,4 +15,6 @@ export type AppStackParamList = {
   ItineraryChat: undefined;
   ItineraryDetail: { itineraryId: string };
   VerifyEmail: { email: string; password: string; codeAlreadySent: boolean };
+  ForgotPassword: undefined;
+  ResetPassword: { email: string };
 };

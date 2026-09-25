@@ -14,7 +14,7 @@ type Props = NativeStackScreenProps<AppStackParamList, "Auth">;
 type Mode = "login" | "register";
 
 export function AuthScreen({ navigation }: Props) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { login, register } = useAuth();
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
@@ -30,7 +30,7 @@ export function AuthScreen({ navigation }: Props) {
         await login(email.trim(), password);
         navigation.goBack();
       } else {
-        await register(email.trim(), password);
+        await register(email.trim(), password, locale);
         navigation.navigate("VerifyEmail", { email: email.trim(), password, codeAlreadySent: true });
       }
     } catch (err) {
@@ -102,6 +102,12 @@ export function AuthScreen({ navigation }: Props) {
           )}
         </Pressable>
 
+        {mode === "login" ? (
+          <Pressable style={styles.forgotPasswordLink} onPress={() => navigation.navigate("ForgotPassword")}>
+            <Text style={styles.forgotPasswordLinkText}>{t.auth.forgotPasswordLink}</Text>
+          </Pressable>
+        ) : null}
+
         <Pressable
           style={styles.switchLink}
           onPress={() => {
@@ -156,6 +162,8 @@ const styles = StyleSheet.create({
   },
   btnDisabled: { opacity: 0.5 },
   btnText: { fontFamily: fonts.bodyBold, fontSize: 16, color: colors.cream },
+  forgotPasswordLink: { paddingTop: 16, alignItems: "center" },
+  forgotPasswordLinkText: { fontFamily: fonts.bodySemiBold, fontSize: 13, color: colors.inkSoft },
   switchLink: { paddingVertical: 16, alignItems: "center" },
   switchLinkText: { fontFamily: fonts.bodySemiBold, fontSize: 14, color: colors.terracotta },
 });
