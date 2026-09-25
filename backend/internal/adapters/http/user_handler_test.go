@@ -88,12 +88,25 @@ func (f *fakeHTTPUserRepo) FindResetCode(_ context.Context, userID string) (stri
 }
 
 type fakeHTTPEmailSender struct {
-	lastCode string
-	err      error
+	lastCode        string
+	lastLanguage    string
+	lastResetCode   string
+	lastResetToAddr string
+	err             error
 }
 
-func (f *fakeHTTPEmailSender) SendVerificationCode(_ context.Context, _, code string) error {
+func (f *fakeHTTPEmailSender) SendVerificationCode(_ context.Context, _, code, language string) error {
 	f.lastCode = code
+	f.lastLanguage = language
+	if f.err != nil {
+		return f.err
+	}
+	return nil
+}
+
+func (f *fakeHTTPEmailSender) SendPasswordResetCode(_ context.Context, toEmail, code, _ string) error {
+	f.lastResetToAddr = toEmail
+	f.lastResetCode = code
 	if f.err != nil {
 		return f.err
 	}
@@ -122,7 +135,7 @@ func TestRegisterHandler_Returns201EvenWhenVerificationEmailFailsToSend(t *testi
 	emailSender := &fakeHTTPEmailSender{err: errors.New("ses rejected the request")}
 	server := newTestServerForUserHandlers(userRepo, emailSender)
 
-	body, _ := json.Marshal(map[string]string{"email": "sendfails@example.com", "password": "password123"})
+	body, _ := json.Marshal(map[string]string{"email": "sendfails@example.com", "password": "password123", "language": "en"})
 	req := httptest.NewRequest("POST", "/register", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
@@ -139,7 +152,7 @@ func TestRegisterHandler_Returns201EvenWhenVerificationEmailFailsToSend(t *testi
 func TestVerifyEmailHandler_CorrectCodeReturns200(t *testing.T) {
 	userRepo := newFakeHTTPUserRepo()
 	emailSender := &fakeHTTPEmailSender{}
-	if _, err := application.RegisterUser(context.Background(), userRepo, emailSender, "handler@example.com", "password123", domain.RoleUser); err != nil {
+	if _, err := application.RegisterUser(context.Background(), userRepo, emailSender, "handler@example.com", "password123", "en", domain.RoleUser); err != nil {
 		t.Fatalf("register: %v", err)
 	}
 	server := newTestServerForUserHandlers(userRepo, emailSender)
@@ -158,7 +171,7 @@ func TestVerifyEmailHandler_CorrectCodeReturns200(t *testing.T) {
 func TestVerifyEmailHandler_WrongCodeReturns422(t *testing.T) {
 	userRepo := newFakeHTTPUserRepo()
 	emailSender := &fakeHTTPEmailSender{}
-	if _, err := application.RegisterUser(context.Background(), userRepo, emailSender, "handler2@example.com", "password123", domain.RoleUser); err != nil {
+	if _, err := application.RegisterUser(context.Background(), userRepo, emailSender, "handler2@example.com", "password123", "en", domain.RoleUser); err != nil {
 		t.Fatalf("register: %v", err)
 	}
 	server := newTestServerForUserHandlers(userRepo, emailSender)
@@ -179,7 +192,7 @@ func TestResendVerificationCodeHandler_AlwaysReturns200(t *testing.T) {
 	emailSender := &fakeHTTPEmailSender{}
 	server := newTestServerForUserHandlers(userRepo, emailSender)
 
-	body, _ := json.Marshal(map[string]string{"email": "nobody@example.com"})
+	body, _ := json.Marshal(map[string]string{"email": "nobody@example.com", "language": "en"})
 	req := httptest.NewRequest("POST", "/resend-verification-code", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
@@ -197,7 +210,7 @@ func TestResendVerificationCodeHandler_AlwaysReturns200(t *testing.T) {
 func TestResendVerificationCodeHandler_Returns200EvenWhenSendFails(t *testing.T) {
 	userRepo := newFakeHTTPUserRepo()
 	registerSender := &fakeHTTPEmailSender{}
-	if _, err := application.RegisterUser(context.Background(), userRepo, registerSender, "resend-fails@example.com", "password123", domain.RoleUser); err != nil {
+	if _, err := application.RegisterUser(context.Background(), userRepo, registerSender, "resend-fails@example.com", "password123", "en", domain.RoleUser); err != nil {
 		t.Fatalf("register: %v", err)
 	}
 	emailSender := &fakeHTTPEmailSender{err: errors.New("ses rejected the request")}
@@ -217,7 +230,7 @@ func TestResendVerificationCodeHandler_Returns200EvenWhenSendFails(t *testing.T)
 func TestLoginHandler_ReturnsForbiddenWhenNotVerified(t *testing.T) {
 	userRepo := newFakeHTTPUserRepo()
 	emailSender := &fakeHTTPEmailSender{}
-	if _, err := application.RegisterUser(context.Background(), userRepo, emailSender, "unverified-http@example.com", "password123", domain.RoleUser); err != nil {
+	if _, err := application.RegisterUser(context.Background(), userRepo, emailSender, "unverified-http@example.com", "password123", "en", domain.RoleUser); err != nil {
 		t.Fatalf("register: %v", err)
 	}
 	server := newTestServerForUserHandlers(userRepo, emailSender)
@@ -230,5 +243,85 @@ func TestLoginHandler_ReturnsForbiddenWhenNotVerified(t *testing.T) {
 
 	if rec.Code != 403 {
 		t.Fatalf("got status %d, want 403, body: %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestForgotPasswordHandler_AlwaysReturns200(t *testing.T) {
+	userRepo := newFakeHTTPUserRepo()
+	emailSender := &fakeHTTPEmailSender{}
+	server := newTestServerForUserHandlers(userRepo, emailSender)
+
+	body, _ := json.Marshal(map[string]string{"email": "nobody@example.com", "language": "en"})
+	req := httptest.NewRequest("POST", "/forgot-password", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != 200 {
+		t.Fatalf("got status %d, want 200 even for an unknown email, body: %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestForgotPasswordHandler_Returns200EvenWhenSendFails(t *testing.T) {
+	userRepo := newFakeHTTPUserRepo()
+	registerSender := &fakeHTTPEmailSender{}
+	if _, err := application.RegisterUser(context.Background(), userRepo, registerSender, "forgot-fails@example.com", "password123", "en", domain.RoleUser); err != nil {
+		t.Fatalf("register: %v", err)
+	}
+	emailSender := &fakeHTTPEmailSender{err: errors.New("ses rejected the request")}
+	server := newTestServerForUserHandlers(userRepo, emailSender)
+
+	body, _ := json.Marshal(map[string]string{"email": "forgot-fails@example.com", "language": "en"})
+	req := httptest.NewRequest("POST", "/forgot-password", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != 200 {
+		t.Fatalf("got status %d, want 200 even though the reset email's send failed, body: %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestResetPasswordHandler_CorrectCodeReturns200(t *testing.T) {
+	userRepo := newFakeHTTPUserRepo()
+	emailSender := &fakeHTTPEmailSender{}
+	if _, err := application.RegisterUser(context.Background(), userRepo, emailSender, "reset-handler@example.com", "old-password", "en", domain.RoleUser); err != nil {
+		t.Fatalf("register: %v", err)
+	}
+	if err := application.ForgotPassword(context.Background(), userRepo, emailSender, "reset-handler@example.com", "en"); err != nil {
+		t.Fatalf("forgot password: %v", err)
+	}
+	server := newTestServerForUserHandlers(userRepo, emailSender)
+
+	body, _ := json.Marshal(map[string]string{"email": "reset-handler@example.com", "code": emailSender.lastResetCode, "newPassword": "new-password"})
+	req := httptest.NewRequest("POST", "/reset-password", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != 200 {
+		t.Fatalf("got status %d, want 200, body: %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestResetPasswordHandler_WrongCodeReturns422(t *testing.T) {
+	userRepo := newFakeHTTPUserRepo()
+	emailSender := &fakeHTTPEmailSender{}
+	if _, err := application.RegisterUser(context.Background(), userRepo, emailSender, "reset-handler2@example.com", "old-password", "en", domain.RoleUser); err != nil {
+		t.Fatalf("register: %v", err)
+	}
+	if err := application.ForgotPassword(context.Background(), userRepo, emailSender, "reset-handler2@example.com", "en"); err != nil {
+		t.Fatalf("forgot password: %v", err)
+	}
+	server := newTestServerForUserHandlers(userRepo, emailSender)
+
+	body, _ := json.Marshal(map[string]string{"email": "reset-handler2@example.com", "code": "000000", "newPassword": "new-password"})
+	req := httptest.NewRequest("POST", "/reset-password", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != 422 {
+		t.Fatalf("got status %d, want 422, body: %s", rec.Code, rec.Body.String())
 	}
 }

@@ -15,6 +15,7 @@ import (
 type registerRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Language string `json:"language"`
 }
 
 type userResponse struct {
@@ -32,7 +33,7 @@ func (s *Server) registerUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
 	}
 
-	user, err := application.RegisterUser(c.Request().Context(), s.userRepo, s.emailSender, req.Email, req.Password, domain.RoleUser)
+	user, err := application.RegisterUser(c.Request().Context(), s.userRepo, s.emailSender, req.Email, req.Password, req.Language, domain.RoleUser)
 	if err != nil {
 		if !errors.Is(err, application.ErrVerificationEmailNotSent) {
 			return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": err.Error()})
@@ -136,7 +137,8 @@ func (s *Server) verifyEmail(c echo.Context) error {
 }
 
 type resendVerificationCodeRequest struct {
-	Email string `json:"email"`
+	Email    string `json:"email"`
+	Language string `json:"language"`
 }
 
 // resendVerificationCode always returns 200, whether or not the email
@@ -153,8 +155,49 @@ func (s *Server) resendVerificationCode(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
 	}
 
-	if err := application.ResendVerificationCode(c.Request().Context(), s.userRepo, s.emailSender, req.Email); err != nil {
+	if err := application.ResendVerificationCode(c.Request().Context(), s.userRepo, s.emailSender, req.Email, req.Language); err != nil {
 		log.Printf("resendVerificationCode: %v", err)
+	}
+	return c.JSON(http.StatusOK, echo.Map{})
+}
+
+type forgotPasswordRequest struct {
+	Email    string `json:"email"`
+	Language string `json:"language"`
+}
+
+// forgotPassword always returns 200, whether or not the email belongs to a
+// real account, and whether or not the send itself succeeded -- same
+// anti-enumeration reasoning as resendVerificationCode's own comment.
+func (s *Server) forgotPassword(c echo.Context) error {
+	var req forgotPasswordRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
+	}
+
+	if err := application.ForgotPassword(c.Request().Context(), s.userRepo, s.emailSender, req.Email, req.Language); err != nil {
+		log.Printf("forgotPassword: %v", err)
+	}
+	return c.JSON(http.StatusOK, echo.Map{})
+}
+
+type resetPasswordRequest struct {
+	Email       string `json:"email"`
+	Code        string `json:"code"`
+	NewPassword string `json:"newPassword"`
+}
+
+func (s *Server) resetPassword(c echo.Context) error {
+	var req resetPasswordRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
+	}
+
+	if err := application.ResetPassword(c.Request().Context(), s.userRepo, req.Email, req.Code, req.NewPassword); err != nil {
+		if errors.Is(err, application.ErrResetCodeInvalid) {
+			return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": "invalid or expired code"})
+		}
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
 	return c.JSON(http.StatusOK, echo.Map{})
 }

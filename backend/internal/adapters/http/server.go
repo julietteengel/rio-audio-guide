@@ -72,6 +72,8 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	s.echo.POST("/login", s.login)
 	s.echo.POST("/verify-email", s.verifyEmail)
 	s.echo.POST("/resend-verification-code", s.resendVerificationCode)
+	s.echo.POST("/forgot-password", s.forgotPassword)
+	s.echo.POST("/reset-password", s.resetPassword)
 	s.echo.POST("/logout", s.logout, auth)
 	s.echo.PATCH("/me", s.updateMe, auth)
 	s.echo.DELETE("/me", s.deleteMe, auth)
