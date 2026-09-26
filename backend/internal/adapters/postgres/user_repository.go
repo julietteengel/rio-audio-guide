@@ -82,12 +82,30 @@ func (r *UserRepository) FindVerificationCode(ctx context.Context, userID string
 }
 
 // SaveResetCode overwrites any previously stored reset code for this user --
-// same overwrite-not-accumulate semantics as SaveVerificationCode.
+// same overwrite-not-accumulate semantics as SaveVerificationCode. Also
+// resets reset_code_attempts to 0: a fresh code (whether issued by
+// ForgotPassword or cleared after a successful ResetPassword) means a fresh
+// attempt budget -- an old lockout must not carry over to a code the user
+// hasn't had a chance to try yet.
 func (r *UserRepository) SaveResetCode(ctx context.Context, userID, code string, expiresAt time.Time) error {
 	_, err := r.db.Exec(ctx, `
-		UPDATE users SET reset_code = $1, reset_code_expires_at = $2, updated_at = now() WHERE id = $3
+		UPDATE users SET reset_code = $1, reset_code_expires_at = $2, reset_code_attempts = 0, updated_at = now() WHERE id = $3
 	`, code, expiresAt, userID)
 	return err
+}
+
+// IncrementResetCodeAttempts atomically increments and returns the new
+// attempt count for this user's current reset code -- ResetPassword uses
+// this to lock out further guesses after too many wrong attempts, since a
+// 6-digit code with only a 15-minute TTL and no attempt limit is brute-
+// forceable by an unthrottled caller.
+func (r *UserRepository) IncrementResetCodeAttempts(ctx context.Context, userID string) (int, error) {
+	var attempts int
+	err := r.db.QueryRow(ctx, `
+		UPDATE users SET reset_code_attempts = reset_code_attempts + 1, updated_at = now() WHERE id = $1
+		RETURNING reset_code_attempts
+	`, userID).Scan(&attempts)
+	return attempts, err
 }
 
 // FindResetCode returns pgx.ErrNoRows when the user has no currently-stored

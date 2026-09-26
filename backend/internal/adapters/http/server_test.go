@@ -93,6 +93,7 @@ type fakeUserRepo struct {
 	codeExpiries      map[string]time.Time
 	resetCodes        map[string]string
 	resetCodeExpiries map[string]time.Time
+	resetCodeAttempts map[string]int
 }
 
 func newFakeUserRepo() *fakeUserRepo {
@@ -102,6 +103,7 @@ func newFakeUserRepo() *fakeUserRepo {
 		codeExpiries:      map[string]time.Time{},
 		resetCodes:        map[string]string{},
 		resetCodeExpiries: map[string]time.Time{},
+		resetCodeAttempts: map[string]int{},
 	}
 }
 
@@ -144,7 +146,16 @@ func (f *fakeUserRepo) SaveResetCode(_ context.Context, userID, code string, exp
 	}
 	f.resetCodes[userID] = code
 	f.resetCodeExpiries[userID] = expiresAt
+	f.resetCodeAttempts[userID] = 0
 	return nil
+}
+
+func (f *fakeUserRepo) IncrementResetCodeAttempts(_ context.Context, userID string) (int, error) {
+	if f.resetCodeAttempts == nil {
+		f.resetCodeAttempts = map[string]int{}
+	}
+	f.resetCodeAttempts[userID]++
+	return f.resetCodeAttempts[userID], nil
 }
 
 func (f *fakeUserRepo) FindResetCode(_ context.Context, userID string) (string, time.Time, error) {

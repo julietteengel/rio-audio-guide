@@ -293,3 +293,72 @@ func TestUserRepository_FindResetCode_NotFound(t *testing.T) {
 		t.Fatalf("got error %v, want pgx.ErrNoRows for a user with no stored reset code", err)
 	}
 }
+
+func TestUserRepository_IncrementResetCodeAttempts(t *testing.T) {
+	pool := testPool(t)
+	repo := NewUserRepository(pool)
+	ctx := context.Background()
+
+	email, _ := domain.NewEmail("reset-attempts+" + fmt.Sprintf("%d", time.Now().UnixNano()) + "@example.com")
+	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
+	user := domain.NewUser(email, passwordHash, domain.RoleUser)
+	if err := repo.Save(ctx, user); err != nil {
+		t.Fatalf("save user: %v", err)
+	}
+	if err := repo.SaveResetCode(ctx, user.ID(), "123456", time.Now().Add(15*time.Minute)); err != nil {
+		t.Fatalf("save reset code: %v", err)
+	}
+
+	first, err := repo.IncrementResetCodeAttempts(ctx, user.ID())
+	if err != nil {
+		t.Fatalf("increment: %v", err)
+	}
+	if first != 1 {
+		t.Fatalf("got %d after the first increment, want 1", first)
+	}
+
+	second, err := repo.IncrementResetCodeAttempts(ctx, user.ID())
+	if err != nil {
+		t.Fatalf("increment: %v", err)
+	}
+	if second != 2 {
+		t.Fatalf("got %d after the second increment, want 2", second)
+	}
+}
+
+func TestUserRepository_SaveResetCode_ResetsAttemptCounter(t *testing.T) {
+	pool := testPool(t)
+	repo := NewUserRepository(pool)
+	ctx := context.Background()
+
+	email, _ := domain.NewEmail("reset-attempts-reset+" + fmt.Sprintf("%d", time.Now().UnixNano()) + "@example.com")
+	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
+	user := domain.NewUser(email, passwordHash, domain.RoleUser)
+	if err := repo.Save(ctx, user); err != nil {
+		t.Fatalf("save user: %v", err)
+	}
+	if err := repo.SaveResetCode(ctx, user.ID(), "111111", time.Now().Add(15*time.Minute)); err != nil {
+		t.Fatalf("save first code: %v", err)
+	}
+	if _, err := repo.IncrementResetCodeAttempts(ctx, user.ID()); err != nil {
+		t.Fatalf("increment: %v", err)
+	}
+	if _, err := repo.IncrementResetCodeAttempts(ctx, user.ID()); err != nil {
+		t.Fatalf("increment: %v", err)
+	}
+
+	// Saving a fresh code (e.g. a resend) must reset the attempt budget --
+	// an old lockout shouldn't carry over to a code the user hasn't had a
+	// chance to try yet.
+	if err := repo.SaveResetCode(ctx, user.ID(), "222222", time.Now().Add(15*time.Minute)); err != nil {
+		t.Fatalf("save second code: %v", err)
+	}
+
+	attempts, err := repo.IncrementResetCodeAttempts(ctx, user.ID())
+	if err != nil {
+		t.Fatalf("increment after reset: %v", err)
+	}
+	if attempts != 1 {
+		t.Fatalf("got %d as the first increment after a fresh code, want 1 (counter should have reset to 0)", attempts)
+	}
+}

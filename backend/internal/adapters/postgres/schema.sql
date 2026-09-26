@@ -11,6 +11,7 @@ CREATE TABLE users (
     verification_code_expires_at   TIMESTAMPTZ,
     reset_code                     TEXT,
     reset_code_expires_at          TIMESTAMPTZ,
+    reset_code_attempts            INTEGER NOT NULL DEFAULT 0,
     created_at                     TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at                     TIMESTAMPTZ NOT NULL DEFAULT now()
 );

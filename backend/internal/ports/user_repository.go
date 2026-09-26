@@ -26,4 +26,8 @@ type UserRepository interface {
 	// each other's in-flight code.
 	SaveResetCode(ctx context.Context, userID, code string, expiresAt time.Time) error
 	FindResetCode(ctx context.Context, userID string) (code string, expiresAt time.Time, err error)
+	// IncrementResetCodeAttempts atomically increments and returns the new
+	// attempt count for the user's current reset code -- ResetPassword uses
+	// this to lock out further guesses after too many wrong attempts.
+	IncrementResetCodeAttempts(ctx context.Context, userID string) (attempts int, err error)
 }
