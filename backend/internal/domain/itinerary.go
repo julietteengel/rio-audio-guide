@@ -111,11 +111,12 @@ func (s ItineraryStop) WalkToNextMinutes() int  { return s.walkToNextMinutes }
 // --- Entity ---
 
 type Itinerary struct {
-	id        string
-	userID    string
-	title     ItineraryTitle
-	stops     []ItineraryStop
-	createdAt time.Time
+	id         string
+	userID     string
+	title      ItineraryTitle
+	stops      []ItineraryStop
+	createdAt  time.Time
+	isFeatured bool
 }
 
 // NewItinerary ne retourne une erreur que sur userID/stops -- title est déjà
@@ -146,8 +147,8 @@ func NewItinerary(userID string, title ItineraryTitle, stops []ItineraryStop) (*
 
 // ReconstructItinerary rebâtit un Itinerary depuis des données déjà valides
 // (des lignes Postgres) -- préserve l'ID et createdAt donnés, ne revalide rien.
-func ReconstructItinerary(id, userID string, title ItineraryTitle, stops []ItineraryStop, createdAt time.Time) *Itinerary {
-	return &Itinerary{id: id, userID: userID, title: title, stops: stops, createdAt: createdAt}
+func ReconstructItinerary(id, userID string, title ItineraryTitle, stops []ItineraryStop, createdAt time.Time, isFeatured bool) *Itinerary {
+	return &Itinerary{id: id, userID: userID, title: title, stops: stops, createdAt: createdAt, isFeatured: isFeatured}
 }
 
 func (i *Itinerary) ID() string             { return i.id }
@@ -178,3 +179,13 @@ func (i *Itinerary) PlaceCount() int {
 	}
 	return count
 }
+
+// MarkFeatured flips isFeatured to true -- one-directional (no
+// UnmarkFeatured), no validation, no error return: unlike
+// User.MarkEmailVerified there is no "deleted" concept on Itinerary to
+// guard against. Idempotent by construction.
+func (i *Itinerary) MarkFeatured() {
+	i.isFeatured = true
+}
+
+func (i *Itinerary) IsFeatured() bool { return i.isFeatured }
