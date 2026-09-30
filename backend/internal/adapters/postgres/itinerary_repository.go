@@ -26,9 +26,9 @@ func NewItineraryRepository(pool *pgxpool.Pool) *ItineraryRepository {
 }
 
 const upsertItinerarySQL = `
-	INSERT INTO itineraries (id, user_id, title, created_at)
-	VALUES ($1, $2, $3, $4)
-	ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title
+	INSERT INTO itineraries (id, user_id, title, created_at, is_featured)
+	VALUES ($1, $2, $3, $4, $5)
+	ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, is_featured = EXCLUDED.is_featured
 `
 
 const insertStopSQL = `
@@ -43,7 +43,7 @@ func (r *ItineraryRepository) Save(ctx context.Context, itinerary *domain.Itiner
 	}
 	defer func() { _ = tx.Rollback(ctx) }() // no-op once Commit has already succeeded
 
-	if _, err := tx.Exec(ctx, upsertItinerarySQL, itinerary.ID(), itinerary.UserID(), itinerary.Title().String(), itinerary.CreatedAt()); err != nil {
+	if _, err := tx.Exec(ctx, upsertItinerarySQL, itinerary.ID(), itinerary.UserID(), itinerary.Title().String(), itinerary.CreatedAt(), itinerary.IsFeatured()); err != nil {
 		return err
 	}
 	// Delete-then-reinsert rather than a per-stop upsert: this plan never
@@ -109,7 +109,7 @@ func (r *ItineraryRepository) loadStops(ctx context.Context, itineraryID string)
 	return stops, rows.Err()
 }
 
-const selectItineraryByIDSQL = `SELECT id, user_id, title, created_at FROM itineraries WHERE id = $1`
+const selectItineraryByIDSQL = `SELECT id, user_id, title, created_at, is_featured FROM itineraries WHERE id = $1`
 
 // created_at scans directly into time.Time -- pgx converts Postgres
 // TIMESTAMPTZ to time.Time natively (see scriptSaveArgs/ReconstructScript
@@ -121,9 +121,10 @@ func (r *ItineraryRepository) FindByID(ctx context.Context, id string) (*domain.
 	var (
 		itinID, userID, titleStr string
 		createdAt                time.Time
+		isFeatured               bool
 	)
 	row := r.pool.QueryRow(ctx, selectItineraryByIDSQL, id)
-	if err := row.Scan(&itinID, &userID, &titleStr, &createdAt); err != nil {
+	if err := row.Scan(&itinID, &userID, &titleStr, &createdAt, &isFeatured); err != nil {
 		return nil, err
 	}
 	stops, err := r.loadStops(ctx, itinID)
@@ -134,11 +135,11 @@ func (r *ItineraryRepository) FindByID(ctx context.Context, id string) (*domain.
 	if err != nil {
 		return nil, err
 	}
-	return domain.ReconstructItinerary(itinID, userID, title, stops, createdAt), nil
+	return domain.ReconstructItinerary(itinID, userID, title, stops, createdAt, isFeatured), nil
 }
 
 const selectItinerariesByUserIDSQL = `
-	SELECT id, user_id, title, created_at
+	SELECT id, user_id, title, created_at, is_featured
 	FROM itineraries
 	WHERE user_id = $1
 	ORDER BY created_at DESC
@@ -155,7 +156,8 @@ func (r *ItineraryRepository) FindByUserID(ctx context.Context, userID string) (
 	for rows.Next() {
 		var id, uid, titleStr string
 		var createdAt time.Time
-		if err := rows.Scan(&id, &uid, &titleStr, &createdAt); err != nil {
+		var isFeatured bool
+		if err := rows.Scan(&id, &uid, &titleStr, &createdAt, &isFeatured); err != nil {
 			return nil, err
 		}
 		stops, err := r.loadStops(ctx, id)
@@ -166,7 +168,42 @@ func (r *ItineraryRepository) FindByUserID(ctx context.Context, userID string) (
 		if err != nil {
 			return nil, err
 		}
-		itineraries = append(itineraries, domain.ReconstructItinerary(id, uid, title, stops, createdAt))
+		itineraries = append(itineraries, domain.ReconstructItinerary(id, uid, title, stops, createdAt, isFeatured))
+	}
+	return itineraries, rows.Err()
+}
+
+const selectFeaturedItinerariesSQL = `
+	SELECT id, user_id, title, created_at, is_featured
+	FROM itineraries
+	WHERE is_featured = true
+	ORDER BY created_at DESC
+`
+
+func (r *ItineraryRepository) FindFeatured(ctx context.Context) ([]*domain.Itinerary, error) {
+	rows, err := r.pool.Query(ctx, selectFeaturedItinerariesSQL)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var itineraries []*domain.Itinerary
+	for rows.Next() {
+		var id, uid, titleStr string
+		var createdAt time.Time
+		var isFeatured bool
+		if err := rows.Scan(&id, &uid, &titleStr, &createdAt, &isFeatured); err != nil {
+			return nil, err
+		}
+		stops, err := r.loadStops(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		title, err := domain.NewItineraryTitle(titleStr)
+		if err != nil {
+			return nil, err
+		}
+		itineraries = append(itineraries, domain.ReconstructItinerary(id, uid, title, stops, createdAt, isFeatured))
 	}
 	return itineraries, rows.Err()
 }
