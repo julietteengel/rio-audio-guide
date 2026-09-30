@@ -33,6 +33,15 @@ func (f *fakeItineraryRepo) FindByID(_ context.Context, id string) (*domain.Itin
 func (f *fakeItineraryRepo) FindByUserID(_ context.Context, userID string) ([]*domain.Itinerary, error) {
 	return f.byUserID[userID], nil
 }
+func (f *fakeItineraryRepo) FindFeatured(_ context.Context) ([]*domain.Itinerary, error) {
+	var featured []*domain.Itinerary
+	for _, it := range f.byID {
+		if it.IsFeatured() {
+			featured = append(featured, it)
+		}
+	}
+	return featured, nil
+}
 
 type fakeGenerator struct {
 	result ports.GeneratedItinerary
