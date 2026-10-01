@@ -111,3 +111,15 @@ export async function getItinerary(token: string, id: string): Promise<Itinerary
   });
   return fromWire(wire);
 }
+
+// Deliberately does NOT go through itinerariesFetch -- every other function
+// in this file requires a token (Authorization header always sent);
+// featured itineraries are public, so this is a plain fetch with no auth at
+// all, proving out the same "works while logged out" contract the backend
+// route itself guarantees.
+export async function listFeaturedItineraries(): Promise<Itinerary[]> {
+  const res = await fetch(`${API_BASE_URL}/featured-itineraries`);
+  if (!res.ok) throw new ItinerariesApiError("request failed", res.status);
+  const wire = (await res.json()) as WireItinerary[];
+  return wire.map(fromWire);
+}

@@ -50,6 +50,7 @@ export const dictionary = {
       locatingYou: "Localisation en cours…",
       locationDenied: "Position indisponible",
       webMapUnavailable: "La carte interactive n'est pas encore disponible sur navigateur — voici la liste des lieux.",
+      discoverTitle: "À découvrir",
     },
     placeDetail: {
       ask: "Poser une question sur ce lieu",
@@ -243,6 +244,7 @@ export const dictionary = {
       locatingYou: "Locating you…",
       locationDenied: "Location unavailable",
       webMapUnavailable: "The interactive map isn't available in the browser yet — here's the place list instead.",
+      discoverTitle: "Discover",
     },
     placeDetail: {
       ask: "Ask a question about this place",
@@ -436,6 +438,7 @@ export const dictionary = {
       locatingYou: "Localizando…",
       locationDenied: "Localização indisponível",
       webMapUnavailable: "O mapa interativo ainda não está disponível no navegador — aqui está a lista de lugares.",
+      discoverTitle: "Para descobrir",
     },
     placeDetail: {
       ask: "Fazer uma pergunta sobre este lugar",
@@ -629,6 +632,7 @@ export const dictionary = {
       locatingYou: "Localizando…",
       locationDenied: "Ubicación no disponible",
       webMapUnavailable: "El mapa interactivo aún no está disponible en el navegador — aquí está la lista de lugares.",
+      discoverTitle: "Para descubrir",
     },
     placeDetail: {
       ask: "Hacer una pregunta sobre este lugar",
