@@ -107,3 +107,54 @@ func (s *Server) getItinerary(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, toItineraryResponse(itinerary))
 }
+
+type createFeaturedItineraryStopRequest struct {
+	PlaceID           string `json:"place_id"`
+	TimeOnSiteMinutes int    `json:"time_on_site_minutes"`
+	WalkToNextMinutes int    `json:"walk_to_next_minutes"`
+}
+
+type createFeaturedItineraryRequest struct {
+	Title string                               `json:"title"`
+	Stops []createFeaturedItineraryStopRequest `json:"stops"`
+}
+
+func (s *Server) createFeaturedItinerary(c echo.Context) error {
+	var req createFeaturedItineraryRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid request body"})
+	}
+
+	stopInputs := make([]application.FeaturedStopInput, len(req.Stops))
+	for i, s := range req.Stops {
+		stopInputs[i] = application.FeaturedStopInput{
+			PlaceID:           s.PlaceID,
+			TimeOnSiteMinutes: s.TimeOnSiteMinutes,
+			WalkToNextMinutes: s.WalkToNextMinutes,
+		}
+	}
+
+	itinerary, err := application.CreateFeaturedItinerary(c.Request().Context(), s.placeRepo, s.itineraryRepo, contextUserID(c), req.Title, stopInputs)
+	if err != nil {
+		switch {
+		case errors.Is(err, application.ErrSaveFailed):
+			log.Printf("createFeaturedItinerary: save failed: %v", err)
+			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "could not save the featured itinerary"})
+		default:
+			return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": err.Error()})
+		}
+	}
+	return c.JSON(http.StatusCreated, toItineraryResponse(itinerary))
+}
+
+func (s *Server) listFeaturedItineraries(c echo.Context) error {
+	itineraries, err := application.ListFeaturedItineraries(c.Request().Context(), s.itineraryRepo)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+	}
+	responses := make([]itineraryResponse, len(itineraries))
+	for i, it := range itineraries {
+		responses[i] = toItineraryResponse(it)
+	}
+	return c.JSON(http.StatusOK, responses)
+}
