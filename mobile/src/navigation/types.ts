@@ -1,3 +1,5 @@
+import type { Itinerary } from "../data/ItinerariesRepository";
+
 export type OnboardingStackParamList = {
   Welcome: undefined;
   Propose: undefined;
@@ -14,6 +16,7 @@ export type AppStackParamList = {
   ItinerariesList: undefined;
   ItineraryChat: undefined;
   ItineraryDetail: { itineraryId: string };
+  FeaturedItineraryDetail: { itinerary: Itinerary };
   VerifyEmail: { email: string; password: string; codeAlreadySent: boolean };
   ForgotPassword: undefined;
   ResetPassword: { email: string };

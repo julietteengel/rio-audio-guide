@@ -34,6 +34,15 @@ func (f *fakeItineraryRepoHTTP) FindByID(_ context.Context, id string) (*domain.
 func (f *fakeItineraryRepoHTTP) FindByUserID(_ context.Context, userID string) ([]*domain.Itinerary, error) {
 	return f.byUserID[userID], nil
 }
+func (f *fakeItineraryRepoHTTP) FindFeatured(_ context.Context) ([]*domain.Itinerary, error) {
+	var featured []*domain.Itinerary
+	for _, it := range f.byID {
+		if it.IsFeatured() {
+			featured = append(featured, it)
+		}
+	}
+	return featured, nil
+}
 
 type fakeGeneratorHTTP struct{ result ports.GeneratedItinerary }
 
@@ -176,5 +185,123 @@ func TestGetItinerary_NotFoundForAnotherUser(t *testing.T) {
 
 	if rec.Code != http.StatusNotFound {
 		t.Fatalf("got status %d, want 404 for another user's itinerary: %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestCreateFeaturedItinerary_RequiresAdmin(t *testing.T) {
+	place := testPlace(t, "Paço Imperial", -22.9035, -43.1755)
+	itineraryRepo := &fakeItineraryRepoHTTP{byID: map[string]*domain.Itinerary{}}
+	tokens := fakeTokenIssuer{}
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
+
+	token, _ := tokens.Issue("someone-else", domain.RoleUser)
+	body, _ := json.Marshal(map[string]any{
+		"title": "Roteiro do Rio Colonial",
+		"stops": []map[string]any{{"place_id": place.ID(), "time_on_site_minutes": 20, "walk_to_next_minutes": 5}},
+	})
+	req := httptest.NewRequest(http.MethodPost, "/featured-itineraries", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusForbidden {
+		t.Fatalf("got status %d, want 403 for a non-admin caller: %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestCreateFeaturedItinerary_Success(t *testing.T) {
+	place := testPlace(t, "Paço Imperial", -22.9035, -43.1755)
+	itineraryRepo := &fakeItineraryRepoHTTP{byID: map[string]*domain.Itinerary{}}
+	tokens := fakeTokenIssuer{}
+	server := NewServer(&fakePlaceRepo{places: []*domain.Place{place}}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
+
+	token, _ := tokens.Issue("admin-1", domain.RoleAdmin)
+	body, _ := json.Marshal(map[string]any{
+		"title": "Roteiro do Rio Colonial",
+		"stops": []map[string]any{{"place_id": place.ID(), "time_on_site_minutes": 20, "walk_to_next_minutes": 5}},
+	})
+	req := httptest.NewRequest(http.MethodPost, "/featured-itineraries", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("got status %d, want 201: %s", rec.Code, rec.Body.String())
+	}
+	if itineraryRepo.saved == nil || !itineraryRepo.saved.IsFeatured() {
+		t.Fatal("expected the saved itinerary to be marked featured")
+	}
+}
+
+func TestCreateFeaturedItinerary_UnknownPlaceReturns422(t *testing.T) {
+	itineraryRepo := &fakeItineraryRepoHTTP{byID: map[string]*domain.Itinerary{}}
+	tokens := fakeTokenIssuer{}
+	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), tokens, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
+
+	token, _ := tokens.Issue("admin-1", domain.RoleAdmin)
+	body, _ := json.Marshal(map[string]any{
+		"title": "Roteiro do Rio Colonial",
+		"stops": []map[string]any{{"place_id": "nonexistent", "time_on_site_minutes": 20, "walk_to_next_minutes": 5}},
+	})
+	req := httptest.NewRequest(http.MethodPost, "/featured-itineraries", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusUnprocessableEntity {
+		t.Fatalf("got status %d, want 422: %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestListFeaturedItineraries_NoAuthRequired(t *testing.T) {
+	title, _ := domain.NewItineraryTitle("Roteiro do Rio Colonial")
+	place := testPlace(t, "Paço Imperial", -22.9035, -43.1755)
+	stop, _ := domain.NewPlaceStop(place.ID(), place.Name().String(), 20, 5)
+	featured, err := domain.NewItinerary("admin-1", title, []domain.ItineraryStop{stop})
+	if err != nil {
+		t.Fatalf("build fixture: %v", err)
+	}
+	featured.MarkFeatured()
+	itineraryRepo := &fakeItineraryRepoHTTP{byID: map[string]*domain.Itinerary{featured.ID(): featured}}
+	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
+
+	// No Authorization header at all -- proves this route is genuinely
+	// unauthenticated, not just tolerant of a bad token.
+	req := httptest.NewRequest(http.MethodGet, "/featured-itineraries", nil)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want 200 with no Authorization header: %s", rec.Code, rec.Body.String())
+	}
+	var resp []itineraryResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if len(resp) != 1 || resp[0].ID != featured.ID() {
+		t.Fatalf("got %d itineraries, want exactly the 1 featured one", len(resp))
+	}
+}
+
+func TestListFeaturedItineraries_EmptyArrayWhenNoneExist(t *testing.T) {
+	itineraryRepo := &fakeItineraryRepoHTTP{byID: map[string]*domain.Itinerary{}}
+	server := NewServer(&fakePlaceRepo{}, &fakeScriptRepo{}, &fakeAudioFileRepo{}, newFakeUserRepo(), itineraryRepo, &fakePublisher{}, fakeAudioStorage{}, newFakeCache(), fakeTokenIssuer{}, &fakeGeneratorHTTP{}, &fakePlaceAssistantHTTP{}, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/featured-itineraries", nil)
+	rec := httptest.NewRecorder()
+	server.echo.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want 200: %s", rec.Code, rec.Body.String())
+	}
+	var resp []itineraryResponse
+	if err := json.Unmarshal(rec.Body.Bytes(), &resp); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if len(resp) != 0 {
+		t.Fatalf("got %d itineraries, want 0", len(resp))
 	}
 }

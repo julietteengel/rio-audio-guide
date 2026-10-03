@@ -11,6 +11,8 @@ import { placesRepository } from "../data/PlacesRepository";
 import { fetchCityManifest, RIO_CITY_SLUG } from "../data/downloadManager";
 import type { Place } from "../data/types";
 import { haversineMeters, formatDistance, type LatLon } from "../utils/geo";
+import { listFeaturedItineraries, type Itinerary } from "../data/ItinerariesRepository";
+import { formatItinerarySummary } from "../utils/itineraryFormat";
 import { colors, fonts, radii } from "../theme/tokens";
 // Metro resolves PlaceMap.web.tsx on web, PlaceMap.tsx (react-native-maps)
 // on native, automatically -- this import is platform-agnostic on purpose,
@@ -78,6 +80,22 @@ export function MapScreen({ navigation }: Props) {
   useEffect(() => {
     placesRepository.listNearby().then(setPlaces);
     placesRepository.downloadedCount().then(setOfflineCount);
+  }, []);
+
+  const [featuredItineraries, setFeaturedItineraries] = useState<Itinerary[]>([]);
+
+  useEffect(() => {
+    listFeaturedItineraries()
+      .then(setFeaturedItineraries)
+      .catch((err) => {
+        // A failed fetch here just means the Discover section stays empty
+        // -- it's a bonus surface, not core map functionality, so this
+        // never blocks or degrades the rest of the screen. Still logged
+        // (matching every other swallowed-but-non-blocking catch in this
+        // codebase, e.g. geofenceTask.ts/downloadManager.ts/Settings.tsx)
+        // so a real outage leaves a trace instead of just an empty row.
+        console.warn("featured itineraries: fetch failed", err);
+      });
   }, []);
 
   useEffect(() => {
@@ -189,6 +207,27 @@ export function MapScreen({ navigation }: Props) {
           </Text>
         </Pressable>
       </ScrollView>
+
+      {featuredItineraries.length > 0 ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.discoverRow}
+          contentContainerStyle={styles.discoverRowContent}
+        >
+          <Text style={styles.discoverSectionTitle}>{t.map.discoverTitle}</Text>
+          {featuredItineraries.map((it) => (
+            <Pressable
+              key={it.id}
+              style={styles.discoverCard}
+              onPress={() => navigation.navigate("FeaturedItineraryDetail", { itinerary: it })}
+            >
+              <Text style={styles.discoverCardTitle}>{it.title}</Text>
+              <Text style={styles.discoverCardMeta}>{formatItinerarySummary(it, t)}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      ) : null}
 
       <View style={styles.map}>
         <PlaceMap
@@ -303,6 +342,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 10,
   },
+  discoverRow: {
+    flexGrow: 0,
+    flexShrink: 0,
+    backgroundColor: colors.cream,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  discoverRowContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+  },
+  discoverSectionTitle: { fontFamily: fonts.bodyBold, fontSize: 13, color: colors.inkSoft, marginRight: 4 },
+  discoverCard: {
+    backgroundColor: colors.white,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.line,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    minWidth: 160,
+  },
+  discoverCardTitle: { fontFamily: fonts.bodySemiBold, fontSize: 13.5, color: colors.ink, marginBottom: 2 },
+  discoverCardMeta: { fontFamily: fonts.body, fontSize: 11.5, color: colors.inkSoft },
   chip: {
     borderRadius: radii.pill,
     paddingVertical: 7,

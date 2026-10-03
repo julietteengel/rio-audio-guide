@@ -1,6 +1,9 @@
 package domain
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestNewPlaceStop(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
@@ -130,5 +133,44 @@ func TestItinerary_TotalMinutesAndPlaceCount(t *testing.T) {
 	// Only stop1/stop2 are real places -- the meal-break suggestion doesn't count.
 	if got := it.PlaceCount(); got != 2 {
 		t.Fatalf("got PlaceCount()=%d, want 2", got)
+	}
+}
+
+func TestItinerary_MarkFeatured(t *testing.T) {
+	title, _ := NewItineraryTitle("Roteiro do Rio Colonial")
+	stop, _ := NewPlaceStop("place-1", "Paço Imperial", 20, 5)
+	it, err := NewItinerary("admin-1", title, []ItineraryStop{stop})
+	if err != nil {
+		t.Fatalf("build fixture: %v", err)
+	}
+
+	if it.IsFeatured() {
+		t.Fatal("a freshly created itinerary must not start featured")
+	}
+
+	it.MarkFeatured()
+	if !it.IsFeatured() {
+		t.Fatal("expected IsFeatured() true after MarkFeatured()")
+	}
+
+	// Idempotent: calling it twice must not error or toggle back off.
+	it.MarkFeatured()
+	if !it.IsFeatured() {
+		t.Fatal("expected IsFeatured() to remain true after a second MarkFeatured() call")
+	}
+}
+
+func TestReconstructItinerary_PreservesIsFeatured(t *testing.T) {
+	title, _ := NewItineraryTitle("Roteiro do Rio Colonial")
+	stop := ReconstructPlaceStop("stop-1", "place-1", "Paço Imperial", 20, 5)
+
+	featured := ReconstructItinerary("it-1", "admin-1", title, []ItineraryStop{stop}, time.Now(), true)
+	if !featured.IsFeatured() {
+		t.Fatal("expected IsFeatured() true when reconstructed with isFeatured=true")
+	}
+
+	notFeatured := ReconstructItinerary("it-2", "user-1", title, []ItineraryStop{stop}, time.Now(), false)
+	if notFeatured.IsFeatured() {
+		t.Fatal("expected IsFeatured() false when reconstructed with isFeatured=false")
 	}
 }
