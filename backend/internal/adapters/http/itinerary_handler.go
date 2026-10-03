@@ -127,11 +127,11 @@ func (s *Server) createFeaturedItinerary(c echo.Context) error {
 	}
 
 	stopInputs := make([]application.FeaturedStopInput, len(req.Stops))
-	for i, s := range req.Stops {
+	for i, stopReq := range req.Stops {
 		stopInputs[i] = application.FeaturedStopInput{
-			PlaceID:           s.PlaceID,
-			TimeOnSiteMinutes: s.TimeOnSiteMinutes,
-			WalkToNextMinutes: s.WalkToNextMinutes,
+			PlaceID:           stopReq.PlaceID,
+			TimeOnSiteMinutes: stopReq.TimeOnSiteMinutes,
+			WalkToNextMinutes: stopReq.WalkToNextMinutes,
 		}
 	}
 
