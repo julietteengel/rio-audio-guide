@@ -6,7 +6,7 @@ import Svg, { Polyline, Path } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
-import { formatDuration } from "../utils/itineraryFormat";
+import { formatDuration, formatItinerarySummary } from "../utils/itineraryFormat";
 import { colors, fonts, radii } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<AppStackParamList, "FeaturedItineraryDetail">;
@@ -27,9 +27,7 @@ export function FeaturedItineraryDetailScreen({ route, navigation }: Props) {
 
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>{itinerary.title}</Text>
-        <Text style={styles.meta}>
-          {formatDuration(itinerary.totalMinutes)} · {t.itineraries.stopCount.replace("{count}", String(itinerary.placeCount))}
-        </Text>
+        <Text style={styles.meta}>{formatItinerarySummary(itinerary, t)}</Text>
 
         <View style={styles.timeline}>
           {(() => {
