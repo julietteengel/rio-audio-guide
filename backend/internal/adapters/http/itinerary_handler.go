@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/labstack/echo/v4"
 
 	"rioaudioguide/backend/internal/application"
@@ -137,6 +138,13 @@ func (s *Server) createFeaturedItinerary(c echo.Context) error {
 	itinerary, err := application.CreateFeaturedItinerary(c.Request().Context(), s.placeRepo, s.itineraryRepo, contextUserID(c), req.Title, stopInputs)
 	if err != nil {
 		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			// A place that doesn't exist at all -- distinguished from
+			// ErrFeaturedStopPlaceNotFound (a place that exists but is
+			// removed) purely for a clearer admin-facing message; both map
+			// to the same 422, same posture askAssistant already takes for
+			// pgx.ErrNoRows vs. a known business-state sentinel.
+			return c.JSON(http.StatusUnprocessableEntity, echo.Map{"error": "one of the featured itinerary's places was not found"})
 		case errors.Is(err, application.ErrSaveFailed):
 			log.Printf("createFeaturedItinerary: save failed: %v", err)
 			return c.JSON(http.StatusInternalServerError, echo.Map{"error": "could not save the featured itinerary"})
@@ -150,7 +158,8 @@ func (s *Server) createFeaturedItinerary(c echo.Context) error {
 func (s *Server) listFeaturedItineraries(c echo.Context) error {
 	itineraries, err := application.ListFeaturedItineraries(c.Request().Context(), s.itineraryRepo)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		log.Printf("listFeaturedItineraries: could not load: %v", err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "could not load featured itineraries"})
 	}
 	responses := make([]itineraryResponse, len(itineraries))
 	for i, it := range itineraries {

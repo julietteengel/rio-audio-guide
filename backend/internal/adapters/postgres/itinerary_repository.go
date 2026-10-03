@@ -145,8 +145,13 @@ const selectItinerariesByUserIDSQL = `
 	ORDER BY created_at DESC
 `
 
-func (r *ItineraryRepository) FindByUserID(ctx context.Context, userID string) ([]*domain.Itinerary, error) {
-	rows, err := r.pool.Query(ctx, selectItinerariesByUserIDSQL, userID)
+// queryItineraries runs sql/args and scans every resulting row into a full
+// domain.Itinerary (including its stops) -- the one scan/reconstruct loop
+// shared by every multi-row itinerary query (FindByUserID, FindFeatured, and
+// any future one), so a new query only needs its own SQL, not a copy of this
+// loop.
+func (r *ItineraryRepository) queryItineraries(ctx context.Context, sql string, args ...any) ([]*domain.Itinerary, error) {
+	rows, err := r.pool.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -173,6 +178,10 @@ func (r *ItineraryRepository) FindByUserID(ctx context.Context, userID string) (
 	return itineraries, rows.Err()
 }
 
+func (r *ItineraryRepository) FindByUserID(ctx context.Context, userID string) ([]*domain.Itinerary, error) {
+	return r.queryItineraries(ctx, selectItinerariesByUserIDSQL, userID)
+}
+
 const selectFeaturedItinerariesSQL = `
 	SELECT id, user_id, title, created_at, is_featured
 	FROM itineraries
@@ -181,29 +190,5 @@ const selectFeaturedItinerariesSQL = `
 `
 
 func (r *ItineraryRepository) FindFeatured(ctx context.Context) ([]*domain.Itinerary, error) {
-	rows, err := r.pool.Query(ctx, selectFeaturedItinerariesSQL)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var itineraries []*domain.Itinerary
-	for rows.Next() {
-		var id, uid, titleStr string
-		var createdAt time.Time
-		var isFeatured bool
-		if err := rows.Scan(&id, &uid, &titleStr, &createdAt, &isFeatured); err != nil {
-			return nil, err
-		}
-		stops, err := r.loadStops(ctx, id)
-		if err != nil {
-			return nil, err
-		}
-		title, err := domain.NewItineraryTitle(titleStr)
-		if err != nil {
-			return nil, err
-		}
-		itineraries = append(itineraries, domain.ReconstructItinerary(id, uid, title, stops, createdAt, isFeatured))
-	}
-	return itineraries, rows.Err()
+	return r.queryItineraries(ctx, selectFeaturedItinerariesSQL)
 }

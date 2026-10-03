@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/jackc/pgx/v5"
+
 	"rioaudioguide/backend/internal/domain"
 	"rioaudioguide/backend/internal/ports"
 )
@@ -17,7 +19,11 @@ func (f *fakeFeaturedPlaceRepo) Save(_ context.Context, _ *domain.Place) error {
 func (f *fakeFeaturedPlaceRepo) FindByID(_ context.Context, id string) (*domain.Place, error) {
 	p, ok := f.places[id]
 	if !ok {
-		return nil, errors.New("not found")
+		// Matches the real Postgres-backed PlaceRepository's actual
+		// behavior (a plain QueryRow/Scan miss) -- so this fake exercises
+		// the same error CreateFeaturedItinerary sees in production,
+		// not a generic stand-in.
+		return nil, pgx.ErrNoRows
 	}
 	return p, nil
 }
@@ -64,8 +70,46 @@ func TestCreateFeaturedItinerary_UnknownPlaceIDFails(t *testing.T) {
 	_, err := CreateFeaturedItinerary(context.Background(), placeRepo, itineraryRepo, "admin-1", "Roteiro do Rio Colonial", []FeaturedStopInput{
 		{PlaceID: "nonexistent", TimeOnSiteMinutes: 20, WalkToNextMinutes: 5},
 	})
+	// A place that doesn't exist at all propagates the repository's own raw
+	// error (pgx.ErrNoRows here) rather than being folded into
+	// ErrFeaturedStopPlaceNotFound -- that sentinel is reserved for a place
+	// that exists but is removed (see TestCreateFeaturedItinerary_RemovedPlaceFails).
+	// The HTTP handler is what maps both cases to the same 422 for the admin.
+	if !errors.Is(err, pgx.ErrNoRows) {
+		t.Fatalf("got error %v, want it to wrap pgx.ErrNoRows", err)
+	}
+}
+
+func TestCreateFeaturedItinerary_RemovedPlaceFails(t *testing.T) {
+	placeName, _ := domain.NewPlaceName("Paço Imperial")
+	coords, _ := domain.NewCoordinates(-22.9035, -43.1755)
+	place := domain.NewPlace(placeName, "historic_site", coords, "", "wikidata", "correct")
+	if err := place.Remove("duplicate"); err != nil {
+		t.Fatalf("remove fixture place: %v", err)
+	}
+	placeRepo := &fakeFeaturedPlaceRepo{places: map[string]*domain.Place{place.ID(): place}}
+	itineraryRepo := &fakeItineraryRepo{byID: map[string]*domain.Itinerary{}}
+
+	_, err := CreateFeaturedItinerary(context.Background(), placeRepo, itineraryRepo, "admin-1", "Roteiro do Rio Colonial", []FeaturedStopInput{
+		{PlaceID: place.ID(), TimeOnSiteMinutes: 20, WalkToNextMinutes: 5},
+	})
 	if !errors.Is(err, ErrFeaturedStopPlaceNotFound) {
-		t.Fatalf("got error %v, want ErrFeaturedStopPlaceNotFound", err)
+		t.Fatalf("got error %v, want ErrFeaturedStopPlaceNotFound for a removed place", err)
+	}
+}
+
+func TestCreateFeaturedItinerary_SaveFailureWrapsErrSaveFailed(t *testing.T) {
+	placeName, _ := domain.NewPlaceName("Paço Imperial")
+	coords, _ := domain.NewCoordinates(-22.9035, -43.1755)
+	place := domain.NewPlace(placeName, "historic_site", coords, "", "wikidata", "correct")
+	placeRepo := &fakeFeaturedPlaceRepo{places: map[string]*domain.Place{place.ID(): place}}
+	itineraryRepo := &fakeItineraryRepo{byID: map[string]*domain.Itinerary{}, saveErr: errors.New("connection reset")}
+
+	_, err := CreateFeaturedItinerary(context.Background(), placeRepo, itineraryRepo, "admin-1", "Roteiro do Rio Colonial", []FeaturedStopInput{
+		{PlaceID: place.ID(), TimeOnSiteMinutes: 20, WalkToNextMinutes: 5},
+	})
+	if !errors.Is(err, ErrSaveFailed) {
+		t.Fatalf("got error %v, want it to wrap ErrSaveFailed", err)
 	}
 }
 

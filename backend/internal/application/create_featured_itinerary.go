@@ -9,11 +9,15 @@ import (
 	"rioaudioguide/backend/internal/ports"
 )
 
-// ErrFeaturedStopPlaceNotFound is returned when a stop names a place_id that
-// doesn't exist -- a featured itinerary is hand-curated by an admin, but the
-// actual place lookup still goes through the real repository rather than
-// trusting the given ID blindly, same "never trust an ID that merely looks
-// real" posture GenerateItinerary already applies to LLM-generated stops.
+// ErrFeaturedStopPlaceNotFound is returned when a stop names a place_id whose
+// place exists but is removed -- a featured itinerary is hand-curated by an
+// admin, but the actual place lookup still goes through the real repository
+// rather than trusting the given ID blindly, same "never trust an ID that
+// merely looks real" posture GenerateItinerary already applies to LLM-
+// generated stops. A place that doesn't exist at all propagates the
+// repository's own raw error instead (see CreateFeaturedItinerary), the same
+// pgx.ErrNoRows-vs-business-state distinction AskAssistant already draws for
+// a missing vs. unpublished script.
 var ErrFeaturedStopPlaceNotFound = errors.New("application: one of the featured itinerary's places was not found")
 
 type FeaturedStopInput struct {
@@ -36,6 +40,9 @@ func CreateFeaturedItinerary(ctx context.Context, placeRepo ports.PlaceRepositor
 	for _, in := range stopInputs {
 		place, err := placeRepo.FindByID(ctx, in.PlaceID)
 		if err != nil {
+			return nil, fmt.Errorf("application: place lookup for featured itinerary stop %s: %w", in.PlaceID, err)
+		}
+		if place.Status() != domain.PlaceStatusActive {
 			return nil, fmt.Errorf("%w: %s", ErrFeaturedStopPlaceNotFound, in.PlaceID)
 		}
 		stop, err := domain.NewPlaceStop(place.ID(), place.Name().String(), in.TimeOnSiteMinutes, in.WalkToNextMinutes)

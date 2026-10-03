@@ -7,26 +7,38 @@ import (
 	"context"
 	"testing"
 
+	"github.com/jackc/pgx/v5/pgxpool"
+
 	"rioaudioguide/backend/internal/domain"
 )
+
+// saveUserFixture crée un utilisateur de test avec une adresse email unique
+// (passée par l'appelant, en général dérivée d'un ID de fixture déjà créé) --
+// comme savePlaceFixture, users.email n'a pas de contrainte d'unicité testée
+// ici et les tests ne nettoient pas derrière eux.
+func saveUserFixture(t *testing.T, pool *pgxpool.Pool, emailLocalPart string) *domain.User {
+	t.Helper()
+	email, err := domain.NewEmail(emailLocalPart + "@example.com")
+	if err != nil {
+		t.Fatalf("unexpected error building fixture: %v", err)
+	}
+	passwordHash, err := domain.NewPasswordHash("$2a$10$fakehashfaketest")
+	if err != nil {
+		t.Fatalf("unexpected error building fixture: %v", err)
+	}
+	user := domain.NewUser(email, passwordHash, domain.RoleUser)
+	if err := NewUserRepository(pool).Save(context.Background(), user); err != nil {
+		t.Fatalf("save user fixture: %v", err)
+	}
+	return user
+}
 
 func TestItineraryRepository_SaveAndFindByID(t *testing.T) {
 	pool := testPool(t)
 	ctx := context.Background()
 
-	placeName, _ := domain.NewPlaceName("Escadaria Selarón")
-	coords, _ := domain.NewCoordinates(-22.9147, -43.1806)
-	place := domain.NewPlace(placeName, "monument", coords, "", "overture", "correct")
-	if err := NewPlaceRepository(pool).Save(ctx, place); err != nil {
-		t.Fatalf("save place fixture: %v", err)
-	}
-
-	email, _ := domain.NewEmail("julie+" + place.ID() + "@example.com")
-	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
-	user := domain.NewUser(email, passwordHash, domain.RoleUser)
-	if err := NewUserRepository(pool).Save(ctx, user); err != nil {
-		t.Fatalf("save user fixture: %v", err)
-	}
+	place := savePlaceFixture(t, NewPlaceRepository(pool), "Escadaria Selarón")
+	user := saveUserFixture(t, pool, "julie+"+place.ID())
 
 	title, _ := domain.NewItineraryTitle("Art et rue à Santa Teresa")
 	placeStop, _ := domain.NewPlaceStop(place.ID(), place.Name().String(), 10, 8)
@@ -66,18 +78,8 @@ func TestItineraryRepository_FindByUserID(t *testing.T) {
 	pool := testPool(t)
 	ctx := context.Background()
 
-	placeName, _ := domain.NewPlaceName("Parque das Ruínas")
-	coords, _ := domain.NewCoordinates(-22.9207, -43.1876)
-	place := domain.NewPlace(placeName, "monument", coords, "", "overture", "correct")
-	if err := NewPlaceRepository(pool).Save(ctx, place); err != nil {
-		t.Fatalf("save place fixture: %v", err)
-	}
-	email, _ := domain.NewEmail("julie+" + place.ID() + "@example.com")
-	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
-	user := domain.NewUser(email, passwordHash, domain.RoleUser)
-	if err := NewUserRepository(pool).Save(ctx, user); err != nil {
-		t.Fatalf("save user fixture: %v", err)
-	}
+	place := savePlaceFixture(t, NewPlaceRepository(pool), "Parque das Ruínas")
+	user := saveUserFixture(t, pool, "julie+"+place.ID())
 
 	title, _ := domain.NewItineraryTitle("Matinée coloniale au Centro")
 	stop, _ := domain.NewPlaceStop(place.ID(), place.Name().String(), 20, 0)
@@ -103,19 +105,9 @@ func TestItineraryRepository_SaveAndFindFeatured(t *testing.T) {
 	pool := testPool(t)
 	ctx := context.Background()
 
-	placeName, _ := domain.NewPlaceName("Paço Imperial")
-	coords, _ := domain.NewCoordinates(-22.9068, -43.1808)
-	place := domain.NewPlace(placeName, "monument", coords, "", "overture", "correct")
-	if err := NewPlaceRepository(pool).Save(ctx, place); err != nil {
-		t.Fatalf("save place fixture: %v", err)
-	}
-	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
+	place := savePlaceFixture(t, NewPlaceRepository(pool), "Paço Imperial")
+	featuredUser := saveUserFixture(t, pool, "julie+featured-"+place.ID())
 
-	featuredEmail, _ := domain.NewEmail("julie+featured-" + place.ID() + "@example.com")
-	featuredUser := domain.NewUser(featuredEmail, passwordHash, domain.RoleUser)
-	if err := NewUserRepository(pool).Save(ctx, featuredUser); err != nil {
-		t.Fatalf("save featured user fixture: %v", err)
-	}
 	featuredTitle, _ := domain.NewItineraryTitle("Roteiro do Rio Colonial")
 	featuredStop, _ := domain.NewPlaceStop(place.ID(), place.Name().String(), 20, 5)
 	featured, err := domain.NewItinerary(featuredUser.ID(), featuredTitle, []domain.ItineraryStop{featuredStop})
@@ -129,11 +121,7 @@ func TestItineraryRepository_SaveAndFindFeatured(t *testing.T) {
 		t.Fatalf("save featured: %v", err)
 	}
 
-	notFeaturedEmail, _ := domain.NewEmail("julie+notfeatured-" + place.ID() + "@example.com")
-	notFeaturedUser := domain.NewUser(notFeaturedEmail, passwordHash, domain.RoleUser)
-	if err := NewUserRepository(pool).Save(ctx, notFeaturedUser); err != nil {
-		t.Fatalf("save non-featured user fixture: %v", err)
-	}
+	notFeaturedUser := saveUserFixture(t, pool, "julie+notfeatured-"+place.ID())
 	notFeaturedTitle, _ := domain.NewItineraryTitle("Une après-midi à Santa Teresa")
 	notFeaturedStop, _ := domain.NewPlaceStop(place.ID(), place.Name().String(), 20, 5)
 	notFeatured, err := domain.NewItinerary(notFeaturedUser.ID(), notFeaturedTitle, []domain.ItineraryStop{notFeaturedStop})
@@ -173,18 +161,8 @@ func TestItineraryRepository_IsFeaturedRoundTrips(t *testing.T) {
 	pool := testPool(t)
 	ctx := context.Background()
 
-	placeName, _ := domain.NewPlaceName("Confeitaria Colombo")
-	coords, _ := domain.NewCoordinates(-22.9016, -43.1786)
-	place := domain.NewPlace(placeName, "monument", coords, "", "overture", "correct")
-	if err := NewPlaceRepository(pool).Save(ctx, place); err != nil {
-		t.Fatalf("save place fixture: %v", err)
-	}
-	email, _ := domain.NewEmail("julie+" + place.ID() + "@example.com")
-	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
-	user := domain.NewUser(email, passwordHash, domain.RoleUser)
-	if err := NewUserRepository(pool).Save(ctx, user); err != nil {
-		t.Fatalf("save user fixture: %v", err)
-	}
+	place := savePlaceFixture(t, NewPlaceRepository(pool), "Confeitaria Colombo")
+	user := saveUserFixture(t, pool, "julie+"+place.ID())
 
 	title, _ := domain.NewItineraryTitle("Roteiro do Rio Colonial")
 	stop, _ := domain.NewPlaceStop(place.ID(), place.Name().String(), 20, 5)
