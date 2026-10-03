@@ -21,7 +21,8 @@ internal/
     s3/          AudioStorage — real AWS S3, no LocalStack/MinIO. Uploads, and presigns GET URLs.
     redis/       Cache — cache-aside in front of the hot read routes. Fail-open: any Redis error is
                  treated as a miss, logged, and never fails the request.
-    http/        Echo HTTP server (GET /places, GET /places/:id/audio, POST /scripts/:id/review).
+    http/        Echo HTTP server — see server.go for the full, current route table rather than an
+                 example list here, which drifts every time a feature adds routes.
 cmd/
   api/           HTTP server binary — Postgres + RabbitMQ (publisher) + Redis + S3 (presigning only).
   worker/        TTS worker binary — Postgres + RabbitMQ (consumer) + S3. Separate from cmd/api so
