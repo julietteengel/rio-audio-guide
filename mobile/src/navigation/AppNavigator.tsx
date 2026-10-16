@@ -13,6 +13,7 @@ import { EditProfileScreen } from "../screens/EditProfile";
 import { ItinerariesListScreen } from "../screens/ItinerariesList";
 import { ItineraryChatScreen } from "../screens/ItineraryChat";
 import { ItineraryDetailScreen } from "../screens/ItineraryDetail";
+import { FeaturedItineraryDetailScreen } from "../screens/FeaturedItineraryDetail";
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -26,6 +27,7 @@ export function AppNavigator() {
       <Stack.Screen name="ItinerariesList" component={ItinerariesListScreen} />
       <Stack.Screen name="ItineraryChat" component={ItineraryChatScreen} />
       <Stack.Screen name="ItineraryDetail" component={ItineraryDetailScreen} />
+      <Stack.Screen name="FeaturedItineraryDetail" component={FeaturedItineraryDetailScreen} />
       <Stack.Screen name="Auth" component={AuthScreen} options={{ presentation: "modal" }} />
       <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} options={{ presentation: "modal" }} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ presentation: "modal" }} />

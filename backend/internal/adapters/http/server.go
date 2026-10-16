@@ -83,6 +83,8 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	s.echo.POST("/itineraries", s.createItinerary, auth)
 	s.echo.GET("/itineraries", s.listItineraries, auth)
 	s.echo.GET("/itineraries/:id", s.getItinerary, auth)
+	s.echo.POST("/featured-itineraries", s.createFeaturedItinerary, auth, adminOnly)
+	s.echo.GET("/featured-itineraries", s.listFeaturedItineraries)
 	s.echo.POST("/places/:id/assistant", s.askAssistant, auth)
 	return s
 }

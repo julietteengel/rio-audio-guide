@@ -60,10 +60,11 @@ CREATE TABLE audio_files (
 );
 
 CREATE TABLE itineraries (
-    id         TEXT PRIMARY KEY,
-    user_id    TEXT NOT NULL REFERENCES users(id),
-    title      TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    id          TEXT PRIMARY KEY,
+    user_id     TEXT NOT NULL REFERENCES users(id),
+    title       TEXT NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    is_featured BOOLEAN NOT NULL DEFAULT false
 );
 CREATE INDEX itineraries_user_id_idx ON itineraries (user_id);
 
