@@ -125,3 +125,56 @@ func TestScriptRepository_FindByPlaceIDAndLanguage(t *testing.T) {
 		t.Fatal("expected an error for a language with no script, got nil")
 	}
 }
+
+func TestScriptRepository_FindAllDraft(t *testing.T) {
+	pool := testPool(t)
+	ctx := context.Background()
+
+	place := savePlaceFixture(t, NewPlaceRepository(pool), "Pedra do Sal")
+	scriptRepo := NewScriptRepository(pool)
+
+	draftText, _ := domain.NewScriptText("Un lieu historique de samba...")
+	draft := domain.NewScript(place.ID(), domain.LanguageFR, draftText, "source text")
+	if err := scriptRepo.Save(ctx, draft); err != nil {
+		t.Fatalf("save draft fixture: %v", err)
+	}
+
+	email, _ := domain.NewEmail("julie+" + place.ID() + "@example.com")
+	passwordHash, _ := domain.NewPasswordHash("$2a$10$fakehashfaketest")
+	reviewer := domain.NewUser(email, passwordHash, domain.RoleUser)
+	if err := NewUserRepository(pool).Save(ctx, reviewer); err != nil {
+		t.Fatalf("save reviewer fixture: %v", err)
+	}
+	reviewedText, _ := domain.NewScriptText("Un autre lieu, déjà reviewé...")
+	reviewed := domain.NewScript(place.ID(), domain.LanguageEN, reviewedText, "source text")
+	if err := reviewed.MarkReviewed(reviewer.ID()); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if err := scriptRepo.Save(ctx, reviewed); err != nil {
+		t.Fatalf("save reviewed fixture: %v", err)
+	}
+
+	found, err := scriptRepo.FindAllDraft(ctx)
+	if err != nil {
+		t.Fatalf("find all draft: %v", err)
+	}
+
+	var sawDraft, sawReviewed bool
+	for _, s := range found {
+		if s.ID() == draft.ID() {
+			sawDraft = true
+			if s.Status() != domain.ScriptStatusDraft {
+				t.Fatalf("got status %v for the draft fixture, want draft", s.Status())
+			}
+		}
+		if s.ID() == reviewed.ID() {
+			sawReviewed = true
+		}
+	}
+	if !sawDraft {
+		t.Fatal("expected FindAllDraft to include the draft script")
+	}
+	if sawReviewed {
+		t.Fatal("expected FindAllDraft to exclude the already-reviewed script")
+	}
+}

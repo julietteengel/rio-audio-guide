@@ -32,6 +32,9 @@ func (f *fakeScriptRepo) FindByID(_ context.Context, id string) (*domain.Script,
 func (f *fakeScriptRepo) FindByPlaceIDAndLanguage(_ context.Context, _, _ string) (*domain.Script, error) {
 	return nil, errors.New("not implemented in fake")
 }
+func (f *fakeScriptRepo) FindAllDraft(_ context.Context) ([]*domain.Script, error) {
+	return nil, errors.New("not implemented in fake")
+}
 
 func (f *fakeScriptRepo) FindByPlaceID(_ context.Context, placeID string) ([]*domain.Script, error) {
 	var found []*domain.Script

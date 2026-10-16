@@ -64,6 +64,9 @@ func (f *fakeScriptRepo) FindByPlaceID(_ context.Context, placeID string) ([]*do
 	}
 	return found, nil
 }
+func (f *fakeScriptRepo) FindAllDraft(_ context.Context) ([]*domain.Script, error) {
+	return nil, errNotImplementedInFake
+}
 
 type fakeAudioFileRepo struct{ files map[string]*domain.AudioFile }
 

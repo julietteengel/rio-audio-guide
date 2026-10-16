@@ -64,6 +64,9 @@ func (f *fakeScriptRepoApp) FindByPlaceIDAndLanguage(_ context.Context, placeID,
 func (f *fakeScriptRepoApp) FindByPlaceID(context.Context, string) ([]*domain.Script, error) {
 	return nil, errors.New("not implemented in fake")
 }
+func (f *fakeScriptRepoApp) FindAllDraft(context.Context) ([]*domain.Script, error) {
+	return nil, errors.New("not implemented in fake")
+}
 
 func TestAskAssistant_AsksWithTheScriptsGroundedText(t *testing.T) {
 	script := publishedScriptFixture(t, "place-1", "fr", "Ce lieu a été construit en 1931.")
@@ -115,6 +118,9 @@ func (f *fakeScriptRepoAppErroring) FindByID(context.Context, string) (*domain.S
 	return nil, f.err
 }
 func (f *fakeScriptRepoAppErroring) FindByPlaceIDAndLanguage(context.Context, string, string) (*domain.Script, error) {
+	return nil, f.err
+}
+func (f *fakeScriptRepoAppErroring) FindAllDraft(context.Context) ([]*domain.Script, error) {
 	return nil, f.err
 }
 func (f *fakeScriptRepoAppErroring) FindByPlaceID(context.Context, string) ([]*domain.Script, error) {
