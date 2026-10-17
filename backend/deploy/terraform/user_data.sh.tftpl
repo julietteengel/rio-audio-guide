@@ -1,0 +1,79 @@
+#!/bin/bash
+# Boots the whole backend on a single instance: installs docker, logs into
+# this stack's two ECR repos, writes a docker-compose file wiring
+# rabbitmq+redis (plain containers) to the api/worker images (built and
+# pushed separately, see deploy/terraform/README.md), applies schema.sql to
+# RDS, then starts everything. Idempotent enough to re-run on instance
+# replacement (user_data_replace_on_change in ec2.tf).
+set -euo pipefail
+exec > /var/log/rio-audio-guide-userdata.log 2>&1
+
+dnf install -y docker
+systemctl enable --now docker
+
+# AL2023's docker package doesn't ship the compose plugin -- the standalone
+# v2 binary is the simplest reliable path, invoked as `docker-compose`.
+curl -fsSL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \
+  -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+aws ecr get-login-password --region ${aws_region} \
+  | docker login --username AWS --password-stdin "${ecr_registry}"
+
+ELEVENLABS_API_KEY=$(aws ssm get-parameter --name "${elevenlabs_param}" --with-decryption --query Parameter.Value --output text --region ${aws_region})
+JWT_SECRET=$(aws ssm get-parameter --name "${jwt_secret_param}" --with-decryption --query Parameter.Value --output text --region ${aws_region})
+
+mkdir -p /opt/rio-audio-guide
+cat > /opt/rio-audio-guide/schema.sql <<'SCHEMA_EOF'
+${schema_sql}
+SCHEMA_EOF
+
+cat > /opt/rio-audio-guide/docker-compose.yml <<COMPOSE_EOF
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+  api:
+    image: ${ecr_api_repo_url}:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://postgres:${db_password}@${db_endpoint}:5432/postgres
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      REDIS_ADDR: redis:6379
+      S3_BUCKET: ${s3_bucket}
+      SES_SENDER_EMAIL: ${ses_sender_email}
+      JWT_SECRET: "$${JWT_SECRET}"
+    depends_on:
+      - rabbitmq
+      - redis
+  worker:
+    image: ${ecr_worker_repo_url}:latest
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://postgres:${db_password}@${db_endpoint}:5432/postgres
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      S3_BUCKET: ${s3_bucket}
+      ELEVENLABS_API_KEY: "$${ELEVENLABS_API_KEY}"
+    depends_on:
+      - rabbitmq
+COMPOSE_EOF
+
+# Wait for RDS to accept connections before applying the schema -- a fresh
+# instance can take a minute past EC2 boot to finish its own setup.
+for i in $(seq 1 30); do
+  if docker run --rm postgres:16-alpine pg_isready -h ${db_endpoint} -p 5432 -U postgres; then
+    break
+  fi
+  sleep 10
+done
+docker run --rm -v /opt/rio-audio-guide/schema.sql:/schema.sql postgres:16-alpine \
+  psql "postgresql://postgres:${db_password}@${db_endpoint}:5432/postgres" -f /schema.sql
+
+cd /opt/rio-audio-guide
+docker-compose pull
+docker-compose up -d

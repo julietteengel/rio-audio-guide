@@ -11,3 +11,9 @@ tmp/
 .env
 .env.local
 .env.*.local
+
+# Terraform
+backend/deploy/terraform/.terraform/
+backend/deploy/terraform/*.tfstate
+backend/deploy/terraform/*.tfstate.*
+backend/deploy/terraform/*.tfvars
