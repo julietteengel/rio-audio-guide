@@ -56,6 +56,7 @@ type PlaceListItem = {
   category: string;
   lat: number;
   lon: number;
+  image_url?: string;
 };
 
 type PlaceDetailReady = {
@@ -64,6 +65,7 @@ type PlaceDetailReady = {
   category: string;
   lat: number;
   lon: number;
+  image_url?: string;
   language: string;
   narration: string;
   source: string;
@@ -85,6 +87,7 @@ function toListPlace(item: PlaceListItem): Place {
     lat: item.lat,
     lon: item.lon,
     city: CURRENT_BACKEND_CITY,
+    imageUrl: item.image_url,
     body: "",
     groundedSourceCount: 0,
     // A list entry hasn't fetched narration yet — not a claim that none
@@ -153,6 +156,7 @@ export class HttpPlacesRepository implements PlacesRepository {
           lat: body.lat,
           lon: body.lon,
           city: CURRENT_BACKEND_CITY,
+          imageUrl: body.image_url,
           body: body.narration,
           groundedSourceCount: body.source ? 1 : 0,
           narrationStatus: "ready",

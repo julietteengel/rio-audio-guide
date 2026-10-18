@@ -94,6 +94,7 @@ type Place struct {
 	wikidataQID    WikidataQID
 	source         string
 	sourceRichness string
+	imageURL       string
 	status         PlaceStatus
 	removedReason  string
 }
@@ -153,6 +154,17 @@ func (p *Place) Remove(reason string) error {
 	return nil
 }
 
+// SetImageURL is deliberately separate from NewPlace/ReconstructPlace/Edit:
+// the image is sourced (Wikidata/Wikipedia thumbnail) by a pipeline step
+// that runs after a place already exists, the same lifecycle AudioFile's
+// and Script's own fields already follow -- adding it to either
+// constructor's positional signature would churn every call site (postgres
+// adapters, cmd/import, every table-driven test building a Place) for a
+// field that's always set well after creation.
+func (p *Place) SetImageURL(url string) {
+	p.imageURL = url
+}
+
 // --- lecture, puisque les champs ne sont plus exportés ---
 
 func (p *Place) ID() string               { return p.id }
@@ -162,6 +174,7 @@ func (p *Place) Coordinates() Coordinates { return p.coords }
 func (p *Place) WikidataQID() WikidataQID { return p.wikidataQID }
 func (p *Place) Source() string           { return p.source }
 func (p *Place) SourceRichness() string   { return p.sourceRichness }
+func (p *Place) ImageURL() string         { return p.imageURL }
 func (p *Place) Status() PlaceStatus      { return p.status }
 func (p *Place) RemovedReason() string    { return p.removedReason }
 

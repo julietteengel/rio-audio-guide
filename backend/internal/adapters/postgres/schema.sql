@@ -24,6 +24,7 @@ CREATE TABLE places (
     wikidata_qid    TEXT,
     source          TEXT NOT NULL,
     source_richness TEXT,
+    image_url       TEXT,
     status          TEXT NOT NULL DEFAULT 'active',
     removed_reason  TEXT,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),

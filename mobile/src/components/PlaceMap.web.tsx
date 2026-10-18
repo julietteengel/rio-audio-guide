@@ -38,7 +38,16 @@ function meIcon(): L.DivIcon {
 // Kept as the automatic fallback for anyone without GOOGLE_MAPS_API_KEY
 // configured (a contributor's machine, or CI). See PlaceMap.tsx for the
 // native counterpart (react-native-maps); same props on both.
-function LeafletPlaceMap({ places, region, userLocation, youAreHereLabel, onSelectPlace }: PlaceMapProps) {
+function stepPinIcon(step: number): L.DivIcon {
+  return L.divIcon({
+    className: "",
+    html: `<div style="width:26px;height:26px;border-radius:13px;background:${colors.terracottaDark};border:2px solid ${colors.cream};box-shadow:0 1px 3px rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;color:${colors.cream};font-family:sans-serif;font-weight:700;font-size:12px;">${step}</div>`,
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+  });
+}
+
+function LeafletPlaceMap({ places, stepNumbers, region, userLocation, youAreHereLabel, onSelectPlace }: PlaceMapProps) {
   const pin = useMemo(() => pinIcon(), []);
   const me = useMemo(() => meIcon(), []);
 
@@ -55,15 +64,18 @@ function LeafletPlaceMap({ places, region, userLocation, youAreHereLabel, onSele
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {places.map((p) => (
-        <Marker
-          key={p.id}
-          position={[p.lat, p.lon]}
-          icon={pin}
-          eventHandlers={{ click: () => onSelectPlace(p.id) }}
-          title={p.name}
-        />
-      ))}
+      {places.map((p) => {
+        const step = stepNumbers?.get(p.id);
+        return (
+          <Marker
+            key={p.id}
+            position={[p.lat, p.lon]}
+            icon={step ? stepPinIcon(step) : pin}
+            eventHandlers={{ click: () => onSelectPlace(p.id) }}
+            title={p.name}
+          />
+        );
+      })}
       {userLocation ? (
         <Marker
           position={[userLocation.latitude, userLocation.longitude]}
@@ -90,7 +102,7 @@ const GOOGLE_MAP_OPTIONS = {
 // Google Maps JS API, on-brand styled (see googleMapStyle.ts). Only
 // rendered when GOOGLE_MAPS_API_KEY is configured -- see PlaceMap below
 // for the fallback-to-Leaflet selection.
-function GoogleWebPlaceMap({ places, region, userLocation, youAreHereLabel, onSelectPlace }: PlaceMapProps) {
+function GoogleWebPlaceMap({ places, stepNumbers, region, userLocation, youAreHereLabel, onSelectPlace }: PlaceMapProps) {
   const { isLoaded, loadError } = useJsApiLoader({ googleMapsApiKey: GOOGLE_MAPS_API_KEY });
   const center = useMemo(
     () => ({ lat: region.latitude, lng: region.longitude }),
@@ -102,7 +114,7 @@ function GoogleWebPlaceMap({ places, region, userLocation, youAreHereLabel, onSe
   // Leaflet rather than showing a permanently blank map. This is distinct
   // from an invalid/unbilled key, where the script loads fine and Google
   // renders its own error overlay.
-  if (loadError) return <LeafletPlaceMap places={places} region={region} userLocation={userLocation} youAreHereLabel={youAreHereLabel} onSelectPlace={onSelectPlace} />;
+  if (loadError) return <LeafletPlaceMap places={places} stepNumbers={stepNumbers} region={region} userLocation={userLocation} youAreHereLabel={youAreHereLabel} onSelectPlace={onSelectPlace} />;
 
   // Google's Size/Point constructors only exist once the script has loaded
   // (they live on the runtime `google` global, not a static import) -- this
@@ -122,18 +134,33 @@ function GoogleWebPlaceMap({ places, region, userLocation, youAreHereLabel, onSe
     scaledSize: new google.maps.Size(34, 34),
     anchor: new google.maps.Point(17, 17),
   };
+  // A plain circle (no custom SVG) with Google's built-in marker label --
+  // simpler than drawing a numbered icon per step, and Google renders the
+  // label text centered on the pin on its own.
+  const stepIcon: google.maps.Symbol = {
+    path: google.maps.SymbolPath.CIRCLE,
+    scale: 13,
+    fillColor: colors.terracottaDark,
+    fillOpacity: 1,
+    strokeColor: colors.cream,
+    strokeWeight: 2,
+  };
 
   return (
     <GoogleMap mapContainerStyle={GOOGLE_MAP_CONTAINER_STYLE} center={center} zoom={12} options={GOOGLE_MAP_OPTIONS}>
-      {places.map((p) => (
-        <MarkerF
-          key={p.id}
-          position={{ lat: p.lat, lng: p.lon }}
-          icon={pinIcon}
-          title={p.name}
-          onClick={() => onSelectPlace(p.id)}
-        />
-      ))}
+      {places.map((p) => {
+        const step = stepNumbers?.get(p.id);
+        return (
+          <MarkerF
+            key={p.id}
+            position={{ lat: p.lat, lng: p.lon }}
+            icon={step ? stepIcon : pinIcon}
+            label={step ? { text: String(step), color: colors.cream, fontSize: "12px", fontWeight: "700" } : undefined}
+            title={p.name}
+            onClick={() => onSelectPlace(p.id)}
+          />
+        );
+      })}
       {userLocation ? (
         <MarkerF
           position={{ lat: userLocation.latitude, lng: userLocation.longitude }}

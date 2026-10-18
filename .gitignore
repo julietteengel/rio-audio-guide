@@ -11,3 +11,7 @@ tmp/
 .env
 .env.local
 .env.*.local
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan

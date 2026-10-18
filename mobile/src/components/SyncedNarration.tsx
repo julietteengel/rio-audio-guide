@@ -1,18 +1,18 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Text, View, ScrollView, StyleSheet, Animated, ActivityIndicator, Easing } from "react-native";
-import { findActiveLineIndex, groupMarksIntoLines, type WordMark } from "../utils/syncedText";
+import { findActiveLineIndex, type NarrationLine } from "../utils/syncedText";
 import { colors, fonts } from "../theme/tokens";
 
 export type NarrationMode = "scroll" | "free";
 
 type Props = {
   text: string;
-  marks: WordMark[] | null;
-  // Distinguishes "no marks yet because the fetch is still in flight" from
-  // "confirmed no marks exist" -- without this, scroll mode briefly rendered
-  // the full free-text fallback (marks === null) and then snapped to the
-  // synced panel the instant marks arrived, a jarring flicker on every load.
-  marksLoading: boolean;
+  lines: NarrationLine[] | null;
+  // Distinguishes "no lines yet because the fetch is still in flight" from
+  // "confirmed no lines exist" -- without this, scroll mode briefly rendered
+  // the full free-text fallback (lines === null) and then snapped to the
+  // synced panel the instant lines arrived, a jarring flicker on every load.
+  linesLoading: boolean;
   // False until playback has genuinely started at least once -- reading the
   // first synced line before Play reads as a bug (it looked like playback
   // had already jumped ahead), not a helpful preview.
@@ -32,21 +32,14 @@ const DIM_TEXT = "rgba(250,245,238,0.45)";
 // (pre-redesign) screen.
 const FREE_TEXT = "rgba(250,245,238,0.85)";
 
-export function SyncedNarration({ text, marks, marksLoading, hasStarted, pressPlayHint, currentTimeMs, mode }: Props) {
-  // Always called, even on the free/fallback/loading paths below, to
-  // satisfy the rules of hooks -- 26 keeps a grouped line to a single
-  // rendered line at the active-line font size (22px bold in a ~326pt-wide
-  // column), so a wrapped two-line group never reintroduces the minHeight
-  // jump dimLine guards against.
-  const lines = useMemo(() => groupMarksIntoLines(marks ?? [], 26), [marks]);
-
+export function SyncedNarration({ text, lines, linesLoading, hasStarted, pressPlayHint, currentTimeMs, mode }: Props) {
   // Clamped to 0: before the first line's timestamp (findActiveLineIndex
   // returns -1), the first line displays as the upcoming/active one rather
   // than showing nothing. Computed unconditionally (even when the loading/
   // free paths below will render something else entirely) so the
   // cross-fade hooks right after, which depend on it, can also run
   // unconditionally.
-  const activeIndex = Math.max(findActiveLineIndex(lines, currentTimeMs), 0);
+  const activeIndex = Math.max(findActiveLineIndex(lines ?? [], currentTimeMs), 0);
 
   // Slides the whole 3-line block up (or down, when time jumps backward --
   // e.g. a seek) into place each time the active line changes, instead of
@@ -74,7 +67,7 @@ export function SyncedNarration({ text, marks, marksLoading, hasStarted, pressPl
   // a brief loading state rather than the free-text fallback below, which
   // would otherwise flash on screen for a moment and then snap to this
   // panel the instant marks arrive.
-  if (mode === "scroll" && marksLoading) {
+  if (mode === "scroll" && linesLoading) {
     return (
       <View style={styles.panel}>
         <ActivityIndicator color={colors.terracotta} />
@@ -82,11 +75,11 @@ export function SyncedNarration({ text, marks, marksLoading, hasStarted, pressPl
     );
   }
 
-  // Marks are ready but playback hasn't started -- show a press-play prompt
+  // Lines are ready but playback hasn't started -- show a press-play prompt
   // instead of the first line, which otherwise looked like narration
   // already in progress. "Lecture libre" is unaffected: showing the full
   // text up front is that mode's whole point.
-  if (mode === "scroll" && marks && !hasStarted) {
+  if (mode === "scroll" && lines && !hasStarted) {
     return (
       <View style={styles.panel}>
         <Text style={styles.pressPlayHint}>{pressPlayHint}</Text>
@@ -94,15 +87,15 @@ export function SyncedNarration({ text, marks, marksLoading, hasStarted, pressPl
     );
   }
 
-  // "Lecture libre" is the same rendering whether or not marks exist (no
-  // marks at all falls back here too, once we're sure loading is finished)
+  // "Lecture libre" is the same rendering whether or not lines exist (no
+  // lines at all falls back here too, once we're sure loading is finished)
   // -- it's the full narration text, scrollable by hand, completely
   // decoupled from playback position. It needs its own ScrollView: the
   // *screen* around this component doesn't scroll (a deliberate, separate
   // decision — PlaceDetail is a fixed single-viewport player), but the
   // narration text itself can run far longer than the space available to
   // it, so this inner area scrolls locally, within its own fixed-height slot.
-  if (mode === "free" || !marks) {
+  if (mode === "free" || !lines) {
     return (
       <ScrollView style={styles.freeScroll} contentContainerStyle={styles.freeContent}>
         <Text style={styles.freeText}>{text}</Text>
@@ -117,9 +110,9 @@ export function SyncedNarration({ text, marks, marksLoading, hasStarted, pressPl
   return (
     <View style={styles.panelClip}>
       <Animated.View style={[styles.panel, { transform: [{ translateY }] }]}>
-        <Text style={styles.dimLine}>{prevLine}</Text>
-        <Text style={styles.activeLine}>{activeLine}</Text>
-        <Text style={styles.dimLine}>{nextLine}</Text>
+        <Text style={styles.dimLine} numberOfLines={2}>{prevLine}</Text>
+        <Text style={styles.activeLine} numberOfLines={4}>{activeLine}</Text>
+        <Text style={styles.dimLine} numberOfLines={2}>{nextLine}</Text>
       </Animated.View>
     </View>
   );

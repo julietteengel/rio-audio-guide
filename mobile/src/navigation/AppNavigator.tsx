@@ -21,7 +21,15 @@ export function AppNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Map" component={MapScreen} />
-      <Stack.Screen name="PlaceDetail" component={PlaceDetailScreen} />
+      {/* gestureEnabled: false -- the iOS edge-swipe-back gesture is a native
+          UIKit gesture recognizer, entirely separate from React Native's JS
+          touch responder system. Dragging the audio progress bar's own
+          PanResponder (which does correctly claim the touch on the JS side)
+          can't stop it from also firing, which read as the seek bar
+          randomly navigating back to the map mid-drag. This screen already
+          has its own visible back button, so losing the swipe gesture here
+          costs nothing. */}
+      <Stack.Screen name="PlaceDetail" component={PlaceDetailScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="Assistant" component={AssistantScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="ItinerariesList" component={ItinerariesListScreen} />

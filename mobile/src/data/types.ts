@@ -25,6 +25,11 @@ export type Place = {
   lat: number;
   lon: number;
   city: string;
+  // A Wikidata/Wikipedia thumbnail, fetched by a pipeline step independent
+  // from narration grounding -- undefined for a place that genuinely has
+  // none (no Wikidata image, name didn't resolve on Wikipedia either), not
+  // a loading state. PlaceDetail falls back to the generic hero image.
+  imageUrl?: string;
   // Static/mock only. The real app never trusts a stored distance — it's a
   // function of (place, the user's live position), computed in Map.tsx.
   distanceMeters?: number;
