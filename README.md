@@ -33,8 +33,9 @@ the single integration branch (see `CLAUDE.md` for the review/branching conventi
 going forward — short-lived branches per change, not per subsystem).
 
 - **`backend/`** — the Go backend. Hexagonal architecture (ports & adapters) + Domain-Driven Design,
-  PostgreSQL/PostGIS, RabbitMQ (TTS job queue), S3, real ElevenLabs voice generation. Has its own
-  [README](backend/README.md) with the full architecture trace and setup/run instructions.
+  PostgreSQL/PostGIS, RabbitMQ (TTS job queue), S3, voice generation via OpenAI and Google Cloud TTS
+  (with OpenAI Whisper producing the synced-caption timing). Has its own [README](backend/README.md)
+  with the full architecture trace and setup/run instructions.
 - **`web/`** — the Next.js landing page. Makes no calls to the Go backend, deployed independently of
   its AWS infrastructure — not a static export though (it uses Next.js Middleware for locale routing,
   which needs a real Node.js runtime, `output: "standalone"`). Has its own [README](web/README.md).
