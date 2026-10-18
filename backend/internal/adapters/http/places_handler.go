@@ -26,6 +26,7 @@ type placeResponse struct {
 	Category string  `json:"category"`
 	Lat      float64 `json:"lat"`
 	Lon      float64 `json:"lon"`
+	ImageURL string  `json:"image_url,omitempty"`
 }
 
 // listPlaces sert aussi de recherche : ?q= filtre par sous-chaîne du nom
@@ -52,6 +53,7 @@ func (s *Server) listPlaces(c echo.Context) error {
 				Category: p.Category(),
 				Lat:      p.Coordinates().Lat(),
 				Lon:      p.Coordinates().Lon(),
+				ImageURL: p.ImageURL(),
 			})
 		}
 		return resp, http.StatusOK, nil
@@ -64,6 +66,7 @@ type placeDetailResponse struct {
 	Category       string  `json:"category"`
 	Lat            float64 `json:"lat"`
 	Lon            float64 `json:"lon"`
+	ImageURL       string  `json:"image_url,omitempty"`
 	Language       string  `json:"language"`
 	Narration      string  `json:"narration"`
 	Source         string  `json:"source"`
@@ -114,6 +117,7 @@ func (s *Server) getPlaceDetail(c echo.Context) error {
 			Category:       place.Category(),
 			Lat:            place.Coordinates().Lat(),
 			Lon:            place.Coordinates().Lon(),
+			ImageURL:       place.ImageURL(),
 			Language:       language,
 			Narration:      script.Text().String(),
 			Source:         place.Source(),

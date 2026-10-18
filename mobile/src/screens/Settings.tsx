@@ -11,7 +11,11 @@ import { colors, fonts, radii } from "../theme/tokens";
 import {
   getOfflineDownloadSummary,
   clearOfflineDownload,
+  downloadCity,
   formatApproxSize,
+  RIO_CITY_SLUG,
+  InsufficientStorageError,
+  PartialDownloadError,
   type OfflineDownloadSummary,
 } from "../data/downloadManager";
 import {
@@ -20,6 +24,7 @@ import {
   startProximityMonitoring,
   stopProximityMonitoring,
 } from "../location/geofenceTask";
+import { alertInfo } from "../utils/platformAlert";
 
 type Props = NativeStackScreenProps<AppStackParamList, "Settings">;
 
@@ -28,11 +33,37 @@ export function SettingsScreen({ navigation }: Props) {
   const { user, isLoggedIn, logout, deleteAccount } = useAuth();
   const [summary, setSummary] = useState<OfflineDownloadSummary | null>(null);
   const [proximityEnabled, setProximityEnabled] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     getOfflineDownloadSummary().then(setSummary);
     isProximityMonitoringActive().then(setProximityEnabled);
   }, []);
+
+  // The only other place this ever ran was onboarding's Propose screen,
+  // which a person only ever sees once (gated by isOnboardingComplete) --
+  // with no equivalent here, there was no way to ever download after that,
+  // including the common case of skipping it the first time and wanting it
+  // later for proximity notifications (which need something downloaded to
+  // have regions to watch at all).
+  async function handleDownloadNow() {
+    if (isDownloading) return;
+    setIsDownloading(true);
+    try {
+      const result = await downloadCity(RIO_CITY_SLUG, "Rio de Janeiro", locale);
+      setSummary(result);
+    } catch (err) {
+      const message =
+        err instanceof InsufficientStorageError
+          ? t.propose.downloadErrorStorage
+          : err instanceof PartialDownloadError
+            ? t.propose.downloadErrorPartial.replace("{count}", String(err.failedCount))
+            : t.propose.downloadErrorGeneric;
+      alertInfo(t.propose.downloadErrorTitle, message);
+    } finally {
+      setIsDownloading(false);
+    }
+  }
 
   function confirmDeleteDownload() {
     Alert.alert(t.settings.deleteDownloadConfirmTitle, t.settings.deleteDownloadConfirmMessage, [
@@ -74,7 +105,7 @@ export function SettingsScreen({ navigation }: Props) {
     // error. An honest, explicit message here is the same choice already
     // made for the map screen's own web gap (webMapUnavailable).
     if (Platform.OS === "web") {
-      Alert.alert(t.settings.proximityWebUnsupportedTitle, t.settings.proximityWebUnsupportedBody);
+      alertInfo(t.settings.proximityWebUnsupportedTitle, t.settings.proximityWebUnsupportedBody);
       return;
     }
     try {
@@ -98,11 +129,11 @@ export function SettingsScreen({ navigation }: Props) {
       const active = await isProximityMonitoringActive();
       setProximityEnabled(active);
       if (!active) {
-        Alert.alert(t.settings.proximityNoDownloadTitle, t.settings.proximityNoDownloadBody);
+        alertInfo(t.settings.proximityNoDownloadTitle, t.settings.proximityNoDownloadBody);
       }
     } catch (err) {
       console.warn("proximity toggle failed", err);
-      Alert.alert(t.auth.genericError);
+      alertInfo(t.auth.genericError);
     }
   }
 
@@ -172,9 +203,15 @@ export function SettingsScreen({ navigation }: Props) {
                     : t.settings.noDownload}
                 </Text>
               </View>
-              {summary && (
+              {summary ? (
                 <Pressable onPress={confirmDeleteDownload}>
                   <Text style={styles.link}>{t.settings.delete}</Text>
+                </Pressable>
+              ) : (
+                <Pressable onPress={handleDownloadNow} disabled={isDownloading}>
+                  <Text style={styles.link}>
+                    {isDownloading ? t.settings.downloading : t.settings.downloadNow}
+                  </Text>
                 </Pressable>
               )}
             </View>

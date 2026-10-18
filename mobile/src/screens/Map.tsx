@@ -11,8 +11,10 @@ import { placesRepository } from "../data/PlacesRepository";
 import { fetchCityManifest, RIO_CITY_SLUG } from "../data/downloadManager";
 import type { Place } from "../data/types";
 import { haversineMeters, formatDistance, type LatLon } from "../utils/geo";
+import { normalizeForSearch } from "../utils/search";
 import { listFeaturedItineraries, type Itinerary } from "../data/ItinerariesRepository";
 import { formatItinerarySummary } from "../utils/itineraryFormat";
+import { useActiveItinerary } from "../itinerary/ActiveItineraryContext";
 import { colors, fonts, radii } from "../theme/tokens";
 // Metro resolves PlaceMap.web.tsx on web, PlaceMap.tsx (react-native-maps)
 // on native, automatically -- this import is platform-agnostic on purpose,
@@ -35,6 +37,15 @@ const RIO_REGION = {
 export function MapScreen({ navigation }: Props) {
   const { t, locale } = useLocale();
   const { isLoggedIn } = useAuth();
+  const {
+    itinerary: activeItinerary,
+    currentStop,
+    currentPlaceStepNumber,
+    totalPlaceSteps,
+    distanceToCurrentStopMeters,
+    justArrived,
+    end: endActiveItinerary,
+  } = useActiveItinerary();
   const [places, setPlaces] = useState<Place[]>([]);
   const [offlineCount, setOfflineCount] = useState(0);
   const [userLocation, setUserLocation] = useState<LatLon | null>(null);
@@ -68,14 +79,48 @@ export function MapScreen({ navigation }: Props) {
   // placesRepository.search() hitting the backend on every character typed
   // would be both slower and unnecessary for a list this size.
   const visiblePlaces = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = normalizeForSearch(query);
     return places.filter((p) => {
-      if (q && !p.name.toLowerCase().includes(q)) return false;
+      if (q) {
+        // Place names stay in their original (Portuguese) spelling -- never
+        // translated, only narration is -- so a query in the app's own
+        // language rarely matches the name itself. Matching the category's
+        // *translated* label too (the same text already shown on its
+        // filter chip) lets "église"/"church"/"igreja" all find every
+        // church regardless of which language the name happens to be in.
+        const categoryLabel = (t.categories as Record<string, string>)[p.category] ?? p.category;
+        const matchesName = normalizeForSearch(p.name).includes(q);
+        const matchesCategory = normalizeForSearch(categoryLabel).includes(q);
+        if (!matchesName && !matchesCategory) return false;
+      }
       if (activeCategory && p.category !== activeCategory) return false;
       if (audioOnly && !audioReadyIds?.has(p.id)) return false;
       return true;
     });
-  }, [places, query, activeCategory, audioOnly, audioReadyIds]);
+  }, [places, query, activeCategory, audioOnly, audioReadyIds, t]);
+
+  // 1-based step number per place, counting only "place" stops (matches the
+  // numbered badges on ItineraryDetail/FeaturedItineraryDetail) -- undefined
+  // for a place not in the active itinerary at all.
+  const stepNumberByPlaceId = useMemo(() => {
+    if (!activeItinerary) return null;
+    const map = new Map<string, number>();
+    let step = 0;
+    for (const stop of activeItinerary.stops) {
+      if (stop.kind !== "place") continue;
+      step += 1;
+      map.set(stop.placeId, step);
+    }
+    return map;
+  }, [activeItinerary]);
+
+  // While an itinerary is active, the map is "about this walk" -- showing
+  // every other place in Rio alongside it just adds noise to exactly the
+  // moment a clear numbered sequence matters most.
+  const mapPlaces = useMemo(() => {
+    if (!stepNumberByPlaceId) return visiblePlaces;
+    return visiblePlaces.filter((p) => stepNumberByPlaceId.has(p.id));
+  }, [visiblePlaces, stepNumberByPlaceId]);
 
   useEffect(() => {
     placesRepository.listNearby().then(setPlaces);
@@ -147,12 +192,19 @@ export function MapScreen({ navigation }: Props) {
       <SafeAreaView edges={["top"]} style={styles.header}>
         <Text style={styles.wordmark}>Memória Carioca</Text>
         <View style={styles.headerRight}>
-          <View style={styles.badge}>
-            <View style={styles.badgeDot} />
-            <Text style={styles.badgeText}>
-              {t.map.offlineBadge.replace("{count}", String(offlineCount))}
-            </Text>
-          </View>
+          {/* This badge means "N places are available even with no signal" --
+              it's a reassurance about what's downloaded, not a live connectivity
+              status, so showing it for offlineCount === 0 (true for anyone who
+              hasn't downloaded anything, i.e. most first-time visits) read as a
+              bare, confusing "no connection" message with no count that made sense. */}
+          {offlineCount > 0 && (
+            <View style={styles.badge}>
+              <View style={styles.badgeDot} />
+              <Text style={styles.badgeText}>
+                {t.map.offlineBadge.replace("{count}", String(offlineCount))}
+              </Text>
+            </View>
+          )}
           <Pressable style={styles.gearBtn} onPress={() => navigation.navigate(isLoggedIn ? "ItinerariesList" : "Auth")}>
             <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
               <Circle cx={6} cy={7} r={2} stroke={colors.ink} strokeWidth={2} />
@@ -172,6 +224,35 @@ export function MapScreen({ navigation }: Props) {
           </Pressable>
         </View>
       </SafeAreaView>
+
+      {activeItinerary && currentStop && (
+        <View style={styles.progressBanner}>
+          <View style={styles.progressBannerText}>
+            <Text style={styles.progressBannerTitle} numberOfLines={1}>
+              {activeItinerary.title}
+            </Text>
+            <Text style={styles.progressBannerStep}>
+              {t.itineraries.progressStep
+                .replace("{current}", String(currentPlaceStepNumber))
+                .replace("{total}", String(totalPlaceSteps))}
+            </Text>
+            <Text style={styles.progressBannerLabel} numberOfLines={1}>
+              {justArrived ? t.itineraries.arrivedAt : currentStop.label}
+            </Text>
+            {!justArrived && distanceToCurrentStopMeters !== null && (
+              <Text style={styles.progressBannerDistance}>
+                {formatDistance(distanceToCurrentStopMeters)}
+              </Text>
+            )}
+          </View>
+          <Pressable style={styles.progressBannerEnd} onPress={endActiveItinerary}>
+            <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+              <Line x1={6} y1={6} x2={18} y2={18} stroke={colors.cream} strokeWidth={2.2} strokeLinecap="round" />
+              <Line x1={18} y1={6} x2={6} y2={18} stroke={colors.cream} strokeWidth={2.2} strokeLinecap="round" />
+            </Svg>
+          </Pressable>
+        </View>
+      )}
 
       <ScrollView
         horizontal
@@ -208,7 +289,10 @@ export function MapScreen({ navigation }: Props) {
         </Pressable>
       </ScrollView>
 
-      {featuredItineraries.length > 0 ? (
+      {/* Pointless (and confusing -- "discover other itineraries" while
+          already following one) once an itinerary is active: this row is
+          for choosing where to go, not for someone already underway. */}
+      {!activeItinerary && featuredItineraries.length > 0 ? (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -231,7 +315,8 @@ export function MapScreen({ navigation }: Props) {
 
       <View style={styles.map}>
         <PlaceMap
-          places={visiblePlaces}
+          places={mapPlaces}
+          stepNumbers={stepNumberByPlaceId ?? undefined}
           region={RIO_REGION}
           userLocation={userLocation}
           youAreHereLabel={t.map.youAreHere}
@@ -250,10 +335,23 @@ export function MapScreen({ navigation }: Props) {
             value={query}
             onChangeText={setQuery}
           />
+          {query.length > 0 && (
+            <Pressable style={styles.searchClear} onPress={() => setQuery("")} hitSlop={8}>
+              <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                <Line x1={6} y1={6} x2={18} y2={18} stroke={colors.inkFaint} strokeWidth={2.2} strokeLinecap="round" />
+                <Line x1={18} y1={6} x2={6} y2={18} stroke={colors.inkFaint} strokeWidth={2.2} strokeLinecap="round" />
+              </Svg>
+            </Pressable>
+          )}
         </View>
       </View>
 
-      {nearby ? (
+      {/* Showing "the nearest place" while following an itinerary competes
+          with the one thing that screen is for: the current stop, already
+          front and center in the progress banner above. Dropped here, not
+          just visually hidden, so it can't also fire PlaceDetail navigation
+          by accident. */}
+      {!activeItinerary && nearby ? (
         <Pressable
           style={styles.nearby}
           onPress={() => navigation.navigate("PlaceDetail", { placeId: nearby.place.id })}
@@ -303,6 +401,38 @@ const styles = StyleSheet.create({
   },
   wordmark: { fontFamily: fonts.display, fontSize: 15, color: colors.ink },
   headerRight: { flexDirection: "row", alignItems: "center", gap: 10 },
+  progressBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.terracotta,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    gap: 10,
+  },
+  progressBannerText: { flex: 1 },
+  progressBannerTitle: {
+    fontFamily: fonts.bodyBold,
+    fontSize: 12,
+    color: colors.cream,
+    marginBottom: 2,
+  },
+  progressBannerStep: {
+    fontFamily: fonts.bodySemiBold,
+    fontSize: 11,
+    color: colors.cream,
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  progressBannerLabel: { fontFamily: fonts.bodyBold, fontSize: 14.5, color: colors.cream, marginTop: 1 },
+  progressBannerDistance: { fontFamily: fonts.body, fontSize: 12, color: colors.cream, marginTop: 1, opacity: 0.9 },
+  progressBannerEnd: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255,255,255,0.2)",
+  },
   badge: {
     flexDirection: "row",
     alignItems: "center",
@@ -399,6 +529,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   searchText: { flex: 1, fontFamily: fonts.body, fontSize: 14, color: colors.inkFaint },
+  searchClear: { padding: 2 },
   nearby: {
     position: "absolute",
     left: 16,
