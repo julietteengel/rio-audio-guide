@@ -6,8 +6,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
 import * as Notifications from "expo-notifications";
+import { setAudioModeAsync } from "expo-audio";
 import { LocaleProvider } from "./src/i18n/LocaleContext";
 import { AuthProvider } from "./src/auth/AuthContext";
+import { ActiveItineraryProvider } from "./src/itinerary/ActiveItineraryContext";
 import { RootNavigator } from "./src/navigation/RootNavigator";
 import {
   navigationRef,
@@ -38,6 +40,15 @@ Notifications.setNotificationHandler({
 
 export default function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  // This is a narration player, not a game or notification sound -- the
+  // whole point is being audible on a walk with the phone in a pocket,
+  // where the hardware silent switch is routinely on. Without this,
+  // expo-audio's default session respects that switch and plays nothing,
+  // with no error anywhere to explain why.
+  useEffect(() => {
+    setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     Font.loadAsync({
@@ -85,13 +96,15 @@ export default function App() {
       <SafeAreaProvider>
         <LocaleProvider>
           <AuthProvider>
-            <NavigationContainer
-              ref={navigationRef}
-              documentTitle={{ formatter: () => "Memória Carioca" }}
-              onReady={flushPendingNavigation}
-            >
-              <RootNavigator />
-            </NavigationContainer>
+            <ActiveItineraryProvider>
+              <NavigationContainer
+                ref={navigationRef}
+                documentTitle={{ formatter: () => "Memória Carioca" }}
+                onReady={flushPendingNavigation}
+              >
+                <RootNavigator />
+              </NavigationContainer>
+            </ActiveItineraryProvider>
           </AuthProvider>
         </LocaleProvider>
       </SafeAreaProvider>

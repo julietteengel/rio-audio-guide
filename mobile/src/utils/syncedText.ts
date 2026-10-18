@@ -1,84 +1,54 @@
-export type WordMark = { time: number; value: string };
+export type NarrationLine = { time: number; text: string };
 
-type RawMark = { time?: number; type?: string; value?: string };
+type WhisperSegment = { start?: number; text?: string };
+type WhisperVerboseJSON = { segments?: WhisperSegment[] };
 
-/** Parses Polly's NDJSON speech marks, keeping only "word" entries. A
- * corrupted line is skipped rather than failing the whole file — one
- * mistimed word shouldn't cost the narration all highlighting. */
-export function parseWordMarks(ndjson: string): WordMark[] {
-  const marks: WordMark[] = [];
-  for (const line of ndjson.split("\n")) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-    let raw: unknown;
-    try {
-      raw = JSON.parse(trimmed);
-    } catch {
-      continue;
-    }
-    if (raw === null || typeof raw !== "object") continue;
-    const { type, time, value } = raw as RawMark;
-    if (type !== "word" || typeof time !== "number" || typeof value !== "string") {
-      continue;
-    }
-    marks.push({ time, value });
+/** Parses an OpenAI Whisper `verbose_json` transcription (one entry per
+ * spoken sentence/segment, with its own start time) into narration lines.
+ * Used instead of Polly's per-word speech marks because neither Google TTS
+ * nor OpenAI TTS -- the two providers actually in use -- return timing
+ * themselves; Whisper re-transcribes the already-generated audio file to
+ * recover it, for either provider's voice, after the fact. A malformed or
+ * unexpected body yields [] rather than throwing. */
+export function parseNarrationSegments(json: string): NarrationLine[] {
+  let raw: unknown;
+  try {
+    raw = JSON.parse(json);
+  } catch {
+    return [];
   }
-  return marks;
+  if (raw === null || typeof raw !== "object") return [];
+  const segments = (raw as WhisperVerboseJSON).segments;
+  if (!Array.isArray(segments)) return [];
+
+  const lines: NarrationLine[] = [];
+  for (const segment of segments) {
+    if (typeof segment.start !== "number" || typeof segment.text !== "string") continue;
+    const text = segment.text.trim();
+    if (!text) continue;
+    lines.push({ time: Math.round(segment.start * 1000), text });
+  }
+  return lines;
 }
 
-/** Never throws — any network or parse failure becomes null, which drives
- * the static-text fallback in SyncedNarration without a separate error state. */
-export async function fetchWordMarks(url: string): Promise<WordMark[] | null> {
+/** Never throws -- any network or parse failure (including a file with no
+ * usable segments) becomes null, which drives SyncedNarration's static-text
+ * fallback without a separate error state. */
+export async function fetchNarrationLines(url: string): Promise<NarrationLine[] | null> {
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
     const text = await res.text();
-    return parseWordMarks(text);
+    const lines = parseNarrationSegments(text);
+    return lines.length > 0 ? lines : null;
   } catch {
     return null;
   }
 }
 
-export type NarrationLine = { time: number; text: string };
-
-// Groups consecutive word marks into short lyric-style lines -- greedily
-// appends words until the joined text would exceed targetChars, then
-// starts a new line. Never flushes a line holding fewer than 2 words
-// (forces the next word in instead) so a line never ends up as a single
-// orphan word when there's another word available to join it -- this is
-// what actually fixes the "short word flashes past unseen" complaint from
-// per-word highlighting: a line lasts several seconds, comfortably longer
-// than one playback-status poll interval.
-export function groupMarksIntoLines(marks: WordMark[], targetChars = 40): NarrationLine[] {
-  if (marks.length === 0) return [];
-
-  const lines: NarrationLine[] = [];
-  let current: WordMark[] = [marks[0]];
-
-  const flush = () => {
-    lines.push({
-      time: current[0].time,
-      text: current.map((m) => m.value).join(" "),
-    });
-  };
-
-  for (let i = 1; i < marks.length; i++) {
-    const candidate = [...current, marks[i]].map((m) => m.value).join(" ");
-    if (candidate.length > targetChars && current.length >= 2) {
-      flush();
-      current = [marks[i]];
-    } else {
-      current.push(marks[i]);
-    }
-  }
-  flush();
-
-  return lines;
-}
-
-// Same binary-search shape as findActiveWordIndex above, applied to
-// NarrationLine[] instead of WordMark[] -- kept as a separate function
-// (not a generic) so each call site's intent stays obvious from its name.
+// Binary search: the active line is the last one whose timestamp has
+// already passed, so -1 before the first line (nothing active yet) and the
+// final line once playback is past every timestamp.
 export function findActiveLineIndex(lines: NarrationLine[], currentTimeMs: number): number {
   if (lines.length === 0 || currentTimeMs < lines[0].time) return -1;
   let lo = 0;

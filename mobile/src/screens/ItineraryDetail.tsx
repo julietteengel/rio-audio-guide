@@ -9,6 +9,7 @@ import { useLocale } from "../i18n/LocaleContext";
 import { useAuth } from "../auth/AuthContext";
 import { getItinerary, type Itinerary } from "../data/ItinerariesRepository";
 import { formatDuration, formatItinerarySummary } from "../utils/itineraryFormat";
+import { useActiveItinerary } from "../itinerary/ActiveItineraryContext";
 import { colors, fonts, radii } from "../theme/tokens";
 
 type Props = NativeStackScreenProps<AppStackParamList, "ItineraryDetail">;
@@ -16,6 +17,7 @@ type Props = NativeStackScreenProps<AppStackParamList, "ItineraryDetail">;
 export function ItineraryDetailScreen({ route, navigation }: Props) {
   const { t } = useLocale();
   const { token } = useAuth();
+  const { start } = useActiveItinerary();
   const [itinerary, setItinerary] = useState<Itinerary | null>(null);
   const [notFound, setNotFound] = useState(false);
 
@@ -100,7 +102,13 @@ export function ItineraryDetailScreen({ route, navigation }: Props) {
             })()}
           </View>
         </ScrollView>
-        <Pressable style={styles.startBtn} onPress={() => navigation.navigate("Map")}>
+        <Pressable
+          style={styles.startBtn}
+          onPress={() => {
+            start(itinerary);
+            navigation.navigate("Map");
+          }}
+        >
           <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
             <Path d="M5 12h14M13 5l7 7-7 7" stroke={colors.cream} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>

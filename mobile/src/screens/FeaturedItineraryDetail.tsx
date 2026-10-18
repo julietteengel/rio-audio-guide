@@ -6,6 +6,7 @@ import Svg, { Polyline, Path } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
+import { useActiveItinerary } from "../itinerary/ActiveItineraryContext";
 import { formatDuration, formatItinerarySummary } from "../utils/itineraryFormat";
 import { colors, fonts, radii } from "../theme/tokens";
 
@@ -14,6 +15,7 @@ type Props = NativeStackScreenProps<AppStackParamList, "FeaturedItineraryDetail"
 export function FeaturedItineraryDetailScreen({ route, navigation }: Props) {
   const { t } = useLocale();
   const { itinerary } = route.params;
+  const { start } = useActiveItinerary();
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -69,7 +71,13 @@ export function FeaturedItineraryDetailScreen({ route, navigation }: Props) {
           })()}
         </View>
       </ScrollView>
-      <Pressable style={styles.startBtn} onPress={() => navigation.navigate("Map")}>
+      <Pressable
+        style={styles.startBtn}
+        onPress={() => {
+          start(itinerary);
+          navigation.navigate("Map");
+        }}
+      >
         <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
           <Path d="M5 12h14M13 5l7 7-7 7" stroke={colors.cream} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>

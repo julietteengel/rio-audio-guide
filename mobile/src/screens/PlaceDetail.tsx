@@ -3,17 +3,17 @@ import React, { useEffect, useRef, useState } from "react";
 import { Animated, View, Text, Pressable, Image, StyleSheet, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
-import Svg, { Polyline, Path, Line, Circle } from "react-native-svg";
+import Svg, { Polyline, Path, Line } from "react-native-svg";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { AppStackParamList } from "../navigation/types";
 import { useLocale } from "../i18n/LocaleContext";
 import { placesRepository } from "../data/PlacesRepository";
 import type { Place, AudioAvailability } from "../data/types";
 import { colors, fonts, radii } from "../theme/tokens";
-import { fetchWordMarks, type WordMark } from "../utils/syncedText";
+import { fetchNarrationLines, type NarrationLine } from "../utils/syncedText";
 import { SyncedNarration, type NarrationMode } from "../components/SyncedNarration";
 import { AudioProgressBar } from "../components/AudioProgressBar";
-import { alertInfo } from "../utils/platformAlert";
+import { useActiveItinerary } from "../itinerary/ActiveItineraryContext";
 
 type Props = NativeStackScreenProps<AppStackParamList, "PlaceDetail">;
 
@@ -44,21 +44,25 @@ function formatTime(seconds: number): string {
 
 export function PlaceDetailScreen({ route, navigation }: Props) {
   const { t, locale } = useLocale();
+  const { markStopListened } = useActiveItinerary();
   // A fixed pixel size looks fine on a real phone's ~375-430px-wide screen
   // but reads as tiny on a wide desktop/tablet testing window -- sizing off
   // the actual window width keeps it proportionally the same "most of the
   // screen" square on both, capped so it doesn't become absurd on a large
-  // display.
+  // display. Deliberately smaller than "most of the screen" (was 0.72/340) --
+  // this screen never scrolls, and on a real phone the image was eating
+  // enough height to squeeze the synced-lyrics panel below it down to a
+  // single half-visible line.
   const { width: windowWidth } = useWindowDimensions();
-  const heroImageSize = Math.min(windowWidth * 0.72, 340);
+  const heroImageSize = Math.min(windowWidth * 0.5, 220);
   const [place, setPlace] = useState<Place | null>(null);
   // Distinct from `place === null`, which also covers "the fetch hasn't come
   // back yet" -- without it, a place that isn't in the offline cache renders
   // a permanently blank screen indistinguishable from loading.
   const [notFound, setNotFound] = useState(false);
   const [audio, setAudio] = useState<AudioAvailability>({ state: "unavailable" });
-  const [marks, setMarks] = useState<WordMark[] | null>(null);
-  const [marksLoading, setMarksLoading] = useState(false);
+  const [lines, setLines] = useState<NarrationLine[] | null>(null);
+  const [linesLoading, setLinesLoading] = useState(false);
   const [narrationMode, setNarrationMode] = useState<NarrationMode>("scroll");
   // Reading the first line before Play reads as a bug, not a preview --
   // once playback has genuinely started at least once, this stays true even
@@ -94,20 +98,20 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   }, [place?.id, locale]);
 
   // Vidé immédiatement, avant même que le fetch ne réponde -- sinon les
-  // marks de l'ancienne langue resteraient affichées un instant pendant la
-  // transition, surlignant les mauvais mots.
+  // lignes de l'ancienne langue resteraient affichées un instant pendant la
+  // transition, surlignant la mauvaise phrase.
   useEffect(() => {
-    setMarks(null);
+    setLines(null);
     if (audio.state !== "ready" || !audio.timestampsUrl) {
-      setMarksLoading(false);
+      setLinesLoading(false);
       return;
     }
-    setMarksLoading(true);
+    setLinesLoading(true);
     let cancelled = false;
-    fetchWordMarks(audio.timestampsUrl).then((result) => {
+    fetchNarrationLines(audio.timestampsUrl).then((result) => {
       if (!cancelled) {
-        setMarks(result);
-        setMarksLoading(false);
+        setLines(result);
+        setLinesLoading(false);
       }
     });
     return () => {
@@ -124,6 +128,14 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
   useEffect(() => {
     if (status.playing) setHasStarted(true);
   }, [status.playing]);
+
+  // Marks this stop done in the active itinerary (if there is one, and this
+  // is its current stop) once the narration actually finishes -- a better
+  // "completed" signal than GPS proximity alone, which can't distinguish a
+  // quick walk-by from someone who stood there and listened.
+  useEffect(() => {
+    if (status.didJustFinish && place) markStopListened(place.id);
+  }, [status.didJustFinish, place, markStopListened]);
 
   // React Navigation's own screen-transition animations don't run on web
   // (react-native-screens has no web implementation of them) -- this fades
@@ -174,17 +186,23 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
 
       <View style={[styles.heroImageWrap, { width: heroImageSize, height: heroImageSize }]}>
         <Image
-          source={require("../../assets/images/place-hero.jpg")}
+          source={place.imageUrl ? { uri: place.imageUrl } : require("../../assets/images/place-hero.jpg")}
           style={styles.heroImage}
           resizeMode="cover"
         />
+        {/* A warm terracotta tint over every hero image, real photo or the
+            generic fallback alike -- real place photos otherwise span a
+            century of sources (archive B&W, modern overexposed snapshots,
+            paintings), and would read as visually unrelated to each other
+            and to the app's own palette without a shared treatment. */}
+        <View style={styles.heroImageTint} pointerEvents="none" />
       </View>
 
       <View style={styles.heroText}>
         <Text style={styles.eyebrow}>
           {place.neighborhood ? `${categoryLabel} · ${place.neighborhood}` : categoryLabel}
         </Text>
-        <Text style={styles.title}>{place.name}</Text>
+        <Text style={styles.title} numberOfLines={2}>{place.name}</Text>
       </View>
 
       <SafeAreaView edges={["bottom"]} style={styles.rest}>
@@ -227,33 +245,41 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
 
         {place.narrationStatus === "ready" ? (
           <>
-            <View style={styles.toggleRow}>
-              <Pressable
-                style={[styles.toggleBtn, narrationMode === "scroll" && marks !== null && styles.toggleBtnActive]}
-                onPress={() => setNarrationMode("scroll")}
-              >
-                <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
-                  <Line x1={4} y1={7} x2={20} y2={7} stroke={narrationMode === "scroll" && marks !== null ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
-                  <Line x1={4} y1={12} x2={16} y2={12} stroke={narrationMode === "scroll" && marks !== null ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
-                  <Line x1={4} y1={17} x2={12} y2={17} stroke={narrationMode === "scroll" && marks !== null ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
-                </Svg>
-              </Pressable>
-              <Pressable
-                style={[styles.toggleBtn, (narrationMode === "free" || marks === null) && styles.toggleBtnActive]}
-                onPress={() => setNarrationMode("free")}
-              >
-                <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
-                  <Path d="M4 5.5C4 5.5 6 4.5 9 4.5S13 5.5 13 5.5V18.5C13 18.5 11 17.5 9 17.5S4 18.5 4 18.5V5.5Z" stroke={narrationMode === "free" || marks === null ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
-                  <Path d="M20 5.5C20 5.5 18 4.5 15 4.5S11 5.5 11 5.5V18.5C11 18.5 13 17.5 15 17.5S20 18.5 20 18.5V5.5Z" stroke={narrationMode === "free" || marks === null ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
-                </Svg>
-              </Pressable>
-            </View>
+            {/* Meaningless (and visually broken: the "free" button would
+                read as permanently active with nothing to compare against)
+                until lines actually exist for this place/language -- the
+                content below already falls back to free text on its own
+                whenever lines is null, so hiding the toggle here doesn't
+                lose that fallback, just the confusing non-functional buttons. */}
+            {lines !== null && (
+              <View style={styles.toggleRow}>
+                <Pressable
+                  style={[styles.toggleBtn, narrationMode === "scroll" && styles.toggleBtnActive]}
+                  onPress={() => setNarrationMode("scroll")}
+                >
+                  <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
+                    <Line x1={4} y1={7} x2={20} y2={7} stroke={narrationMode === "scroll" ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
+                    <Line x1={4} y1={12} x2={16} y2={12} stroke={narrationMode === "scroll" ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
+                    <Line x1={4} y1={17} x2={12} y2={17} stroke={narrationMode === "scroll" ? colors.terracotta : DIM_45} strokeWidth={2} strokeLinecap="round" />
+                  </Svg>
+                </Pressable>
+                <Pressable
+                  style={[styles.toggleBtn, narrationMode === "free" && styles.toggleBtnActive]}
+                  onPress={() => setNarrationMode("free")}
+                >
+                  <Svg width={17} height={17} viewBox="0 0 24 24" fill="none">
+                    <Path d="M4 5.5C4 5.5 6 4.5 9 4.5S13 5.5 13 5.5V18.5C13 18.5 11 17.5 9 17.5S4 18.5 4 18.5V5.5Z" stroke={narrationMode === "free" ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
+                    <Path d="M20 5.5C20 5.5 18 4.5 15 4.5S11 5.5 11 5.5V18.5C11 18.5 13 17.5 15 17.5S20 18.5 20 18.5V5.5Z" stroke={narrationMode === "free" ? colors.terracotta : DIM_45} strokeWidth={1.7} strokeLinejoin="round" />
+                  </Svg>
+                </Pressable>
+              </View>
+            )}
 
             <View style={styles.lyricsArea}>
               <SyncedNarration
                 text={place.body}
-                marks={marks}
-                marksLoading={marksLoading}
+                lines={lines}
+                linesLoading={linesLoading}
                 hasStarted={hasStarted}
                 pressPlayHint={t.placeDetail.pressPlayHint}
                 currentTimeMs={status.currentTime * 1000}
@@ -272,7 +298,7 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
         )}
 
         <Pressable
-          style={[styles.ask, place.narrationStatus !== "ready" && styles.askDisabled]}
+          style={[styles.ask, styles.askLast, place.narrationStatus !== "ready" && styles.askDisabled]}
           disabled={place.narrationStatus !== "ready"}
           onPress={() => navigation.navigate("Assistant", { placeId: place.id })}
         >
@@ -286,21 +312,6 @@ export function PlaceDetailScreen({ route, navigation }: Props) {
             />
           </Svg>
           <Text style={styles.askText}>{t.placeDetail.ask}</Text>
-          <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-            <Polyline points="9 6 15 12 9 18" stroke={DIM_45} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
-          </Svg>
-        </Pressable>
-
-        <Pressable
-          style={[styles.ask, styles.askLast]}
-          onPress={() => alertInfo(t.placeDetail.itineraryComingSoonTitle, t.placeDetail.itineraryComingSoonBody)}
-        >
-          <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-            <Circle cx={12} cy={12} r={9} stroke={colors.terracotta} strokeWidth={2} />
-            <Line x1={12} y1={8} x2={12} y2={16} stroke={colors.terracotta} strokeWidth={2} strokeLinecap="round" />
-            <Line x1={8} y1={12} x2={16} y2={12} stroke={colors.terracotta} strokeWidth={2} strokeLinecap="round" />
-          </Svg>
-          <Text style={styles.askText}>{t.placeDetail.addToItinerary}</Text>
           <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
             <Polyline points="9 6 15 12 9 18" stroke={DIM_45} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>
@@ -333,6 +344,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sand,
   },
   heroImage: { width: "100%", height: "100%" },
+  // Low-opacity terracotta wash over every hero image -- unifies real
+  // photos of wildly different eras/quality (archive B&W, modern snapshots,
+  // paintings) and the generic fallback alike into one consistent palette,
+  // without altering what's actually shown underneath.
+  heroImageTint: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(193,89,46,0.22)",
+  },
   heroText: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 4 },
   eyebrow: {
     fontFamily: fonts.bodyBold,
@@ -357,10 +380,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   playBtnDisabled: { backgroundColor: "rgba(193,89,46,0.35)" },
-  toggleRow: { flexDirection: "row", justifyContent: "flex-end", gap: 8, paddingHorizontal: 20, marginTop: 16 },
+  toggleRow: { flexDirection: "row", justifyContent: "flex-end", gap: 8, paddingHorizontal: 20, marginTop: 16, marginBottom: 12 },
   toggleBtn: { width: 34, height: 34, borderRadius: radii.md, alignItems: "center", justifyContent: "center" },
   toggleBtnActive: { backgroundColor: TINT_ACTIVE },
-  lyricsArea: { flex: 1, minHeight: 0, paddingHorizontal: 32, justifyContent: "center" },
+  // overflow: hidden is a deliberate safety net, not just panelClip's own
+  // clipping inside SyncedNarration -- a centered child taller than this
+  // box's own flex:1 allocation would otherwise spill past its boundary
+  // (centering doesn't clip), visually overlapping the toggle row above.
+  lyricsArea: { flex: 1, minHeight: 0, paddingHorizontal: 32, justifyContent: "center", overflow: "hidden" },
   pendingText: { fontFamily: fonts.body, fontSize: 15, lineHeight: 24, color: DIM_55, textAlign: "center" },
   ask: {
     flexDirection: "row",
