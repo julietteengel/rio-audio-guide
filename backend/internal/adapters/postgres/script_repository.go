@@ -175,6 +175,52 @@ func (r *ScriptRepository) FindByPlaceID(ctx context.Context, placeID string) ([
 	return scripts, rows.Err()
 }
 
+// FindAllDraft returns every script still in ScriptStatusDraft -- used by
+// cmd/batchreview to work through the whole backlog in one pass, not by any
+// HTTP route (there is no "list all drafts" use case in the product itself).
+func (r *ScriptRepository) FindAllDraft(ctx context.Context) ([]*domain.Script, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT id, place_id, language, text, COALESCE(source_text, ''), status,
+		       COALESCE(reviewer_id, ''), reviewed_at, published_at
+		FROM scripts WHERE status = $1
+	`, string(domain.ScriptStatusDraft))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var scripts []*domain.Script
+	for rows.Next() {
+		var scriptID, placeIDCol, languageRaw, textRaw, sourceText, status, reviewerID string
+		var reviewedAt, publishedAt *time.Time
+		if err := rows.Scan(&scriptID, &placeIDCol, &languageRaw, &textRaw, &sourceText, &status,
+			&reviewerID, &reviewedAt, &publishedAt); err != nil {
+			return nil, err
+		}
+
+		language, err := domain.NewLanguage(languageRaw)
+		if err != nil {
+			return nil, err
+		}
+		text, err := domain.NewScriptText(textRaw)
+		if err != nil {
+			return nil, err
+		}
+
+		var reviewedAtVal, publishedAtVal time.Time
+		if reviewedAt != nil {
+			reviewedAtVal = *reviewedAt
+		}
+		if publishedAt != nil {
+			publishedAtVal = *publishedAt
+		}
+
+		scripts = append(scripts, domain.ReconstructScript(scriptID, placeIDCol, language, text, sourceText,
+			domain.ScriptStatus(status), reviewerID, reviewedAtVal, publishedAtVal))
+	}
+	return scripts, rows.Err()
+}
+
 func (r *ScriptRepository) FindByPlaceIDAndLanguage(ctx context.Context, placeID, language string) (*domain.Script, error) {
 	row := r.db.QueryRow(ctx, `
 		SELECT id, place_id, language, text, COALESCE(source_text, ''), status,
