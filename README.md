@@ -4,7 +4,7 @@ A hands-free, multilingual (EN/FR/PT/ES) geolocation-triggered audio guide for R
 cultural and heritage sites. Real, sourced, verified content (grounded in Wikidata/Wikipedia/Overture,
 checked by an anti-hallucination pass) — not AI-invented history.
 
-**Stack**: React Native (Expo) · Go (hexagonal architecture + DDD) · PostgreSQL/PostGIS · AWS (EC2, RDS, S3) · RabbitMQ · Redis · Anthropic Claude (AI itineraries, place assistant) · OpenAI & Google Cloud TTS/Whisper (narration + synced captions) · Next.js (landing page)
+**Stack**: React Native (Expo) · Go (hexagonal architecture + DDD) · PostgreSQL/PostGIS · AWS (EC2, RDS, S3) provisioned with Terraform · RabbitMQ · Redis · Anthropic Claude (AI itineraries, place assistant) · OpenAI & Google Cloud TTS/Whisper (narration + synced captions) · Next.js (landing page)
 
 See [`mission.md`](mission.md) for the full vision, scope, and current project status.
 
