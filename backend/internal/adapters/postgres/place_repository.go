@@ -17,13 +17,14 @@ func NewPlaceRepository(db DBTX) *PlaceRepository {
 }
 
 const upsertPlaceSQL = `
-	INSERT INTO places (id, name, category, geom, wikidata_qid, source, source_richness, status, removed_reason)
-	VALUES ($1, $2, $3, ST_SetSRID(ST_MakePoint($4, $5), 4326), $6, $7, $8, $9, $10)
+	INSERT INTO places (id, name, category, geom, wikidata_qid, source, source_richness, image_url, status, removed_reason)
+	VALUES ($1, $2, $3, ST_SetSRID(ST_MakePoint($4, $5), 4326), $6, $7, $8, $9, $10, $11)
 	ON CONFLICT (id) DO UPDATE SET
 		name = EXCLUDED.name,
 		category = EXCLUDED.category,
 		geom = EXCLUDED.geom,
 		wikidata_qid = EXCLUDED.wikidata_qid,
+		image_url = EXCLUDED.image_url,
 		status = EXCLUDED.status,
 		removed_reason = EXCLUDED.removed_reason,
 		updated_at = now()
@@ -32,7 +33,7 @@ const upsertPlaceSQL = `
 func placeSaveArgs(place *domain.Place) []any {
 	return []any{
 		place.ID(), place.Name().String(), place.Category(), place.Coordinates().Lon(), place.Coordinates().Lat(),
-		place.WikidataQID().String(), place.Source(), place.SourceRichness(), string(place.Status()), place.RemovedReason(),
+		place.WikidataQID().String(), place.Source(), place.SourceRichness(), place.ImageURL(), string(place.Status()), place.RemovedReason(),
 	}
 }
 
@@ -80,7 +81,7 @@ func (r *PlaceRepository) FindByID(ctx context.Context, id string) (*domain.Plac
 	row := r.db.QueryRow(ctx, `
 		SELECT id, name, category, ST_Y(geom::geometry), ST_X(geom::geometry),
 		       COALESCE(wikidata_qid, ''), source, COALESCE(source_richness, ''),
-		       status, COALESCE(removed_reason, '')
+		       status, COALESCE(removed_reason, ''), COALESCE(image_url, '')
 		FROM places WHERE id = $1
 	`, id)
 	return scanPlace(row)
@@ -94,7 +95,7 @@ func (r *PlaceRepository) FindByName(ctx context.Context, name string) (*domain.
 	row := r.db.QueryRow(ctx, `
 		SELECT id, name, category, ST_Y(geom::geometry), ST_X(geom::geometry),
 		       COALESCE(wikidata_qid, ''), source, COALESCE(source_richness, ''),
-		       status, COALESCE(removed_reason, '')
+		       status, COALESCE(removed_reason, ''), COALESCE(image_url, '')
 		FROM places WHERE name = $1 AND status = 'active' ORDER BY created_at LIMIT 1
 	`, name)
 	return scanPlace(row)
@@ -104,7 +105,7 @@ func (r *PlaceRepository) FindActiveInBoundingBox(ctx context.Context, minLat, m
 	rows, err := r.db.Query(ctx, `
 		SELECT id, name, category, ST_Y(geom::geometry), ST_X(geom::geometry),
 		       COALESCE(wikidata_qid, ''), source, COALESCE(source_richness, ''),
-		       status, COALESCE(removed_reason, '')
+		       status, COALESCE(removed_reason, ''), COALESCE(image_url, '')
 		FROM places
 		WHERE status = 'active'
 		  AND geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)::geography
@@ -132,9 +133,9 @@ type rowScanner interface {
 }
 
 func scanPlace(row rowScanner) (*domain.Place, error) {
-	var id, nameRaw, category, wikidataRaw, source, sourceRichness, status, removedReason string
+	var id, nameRaw, category, wikidataRaw, source, sourceRichness, status, removedReason, imageURL string
 	var lat, lon float64
-	if err := row.Scan(&id, &nameRaw, &category, &lat, &lon, &wikidataRaw, &source, &sourceRichness, &status, &removedReason); err != nil {
+	if err := row.Scan(&id, &nameRaw, &category, &lat, &lon, &wikidataRaw, &source, &sourceRichness, &status, &removedReason, &imageURL); err != nil {
 		return nil, err
 	}
 
@@ -151,5 +152,7 @@ func scanPlace(row rowScanner) (*domain.Place, error) {
 		return nil, err
 	}
 
-	return domain.ReconstructPlace(id, name, category, coords, qid, source, sourceRichness, domain.PlaceStatus(status), removedReason), nil
+	place := domain.ReconstructPlace(id, name, category, coords, qid, source, sourceRichness, domain.PlaceStatus(status), removedReason)
+	place.SetImageURL(imageURL)
+	return place, nil
 }

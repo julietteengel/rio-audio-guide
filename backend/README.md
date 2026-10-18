@@ -71,6 +71,27 @@ quota exceeded, rejected text — marks the `AudioFile` failed and stops retryin
 for a real incident/fix history (an unbounded retry loop that silently re-billed ElevenLabs) worth
 reading before touching this code.
 
+**This adapter exists in code but is not what actually generates audio right now.** ElevenLabs
+turned out too expensive and too robotic-sounding; every real audio file currently in the dev/prod
+database was produced by standalone Python scripts (not yet committed to this repo — they live in a
+session scratch workspace) that call Google Cloud TTS and OpenAI TTS directly and write straight to
+S3 + Postgres, bypassing the worker/RabbitMQ/ElevenLabs path entirely. Any script doing this **must**
+reproduce `CompleteAudioGeneration`'s contract (`internal/application/publish_script.go`) by hand: insert
+the `audio_files` row as `status='ready'`, *and* flip the matching `scripts` row to `status='published'`
+in the same step — skipping the second half leaves a ready audio file that `getPlaceAudio` still refuses
+to serve (see `audio_handler.go`'s own comment on this exact two-step risk). A second pipeline step,
+also outside this repo for now, re-transcribes the finished audio with OpenAI's Whisper
+(`audio/transcriptions`, `response_format=verbose_json`, `timestamp_granularities=["segment"]`) to
+produce `timestamps_url` (per-sentence timing) — neither Google TTS nor OpenAI TTS return timing
+themselves, unlike ElevenLabs/Polly's speech marks. The mobile app's synced-narration feature
+(`mobile/src/utils/syncedText.ts`) expects exactly that Whisper `segments` shape, not Polly's old
+per-word NDJSON format.
+
+`places.image_url` (added this session) is populated by a third, separate pipeline step: a Wikidata
+P18 lookup (falling back to the Wikipedia `pageimages` API by name) per place, also run as a standalone
+script, also not yet committed here. `PlaceDetail` in the mobile app falls back to a generic local
+image when a place has none.
+
 `cmd/import` is a separate, manually-run CLI (not a long-lived service) that bridges the Python
 sourcing/curation pipeline's output (`../pipeline/curation/places_export_v2.csv` +
 `../pipeline/curation/narrations_multi_full.csv`) into Postgres as `Place`/`Script` rows, before any of
@@ -164,6 +185,15 @@ on `docker compose down -v`) — **not** the port-5433 one holding real dev data
 `docker compose up -d worker` for real generation, stop it before running the RabbitMQ integration
 suite: both would consume from the same real `tts_jobs` queue and produce confusing cross-contaminated
 failures that look like a code bug but aren't.
+
+## Deployment
+
+`deploy/terraform/` — a quick, real AWS deployment (RDS + one EC2 instance running
+api+worker+rabbitmq+redis via docker-compose), applied for the first time this session. See its own
+README for the full apply/push/restore steps. Not wired to the ElevenLabs path above (its SSM secret
+for that was removed once the key stopped being needed) — it serves whatever's already in the
+database, including content that only ever went through the standalone TTS/Whisper/image scripts
+above, never through `cmd/worker`.
 
 ## CI/CD
 
