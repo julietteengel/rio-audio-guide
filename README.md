@@ -4,7 +4,26 @@ A hands-free, multilingual (EN/FR/PT/ES) geolocation-triggered audio guide for R
 cultural and heritage sites. Real, sourced, verified content (grounded in Wikidata/Wikipedia/Overture,
 checked by an anti-hallucination pass) — not AI-invented history.
 
+**Stack**: React Native (Expo) · Go (hexagonal architecture + DDD) · PostgreSQL/PostGIS · AWS (EC2, RDS, S3) · RabbitMQ · Redis · Anthropic Claude (AI itineraries, place assistant) · OpenAI & Google Cloud TTS/Whisper (narration + synced captions) · Next.js (landing page)
+
 See [`mission.md`](mission.md) for the full vision, scope, and current project status.
+
+![Memória Carioca landing page](docs/images/landing-page.png)
+
+## App features
+
+<!-- Screenshots added as they're captured -- see docs/superpowers/specs/2026-10-18-live-testing-session-status.md -->
+
+| | |
+|---|---|
+| **Curated map with nearby places** — search, filter by category, multilingual labels. | ![Map](docs/images/feature-map.png) |
+| **Hands-free, location-triggered narration** — synced, karaoke-style captions highlight the sentence being read as it plays. | ![Now playing](docs/images/feature-now-playing.png) |
+| **Free-reading mode** — the full narration text, for anyone who'd rather read than follow along word-by-word. | ![Free reading mode](docs/images/feature-reading-mode.png) |
+| **Guided pilot itineraries** — hand-curated routes (Centro Histórico, Lapa & Arcos, Santa Teresa) with real verified stops. | ![Itinerary detail](docs/images/feature-itinerary-detail.png) |
+| **Live itinerary progress** — numbered map pins and a progress banner while a route is active. | ![Itinerary in progress](docs/images/feature-itinerary-progress.png) |
+| **AI-generated custom itineraries** — describe your time/interests, get a route built only from verified places in the guide (every stop is a real, grounded place; a hallucinated place is architecturally impossible, see [`backend/README.md`](backend/README.md)). | ![AI itinerary chat](docs/images/feature-ai-itinerary.png) |
+| **Ask a question about any place** — a grounded chat assistant answers using only the guide's own sourced content. | ![Place assistant](docs/images/feature-ask.png) |
+| **Multilingual throughout** — EN/FR/PT/ES, UI and narration independently switchable. | ![Language switcher](docs/images/feature-multilingual.png) |
 
 ## Repository structure
 
