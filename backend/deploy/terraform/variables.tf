@@ -38,6 +38,17 @@ variable "ses_sender_email" {
   default     = "noreply@example.com"
 }
 
+variable "ssh_allowed_cidr" {
+  description = "CIDR allowed to reach port 22 when ssh_key_name is set, e.g. \"203.0.113.7/32\" (your own IP). Never 0.0.0.0/0."
+  type        = string
+  default     = "127.0.0.1/32"
+
+  validation {
+    condition     = var.ssh_allowed_cidr != "0.0.0.0/0"
+    error_message = "ssh_allowed_cidr must not be 0.0.0.0/0; use your own IP as a /32."
+  }
+}
+
 variable "ssh_key_name" {
   description = "Optional: an existing EC2 key pair name, if you want SSH as a fallback alongside SSM Session Manager. Leave null to rely on SSM only (no inbound SSH port opened)."
   type        = string
