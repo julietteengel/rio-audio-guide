@@ -14,10 +14,11 @@ resource "random_password" "jwt_secret" {
   special = false
 }
 
-resource "aws_ssm_parameter" "elevenlabs_api_key" {
-  name  = "/rio-audio-guide/elevenlabs_api_key"
+resource "aws_ssm_parameter" "anthropic_api_key" {
+  count = var.anthropic_api_key == null ? 0 : 1
+  name  = "/rio-audio-guide/anthropic_api_key"
   type  = "SecureString"
-  value = var.elevenlabs_api_key
+  value = var.anthropic_api_key
 }
 
 resource "aws_ssm_parameter" "jwt_secret" {

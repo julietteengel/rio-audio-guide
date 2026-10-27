@@ -71,10 +71,10 @@ data "aws_iam_policy_document" "app" {
   statement {
     sid     = "ReadOwnSecrets"
     actions = ["ssm:GetParameter"]
-    resources = [
-      aws_ssm_parameter.elevenlabs_api_key.arn,
-      aws_ssm_parameter.jwt_secret.arn,
-    ]
+    resources = concat(
+      [aws_ssm_parameter.jwt_secret.arn],
+      aws_ssm_parameter.anthropic_api_key[*].arn,
+    )
   }
   statement {
     sid       = "SendAccountEmails"
@@ -114,7 +114,7 @@ resource "aws_instance" "app" {
     ecr_worker_repo_url = aws_ecr_repository.worker.repository_url
     ecr_registry        = split("/", aws_ecr_repository.api.repository_url)[0]
     ses_sender_email    = var.ses_sender_email
-    elevenlabs_param    = aws_ssm_parameter.elevenlabs_api_key.name
+    anthropic_param     = one(aws_ssm_parameter.anthropic_api_key[*].name)
     jwt_secret_param    = aws_ssm_parameter.jwt_secret.name
     schema_sql          = file("${path.module}/../../internal/adapters/postgres/schema.sql")
   })

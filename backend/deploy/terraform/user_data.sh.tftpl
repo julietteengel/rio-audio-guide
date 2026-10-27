@@ -20,7 +20,9 @@ chmod +x /usr/local/bin/docker-compose
 aws ecr get-login-password --region ${aws_region} \
   | docker login --username AWS --password-stdin "${ecr_registry}"
 
-ELEVENLABS_API_KEY=$(aws ssm get-parameter --name "${elevenlabs_param}" --with-decryption --query Parameter.Value --output text --region ${aws_region})
+%{ if anthropic_param != null ~}
+ANTHROPIC_API_KEY=$(aws ssm get-parameter --name "${anthropic_param}" --with-decryption --query Parameter.Value --output text --region ${aws_region})
+%{ endif ~}
 JWT_SECRET=$(aws ssm get-parameter --name "${jwt_secret_param}" --with-decryption --query Parameter.Value --output text --region ${aws_region})
 
 mkdir -p /opt/rio-audio-guide
@@ -48,6 +50,7 @@ services:
       S3_BUCKET: ${s3_bucket}
       SES_SENDER_EMAIL: ${ses_sender_email}
       JWT_SECRET: "$${JWT_SECRET}"
+      ANTHROPIC_API_KEY: "$${ANTHROPIC_API_KEY:-}"
     depends_on:
       - rabbitmq
       - redis
@@ -58,7 +61,6 @@ services:
       DATABASE_URL: postgres://postgres:${db_password}@${db_endpoint}:5432/postgres
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
       S3_BUCKET: ${s3_bucket}
-      ELEVENLABS_API_KEY: "$${ELEVENLABS_API_KEY}"
     depends_on:
       - rabbitmq
 COMPOSE_EOF

@@ -8,7 +8,7 @@ Postgres instance, one EC2 instance running `api` + `worker` + `rabbitmq` +
 ## Prerequisites
 
 - Working AWS credentials (`aws sts get-caller-identity` succeeds).
-- A real ElevenLabs API key.
+- Optionally an Anthropic API key (AI itineraries and the place assistant need it; the rest of the API works without).
 - Docker running locally (to build and push the two images).
 
 ## 1. Apply the infrastructure
@@ -16,7 +16,8 @@ Postgres instance, one EC2 instance running `api` + `worker` + `rabbitmq` +
 ```bash
 cd backend/deploy/terraform
 terraform init
-terraform apply -var="elevenlabs_api_key=<your real key>"
+export TF_VAR_anthropic_api_key=<your key>   # optional
+terraform apply
 ```
 
 This creates: 2 ECR repos, an RDS instance, an EC2 instance, IAM

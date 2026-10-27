@@ -26,10 +26,11 @@ variable "db_allocated_storage_gb" {
   default = 20
 }
 
-variable "elevenlabs_api_key" {
-  description = "Real ElevenLabs key -- the worker refuses to start without one. Pass via -var or TF_VAR_elevenlabs_api_key, never commit it."
+variable "anthropic_api_key" {
+  description = "Anthropic API key for AI itineraries and the place assistant. Optional: leave null and those two routes fail while the rest of the API works. Pass via TF_VAR_anthropic_api_key, never commit it."
   type        = string
   sensitive   = true
+  default     = null
 }
 
 variable "ses_sender_email" {
