@@ -106,9 +106,9 @@ to be implemented ad hoc off conversational discussion alone.
   larger scale is researched but parked (`2026-09-07-content-verification-research.md`).
 - **Audio**: 203 ready audio files as of 2026-10-18, roughly 205 places still without audio, blocked on
   OpenAI credit. The audio was produced by standalone scripts (Google Cloud TTS and OpenAI TTS, Whisper
-  for caption timing) that were **never committed** and are no longer on the dev machine. The worker in
-  `backend/` still targets AWS Polly, so the committed code path and the audio actually in the database
-  do not match. Reconstructing these scripts in the repo is open work.
+  for caption timing) that were never committed and are lost. `pipeline/audiogen/` is a reconstruction
+  (OpenAI only, unit-tested, **never run against the live APIs**). The worker in `backend/` still targets
+  AWS Polly, so the committed worker and the audio actually in the database still do not match.
 - **Deployment**: AWS (EC2 + RDS + S3) was live in October 2026 and torn down with Terraform to avoid
   idle cost. It can be recreated from `backend/deploy/terraform`.
 - **Open**: rotate production credentials from root to the scoped `rio-cicd` IAM user; bulk audio and

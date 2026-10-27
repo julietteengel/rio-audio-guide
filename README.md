@@ -4,7 +4,7 @@ A hands-free, multilingual (EN/FR/PT/ES) geolocation-triggered audio guide for R
 cultural and heritage sites. Real, sourced, verified content (grounded in Wikidata/Wikipedia/Overture,
 checked by an anti-hallucination pass) — not AI-invented history.
 
-**Stack**: React Native (Expo) · Go (hexagonal architecture + DDD) · PostgreSQL/PostGIS · AWS (EC2, RDS, S3) provisioned with Terraform · RabbitMQ · Redis · Anthropic Claude (AI itineraries, place assistant) · OpenAI & Google Cloud TTS/Whisper (narration + synced captions) · Next.js (landing page)
+**Stack**: React Native (Expo) · Go (hexagonal architecture + DDD) · PostgreSQL/PostGIS · AWS (EC2, RDS, S3) provisioned with Terraform (deployed for field testing, since torn down) · RabbitMQ · Redis · Anthropic Claude (AI itineraries, place assistant) · OpenAI & Google Cloud TTS/Whisper (narration + synced captions) · Next.js (landing page)
 
 See [`mission.md`](mission.md) for the full vision, scope, and current project status.
 
@@ -21,7 +21,7 @@ See [`mission.md`](mission.md) for the full vision, scope, and current project s
 | **Free-reading mode** — the full narration text, for anyone who'd rather read than follow along word-by-word. | ![Free reading mode](docs/images/feature-reading-mode.png) |
 | **Guided pilot itineraries** — hand-curated routes (Centro Histórico, Lapa & Arcos, Santa Teresa) with real verified stops. | ![Itinerary detail](docs/images/feature-itinerary-detail.png) |
 | **Live itinerary progress** — numbered map pins and a progress banner while a route is active. | ![Itinerary in progress](docs/images/feature-itinerary-progress.png) |
-| **AI-generated custom itineraries** — describe your time/interests, get a route built only from verified places in the guide (every stop is a real, grounded place; a hallucinated place is architecturally impossible, see [`backend/README.md`](backend/README.md)). | ![AI itinerary chat](docs/images/feature-ai-itinerary.png) |
+| **AI-generated custom itineraries** — describe your time/interests, get a route built only from verified places in the guide (every stop comes from the guide's own verified places; the model can't invent a place, because any `place_id` it returns that isn't in the candidate set is rejected. At most one clearly-labelled, unverified AI suggestion, such as a meal break, can be added. See [`backend/README.md`](backend/README.md)). | ![AI itinerary chat](docs/images/feature-ai-itinerary.png) |
 | **Ask a question about any place** — a grounded chat assistant answers using only the guide's own sourced content. | ![Place assistant](docs/images/feature-ask.png) |
 | **Multilingual throughout** — EN/FR/PT/ES, UI and narration independently switchable. | ![Language switcher](docs/images/feature-multilingual.png) |
 
@@ -33,8 +33,9 @@ the single integration branch (see `CLAUDE.md` for the review/branching conventi
 going forward — short-lived branches per change, not per subsystem).
 
 - **`backend/`** — the Go backend. Hexagonal architecture (ports & adapters) + Domain-Driven Design,
-  PostgreSQL/PostGIS, RabbitMQ (TTS job queue), S3, voice generation via OpenAI and Google Cloud TTS
-  (with OpenAI Whisper producing the synced-caption timing). Has its own [README](backend/README.md)
+  PostgreSQL/PostGIS, RabbitMQ (TTS job queue), S3. The committed worker targets AWS Polly; the audio
+  actually in the database came from OpenAI/Google Cloud TTS scripts (reconstructed in `pipeline/audiogen/`,
+  with OpenAI Whisper producing the synced-caption timing). Has its own [README](backend/README.md)
   with the full architecture trace and setup/run instructions.
 - **`web/`** — the Next.js landing page. Makes no calls to the Go backend, deployed independently of
   its AWS infrastructure — not a static export though (it uses Next.js Middleware for locale routing,
@@ -44,17 +45,19 @@ going forward — short-lived branches per change, not per subsystem).
 - **`pipeline/`** — the Python sourcing pipeline (Overture Maps, Wikidata, feiras livres registry,
   deduplication — `pipeline/sourcing/`, a tested package) and the content curation scripts (grounding,
   narration, translation, anti-hallucination checks — `pipeline/curation/`, ad-hoc, not a tested
-  package). Produces the CSVs `backend/cmd/import` consumes; has no runtime relationship to
-  backend/frontend beyond that one-time import.
+  package). Produces the CSVs `backend/cmd/import` consumes. `pipeline/audiogen/` generates and
+  publishes the narration audio (reconstructed, see its README); apart from that and the one-time
+  import, it has no runtime relationship to backend/frontend.
 
 ## Why Go for the backend, why Python for the pipeline
 
 **Go, hexagonal + DDD, backend**: the domain has real invariants — no publish without human review, no
 language variant without its generated audio, conservative dedup (a false merge already dropped a real
 place once during sourcing, the hard way). Static typing catches missed state-transition bugs at compile
-time; goroutines/channels are a direct fit for an API and a RabbitMQ worker running concurrently. Kafka,
-MongoDB, and Redis were each proposed and cut — no measured need, only "it's on a skills list," not a
-real reason. Full writeup:
+time; goroutines/channels are a direct fit for an API and a RabbitMQ worker running concurrently. Kafka
+and MongoDB were proposed and cut — no measured need, only "it's on a skills list," not a real reason.
+Redis was cut the same way, then added later (2026-08-16) as a read cache once the hot-read need was
+concrete. Full writeup:
 [`docs/superpowers/specs/2026-08-04-backend-stack-decision.md`](docs/superpowers/specs/2026-08-04-backend-stack-decision.md).
 
 **Python, sourcing/curation pipeline**: never formally decided, just the obvious fit — one-off batch work

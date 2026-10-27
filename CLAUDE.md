@@ -47,6 +47,8 @@ docs/superpowers/specs/   dated, point-in-time decision/research documents (desi
 docs/superpowers/plans/   per-feature TDD implementation plans (task-by-task, checkbox-tracked)
 pipeline/sourcing/        the tested package: one module per data source (Overture, Wikidata,
                            feiras livres) + pure dedup logic + orchestrator
+pipeline/audiogen/         narration audio generation + Whisper timestamps (reconstructed, unit-tested,
+                           never run against the live APIs -- see its README)
 pipeline/curation/        one-off/ad-hoc scripts for content enrichment, narration generation,
                            and data cleanup — NOT a tested package, run manually, no test coverage
 ```

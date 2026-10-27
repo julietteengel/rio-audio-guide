@@ -73,14 +73,15 @@ reading before touching this code.
 
 **This adapter exists in code but is not what actually generates audio right now.** ElevenLabs
 turned out too expensive and too robotic-sounding; every real audio file currently in the dev/prod
-database was produced by standalone Python scripts (not yet committed to this repo — they live in a
-session scratch workspace) that call Google Cloud TTS and OpenAI TTS directly and write straight to
+database was produced by standalone Python scripts (the originals were never committed and are lost;
+`../pipeline/audiogen/` is a reconstruction, OpenAI only, not re-validated against the live API) that
+called Google Cloud TTS and OpenAI TTS directly and wrote straight to
 S3 + Postgres, bypassing the worker/RabbitMQ/ElevenLabs path entirely. Any script doing this **must**
 reproduce `CompleteAudioGeneration`'s contract (`internal/application/publish_script.go`) by hand: insert
 the `audio_files` row as `status='ready'`, *and* flip the matching `scripts` row to `status='published'`
 in the same step — skipping the second half leaves a ready audio file that `getPlaceAudio` still refuses
 to serve (see `audio_handler.go`'s own comment on this exact two-step risk). A second pipeline step,
-also outside this repo for now, re-transcribes the finished audio with OpenAI's Whisper
+now `../pipeline/audiogen/transcribe.py`, re-transcribes the finished audio with OpenAI's Whisper
 (`audio/transcriptions`, `response_format=verbose_json`, `timestamp_granularities=["segment"]`) to
 produce `timestamps_url` (per-sentence timing) — neither Google TTS nor OpenAI TTS return timing
 themselves, unlike ElevenLabs/Polly's speech marks. The mobile app's synced-narration feature
@@ -189,11 +190,11 @@ failures that look like a code bug but aren't.
 ## Deployment
 
 `deploy/terraform/` — a quick, real AWS deployment (RDS + one EC2 instance running
-api+worker+rabbitmq+redis via docker-compose), applied for the first time this session. See its own
-README for the full apply/push/restore steps. Not wired to the ElevenLabs path above (its SSM secret
-for that was removed once the key stopped being needed) — it serves whatever's already in the
-database, including content that only ever went through the standalone TTS/Whisper/image scripts
-above, never through `cmd/worker`.
+api+worker+rabbitmq+redis via docker-compose). It was applied in October 2026, used from a real iOS
+build, then destroyed with `terraform destroy` to avoid idle cost; it can be recreated from this code.
+See its own README for the apply/push/restore steps. It no longer carries an ElevenLabs secret; the
+Anthropic key is optional. It serves whatever is already in the database, including content that only
+ever went through the standalone TTS/Whisper/image scripts above, never through `cmd/worker`.
 
 ## CI/CD
 
