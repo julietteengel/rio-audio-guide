@@ -11,7 +11,9 @@ tmp/
 .env
 .env.local
 .env.*.local
+# Terraform
 .terraform/
 *.tfstate
 *.tfstate.*
 *.tfplan
+*.tfvars
