@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../config";
+import { fetchWithRetry } from "../utils/retry";
 
 export type ItineraryStopKind = "place" | "suggestion";
 
@@ -144,7 +145,7 @@ export async function getItinerary(token: string, id: string): Promise<Itinerary
 // all, proving out the same "works while logged out" contract the backend
 // route itself guarantees.
 export async function listFeaturedItineraries(): Promise<Itinerary[]> {
-  const res = await fetch(`${API_BASE_URL}/featured-itineraries`);
+  const res = await fetchWithRetry(`${API_BASE_URL}/featured-itineraries`);
   if (!res.ok) throw new ItinerariesApiError("request failed", res.status);
   // Guards against a 200 with a non-JSON body (an odd proxy/cache response,
   // an HTML error page served with the wrong status) the same way

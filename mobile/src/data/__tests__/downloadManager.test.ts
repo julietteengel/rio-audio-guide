@@ -4,6 +4,7 @@ import {
   fetchCityManifest,
   formatApproxSize,
   InsufficientStorageError,
+  isRetryableDownloadError,
 } from "../downloadManager";
 import type { Place } from "../types";
 
@@ -128,9 +129,56 @@ describe("fetchCityManifest", () => {
     expect(await fetchCityManifest("unknown-city", "fr")).toEqual([]);
   });
 
-  it("returns an empty array instead of throwing on a network failure", async () => {
-    globalThis.fetch = jest.fn().mockRejectedValue(new Error("network down")) as unknown as typeof fetch;
-    expect(await fetchCityManifest("rio", "fr")).toEqual([]);
+  it("returns an empty array instead of throwing on a network failure, after retrying", async () => {
+    jest.useFakeTimers();
+    try {
+      globalThis.fetch = jest.fn().mockRejectedValue(new Error("network down")) as unknown as typeof fetch;
+      const result = fetchCityManifest("rio", "fr");
+      await jest.runAllTimersAsync();
+      expect(await result).toEqual([]);
+      expect(globalThis.fetch).toHaveBeenCalledTimes(3);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it("recovers when the first attempt hits a transient 503", async () => {
+    jest.useFakeTimers();
+    try {
+      globalThis.fetch = jest
+        .fn()
+        .mockResolvedValueOnce({ status: 503 })
+        .mockResolvedValue({
+          status: 200,
+          json: async () => ({ city: "rio", language: "fr", places: [] }),
+        }) as unknown as typeof fetch;
+      const result = fetchCityManifest("rio", "fr");
+      await jest.runAllTimersAsync();
+      expect(await result).toEqual([]);
+      expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+});
+
+describe("isRetryableDownloadError", () => {
+  it("does not retry an expired or missing presigned URL", () => {
+    expect(isRetryableDownloadError(new Error("Request failed with status 403"))).toBe(false);
+    expect(isRetryableDownloadError(new Error("HTTP 404 Not Found"))).toBe(false);
+  });
+
+  it("does not mistake a port number for an HTTP status", () => {
+    expect(isRetryableDownloadError(new Error("failed to connect to host:443"))).toBe(true);
+    expect(isRetryableDownloadError(new Error("downloaded 404 of 1200 bytes, connection reset"))).toBe(true);
+  });
+
+  it("retries rate limiting, timeouts, server errors and dropped connections", () => {
+    expect(isRetryableDownloadError(new Error("status 429"))).toBe(true);
+    expect(isRetryableDownloadError(new Error("status 408"))).toBe(true);
+    expect(isRetryableDownloadError(new Error("status 503"))).toBe(true);
+    expect(isRetryableDownloadError(new Error("The network connection was lost"))).toBe(true);
+    expect(isRetryableDownloadError("something odd")).toBe(true);
   });
 });
 

@@ -4,6 +4,8 @@ import { Directory, File, Paths } from "expo-file-system";
 import type { Locale } from "../i18n/dictionary";
 import type { Place } from "./types";
 import { API_BASE_URL } from "../config";
+import { isOnline } from "../utils/network";
+import { fetchWithRetry, withRetry } from "../utils/retry";
 import {
   saveCachedPlaces,
   getAllCachedPlaces,
@@ -81,7 +83,7 @@ export const RIO_CITY_SLUG = "rio";
 
 async function fetchManifestRaw(citySlug: string, language: Locale): Promise<ManifestPlace[]> {
   try {
-    const res = await fetch(
+    const res = await fetchWithRetry(
       `${API_BASE_URL}/cities/${encodeURIComponent(citySlug)}/manifest?language=${language}`,
     );
     if (res.status !== 200) return [];
@@ -271,21 +273,48 @@ export async function downloadCity(
   // late URLs expiring mid-loop is expected, not exceptional. A failed place
   // keeps its null audio_local_uri, so the next call retries exactly it.
   let failedCount = 0;
-  for (const place of toDownload) {
+  for (let i = 0; i < toDownload.length; i++) {
+    const place = toDownload[i];
     try {
       const destination = new File(audioDir, `${place.id}.mp3`);
-      const downloaded = await File.downloadFileAsync(place.audio_url, destination, {
-        idempotent: true,
-      });
+      const downloaded = await withRetry(
+        () => File.downloadFileAsync(place.audio_url, destination, { idempotent: true }),
+        { attempts: 3, baseDelayMs: 1000, shouldRetry: isRetryableDownloadError },
+      );
       await setCachedPlaceAudioUri(place.id, downloaded.uri);
     } catch (err) {
       failedCount += 1;
       console.warn(`offline download: skipping ${place.id}`, err);
+      // Connection gone for good: retrying every remaining place would burn
+      // ~3 attempts and their backoff each for nothing. Stop, count the rest
+      // as still to do -- the next call resumes exactly there.
+      const online = await isOnline().catch((probeErr) => {
+        console.warn("offline download: connectivity probe failed, assuming online", probeErr);
+        return true;
+      });
+      if (!online) {
+        failedCount += toDownload.length - i - 1;
+        break;
+      }
     }
   }
 
   if (failedCount > 0) throw new PartialDownloadError(failedCount);
   return summary;
+}
+
+/**
+ * A 4xx on a presigned audio URL (403 once its 15-minute TTL has passed, 404)
+ * cannot be fixed by retrying the same URL -- the next downloadCity call
+ * fetches a fresh manifest with fresh URLs. Anything else (dropped
+ * connection, 5xx, timeout) is worth another try.
+ */
+export function isRetryableDownloadError(err: unknown): boolean {
+  const message = err instanceof Error ? err.message : String(err);
+  // Anchored on "status"/"HTTP"/"code" so a port or a count (":443") is not read as a 404.
+  const status = message.match(/\b(?:status|http|code)\D{0,12}(4\d\d)\b/i);
+  if (!status) return true;
+  return status[1] === "408" || status[1] === "429";
 }
 
 export async function getOfflineDownloadSummary(): Promise<OfflineDownloadSummary | null> {

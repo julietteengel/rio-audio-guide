@@ -174,3 +174,49 @@ describe("HttpPlacesRepository.getById", () => {
     expect(await ptRepo.getById("cristo-redentor")).toBeUndefined();
   });
 });
+
+describe("HttpPlacesRepository.listNearby paging", () => {
+  const repo = new HttpPlacesRepository(() => "fr");
+  const originalFetch = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  const items = (n: number, from = 0) =>
+    Array.from({ length: n }, (_, i) => ({
+      id: `p${from + i}`,
+      name: `Place ${from + i}`,
+      category: "monument",
+      lat: -22.9,
+      lon: -43.2,
+    }));
+  const ok = (body: unknown) => ({ status: 200, json: async () => body });
+
+  it("stops after one request when the first page is not full", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(ok(items(252))) as unknown as typeof fetch;
+    expect(await repo.listNearby()).toHaveLength(252);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps requesting pages until one comes back short", async () => {
+    globalThis.fetch = jest
+      .fn()
+      .mockResolvedValueOnce(ok(items(500)))
+      .mockResolvedValueOnce(ok(items(3, 500))) as unknown as typeof fetch;
+    expect(await repo.listNearby()).toHaveLength(503);
+    const urls = (globalThis.fetch as jest.Mock).mock.calls.map((c) => c[0] as string);
+    expect(urls[0]).toContain("limit=500&offset=0");
+    expect(urls[1]).toContain("limit=500&offset=500");
+  });
+
+  it("never loops forever against a server that always returns full pages", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue(ok(items(500))) as unknown as typeof fetch;
+    await repo.listNearby();
+    expect((globalThis.fetch as jest.Mock).mock.calls.length).toBeLessThanOrEqual(20);
+  });
+
+  it("returns an empty list when the first page fails", async () => {
+    globalThis.fetch = jest.fn().mockResolvedValue({ status: 404 }) as unknown as typeof fetch;
+    expect(await repo.listNearby()).toEqual([]);
+  });
+});

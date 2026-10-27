@@ -5,6 +5,7 @@ import type { Locale } from "../i18n/dictionary";
 import { getOfflineDownloadSummary } from "./downloadManager";
 import { getCachedPlace } from "./offlineStore";
 import { isOnline } from "../utils/network";
+import { fetchWithRetry } from "../utils/retry";
 
 export interface PlacesRepository {
   listNearby(): Promise<Place[]>;
@@ -105,7 +106,7 @@ async function isCachedLanguage(language: Locale): Promise<boolean> {
 
 async function fetchJson<T>(path: string): Promise<{ status: number; body: T | null }> {
   try {
-    const res = await fetch(`${API_BASE_URL}${path}`);
+    const res = await fetchWithRetry(`${API_BASE_URL}${path}`);
     let body: T | null = null;
     try {
       body = (await res.json()) as T;
@@ -118,13 +119,35 @@ async function fetchJson<T>(path: string): Promise<{ status: number; body: T | n
   }
 }
 
+// Matches maxPlacesPageSize in backend/internal/adapters/http/pagination.go.
+const PLACES_PAGE_SIZE = 500;
+const MAX_PLACE_PAGES = 20;
+
 export class HttpPlacesRepository implements PlacesRepository {
   constructor(private getLocale: () => Locale) {}
 
   async listNearby(): Promise<Place[]> {
-    const { status, body } = await fetchJson<PlaceListItem[]>("/places");
-    if (status !== 200 || !body) return [];
-    return body.map(toListPlace);
+    // The backend caps one /places response at PLACES_PAGE_SIZE; keep asking
+    // for the next page until one comes back short. MAX_PLACE_PAGES bounds the
+    // loop so a misbehaving server can't make it run forever.
+    const all: PlaceListItem[] = [];
+    for (let page = 0; page < MAX_PLACE_PAGES; page++) {
+      const { status, body } = await fetchJson<PlaceListItem[]>(
+        `/places?limit=${PLACES_PAGE_SIZE}&offset=${page * PLACES_PAGE_SIZE}`,
+      );
+      if (status !== 200 || !body) {
+        // Same contract as before paging: a failed read yields what was loaded
+        // (nothing, for page 0), never an exception. But say so.
+        console.warn(`listNearby: page ${page} failed (status ${status}), returning ${all.length} places`);
+        break;
+      }
+      all.push(...body);
+      if (body.length < PLACES_PAGE_SIZE) break;
+      if (page === MAX_PLACE_PAGES - 1) {
+        console.warn(`listNearby: stopped at ${MAX_PLACE_PAGES} pages, the list may be truncated`);
+      }
+    }
+    return all.map(toListPlace);
   }
 
   async search(query: string): Promise<Place[]> {
