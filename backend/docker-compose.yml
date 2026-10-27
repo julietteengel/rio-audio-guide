@@ -74,6 +74,11 @@ services:
       # yourself, never here -- needed for POST /itineraries and
       # POST /places/:id/assistant to actually call Claude.
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # Same rule again -- needed for /register, /resend-verification-code
+      # and /forgot-password to send real email via SES instead of falling
+      # back to main.go's noreply@example.com default, which SES always
+      # rejects (not a verified identity).
+      SES_SENDER_EMAIL: ${SES_SENDER_EMAIL:-}
     volumes:
       - .:/src
       - api-gocache:/go/pkg/mod

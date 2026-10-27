@@ -3,6 +3,7 @@ package awsses
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/service/sesv2"
 	"github.com/aws/aws-sdk-go-v2/service/sesv2/types"
@@ -20,23 +21,28 @@ type Sender struct {
 	from   string
 }
 
+// NewSender sets the From header's display name to "Memória Carioca"
+// alongside the raw address -- SES's FromEmailAddress accepts the standard
+// RFC 5322 "Display Name <address>" form directly, and without it clients
+// show the raw address (or whatever the mailbox's own contact name happens
+// to be) instead of the brand name.
 func NewSender(client sesAPI, fromEmail string) *Sender {
-	return &Sender{client: client, from: fromEmail}
+	return &Sender{client: client, from: fmt.Sprintf("Memória Carioca <%s>", fromEmail)}
 }
 
 func (s *Sender) SendVerificationCode(ctx context.Context, toEmail, code, language string) error {
 	c := verificationCopyFor(language)
-	return s.send(ctx, toEmail, c.subject, c.heading, c.body, code)
+	return s.send(ctx, toEmail, c.subject, c.heading, c.body, code, footerFor(language))
 }
 
 func (s *Sender) SendPasswordResetCode(ctx context.Context, toEmail, code, language string) error {
 	c := resetCopyFor(language)
-	return s.send(ctx, toEmail, c.subject, c.heading, c.body, code)
+	return s.send(ctx, toEmail, c.subject, c.heading, c.body, code, footerFor(language))
 }
 
-func (s *Sender) send(ctx context.Context, toEmail, subject, heading, body, code string) error {
-	html := renderHTML(heading, body, code)
-	text := renderText(body, code)
+func (s *Sender) send(ctx context.Context, toEmail, subject, heading, body, code, footer string) error {
+	html := renderHTML(heading, body, code, footer)
+	text := renderText(body, code, footer)
 
 	_, err := s.client.SendEmail(ctx, &sesv2.SendEmailInput{
 		FromEmailAddress: &s.from,

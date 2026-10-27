@@ -77,6 +77,23 @@ func resetCopyFor(language string) emailCopy {
 	return resetCopy["en"]
 }
 
+// footer is shared by both email kinds -- it's just the brand's own
+// description, not something specific to verifying an email vs resetting a
+// password, so it doesn't need its own entry in verificationCopy/resetCopy.
+var footer = map[string]string{
+	"en": "Memória Carioca — Rio de Janeiro audio guide",
+	"fr": "Memória Carioca — guide audio de Rio de Janeiro",
+	"pt": "Memória Carioca — guia de áudio do Rio de Janeiro",
+	"es": "Memória Carioca — guía de audio de Río de Janeiro",
+}
+
+func footerFor(language string) string {
+	if f, ok := footer[language]; ok {
+		return f
+	}
+	return footer["en"]
+}
+
 // htmlShell is a table-based, inline-CSS layout -- the only reliable way to
 // get consistent rendering across email clients, Outlook desktop in
 // particular, which ignores most modern CSS and any <style> block. A single
@@ -96,6 +113,13 @@ const htmlShell = `<!DOCTYPE html>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#FAF5EE;">
       <tr>
         <td align="center" style="padding:32px 16px;">
+          <table role="presentation" width="100%" style="max-width:480px;" cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center" style="padding-bottom:20px;">
+                <span style="font-family:Georgia,'Times New Roman',serif;font-size:15px;letter-spacing:3px;color:#C1592E;text-transform:uppercase;">Memória Carioca</span>
+              </td>
+            </tr>
+          </table>
           <table role="presentation" width="100%" style="max-width:480px;background-color:#FFFFFF;border-radius:12px;border:1px solid rgba(43,33,27,0.14);" cellpadding="0" cellspacing="0">
             <tr>
               <td style="padding:32px;">
@@ -111,6 +135,13 @@ const htmlShell = `<!DOCTYPE html>
               </td>
             </tr>
           </table>
+          <table role="presentation" width="100%" style="max-width:480px;" cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center" style="padding-top:20px;">
+                <span style="font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;color:#9A8B7C;">{{FOOTER}}</span>
+              </td>
+            </tr>
+          </table>
         </td>
       </tr>
     </table>
@@ -121,11 +152,11 @@ const htmlShell = `<!DOCTYPE html>
 // htmlShell is full of literal "%" characters (e.g. width="100%"), which
 // fmt.Sprintf would try to parse as format verbs; token replacement sidesteps
 // that entirely.
-func renderHTML(heading, body, code string) string {
-	r := strings.NewReplacer("{{HEADING}}", heading, "{{CODE}}", code, "{{BODY}}", body)
+func renderHTML(heading, body, code, footer string) string {
+	r := strings.NewReplacer("{{HEADING}}", heading, "{{CODE}}", code, "{{BODY}}", body, "{{FOOTER}}", footer)
 	return r.Replace(htmlShell)
 }
 
-func renderText(body, code string) string {
-	return body + "\n\nCode: " + code
+func renderText(body, code, footer string) string {
+	return body + "\n\nCode: " + code + "\n\n--\n" + footer
 }

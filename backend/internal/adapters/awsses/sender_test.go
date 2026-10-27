@@ -33,8 +33,8 @@ func TestSender_SendVerificationCode_SendsFromAndToCorrectAddresses(t *testing.T
 	if fake.lastInput == nil {
 		t.Fatal("expected SendEmail to have been called")
 	}
-	if fake.lastInput.FromEmailAddress == nil || *fake.lastInput.FromEmailAddress != "noreply@example.com" {
-		t.Fatalf("got FromEmailAddress %v, want noreply@example.com", fake.lastInput.FromEmailAddress)
+	if fake.lastInput.FromEmailAddress == nil || *fake.lastInput.FromEmailAddress != "Memória Carioca <noreply@example.com>" {
+		t.Fatalf("got FromEmailAddress %v, want \"Memória Carioca <noreply@example.com>\"", fake.lastInput.FromEmailAddress)
 	}
 	if fake.lastInput.Destination == nil || len(fake.lastInput.Destination.ToAddresses) != 1 || fake.lastInput.Destination.ToAddresses[0] != "user@example.com" {
 		t.Fatalf("got Destination %+v, want ToAddresses=[user@example.com]", fake.lastInput.Destination)
