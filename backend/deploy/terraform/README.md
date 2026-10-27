@@ -8,6 +8,7 @@ Postgres instance, one EC2 instance running `api` + `worker` + `rabbitmq` +
 ## Prerequisites
 
 - Working AWS credentials (`aws sts get-caller-identity` succeeds).
+- Optionally an OpenAI API key (the worker uses OpenAI text-to-speech and Whisper when it is set, AWS Polly otherwise).
 - Optionally an Anthropic API key (AI itineraries and the place assistant need it; the rest of the API works without).
 - Docker running locally (to build and push the two images).
 
@@ -17,6 +18,7 @@ Postgres instance, one EC2 instance running `api` + `worker` + `rabbitmq` +
 cd backend/deploy/terraform
 terraform init
 export TF_VAR_anthropic_api_key=<your key>   # optional
+export TF_VAR_openai_api_key=<your key>      # optional
 terraform apply
 ```
 

@@ -74,6 +74,7 @@ data "aws_iam_policy_document" "app" {
     resources = concat(
       [aws_ssm_parameter.jwt_secret.arn],
       aws_ssm_parameter.anthropic_api_key[*].arn,
+      aws_ssm_parameter.openai_api_key[*].arn,
     )
   }
   statement {
@@ -115,6 +116,8 @@ resource "aws_instance" "app" {
     ecr_registry        = split("/", aws_ecr_repository.api.repository_url)[0]
     ses_sender_email    = var.ses_sender_email
     anthropic_param     = one(aws_ssm_parameter.anthropic_api_key[*].name)
+    openai_param        = one(aws_ssm_parameter.openai_api_key[*].name)
+    tts_provider        = var.openai_api_key == null ? "polly" : "openai"
     jwt_secret_param    = aws_ssm_parameter.jwt_secret.name
     schema_sql          = file("${path.module}/../../internal/adapters/postgres/schema.sql")
   })

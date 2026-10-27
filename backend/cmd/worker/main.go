@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/polly"
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
@@ -14,8 +16,11 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 
 	"rioaudioguide/backend/internal/adapters/awspolly"
+	"rioaudioguide/backend/internal/adapters/openaitts"
 	"rioaudioguide/backend/internal/adapters/postgres"
 	"rioaudioguide/backend/internal/adapters/rabbitmq"
+	s3adapter "rioaudioguide/backend/internal/adapters/s3"
+	"rioaudioguide/backend/internal/ports"
 )
 
 func main() {
@@ -68,8 +73,10 @@ func main() {
 
 	scriptRepo := postgres.NewScriptRepository(pool)
 	audioFileRepo := postgres.NewAudioFileRepository(pool)
-	pollyClient := polly.NewFromConfig(awsCfg)
-	ttsGenerator := awspolly.NewGenerator(pollyClient, s3Client, bucket)
+	ttsGenerator, err := newTTSGenerator(awsCfg, s3Client, bucket)
+	if err != nil {
+		log.Fatalf("set up tts provider: %v", err)
+	}
 
 	worker, err := rabbitmq.NewWorker(channel, scriptRepo, audioFileRepo, ttsGenerator)
 	if err != nil {
@@ -81,6 +88,34 @@ func main() {
 		log.Fatalf("worker stopped unexpectedly: %v", err)
 	}
 	log.Println("worker shut down cleanly")
+}
+
+// newTTSGenerator picks the speech provider. TTS_PROVIDER=openai|polly wins;
+// unset, it is OpenAI when OPENAI_API_KEY is present (the provider that produced
+// the audio in the database) and Polly otherwise, so an existing Polly-only
+// deployment keeps working untouched.
+func newTTSGenerator(awsCfg aws.Config, s3Client *awss3.Client, bucket string) (ports.TTSGenerator, error) {
+	openaiKey := os.Getenv("OPENAI_API_KEY")
+	provider := os.Getenv("TTS_PROVIDER")
+	if provider == "" {
+		provider = "polly"
+		if openaiKey != "" {
+			provider = "openai"
+		}
+	}
+	switch provider {
+	case "openai":
+		if openaiKey == "" {
+			return nil, fmt.Errorf("TTS_PROVIDER=openai requires OPENAI_API_KEY")
+		}
+		log.Println("tts provider: openai (tts-1 + whisper-1)")
+		return openaitts.NewGenerator(openaiKey, s3adapter.NewAudioStorage(s3Client, bucket)), nil
+	case "polly":
+		log.Println("tts provider: aws polly")
+		return awspolly.NewGenerator(polly.NewFromConfig(awsCfg), s3Client, bucket), nil
+	default:
+		return nil, fmt.Errorf("unknown TTS_PROVIDER %q (want openai or polly)", provider)
+	}
 }
 
 func envOr(key, fallback string) string {

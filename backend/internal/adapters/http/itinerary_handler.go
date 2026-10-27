@@ -84,10 +84,15 @@ func (s *Server) createItinerary(c echo.Context) error {
 }
 
 func (s *Server) listItineraries(c echo.Context) error {
+	page, err := parsePage(c, maxItinerariesPerPage)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
+	}
 	itineraries, err := application.ListItineraries(c.Request().Context(), s.itineraryRepo, contextUserID(c))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
 	}
+	itineraries = paginate(itineraries, page)
 	responses := make([]itineraryResponse, len(itineraries))
 	for i, it := range itineraries {
 		responses[i] = toItineraryResponse(it)
@@ -156,11 +161,16 @@ func (s *Server) createFeaturedItinerary(c echo.Context) error {
 }
 
 func (s *Server) listFeaturedItineraries(c echo.Context) error {
+	page, err := parsePage(c, maxItinerariesPerPage)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
+	}
 	itineraries, err := application.ListFeaturedItineraries(c.Request().Context(), s.itineraryRepo)
 	if err != nil {
 		log.Printf("listFeaturedItineraries: could not load: %v", err)
 		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "could not load featured itineraries"})
 	}
+	itineraries = paginate(itineraries, page)
 	responses := make([]itineraryResponse, len(itineraries))
 	for i, it := range itineraries {
 		responses[i] = toItineraryResponse(it)

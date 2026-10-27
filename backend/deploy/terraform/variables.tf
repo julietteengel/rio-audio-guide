@@ -55,3 +55,10 @@ variable "ssh_key_name" {
   type        = string
   default     = null
 }
+
+variable "openai_api_key" {
+  description = "OpenAI API key for the worker's text-to-speech and Whisper timestamps. Optional: leave null and the worker falls back to AWS Polly. Pass via TF_VAR_openai_api_key, never commit it."
+  type        = string
+  sensitive   = true
+  default     = null
+}

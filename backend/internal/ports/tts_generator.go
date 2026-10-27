@@ -7,11 +7,12 @@ import (
 )
 
 // TTSGenerator is the outbound port to a text-to-speech provider — implemented
-// by internal/adapters/awspolly. Generate is expected to complete the ENTIRE
-// synthesis (including any provider-side async polling) and return final,
-// already-uploaded storage locations -- not raw bytes. Amazon Polly's
-// long-text API writes directly to S3 itself; there is no upload step left
-// for the worker to perform.
+// by internal/adapters/openaitts and internal/adapters/awspolly. Generate is
+// expected to complete the ENTIRE synthesis (including any provider-side async
+// polling) and return final, already-uploaded storage locations -- not raw
+// bytes. Polly's long-text API writes directly to S3 itself; the OpenAI adapter
+// uploads through the storage port itself. Either way there is no upload step
+// left for the worker to perform.
 type TTSGenerator interface {
 	Generate(ctx context.Context, text, language, voiceID string) (storageURL, timestampsURL string, duration time.Duration, err error)
 }

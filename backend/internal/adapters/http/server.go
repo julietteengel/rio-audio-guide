@@ -56,6 +56,13 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	// les domaines réels avant une vraie prod publique.
 	s.echo.Use(middleware.CORS())
 
+	// Rate limiting keys on the client IP; behind a reverse proxy that is the
+	// forwarded address, but only when the direct peer is a private/loopback
+	// one (the proxy itself), so it cannot be spoofed from the open internet.
+	s.echo.IPExtractor = echo.ExtractIPFromXFFHeader()
+	s.echo.Use(rateLimiter(globalRatePerSecond, globalBurst))
+	strict := rateLimiter(strictRatePerSecond, strictBurst)
+
 	s.echo.GET("/places", s.listPlaces)
 	s.echo.GET("/places/:id", s.getPlaceDetail)
 	s.echo.GET("/places/:id/audio", s.getPlaceAudio)
@@ -68,24 +75,24 @@ func NewServer(placeRepo ports.PlaceRepository, scriptRepo ports.ScriptRepositor
 	s.echo.POST("/scripts/:id/review", s.reviewScript, auth, adminOnly)
 	s.echo.POST("/audio-files/:id/retry", s.retryAudio, auth, adminOnly)
 
-	s.echo.POST("/register", s.registerUser)
-	s.echo.POST("/login", s.login)
-	s.echo.POST("/verify-email", s.verifyEmail)
-	s.echo.POST("/resend-verification-code", s.resendVerificationCode)
-	s.echo.POST("/forgot-password", s.forgotPassword)
-	s.echo.POST("/reset-password", s.resetPassword)
+	s.echo.POST("/register", s.registerUser, strict)
+	s.echo.POST("/login", s.login, strict)
+	s.echo.POST("/verify-email", s.verifyEmail, strict)
+	s.echo.POST("/resend-verification-code", s.resendVerificationCode, strict)
+	s.echo.POST("/forgot-password", s.forgotPassword, strict)
+	s.echo.POST("/reset-password", s.resetPassword, strict)
 	s.echo.POST("/logout", s.logout, auth)
 	s.echo.PATCH("/me", s.updateMe, auth)
 	s.echo.DELETE("/me", s.deleteMe, auth)
 
 	// Itineraries are always tied to the caller's own account (contextUserID),
 	// never a client-supplied user ID -- same reasoning as updateMe/deleteMe.
-	s.echo.POST("/itineraries", s.createItinerary, auth)
+	s.echo.POST("/itineraries", s.createItinerary, auth, strict)
 	s.echo.GET("/itineraries", s.listItineraries, auth)
 	s.echo.GET("/itineraries/:id", s.getItinerary, auth)
 	s.echo.POST("/featured-itineraries", s.createFeaturedItinerary, auth, adminOnly)
 	s.echo.GET("/featured-itineraries", s.listFeaturedItineraries)
-	s.echo.POST("/places/:id/assistant", s.askAssistant, auth)
+	s.echo.POST("/places/:id/assistant", s.askAssistant, auth, strict)
 	return s
 }
 

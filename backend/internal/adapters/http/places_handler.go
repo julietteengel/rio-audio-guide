@@ -36,7 +36,11 @@ type placeResponse struct {
 // de recherche serait à envisager si ça grossit beaucoup plus.
 func (s *Server) listPlaces(c echo.Context) error {
 	query := strings.ToLower(strings.TrimSpace(c.QueryParam("q")))
-	key := fmt.Sprintf("places:%v:%v:%v:%v:q=%s", rioMinLat, rioMinLon, rioMaxLat, rioMaxLon, query)
+	page, err := parsePage(c, maxPlacesPageSize)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
+	}
+	key := fmt.Sprintf("places:%v:%v:%v:%v:q=%s:limit=%d:offset=%d", rioMinLat, rioMinLon, rioMaxLat, rioMaxLon, query, page.limit, page.offset)
 	return s.cachedJSON(c, key, func() (any, int, error) {
 		places, err := s.placeRepo.FindActiveInBoundingBox(c.Request().Context(), rioMinLat, rioMinLon, rioMaxLat, rioMaxLon)
 		if err != nil {
@@ -56,7 +60,7 @@ func (s *Server) listPlaces(c echo.Context) error {
 				ImageURL: p.ImageURL(),
 			})
 		}
-		return resp, http.StatusOK, nil
+		return paginate(resp, page), http.StatusOK, nil
 	})
 }
 

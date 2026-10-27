@@ -23,6 +23,9 @@ aws ecr get-login-password --region ${aws_region} \
 %{ if anthropic_param != null ~}
 ANTHROPIC_API_KEY=$(aws ssm get-parameter --name "${anthropic_param}" --with-decryption --query Parameter.Value --output text --region ${aws_region})
 %{ endif ~}
+%{ if openai_param != null ~}
+OPENAI_API_KEY=$(aws ssm get-parameter --name "${openai_param}" --with-decryption --query Parameter.Value --output text --region ${aws_region})
+%{ endif ~}
 JWT_SECRET=$(aws ssm get-parameter --name "${jwt_secret_param}" --with-decryption --query Parameter.Value --output text --region ${aws_region})
 
 mkdir -p /opt/rio-audio-guide
@@ -61,6 +64,8 @@ services:
       DATABASE_URL: postgres://postgres:${db_password}@${db_endpoint}:5432/postgres
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
       S3_BUCKET: ${s3_bucket}
+      OPENAI_API_KEY: "$${OPENAI_API_KEY:-}"
+      TTS_PROVIDER: "${tts_provider}"
     depends_on:
       - rabbitmq
 COMPOSE_EOF

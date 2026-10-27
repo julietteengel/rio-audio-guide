@@ -109,6 +109,7 @@ func (r *PlaceRepository) FindActiveInBoundingBox(ctx context.Context, minLat, m
 		FROM places
 		WHERE status = 'active'
 		  AND geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)::geography
+		ORDER BY name, id
 	`, minLon, minLat, maxLon, maxLat)
 	if err != nil {
 		return nil, err

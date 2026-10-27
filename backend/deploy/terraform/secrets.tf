@@ -26,3 +26,10 @@ resource "aws_ssm_parameter" "jwt_secret" {
   type  = "SecureString"
   value = random_password.jwt_secret.result
 }
+
+resource "aws_ssm_parameter" "openai_api_key" {
+  count = var.openai_api_key == null ? 0 : 1
+  name  = "/rio-audio-guide/openai_api_key"
+  type  = "SecureString"
+  value = var.openai_api_key
+}

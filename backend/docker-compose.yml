@@ -102,10 +102,11 @@ services:
       # Repris depuis le shell hôte (docker compose interpole ${VAR} tel
       # quel). Pas de ":?" ici : ça ferait échouer `docker compose up api`
       # aussi (compose interpole tout le fichier, pas juste le service
-      # démarré) même quand on ne touche pas au worker. Le vrai garde-fou
-      # est mustEnv() côté Go (cmd/worker/main.go) -- absent, seul le
-      # worker refuse de démarrer, pas le reste de la stack.
-      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      # démarré) même quand on ne touche pas au worker.
+      # Fournisseur TTS : OPENAI_API_KEY présent -> OpenAI, sinon AWS Polly
+      # (les credentials AWS ci-dessous). TTS_PROVIDER=openai|polly force le choix.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      TTS_PROVIDER: ${TTS_PROVIDER:-}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
