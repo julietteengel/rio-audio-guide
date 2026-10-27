@@ -11,6 +11,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0"]
+# audiogen (narration audio generation): needs a live Postgres, S3 and an OpenAI key
+audio = ["psycopg[binary]>=3.2", "boto3>=1.34", "mutagen>=1.47"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
