@@ -15,6 +15,14 @@ class FatalProviderError(Exception):
     """
 
 
+class PermanentItemError(Exception):
+    """This one script/audio can never succeed as it is (rejected input, bad audio).
+
+    Unlike FatalProviderError the rest of the batch is fine, so the run goes on;
+    unlike a transient error it is not worth trying again on the next run.
+    """
+
+
 def split_for_tts(text: str, limit: int = MAX_TTS_CHARS) -> list[str]:
     """Split on sentence boundaries into chunks of at most `limit` characters."""
     chunks: list[str] = []
@@ -78,3 +86,33 @@ def whisper_prompt(script_text: str, max_chars: int = 500) -> str:
     narration (docs/superpowers/specs/2026-10-18-live-testing-session-status.md).
     """
     return script_text.strip()[:max_chars]
+
+
+def parse_s3_key(url: str) -> str:
+    """Inverse of storage_url: "s3://bucket/some/key" -> "some/key"."""
+    rest = url.removeprefix("s3://")
+    if rest == url or "/" not in rest or rest.endswith("/"):
+        raise ValueError(f"not an s3://bucket/key url: {url!r}")
+    return rest.split("/", 1)[1]
+
+
+def validate_whisper(body: bytes) -> float:
+    """Returns the audio duration (seconds) if body is a usable verbose_json, else raises.
+
+    A 200 with an empty or segment-less body would otherwise be stored as
+    timestamps_url, and since that column is what marks an audio as done it
+    could then never be repaired by a later run.
+    """
+    import json
+
+    try:
+        data = json.loads(body)
+    except ValueError as exc:
+        raise ValueError(f"whisper body is not JSON: {body[:200]!r}") from exc
+    segments = data.get("segments") if isinstance(data, dict) else None
+    duration = data.get("duration") if isinstance(data, dict) else None
+    if not isinstance(segments, list) or not segments:
+        raise ValueError(f"whisper body has no segments: {body[:200]!r}")
+    if not isinstance(duration, (int, float)) or duration <= 0:
+        raise ValueError(f"whisper body has no usable duration: {body[:200]!r}")
+    return float(duration)

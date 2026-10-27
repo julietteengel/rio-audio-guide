@@ -3,7 +3,7 @@ import time
 
 import requests
 
-from .core import FatalProviderError
+from .core import FatalProviderError, PermanentItemError
 
 _BASE = "https://api.openai.com/v1"
 _MAX_ATTEMPTS = 3
@@ -30,7 +30,8 @@ def _post(path: str, api_key: str, **kwargs) -> requests.Response:
             ):
                 raise FatalProviderError(f"{resp.status_code}: {resp.text[:200]}")
             if resp.status_code < 500 and resp.status_code != 429:
-                resp.raise_for_status()  # other 4xx: permanent for this item
+                # Other 4xx: this item is rejected for good. Keep OpenAI's reason.
+                raise PermanentItemError(f"{resp.status_code}: {resp.text[:200]}")
             last = requests.HTTPError(f"{resp.status_code}: {resp.text[:200]}")
         if attempt < _MAX_ATTEMPTS:
             time.sleep(_BACKOFF_S * attempt)

@@ -4,6 +4,9 @@ import requests
 from audiogen import openai_client
 from audiogen.core import (
     FatalProviderError,
+    PermanentItemError,
+    parse_s3_key,
+    validate_whisper,
     audio_key,
     split_for_tts,
     storage_url,
@@ -112,3 +115,86 @@ def test_transient_failure_then_success(monkeypatch):
     responses = iter([_Resp(500, text="x"), _Resp(200, content=b"ok")])
     monkeypatch.setattr(openai_client.requests, "post", lambda *a, **k: next(responses))
     assert openai_client.synthesize("oi", "key", "tts-1", "onyx") == b"ok"
+
+
+def test_other_4xx_is_a_permanent_item_error_that_keeps_openai_reason(monkeypatch):
+    monkeypatch.setattr(
+        openai_client.requests, "post", lambda *a, **k: _Resp(400, text='{"error":"invalid voice"}')
+    )
+    with pytest.raises(PermanentItemError, match="invalid voice"):
+        openai_client.synthesize("oi", "key", "tts-1", "nope")
+
+
+def test_parse_s3_key_inverts_storage_url():
+    assert parse_s3_key(storage_url("bucket", "audio/x/y.mp3")) == "audio/x/y.mp3"
+    for bad in ["https://x/y", "s3://bucket", "s3://bucket/", "audio/x.mp3"]:
+        with pytest.raises(ValueError):
+            parse_s3_key(bad)
+
+
+def test_validate_whisper_accepts_a_real_looking_body_and_returns_duration():
+    body = b'{"duration": 12.5, "segments": [{"start": 0.0, "text": "Oi."}]}'
+    assert validate_whisper(body) == 12.5
+
+
+@pytest.mark.parametrize(
+    "body",
+    [b"", b"not json", b"[]", b'{"duration": 5}', b'{"duration": 5, "segments": []}',
+     b'{"segments": [{"start": 0, "text": "x"}]}', b'{"duration": 0, "segments": [{"start": 0}]}'],
+)
+def test_validate_whisper_rejects_unusable_bodies(body):
+    with pytest.raises(ValueError):
+        validate_whisper(body)
+
+
+class _Cursor:
+    def __init__(self, rowcount=1, row=None):
+        self.rowcount, self._row = rowcount, row
+
+    def fetchone(self):
+        return self._row
+
+
+class _FakeConn:
+    """Records statements; the script UPDATE reports `script_rowcount` rows."""
+
+    def __init__(self, script_rowcount):
+        self.script_rowcount, self.statements, self.committed = script_rowcount, [], None
+
+    def transaction(self):
+        conn = self
+
+        class _Tx:
+            def __enter__(self):
+                return conn
+
+            def __exit__(self, exc_type, *_):
+                conn.committed = exc_type is None
+                return False
+
+        return _Tx()
+
+    def execute(self, sql, params=()):
+        self.statements.append(sql)
+        if "UPDATE scripts" in sql:
+            return _Cursor(rowcount=self.script_rowcount)
+        return _Cursor(row=None)
+
+
+def test_save_ready_publishes_the_script_in_the_same_transaction():
+    from audiogen.generate import save_ready
+
+    conn = _FakeConn(script_rowcount=1)
+    save_ready(conn, "s1", "openai-onyx", "s3://b/audio/x.mp3", 1000)
+    assert conn.committed is True
+    assert any("INSERT INTO audio_files" in s for s in conn.statements)
+    assert any("UPDATE scripts" in s for s in conn.statements)
+
+
+def test_save_ready_rolls_back_when_the_script_does_not_exist():
+    from audiogen.generate import save_ready
+
+    conn = _FakeConn(script_rowcount=0)
+    with pytest.raises(RuntimeError, match="not found"):
+        save_ready(conn, "ghost", "openai-onyx", "s3://b/audio/x.mp3", 1000)
+    assert conn.committed is False  # the exception unwound the transaction
