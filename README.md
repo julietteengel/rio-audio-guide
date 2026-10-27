@@ -33,9 +33,9 @@ the single integration branch (see `CLAUDE.md` for the review/branching conventi
 going forward — short-lived branches per change, not per subsystem).
 
 - **`backend/`** — the Go backend. Hexagonal architecture (ports & adapters) + Domain-Driven Design,
-  PostgreSQL/PostGIS, RabbitMQ (TTS job queue), S3. The committed worker targets AWS Polly; the audio
-  actually in the database came from OpenAI/Google Cloud TTS scripts (reconstructed in `pipeline/audiogen/`,
-  with OpenAI Whisper producing the synced-caption timing). Has its own [README](backend/README.md)
+  PostgreSQL/PostGIS, RabbitMQ (TTS job queue), S3. The worker speaks through OpenAI TTS + Whisper
+  (the synced-caption timing) or AWS Polly, chosen by configuration. Most of the audio in the database
+  came from earlier standalone OpenAI/Google Cloud TTS scripts, reconstructed in `pipeline/audiogen/`. Has its own [README](backend/README.md)
   with the full architecture trace and setup/run instructions.
 - **`web/`** — the Next.js landing page. Makes no calls to the Go backend, deployed independently of
   its AWS infrastructure — not a static export though (it uses Next.js Middleware for locale routing,

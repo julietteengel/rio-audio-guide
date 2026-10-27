@@ -107,13 +107,17 @@ to be implemented ad hoc off conversational discussion alone.
 - **Audio**: 203 ready audio files as of 2026-10-18, roughly 205 places still without audio, blocked on
   OpenAI credit. The audio was produced by standalone scripts (Google Cloud TTS and OpenAI TTS, Whisper
   for caption timing) that were never committed and are lost. `pipeline/audiogen/` is a reconstruction
-  (OpenAI only, unit-tested, **never run against the live APIs**). The worker in `backend/` still targets
-  AWS Polly, so the committed worker and the audio actually in the database still do not match.
+  (OpenAI only, unit-tested, **never run against the live APIs**). The backend worker now has an OpenAI
+  TTS + Whisper adapter (unit-tested against a fake server, also never run live) alongside AWS Polly,
+  selected by `TTS_PROVIDER` / `OPENAI_API_KEY`.
 - **Deployment**: AWS (EC2 + RDS + S3) was live in October 2026 and torn down with Terraform to avoid
   idle cost. It can be recreated from `backend/deploy/terraform`.
+- **API and mobile hardening (Oct 2026)**: per-client rate limiting (global + stricter on credential,
+  email-code and paid-LLM routes), capped and optionally paginated list routes, and bounded
+  retry/backoff with timeouts on the mobile's read requests and offline audio downloads.
 - **Open**: rotate production credentials from root to the scoped `rio-cicd` IAM user; bulk audio and
-  Whisper timestamps for the remaining places; API pagination and rate limiting; retry/backoff on the
-  mobile download path.
+  Whisper timestamps for the remaining places (needs OpenAI credit); a live validation run of the
+  OpenAI adapter and `pipeline/audiogen`; rate limits are per replica, not shared across replicas.
 
 ## Where to find more
 

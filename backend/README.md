@@ -63,30 +63,43 @@ Why bother: `application`/`domain` can be unit-tested with fakes (no real Postgr
 see the `fake*Repo` types in the `_test.go` files), and swapping Postgres for something else would only
 touch `adapters/postgres`, never the business logic.
 
-TTS generation calls the real ElevenLabs API (`internal/adapters/elevenlabs/generator.go`, model
-`eleven_multilingual_v2`) — the worker classifies failures as transient (429/5xx/408/timeout, requeued
-with a 2s backoff and a capped retry count) or permanent (other 4xx — bad API key, unknown `voice_id`,
-quota exceeded, rejected text — marks the `AudioFile` failed and stops retrying). Requires
-`ELEVENLABS_API_KEY`. See `../docs/superpowers/specs/2026-08-19-elevenlabs-real-generation-findings.md`
-for a real incident/fix history (an unbounded retry loop that silently re-billed ElevenLabs) worth
-reading before touching this code.
+TTS generation is a port (`ports.TTSGenerator`) with three adapters, picked by `cmd/worker` at start-up:
+`TTS_PROVIDER=openai|polly` wins; unset, it is OpenAI when `OPENAI_API_KEY` is present and AWS Polly
+otherwise. `internal/adapters/openaitts` (OpenAI `tts-1` + Whisper for per-sentence timestamps) is the
+provider that produced the audio in the database. `internal/adapters/awspolly` is the AWS-only
+alternative, and `internal/adapters/elevenlabs` is kept in the tree but no longer wired (too expensive and
+too robotic-sounding; see `../docs/superpowers/specs/2026-08-19-elevenlabs-real-generation-findings.md`
+for the incident history, an unbounded retry loop that silently re-billed it, worth reading before
+touching retry logic). Whatever the provider, the worker classifies failures as transient (429, 5xx,
+timeouts: requeued with a 2s backoff and a capped retry count) or permanent (bad key, exhausted credit,
+invalid request: marks the `AudioFile` failed and stops retrying). A Whisper failure in the OpenAI
+adapter does not discard the audio; it is kept without timestamps and can be backfilled with
+`../pipeline/audiogen/transcribe.py`.
 
-**This adapter exists in code but is not what actually generates audio right now.** ElevenLabs
-turned out too expensive and too robotic-sounding; every real audio file currently in the dev/prod
-database was produced by standalone Python scripts (the originals were never committed and are lost;
-`../pipeline/audiogen/` is a reconstruction, OpenAI only, not re-validated against the live API) that
-called Google Cloud TTS and OpenAI TTS directly and wrote straight to
-S3 + Postgres, bypassing the worker/RabbitMQ/ElevenLabs path entirely. Any script doing this **must**
-reproduce `CompleteAudioGeneration`'s contract (`internal/application/publish_script.go`) by hand: insert
-the `audio_files` row as `status='ready'`, *and* flip the matching `scripts` row to `status='published'`
-in the same step — skipping the second half leaves a ready audio file that `getPlaceAudio` still refuses
-to serve (see `audio_handler.go`'s own comment on this exact two-step risk). A second pipeline step,
-now `../pipeline/audiogen/transcribe.py`, re-transcribes the finished audio with OpenAI's Whisper
-(`audio/transcriptions`, `response_format=verbose_json`, `timestamp_granularities=["segment"]`) to
-produce `timestamps_url` (per-sentence timing) — neither Google TTS nor OpenAI TTS return timing
-themselves, unlike ElevenLabs/Polly's speech marks. The mobile app's synced-narration feature
-(`mobile/src/utils/syncedText.ts`) expects exactly that Whisper `segments` shape, not Polly's old
-per-word NDJSON format.
+The batch scripts in `../pipeline/audiogen/` (a reconstruction of the standalone scripts that generated
+most of the existing audio, not re-validated against the live APIs) do the same job outside the queue.
+Anything writing audio directly **must** reproduce `CompleteAudioGeneration`'s contract
+(`internal/application/publish_script.go`): the `audio_files` row `status='ready'` *and* the matching
+`scripts` row `status='published'`, in the same step; skipping the second half leaves a ready audio
+that `getPlaceAudio` still refuses to serve (see `audio_handler.go`'s comment on this two-step risk).
+The mobile app's synced narration (`mobile/src/utils/syncedText.ts`) expects Whisper's `segments`
+shape (`timestamp_granularities=["segment"]`), not Polly's per-word NDJSON.
+
+## API limits
+
+Per-client rate limiting (in memory, per replica): a global ceiling of 20 req/s (burst 40), and a stricter
+12 req/min (burst 10) on credential and email-code routes plus the two paid-LLM routes
+(`POST /itineraries`, `POST /places/:id/assistant`); excess requests get `429` with `Retry-After`. The
+client IP comes from `X-Forwarded-For` only when the direct peer is a private/loopback address (a reverse
+proxy), so it can't be spoofed from the open internet. **To verify on the first deploy:** the EC2
+compose publishes `8080:8080` straight to the internet. If requests reach the API from the Docker bridge
+gateway (a `172.x` peer) instead of the client's address, every client would share one bucket, and a
+forged `X-Forwarded-For` would be honoured. Check the `rate limited <ip> ...` log lines (they print the
+key used); if it is a `172.x` address, switch `IPExtractor` to `echo.ExtractIPDirect()` or put a real
+proxy in front. List routes (`/places`, `/itineraries`,
+`/featured-itineraries`) take optional `?limit=&offset=` and are capped by default (500 and 100 items); they
+stay plain JSON arrays, ordered by `name, id` so pages are stable, and a client pages until it gets fewer
+items than it asked for. Nothing signals a truncated response to a client that does not page.
 
 `places.image_url` (added this session) is populated by a third, separate pipeline step: a Wikidata
 P18 lookup (falling back to the Wikipedia `pageimages` API by name) per place, also run as a standalone
