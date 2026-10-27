@@ -51,12 +51,13 @@ may now write domain/ports code too, human-reviewed like every other layer.
 
 | Sub-system | Stack | Status |
 |---|---|---|
-| Sourcing pipeline | Python (Overture Maps, Wikidata, feiras registry) | Built, tested, **not yet merged to master** (pending human code review) |
-| Content pipeline (batch) | Python (grounding, narration, translation, anti-hallucination judge) | In progress — see status below |
-| Guide runtime (v1 scope) | Mobile app logic (React Native) — proximity-triggered narration + local tour memory, no server-side agent | Not started. Scope resolved 2026-08-12 — live Q&A/tool calling/human-in-the-loop deferred to Phase 2, per `docs/superpowers/specs/2026-08-12-guide-runtime-v1-scope-design.md` |
-| Backend | Go, hexagonal architecture + DDD, PostgreSQL/PostGIS, RabbitMQ (TTS job queue), K8s (EKS demo)/Scaleway (real prod) | In progress — domain layer (Place/Script/AudioFile) and ports were **written by hand** by the founder through 2026-09-06; that restriction is now lifted, all layers (including new domain concepts, e.g. `Itinerary`) are **AI-written, human-reviewed**. See note below. |
-| Ops depth | CI/CD canary+rollback, distributed observability, security guardrails, compliance | Not started — explicitly scoped in depth, not minimal, per roadmap v2 |
-| Admin dashboard + mobile app | React Native app, admin dashboard | Not started |
+| Sourcing pipeline | Python (Overture Maps, Wikidata, feiras registry) | Built, tested, merged to `master` (PR #2) |
+| Content pipeline (batch) | Python (grounding, narration, translation, anti-hallucination judge) | Done for the ~252 places in the database: grounded, narrated EN/FR/PT/ES, verified (see Current status). The rest of the 696 boundary-verified places are not yet grounded |
+| Guide runtime (v1 scope) | Mobile app logic (React Native) — proximity-triggered narration (background geofencing) + offline downloads, no server-side agent | Built (proximity notifications, real offline downloads); proximity needs a physical device to verify |
+| Backend | Go, hexagonal architecture + DDD, PostgreSQL/PostGIS, RabbitMQ (TTS job queue), Redis, S3 | Built and tested (auth with email verification via SES, places, scripts, audio, AI itineraries, place assistant, featured itineraries). Deployed on AWS (EC2 + RDS, Terraform in `backend/deploy/terraform`) and exercised from a real iOS build in Oct 2026, then torn down to avoid cost. Helm/KEDA/Istio/blue-green manifests exist but were only validated on a local `kind` cluster, never on a real EKS cluster. No Scaleway deployment exists. |
+| Ops depth | CI/CD canary+rollback, distributed observability, security guardrails, compliance | Partial — GitHub Actions CI (lint, test, govulncheck, integration tests against real services) exists. No metrics/alerting. Production AWS credentials are still root rather than the scoped `rio-cicd` user |
+| Mobile app | React Native (Expo), iOS first | Built; standalone EAS preview build field-tested in Rio. Not on the App Store |
+| Admin dashboard | — | Not started |
 
 Redis and Kafka were both proposed and then explicitly cut (2026-08-04) for lack of a measured,
 current need — see the backend-stack-decision spec before re-adding either. Raised again on
@@ -84,8 +85,7 @@ to be implemented ad hoc off conversational discussion alone.
 
 ## Phases / sequencing
 
-1. **Sourcing** — done, unmerged (`sourcing-pipeline` branch). Needs a real human review pass before
-   merge; an automated subagent review approved it, which is not the same thing.
+1. **Sourcing** — done and merged (PR #2).
 2. **Content pipeline** — in progress. See status below.
 3. **Guide runtime** — a mobile app feature (proximity + local memory only, see scope decision above),
    not a blocking server-side phase; can proceed alongside backend rather than before it.
@@ -94,34 +94,30 @@ to be implemented ad hoc off conversational discussion alone.
 5. **Ops depth** — built as its own deliberate phase, not bolted on at the end.
 6. **Admin dashboard + mobile app** — last.
 
-## Current status (as of 2026-08-12 — keep this section updated, don't let it drift)
+## Current status (as of 2026-10-27 — keep this section updated, don't let it drift)
 
-- **Sourcing**: rebuilt from scratch after an accidental data-loss (see
-  `docs/superpowers/specs/2026-08-04-backend-stack-decision.md`-era commits and git history on
-  `sourcing-pipeline` for context) — 3858 raw places, category allowlist restricted to strict cultural
-  scope (nature/landscape categories dropped). Branch complete but unmerged, pending human review.
-- **Content pipeline**: full CULTURAL/NATURAL/NOISE triage done on the three noisy Overture categories
-  (`landmark_and_historical_building`, `topic_concert_venue`, `cultural_center`) plus the trusted
-  categories → **773 CULTURAL places**. Municipal-boundary check (Nominatim reverse-geocode, not just
-  proximity to stored coordinates) removed **77 places actually outside Rio** (mostly Niterói) →
-  **696 boundary-verified places**, the real base for grounding. Grounding switched from a per-place
-  Wikipedia geosearch (throttled by Wikimedia's anti-scraping tier even with a compliant User-Agent)
-  to a **bulk SPARQL query** (`wikibase:around`, one request, ~1300 candidate Wikidata items) + local
-  spatial/name-overlap matching — **193 places grounded** with a real source. Of those, 154 got fresh
-  FR/EN/ES/PT narration this session (`narrations_data_part4.py`), on top of 33 that already had
-  narration surviving from before the data loss — **187 places narrated across parts 1-4**. 7 places
-  hit a real source that didn't actually describe them (wrong entity, thin/off-topic extract) and were
-  routed to `ungrounded_queue_v1.csv` with a reason, not silently dropped. The remaining ~500
-  boundary-verified places haven't been grounded yet (per-place fallback search or manual web search
-  needed for places with no Wikidata/Wikipedia presence). Anti-hallucination judge has not been re-run
-  on this new corpus yet. Photos and audio/TTS generation — both fully specced in the design doc —
-  have **not started at all**.
-- **Everything else** (guide runtime, backend, ops, admin/mobile): not started.
+- **Sourcing**: 3,858 raw places (Overture Maps, Wikidata, feiras livres registry), deduplicated
+  conservatively after an earlier false merge dropped a real place. Merged to `master`.
+- **Content pipeline**: triage down to 773 cultural places, 696 after a Nominatim municipal-boundary
+  check (77 were outside Rio, mostly Niterói). About 252 places have grounded, narrated FR/EN/PT/ES
+  scripts in the database. Anti-hallucination verification report: 132 clean, 28 with issues, 92
+  unverifiable; the 9 severe findings were fixed and the unverifiable set triaged
+  (`pipeline/curation/`). A translation-fidelity judge pass was also run. Content verification at
+  larger scale is researched but parked (`2026-09-07-content-verification-research.md`).
+- **Audio**: 203 ready audio files as of 2026-10-18, roughly 205 places still without audio, blocked on
+  OpenAI credit. The audio was produced by standalone scripts (Google Cloud TTS and OpenAI TTS, Whisper
+  for caption timing) that were **never committed** and are no longer on the dev machine. The worker in
+  `backend/` still targets AWS Polly, so the committed code path and the audio actually in the database
+  do not match. Reconstructing these scripts in the repo is open work.
+- **Deployment**: AWS (EC2 + RDS + S3) was live in October 2026 and torn down with Terraform to avoid
+  idle cost. It can be recreated from `backend/deploy/terraform`.
+- **Open**: rotate production credentials from root to the scoped `rio-cicd` IAM user; bulk audio and
+  Whisper timestamps for the remaining places; API pagination and rate limiting; retry/backoff on the
+  mobile download path.
 
 ## Where to find more
 
 - `docs/superpowers/specs/` — dated decisions and research (design doc, roadmap v2, backend stack
   decision, AI-judgment research), each a snapshot of reasoning at the time.
 - `docs/superpowers/plans/` — per-feature TDD implementation plans.
-- `CLAUDE.md` — engineering conventions, commands, repo structure (including why the sourcing code
-  lives on a separate branch/worktree, not `master`).
+- `CLAUDE.md` — engineering conventions, commands, repo structure and branching convention.
