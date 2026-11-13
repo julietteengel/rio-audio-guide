@@ -202,7 +202,9 @@ def apply_fixes(
 ) -> tuple[dict, int, list[tuple[Mismatch, Verdict]]]:
     """Fix the misheard words of "error" verdicts inside Whisper's segments, leaving all timing alone.
 
-    Each fix is made at the exact words where the difference was found (never a
+    The text written is the script's own words at that spot (`script_span`), never
+    what the model proposed, since the script is what the voice read. Each fix is
+    made at the exact words where the difference was found (never a
     search-and-replace, which would also hit legitimate uses of a short word
     like "O" or "Alma"). Only "replace" differences inside one segment are
     applied; a difference spanning two segments, a missing or extra word, or
@@ -238,7 +240,7 @@ def apply_fixes(
         raw_first, raw_last = text[first.start : first.end], text[last.start : last.end]
         lead = re.match(r"\W*", raw_first).group()  # punctuation the correction must not eat
         trail = re.search(r"\W*$", raw_last).group()
-        seg["text"] = text[: first.start] + lead + v.correction + trail + text[last.end :]
+        seg["text"] = text[: first.start] + lead + m.script_span + trail + text[last.end :]
         applied += 1
     joined = " ".join(seg.get("text", "").strip() for seg in whisper_body.get("segments", []))
     if applied and whisper_body.get("text", "").strip() == joined:
