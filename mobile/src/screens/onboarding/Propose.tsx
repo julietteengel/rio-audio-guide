@@ -21,6 +21,7 @@ import {
 } from "../../data/downloadManager";
 import { alertInfo } from "../../utils/platformAlert";
 import { colors, fonts, spacing, radii } from "../../theme/tokens";
+import { plural } from "../../utils/plural";
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "Propose">;
 
@@ -89,8 +90,7 @@ export function ProposeScreen({ navigation }: Props) {
   }
 
   const cityMeta = preview
-    ? t.propose.cityMeta
-        .replace("{count}", String(preview.count))
+    ? plural(t.propose.cityMeta, preview.count)
         .replace("{size}", preview.sizeLabel)
     : undefined;
 

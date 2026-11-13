@@ -9,6 +9,7 @@ import { useAuth } from "../auth/AuthContext";
 import { createItinerary, type Itinerary } from "../data/ItinerariesRepository";
 import { formatDuration } from "../utils/itineraryFormat";
 import { colors, fonts, radii } from "../theme/tokens";
+import { plural } from "../utils/plural";
 
 type Props = NativeStackScreenProps<AppStackParamList, "ItineraryChat">;
 
@@ -81,7 +82,7 @@ export function ItineraryChatScreen({ navigation }: Props) {
                       >
                         <Text style={styles.itineraryCardTitle}>{turn.result.title}</Text>
                         <Text style={styles.itineraryCardMeta}>
-                          {formatDuration(turn.result.totalMinutes)} · {t.itineraries.stopCount.replace("{count}", String(turn.result.placeCount))}
+                          {formatDuration(turn.result.totalMinutes)} · {plural(t.itineraries.stopCount, turn.result.placeCount)}
                         </Text>
                         {turn.result.stops.map((stop, si) => {
                           const isSuggestion = stop.kind === "suggestion";

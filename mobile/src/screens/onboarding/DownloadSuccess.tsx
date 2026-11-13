@@ -14,6 +14,7 @@ import {
   type OfflineDownloadSummary,
 } from "../../data/downloadManager";
 import { colors, fonts, spacing, radii } from "../../theme/tokens";
+import { plural } from "../../utils/plural";
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "DownloadSuccess">;
 
@@ -31,10 +32,9 @@ export function DownloadSuccessScreen({ navigation }: Props) {
   }
 
   const cityMeta = summary
-    ? t.downloadSuccess.cityMeta
-        .replace("{count}", String(summary.placeCount))
+    ? plural(t.downloadSuccess.cityMeta, summary.placeCount)
         .replace("{size}", formatApproxSize(summary.approxSizeBytes, locale))
-    : t.downloadSuccess.cityMeta.replace("{count}", "0").replace("{size}", formatApproxSize(0, locale));
+    : plural(t.downloadSuccess.cityMeta, 0).replace("{size}", formatApproxSize(0, locale));
 
   return (
     <SafeAreaView style={styles.screen}>
