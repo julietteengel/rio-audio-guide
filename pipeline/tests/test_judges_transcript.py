@@ -82,12 +82,17 @@ class TestParseVerdicts:
             "not json",
             '{"index": 0}',  # not a list
             '[{"index": 0, "verdict": "maybe", "correction": null, "reason": ""}]',  # unknown verdict
-            '[{"index": 0, "verdict": "error", "correction": null, "reason": ""}]',  # error without a correction
         ],
     )
     def test_rejects_malformed_or_unusable_responses(self, body):
         with pytest.raises(ValueError):
             parse_verdicts(body, 1)
+
+    @pytest.mark.parametrize("correction", ["null", '""'])
+    def test_an_error_without_a_correction_is_allowed_for_words_the_transcript_added(self, correction):
+        # nothing to write there: apply_fixes uses the script's words and only for "replace" differences
+        body = '[{"index": 0, "verdict": "error", "correction": %s, "reason": "extra word"}]' % correction
+        assert parse_verdicts(body, 1)[0].verdict == "error"
 
     def test_rejects_a_response_that_skips_a_mismatch(self):
         body = '[{"index": 0, "verdict": "benign", "correction": null, "reason": ""}]'

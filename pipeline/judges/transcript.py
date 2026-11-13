@@ -49,7 +49,7 @@ class Mismatch:
 class Verdict:
     index: int
     verdict: str  # "benign" | "error"
-    correction: str | None  # what the transcript should say, for an error
+    correction: str | None  # the model's proposal, informational: fixes use the script's own words
     reason: str
 
 
@@ -189,8 +189,6 @@ def parse_verdicts(body: str, expected: int) -> list[Verdict]:
         verdict, correction = item.get("verdict"), item.get("correction")
         if verdict not in VERDICTS:
             raise ValueError(f"unknown verdict {verdict!r}")
-        if verdict == "error" and not (isinstance(correction, str) and correction.strip()):
-            raise ValueError(f"error verdict without a correction: {item!r}")
         verdicts.append(Verdict(item["index"], verdict, correction, str(item.get("reason", ""))))
     if sorted(v.index for v in verdicts) != list(range(expected)):
         raise ValueError(f"expected verdicts for exactly items 0..{expected - 1}, got {[v.index for v in verdicts]}")
