@@ -10,6 +10,7 @@ import { useAuth } from "../auth/AuthContext";
 import { listItineraries, type Itinerary } from "../data/ItinerariesRepository";
 import { formatDuration } from "../utils/itineraryFormat";
 import { colors, fonts, radii } from "../theme/tokens";
+import { plural } from "../utils/plural";
 
 type Props = NativeStackScreenProps<AppStackParamList, "ItinerariesList">;
 
@@ -91,7 +92,7 @@ export function ItinerariesListScreen({ navigation }: Props) {
               <View style={styles.cardBody}>
                 <Text style={styles.cardTitle}>{item.title}</Text>
                 <Text style={styles.cardMeta}>
-                  {formatDuration(item.totalMinutes)} · {t.itineraries.stopCount.replace("{count}", String(item.placeCount))}
+                  {formatDuration(item.totalMinutes)} · {plural(t.itineraries.stopCount, item.placeCount)}
                 </Text>
               </View>
             </Pressable>

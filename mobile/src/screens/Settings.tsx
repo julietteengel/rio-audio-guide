@@ -25,6 +25,7 @@ import {
   stopProximityMonitoring,
 } from "../location/geofenceTask";
 import { alertInfo } from "../utils/platformAlert";
+import { plural } from "../utils/plural";
 
 type Props = NativeStackScreenProps<AppStackParamList, "Settings">;
 
@@ -197,8 +198,7 @@ export function SettingsScreen({ navigation }: Props) {
                 <Text style={styles.rowLabel}>Rio de Janeiro</Text>
                 <Text style={styles.rowSub}>
                   {summary
-                    ? t.downloadSuccess.cityMeta
-                        .replace("{count}", String(summary.placeCount))
+                    ? plural(t.downloadSuccess.cityMeta, summary.placeCount)
                         .replace("{size}", formatApproxSize(summary.approxSizeBytes, locale))
                     : t.settings.noDownload}
                 </Text>

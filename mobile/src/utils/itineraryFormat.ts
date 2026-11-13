@@ -1,4 +1,5 @@
 import type { Dictionary } from "../i18n/dictionary";
+import { plural } from "./plural";
 
 // "1h" / "1h30" / "2h05" / "45 min" -- matches how duration is written
 // colloquially in fr/en/pt/es alike (unlike most copy in this app, this
@@ -20,5 +21,5 @@ export function formatItinerarySummary(
   itinerary: { totalMinutes: number; placeCount: number },
   t: Dictionary,
 ): string {
-  return `${formatDuration(itinerary.totalMinutes)} · ${t.itineraries.stopCount.replace("{count}", String(itinerary.placeCount))}`;
+  return `${formatDuration(itinerary.totalMinutes)} · ${plural(t.itineraries.stopCount, itinerary.placeCount)}`;
 }
