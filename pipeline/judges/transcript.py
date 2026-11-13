@@ -1,0 +1,194 @@
+"""Judge for Whisper transcripts of narration audio, in two layers.
+
+The audio is generated from a script, so the script is what was spoken and the
+transcript is the part that can be wrong (Whisper once heard "Praça XV" as
+"Traça 15" across a whole narration). Layer 1 is a pure word alignment between
+the two that keeps only real differences. Layer 2 asks an LLM to decide, for
+each remaining difference, whether it matters and what the transcript should
+say. Splitting it this way is what makes the judge usable: comparing every
+capitalized word, as the first audit did, produced 481 findings that were
+almost all noise.
+
+Everything here is pure (no network, no DB) so it is unit-tested directly.
+"""
+import copy
+import json
+import re
+import unicodedata
+from dataclasses import dataclass
+from difflib import SequenceMatcher
+
+VERDICTS = {"benign", "error"}
+
+_EDGE_PUNCT = re.compile(r"^\W+|\W+$")
+_ROMAN = re.compile(r"^[IVXLCDM]+$")
+_ROMAN_VALUES = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+
+
+@dataclass(frozen=True)
+class Mismatch:
+    kind: str  # "replace" | "missing" (in the transcript) | "extra" (in the transcript)
+    script_span: str
+    transcript_span: str
+    script_context: str
+    transcript_context: str
+
+
+@dataclass(frozen=True)
+class Verdict:
+    index: int
+    verdict: str  # "benign" | "error"
+    correction: str | None  # what the transcript should say, for an error
+    reason: str
+
+
+def _normalize(word: str) -> str:
+    folded = unicodedata.normalize("NFKD", word).encode("ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]", "", folded.lower())
+
+
+def _tokens(text: str) -> tuple[list[str], list[str]]:
+    """(display words, normalized words), dropping tokens that are only punctuation."""
+    display, norm = [], []
+    for raw in text.split():
+        shown = _EDGE_PUNCT.sub("", raw)
+        n = _normalize(shown)
+        if n:
+            display.append(shown)
+            norm.append(n)
+    return display, norm
+
+
+def _roman_value(word: str) -> int | None:
+    """Value of an upper-case roman numeral like "XV"; None for anything else.
+
+    Lower-case and the lone "I" are rejected so ordinary words ("vi", "mil",
+    "I") are never read as numbers.
+    """
+    if not _ROMAN.match(word) or word == "I":
+        return None
+    total = 0
+    for i, ch in enumerate(word):
+        value = _ROMAN_VALUES[ch]
+        nxt = _ROMAN_VALUES[word[i + 1]] if i + 1 < len(word) else 0
+        total += -value if value < nxt else value
+    return total if _to_roman(total) == word else None
+
+
+def _to_roman(n: int) -> str:
+    out = ""
+    for value, symbol in [(1000, "M"), (900, "CM"), (500, "D"), (400, "CD"), (100, "C"), (90, "XC"),
+                          (50, "L"), (40, "XL"), (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I")]:
+        while n >= value:
+            out += symbol
+            n -= value
+    return out
+
+
+def _same_token(shown_a: str, norm_a: str, shown_b: str, norm_b: str) -> bool:
+    if norm_a == norm_b:
+        return True
+    for roman, digits in ((shown_a, norm_b), (shown_b, norm_a)):
+        value = _roman_value(roman)
+        if value is not None and digits.isdigit() and int(digits) == value:
+            return True
+    return False
+
+
+def _clip(words: list[str], start: int, end: int, context: int) -> str:
+    return " ".join(words[max(0, start - context) : end + context])
+
+
+def find_mismatches(script: str, transcript: str, context_words: int = 6) -> list[Mismatch]:
+    """Real differences between a script and the transcript of its audio.
+
+    Case, accents, punctuation and roman-vs-arabic numerals ("XV" / "15") are
+    not differences.
+    """
+    s_show, s_norm = _tokens(script)
+    t_show, t_norm = _tokens(transcript)
+    out: list[Mismatch] = []
+    for tag, i1, i2, j1, j2 in SequenceMatcher(None, s_norm, t_norm, autojunk=False).get_opcodes():
+        if tag == "equal":
+            continue
+        if tag == "replace" and i2 - i1 == j2 - j1 and all(
+            _same_token(s_show[i1 + k], s_norm[i1 + k], t_show[j1 + k], t_norm[j1 + k]) for k in range(i2 - i1)
+        ):
+            continue
+        out.append(
+            Mismatch(
+                kind={"replace": "replace", "delete": "missing", "insert": "extra"}[tag],
+                script_span=" ".join(s_show[i1:i2]),
+                transcript_span=" ".join(t_show[j1:j2]),
+                script_context=_clip(s_show, i1, i2, context_words),
+                transcript_context=_clip(t_show, j1, j2, context_words),
+            )
+        )
+    return out
+
+
+def build_prompt(mismatches: list[Mismatch], language: str) -> str:
+    items = "\n".join(
+        f"[{i}] {m.kind}\n    script:     ...{m.script_context}...\n    transcript: ...{m.transcript_context}...\n"
+        f"    differing script words: {m.script_span!r}; differing transcript words: {m.transcript_span!r}"
+        for i, m in enumerate(mismatches)
+    )
+    return (
+        f"A narration in language '{language}' was generated by text-to-speech from a script, then the audio was "
+        "transcribed with Whisper. The script is what was actually spoken, so any difference is a transcription "
+        "mistake. Each item below is a place where the transcript differs from the script.\n\n"
+        "For each item decide:\n"
+        '- "benign": spelling, number or date formatting, punctuation, or a harmless inflection that changes no name, '
+        "date, number or fact.\n"
+        '- "error": a person, place or institution name, a date, a number or a fact was misheard or changed.\n'
+        'For an "error", give in "correction" the exact script words the transcript should say instead.\n\n'
+        f"{items}\n\n"
+        'Reply with only a JSON array, one object per item, in order: '
+        '[{"index": 0, "verdict": "benign" or "error", "correction": string or null, "reason": short string}]'
+    )
+
+
+def parse_verdicts(body: str, expected: int) -> list[Verdict]:
+    """Strictly parse the judge's reply; any malformed or incomplete answer raises ValueError."""
+    text = body.strip()
+    text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text)
+    try:
+        data = json.loads(text)
+    except ValueError as exc:
+        raise ValueError(f"judge reply is not JSON: {body[:200]!r}") from exc
+    if not isinstance(data, list):
+        raise ValueError(f"judge reply is not a list: {body[:200]!r}")
+    verdicts: list[Verdict] = []
+    for item in data:
+        if not isinstance(item, dict) or not isinstance(item.get("index"), int):
+            raise ValueError(f"bad verdict entry: {item!r}")
+        verdict, correction = item.get("verdict"), item.get("correction")
+        if verdict not in VERDICTS:
+            raise ValueError(f"unknown verdict {verdict!r}")
+        if verdict == "error" and not (isinstance(correction, str) and correction.strip()):
+            raise ValueError(f"error verdict without a correction: {item!r}")
+        verdicts.append(Verdict(item["index"], verdict, correction, str(item.get("reason", ""))))
+    if sorted(v.index for v in verdicts) != list(range(expected)):
+        raise ValueError(f"expected verdicts for exactly items 0..{expected - 1}, got {[v.index for v in verdicts]}")
+    return sorted(verdicts, key=lambda v: v.index)
+
+
+def apply_corrections(whisper_body: dict, corrections: list[tuple[str, str]]) -> tuple[dict, list[tuple[str, str]]]:
+    """Fix misheard text inside Whisper's verbose_json segments, leaving all timing alone.
+
+    Returns (fixed copy, corrections that matched no segment). A correction
+    spanning two segments, or one with nothing to replace, is reported rather
+    than guessed at.
+    """
+    fixed = copy.deepcopy(whisper_body)
+    unapplied: list[tuple[str, str]] = []
+    for wrong, right in corrections:
+        hit = False
+        if wrong:
+            for seg in fixed.get("segments", []):
+                if wrong in seg.get("text", ""):
+                    seg["text"] = seg["text"].replace(wrong, right)
+                    hit = True
+        if not hit:
+            unapplied.append((wrong, right))
+    return fixed, unapplied
