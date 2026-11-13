@@ -33,3 +33,39 @@ strong filter for a human to skim, not as ground truth.
 Circo Voador es, Theatro Municipal pt) with `claude-haiku-5-5`, where it found real misheard names. The
 `--write-fixes` path is unit-tested against a fake S3 but has not yet written to the real bucket, and the whole
 corpus has not been run.
+
+## grounding — narration vs. its real source
+
+```bash
+export DATABASE_URL=... ANTHROPIC_API_KEY=...
+python -m judges.judge_content grounding --limit 3                     # dry run
+python -m judges.judge_content grounding --apply --place "Jardim Bot"  # ask the model, write a JSON report
+```
+
+The model splits the narration into claims (block by block, each against the full source) and marks each
+supported, unsupported or contradicted. **A "supported" claim only counts if its citation is a verbatim passage
+of the source** (case, accents and whitespace aside): a quote the model made up downgrades the claim to
+unsupported. That also means a correct but loosely quoted claim can be downgraded, so read "citation not found"
+as "check this", not as proof of a fabrication. A place is `clean` only if no claim is unsupported or
+contradicted *and* at least 60% of the narration's sentences got a claim, so a judge that skips content cannot
+pass a place.
+
+Sources come from `pipeline/curation/places_grounding_full_articles_v1.csv` (the database keeps none:
+`scripts.source_text` is empty). 161 of 252 places have one. **A place with no source is reported as
+unverifiable, never as clean.**
+
+## translation — EN/ES/PT vs. the French
+
+```bash
+python -m judges.judge_content translation --apply --language en --place Selar
+```
+
+The French is the ground truth, so the other languages are never re-grounded against the source, only checked
+for facts added, dropped or altered. A mechanical precheck compares the numbers (8 000 = 8,000 = 8000) and the
+length of the two texts; the model then lists the issues, and each quote it gives is checked against the text it
+claims to come from (`quote_verified`).
+
+**Status of both:** unit-tested without network; run live on a few real places with `claude-haiku-5-5`
+(Jardim Botânico grounding: 158 supported, 9 unsupported, 1 contradicted, including "Napoleon" and "Ministry of the
+Empire" that the source does not support; Escadaria Selarón translations en/es). Report only, not run on the
+whole corpus, and the model is not deterministic.
