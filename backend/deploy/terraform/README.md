@@ -23,9 +23,14 @@ terraform apply
 ```
 
 This creates: 2 ECR repos, an RDS instance, an EC2 instance, IAM
-role/policies, security groups, and 2 SSM SecureString parameters. It does
-**not** create the S3 bucket (`rio-audio-guide` already exists) or a VPC
-(reuses the account's default VPC/subnets).
+role/policies, security groups, and 3 SSM SecureString parameters (the JWT
+signing secret and the Anthropic and OpenAI keys). It does **not** create the S3 bucket (`rio-audio-guide`
+already exists) or a VPC (reuses the account's default VPC/subnets).
+
+RDS creation alone takes 5-10 minutes; the EC2 instance registers with SSM
+(needed for step 4 and for debugging) a minute or two after it boots, not
+instantly -- `aws ssm describe-instance-information` returning nothing yet
+for a brand new instance is normal, not a failure.
 
 The EC2 instance's `user_data` applies `schema.sql` to the fresh RDS
 instance automatically on first boot -- no separate migration step. Check
@@ -63,18 +68,44 @@ terraform -chdir=deploy/terraform output -raw api_url
 
 Put that in `mobile/.env` as `EXPO_PUBLIC_API_BASE_URL`.
 
-## 4. Run the narration batch review against this real database
+## 4. Carry over the real content already generated locally
 
-`cmd/batchreview` (see `backend/cmd/batchreview`) needs `DATABASE_URL`
-pointed at the real RDS instance, not local Postgres:
+This stack only creates an empty, schema'd database -- `cmd/import` alone
+would only reload the raw sourcing CSVs, missing every place's real
+narration, translations, audio, and images already generated and sitting
+in the local dev Postgres (not reproducible from a re-run). Dump and
+restore instead.
+
+RDS is deliberately `publicly_accessible = false` (only the EC2 instance's
+security group can reach port 5432, see `rds.tf`) -- don't open that up
+just for convenience. Reach it from a laptop through an SSM port-forward
+tunnel via the EC2 instance instead, no public exposure needed:
 
 ```bash
-export DATABASE_URL="postgres://postgres:$(terraform -chdir=deploy/terraform output -raw db_password)@$(terraform -chdir=deploy/terraform output -raw rds_endpoint):5432/postgres"
+# Dump: your local pg_dump must match the server's major version (16) --
+# Homebrew's is often older, so dump from inside the matching postgres
+# container rather than failing on a version mismatch.
+docker exec backend-postgres-1 pg_dump -U postgres -d postgres \
+  --no-owner --no-privileges -F c -f /tmp/rio-dump.pgdump
+docker cp backend-postgres-1:/tmp/rio-dump.pgdump /tmp/rio-local-dump.pgdump
+
+# Tunnel (run in the background -- it's a persistent session):
+aws ssm start-session --region us-east-1 \
+  --target "$(terraform -chdir=deploy/terraform output -raw ec2_instance_id)" \
+  --document-name AWS-StartPortForwardingSessionToRemoteHost \
+  --parameters '{"host":["'"$(terraform -chdir=deploy/terraform output -raw rds_endpoint)"'"],"portNumber":["5432"],"localPortNumber":["15432"]}'
+
+# Restore, through the tunnel's local port -- same version-matching reason
+# as the dump step, so via a postgres:16 container, not local pg_restore:
+docker run --rm -v /tmp/rio-local-dump.pgdump:/dump.pgdump \
+  -e PGPASSWORD="$(terraform -chdir=deploy/terraform output -raw db_password)" \
+  --network host postgres:16-alpine \
+  pg_restore -h localhost -p 15432 -U postgres -d postgres \
+  --no-owner --no-privileges /dump.pgdump
 ```
 
-It still needs `cmd/import` run first against this same `DATABASE_URL` to
-actually load places/scripts -- this stack only creates an empty, schema'd
-database.
+Only needed once, or again after a local session that adds more real
+content worth carrying forward.
 
 ## Debugging without SSH
 
