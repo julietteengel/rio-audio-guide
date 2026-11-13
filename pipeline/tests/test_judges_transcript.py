@@ -135,6 +135,12 @@ class TestApplyFixes:
         assert fixed["segments"][1]["text"] == " Depois seguimos."
         assert applied == 1 and unapplied == []
 
+    def test_writes_the_script_s_own_words_whatever_the_model_proposed(self):
+        body = _body(" Estamos na Traça 15 de Novembro.")
+        [m] = find_mismatches_in_body("Estamos na Praça XV de Novembro.", body)
+        fixed, applied, _ = apply_fixes(body, [_error(m, "texto inventado pelo modelo")])
+        assert fixed["segments"][0]["text"] == " Estamos na Praça XV de Novembro." and applied == 1
+
     def test_does_not_touch_the_same_word_elsewhere(self):
         # "O" is a real word in the first segment; only the misheard one in the second is fixed.
         body = _body(" O Circo abre.", " Hoje O evento começa.")
