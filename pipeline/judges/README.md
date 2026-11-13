@@ -16,9 +16,20 @@ python -m judges.judge_transcripts --limit 3                           # dry run
 python -m judges.judge_transcripts --apply --place Selar --language fr # asks the model, writes a JSON report
 ```
 
-Report only: it never writes the database or S3. `transcript.apply_corrections` turns a report into fixed
-Whisper `segments` (text only, timing untouched).
+Without `--write-fixes` it only reports: nothing is written to S3 or the database.
 
-**Status:** unit-tested without network; run live on three real pairs (Escadaria Selarón fr, Circo Voador es,
-Theatro Municipal pt) with `claude-haiku-5-5`, where it found real misheard names. Not yet run on the whole
-corpus, and the correction step is not wired to S3.
+`--write-fixes` (needs `--apply`) rewrites the caption text of a timestamps file, timing untouched. Each fix is
+made at the exact words where the difference was found, never as a search-and-replace (which would also hit
+legitimate uses of short words like "O" or "Alma"). The original is first copied to `<key>.orig`, and an
+existing backup is never overwritten, so the very first original always survives; to undo, copy it back.
+Only a misheard word inside one segment is fixed. A difference spanning two segments, or a missing or extra
+word, is listed as `unapplied` for a human. The fixed file is validated before it replaces the original.
+
+Identical differences (the same misheard name repeated) are judged once. The model is not deterministic: a
+borderline difference can be ruled benign on one run and an error on the next, so treat the report as a
+strong filter for a human to skim, not as ground truth.
+
+**Status:** unit-tested without network; run live (report only) on three real pairs (Escadaria Selarón fr,
+Circo Voador es, Theatro Municipal pt) with `claude-haiku-5-5`, where it found real misheard names. The
+`--write-fixes` path is unit-tested against a fake S3 but has not yet written to the real bucket, and the whole
+corpus has not been run.

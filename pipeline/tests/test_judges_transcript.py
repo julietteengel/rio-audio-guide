@@ -5,9 +5,11 @@ import pytest
 from judges.transcript import (
     Mismatch,
     Verdict,
-    apply_corrections,
+    apply_fixes,
     build_prompt,
     find_mismatches,
+    find_mismatches_in_body,
+    judge,
     parse_verdicts,
 )
 
@@ -105,27 +107,99 @@ class TestBuildPrompt:
         assert "pt" in prompt
 
 
-class TestApplyCorrections:
-    def _body(self, *texts):
-        return {
-            "duration": 10.0,
-            "segments": [{"id": i, "start": float(i), "end": float(i + 1), "text": t} for i, t in enumerate(texts)],
-        }
+def _body(*texts):
+    return {
+        "text": " ".join(t.strip() for t in texts),
+        "duration": 10.0,
+        "segments": [{"id": i, "start": float(i), "end": float(i + 1), "text": t} for i, t in enumerate(texts)],
+    }
 
-    def test_replaces_the_misheard_text_inside_a_segment(self):
-        body = self._body(" Estamos na Traça 15 de Novembro.")
-        fixed, unapplied = apply_corrections(body, [("Traça 15", "Praça XV")])
+
+def _error(m, correction):
+    return (m, Verdict(0, "error", correction, ""))
+
+
+class TestSegmentAwareAlignment:
+    def test_locates_a_mismatch_by_transcript_word_position(self):
+        body = _body(" Estamos na Traça 15 de Novembro.")
+        [m] = find_mismatches_in_body("Estamos na Praça XV de Novembro.", body)
+        assert (m.t_start, m.t_end) == (2, 4)
+
+
+class TestApplyFixes:
+    def test_replaces_only_the_misheard_words_at_their_position(self):
+        body = _body(" Estamos na Traça 15 de Novembro.", " Depois seguimos.")
+        [m] = find_mismatches_in_body("Estamos na Praça XV de Novembro. Depois seguimos.", body)
+        fixed, applied, unapplied = apply_fixes(body, [_error(m, "Praça XV")])
         assert fixed["segments"][0]["text"] == " Estamos na Praça XV de Novembro."
-        assert unapplied == []
+        assert fixed["segments"][1]["text"] == " Depois seguimos."
+        assert applied == 1 and unapplied == []
+
+    def test_does_not_touch_the_same_word_elsewhere(self):
+        # "O" is a real word in the first segment; only the misheard one in the second is fixed.
+        body = _body(" O Circo abre.", " Hoje O evento começa.")
+        script = "O Circo abre. Hoje Eu evento começa."
+        ms = find_mismatches_in_body(script, body)
+        [m] = ms
+        fixed, applied, _ = apply_fixes(body, [_error(m, "Eu")])
+        assert fixed["segments"][0]["text"] == " O Circo abre."
+        assert fixed["segments"][1]["text"] == " Hoje Eu evento começa."
+
+    def test_keeps_surrounding_punctuation_and_spacing(self):
+        body = _body(" (Traça 15), cidade.")
+        [m] = find_mismatches_in_body("(Praça XV), cidade.", body)
+        fixed, _, _ = apply_fixes(body, [_error(m, "Praça XV")])
+        assert fixed["segments"][0]["text"] == " (Praça XV), cidade."
 
     def test_leaves_timing_untouched_and_does_not_mutate_the_input(self):
-        body = self._body("Traça 15")
-        fixed, _ = apply_corrections(body, [("Traça 15", "Praça XV")])
+        body = _body("Traça 15")
+        [m] = find_mismatches_in_body("Praça XV", body)
+        fixed, _, _ = apply_fixes(body, [_error(m, "Praça XV")])
         assert fixed["segments"][0]["start"] == 0.0 and fixed["duration"] == 10.0
         assert body["segments"][0]["text"] == "Traça 15"
 
-    def test_reports_a_correction_it_could_not_place(self):
-        body = self._body("nada a ver")
-        fixed, unapplied = apply_corrections(body, [("Traça 15", "Praça XV")])
-        assert fixed["segments"][0]["text"] == "nada a ver"
-        assert unapplied == [("Traça 15", "Praça XV")]
+    def test_a_span_crossing_two_segments_is_reported_not_guessed(self):
+        body = _body(" na Traça", " 15 de Novembro.")
+        [m] = find_mismatches_in_body("na Praça XV de Novembro.", body)
+        fixed, applied, unapplied = apply_fixes(body, [_error(m, "Praça XV")])
+        assert applied == 0 and len(unapplied) == 1
+        assert fixed["segments"][0]["text"] == " na Traça"
+
+    def test_benign_and_missing_and_extra_are_never_applied(self):
+        body = _body("um dois cinco")
+        [m] = find_mismatches_in_body("um dois três quatro cinco", body)  # missing
+        _, applied, unapplied = apply_fixes(body, [_error(m, "três quatro")])
+        assert applied == 0 and len(unapplied) == 1
+        body2 = _body("a Traça b")
+        [m2] = find_mismatches_in_body("a Praça b", body2)
+        _, applied2, _ = apply_fixes(body2, [(m2, Verdict(0, "benign", None, ""))])
+        assert applied2 == 0
+
+    def test_a_stale_position_is_refused_rather_than_corrupting_text(self):
+        body = _body("a Traça b")
+        [m] = find_mismatches_in_body("a Praça b", body)
+        other = _body("zzz yyy xxx")
+        fixed, applied, unapplied = apply_fixes(other, [_error(m, "Praça")])
+        assert applied == 0 and len(unapplied) == 1
+        assert fixed["segments"][0]["text"] == "zzz yyy xxx"
+
+    def test_updates_the_full_text_when_it_is_the_joined_segments(self):
+        body = _body(" Estamos na Traça 15.")
+        [m] = find_mismatches_in_body("Estamos na Praça XV.", body)
+        fixed, _, _ = apply_fixes(body, [_error(m, "Praça XV")])
+        assert fixed["text"] == "Estamos na Praça XV."
+
+
+class TestJudgeDedup:
+    def test_identical_differences_are_sent_to_the_model_once_and_share_the_verdict(self):
+        script = "Selarón a Selarón b Selarón"
+        heard = "Celarón a Celarón b Celarón"
+        seen = []
+
+        def fake(prompt):
+            seen.append(prompt.count("differing script words"))
+            return json.dumps([{"index": 0, "verdict": "error", "correction": "Selarón", "reason": "name"}])
+
+        out = judge(script, heard, "fr", fake)
+        assert seen == [1]
+        assert len(out) == 3 and all(v.verdict == "error" for _, v in out)
