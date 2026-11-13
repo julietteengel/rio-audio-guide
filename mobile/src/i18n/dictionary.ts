@@ -41,7 +41,8 @@ export const dictionary = {
       cta: "Continuer",
     },
     map: {
-      offlineBadge: "Hors ligne · {count} lieux",
+      offlineBadge: "{count} lieux disponibles hors ligne",
+      offlineBadgeOne: "1 lieu disponible hors ligne",
       searchPlaceholder: "Rechercher un lieu",
       allCategories: "Tout",
       audioOnlyFilter: "Audio disponible",
@@ -240,7 +241,8 @@ export const dictionary = {
       cta: "Continue",
     },
     map: {
-      offlineBadge: "Offline · {count} places",
+      offlineBadge: "{count} places available offline",
+      offlineBadgeOne: "1 place available offline",
       searchPlaceholder: "Search a place",
       allCategories: "All",
       audioOnlyFilter: "Audio available",
@@ -439,7 +441,8 @@ export const dictionary = {
       cta: "Continuar",
     },
     map: {
-      offlineBadge: "Offline · {count} lugares",
+      offlineBadge: "{count} lugares disponíveis offline",
+      offlineBadgeOne: "1 lugar disponível offline",
       searchPlaceholder: "Buscar um lugar",
       allCategories: "Tudo",
       audioOnlyFilter: "Áudio disponível",
@@ -638,7 +641,8 @@ export const dictionary = {
       cta: "Continuar",
     },
     map: {
-      offlineBadge: "Sin conexión · {count} lugares",
+      offlineBadge: "{count} lugares disponibles sin conexión",
+      offlineBadgeOne: "1 lugar disponible sin conexión",
       searchPlaceholder: "Buscar un lugar",
       allCategories: "Todo",
       audioOnlyFilter: "Audio disponible",

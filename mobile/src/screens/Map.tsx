@@ -10,7 +10,8 @@ import { useAuth } from "../auth/AuthContext";
 import { placesRepository } from "../data/PlacesRepository";
 import { fetchCityManifest, RIO_CITY_SLUG } from "../data/downloadManager";
 import type { Place } from "../data/types";
-import { haversineMeters, formatDistance, type LatLon } from "../utils/geo";
+import { pickNearby, isWithinReach } from "../utils/nearby";
+import { formatDistance, type LatLon } from "../utils/geo";
 import { normalizeForSearch } from "../utils/search";
 import { listFeaturedItineraries, type Itinerary } from "../data/ItinerariesRepository";
 import { formatItinerarySummary } from "../utils/itineraryFormat";
@@ -168,24 +169,12 @@ export function MapScreen({ navigation }: Props) {
     };
   }, []);
 
-  // The nearest place to the user's real position, with a real distance —
-  // only computable once location permission is granted and resolved. With
-  // no location, fall back to the first place and no distance rather than
-  // hiding the card entirely or showing a fabricated number.
-  const nearby = useMemo(() => {
-    if (places.length === 0) return null;
-    if (!userLocation) return { place: places[0], distanceMeters: null as number | null };
-    let closest = places[0];
-    let closestDistance = haversineMeters(userLocation, { latitude: closest.lat, longitude: closest.lon });
-    for (const p of places.slice(1)) {
-      const d = haversineMeters(userLocation, { latitude: p.lat, longitude: p.lon });
-      if (d < closestDistance) {
-        closest = p;
-        closestDistance = d;
-      }
-    }
-    return { place: closest, distanceMeters: closestDistance };
-  }, [places, userLocation]);
+  // The closest place with audio to the user's real position, with a real
+  // distance -- only computable once location permission is granted and resolved.
+  const nearby = useMemo(
+    () => pickNearby(places, audioReadyIds, userLocation),
+    [places, audioReadyIds, userLocation],
+  );
 
   return (
     <View style={styles.screen}>
@@ -201,7 +190,9 @@ export function MapScreen({ navigation }: Props) {
             <View style={styles.badge}>
               <View style={styles.badgeDot} />
               <Text style={styles.badgeText}>
-                {t.map.offlineBadge.replace("{count}", String(offlineCount))}
+                {offlineCount === 1
+                  ? t.map.offlineBadgeOne
+                  : t.map.offlineBadge.replace("{count}", String(offlineCount))}
               </Text>
             </View>
           )}
@@ -370,7 +361,9 @@ export function MapScreen({ navigation }: Props) {
             <Text style={styles.nearbyTitle}>{nearby.place.name}</Text>
             <Text style={styles.nearbySub}>
               {nearby.distanceMeters !== null
-                ? t.map.nearbyDistance.replace("{distance}", formatDistance(nearby.distanceMeters))
+                ? isWithinReach(nearby.distanceMeters)
+                  ? t.map.nearbyDistance.replace("{distance}", formatDistance(nearby.distanceMeters))
+                  : formatDistance(nearby.distanceMeters)
                 : locationDenied
                   ? t.map.locationDenied
                   : t.map.locatingYou}
