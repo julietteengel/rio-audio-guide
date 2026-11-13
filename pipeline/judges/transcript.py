@@ -192,3 +192,18 @@ def apply_corrections(whisper_body: dict, corrections: list[tuple[str, str]]) ->
         if not hit:
             unapplied.append((wrong, right))
     return fixed, unapplied
+
+
+def judge(script: str, transcript: str, language: str, complete, batch: int = 40) -> list[tuple[Mismatch, Verdict]]:
+    """Run both layers: align, then have the model rule on each difference.
+
+    `complete` is a prompt -> reply-text callable (anthropic_client.complete
+    bound to a key and model). No differences means no model call. Differences
+    go in batches so one long narration cannot overflow a single reply.
+    """
+    mismatches = find_mismatches(script, transcript)
+    out: list[tuple[Mismatch, Verdict]] = []
+    for start in range(0, len(mismatches), batch):
+        chunk = mismatches[start : start + batch]
+        out.extend(zip(chunk, parse_verdicts(complete(build_prompt(chunk, language)), len(chunk))))
+    return out
